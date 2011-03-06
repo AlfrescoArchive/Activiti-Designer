@@ -67,20 +67,20 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
     for (EObject bpmnObject : contents) {
 
       if (bpmnObject instanceof FlowNode) {
-        writeBpmnElement((FlowNode) bpmnObject, diagram, false);
+        writeBpmnElement((FlowNode) bpmnObject, diagram, "");
         if(bpmnObject instanceof SubProcess) {
           for (FlowElement subFlowElement : ((SubProcess) bpmnObject).getFlowElements()) {
             if (subFlowElement instanceof FlowNode) {
               List<PictogramElement> pictoList = linkService.getPictogramElements(diagram, bpmnObject);
               if(pictoList != null && pictoList.size() > 0) {
                 ContainerShape parent = (ContainerShape) pictoList.get(0);
-                writeBpmnElement((FlowNode) subFlowElement, parent, true);
+                writeBpmnElement((FlowNode) subFlowElement, parent, ((SubProcess) bpmnObject).getId());
               }
             }
           }
           for (FlowElement subFlowElement : ((SubProcess) bpmnObject).getFlowElements()) {
             if (subFlowElement instanceof SequenceFlow) {
-              writeBpmnEdge((SequenceFlow) subFlowElement);
+              writeBpmnEdge((SequenceFlow) subFlowElement, ((SubProcess) bpmnObject).getId());
             }
           }
         }
@@ -89,17 +89,17 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
 
     for (EObject bpmnObject : contents) {
       if (bpmnObject instanceof SequenceFlow) {
-        writeBpmnEdge((SequenceFlow) bpmnObject);
+        writeBpmnEdge((SequenceFlow) bpmnObject, "");
       } 
     }
     xtw.writeEndElement();
     xtw.writeEndElement();
   }
   
-  private static void writeBpmnElement(FlowNode flowNode, ContainerShape parent, boolean subprocess) throws Exception {
+  private static void writeBpmnElement(FlowNode flowNode, ContainerShape parent, String subprocessId) throws Exception {
     ILinkService linkService = Graphiti.getLinkService();
     xtw.writeStartElement(BPMNDI_PREFIX, "BPMNShape", BPMNDI_NAMESPACE);
-    xtw.writeAttribute("bpmnElement", flowNode.getId());
+    xtw.writeAttribute("bpmnElement", subprocessId + flowNode.getId());
     xtw.writeAttribute("id", "BPMNShape_" + flowNode.getId());
 
     xtw.writeStartElement(OMGDC_PREFIX, "Bounds", OMGDC_NAMESPACE);
@@ -137,7 +137,7 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
             diFlowNodeMap.put(flowNode.getId(), shape.getGraphicsAlgorithm());
             xtw.writeAttribute("height", "" + shape.getGraphicsAlgorithm().getHeight());
             xtw.writeAttribute("width", "" + shape.getGraphicsAlgorithm().getWidth());
-            if(subprocess == true) {
+            if(subprocessId.length() > 0) {
               xtw.writeAttribute("x", "" + (shape.getGraphicsAlgorithm().getX() + shape.getContainer().getGraphicsAlgorithm().getX()));
               xtw.writeAttribute("y", "" + (shape.getGraphicsAlgorithm().getY() + shape.getContainer().getGraphicsAlgorithm().getY()));
             } else {
@@ -153,7 +153,7 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
     xtw.writeEndElement();
   }
   
-  private static void writeBpmnEdge(SequenceFlow sequenceFlow) throws Exception {
+  private static void writeBpmnEdge(SequenceFlow sequenceFlow, String subprocessId) throws Exception {
     if (diFlowNodeMap.containsKey(sequenceFlow.getSourceRef().getId()) && diFlowNodeMap.containsKey(sequenceFlow.getTargetRef().getId())) {
       
       ILinkService linkService = Graphiti.getLinkService();
@@ -175,7 +175,7 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
       if(freeFormConnection == null) return;
       
       xtw.writeStartElement(BPMNDI_PREFIX, "BPMNEdge", BPMNDI_NAMESPACE);
-      xtw.writeAttribute("bpmnElement", sequenceFlow.getId());
+      xtw.writeAttribute("bpmnElement", subprocessId + sequenceFlow.getId());
       xtw.writeAttribute("id", "BPMNEdge_" + sequenceFlow.getId());
       
       GraphicsAlgorithm sourceConnection = diFlowNodeMap.get(sequenceFlow.getSourceRef().getId());
