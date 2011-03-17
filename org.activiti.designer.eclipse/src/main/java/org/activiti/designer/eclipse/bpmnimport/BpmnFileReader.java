@@ -443,6 +443,8 @@ public class BpmnFileReader {
       sequenceFlow.setId(ActivitiUiUtil.getNextId(SequenceFlow.class, "flow", diagram));
       sequenceFlow.setSourceRef(getFlowNode(sequenceFlowModel.sourceRef));
       sequenceFlow.setTargetRef(getFlowNode(sequenceFlowModel.targetRef));
+      if(sequenceFlow.getSourceRef() == null || sequenceFlow.getSourceRef().getId() == null || 
+              sequenceFlow.getTargetRef() == null || sequenceFlow.getTargetRef().getId() == null) continue;
       if(sequenceFlowModel.conditionExpression != null) {
         sequenceFlow.setConditionExpression(sequenceFlowModel.conditionExpression);
       }

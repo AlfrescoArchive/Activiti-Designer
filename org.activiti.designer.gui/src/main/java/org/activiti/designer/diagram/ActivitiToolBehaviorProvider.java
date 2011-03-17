@@ -108,10 +108,10 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
 
   @Override
   public ICustomFeature getDoubleClickFeature(IDoubleClickContext context) {
-    ICustomFeature customFeature = new ExpandCollapseSubProcessFeature(getFeatureProvider());
+    /*ICustomFeature customFeature = new ExpandCollapseSubProcessFeature(getFeatureProvider());
     if (customFeature.canExecute(context)) {
       return customFeature;
-    }
+    }*/
     return super.getDoubleClickFeature(context);
   }
 

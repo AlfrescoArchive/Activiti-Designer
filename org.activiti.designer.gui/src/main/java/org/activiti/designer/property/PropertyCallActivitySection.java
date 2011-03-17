@@ -1,7 +1,6 @@
 package org.activiti.designer.property;
 
 import org.activiti.designer.eclipse.util.ActivitiUiUtil;
-import org.eclipse.bpmn2.Bpmn2Factory;
 import org.eclipse.bpmn2.CallActivity;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
@@ -60,10 +59,7 @@ public class PropertyCallActivitySection extends ActivitiPropertySection impleme
 				return;
 			
 			CallActivity callActivity = (CallActivity) bo;
-			String calledElement = null;
-			if(callActivity.getCalledElementRef() != null) {
-			  calledElement = callActivity.getCalledElementRef().getId();
-			}
+			String calledElement = callActivity.getCalledElement();
 			callElementText.setText(calledElement == null ? "" : calledElement);
 		}
 		callElementText.addFocusListener(listener);
@@ -88,14 +84,8 @@ public class PropertyCallActivitySection extends ActivitiPropertySection impleme
 								return;
 							}
 							String calledElement = callElementText.getText();
-							if (calledElement != null) {
-							  CallActivity callActivity = (CallActivity) bo;
-							  if(callActivity.getCalledElementRef() == null) {
-							    org.eclipse.bpmn2.Process process = Bpmn2Factory.eINSTANCE.createProcess();
-							    callActivity.setCalledElementRef(process);
-							  }
-							  callActivity.getCalledElementRef().setId(calledElement);
-							}
+							CallActivity callActivity = (CallActivity) bo;
+							callActivity.setCalledElement(calledElement);
 						}
 					}, editingDomain, "Model Update");
 				}

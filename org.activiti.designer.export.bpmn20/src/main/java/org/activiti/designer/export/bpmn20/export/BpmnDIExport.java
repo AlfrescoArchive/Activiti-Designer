@@ -80,7 +80,11 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
           }
           for (FlowElement subFlowElement : ((SubProcess) bpmnObject).getFlowElements()) {
             if (subFlowElement instanceof SequenceFlow) {
-              writeBpmnEdge((SequenceFlow) subFlowElement, ((SubProcess) bpmnObject).getId());
+              List<PictogramElement> pictoList = linkService.getPictogramElements(diagram, bpmnObject);
+              if(pictoList != null && pictoList.size() > 0) {
+                ContainerShape parent = (ContainerShape) pictoList.get(0);
+                writeBpmnEdge((SequenceFlow) subFlowElement, parent, ((SubProcess) bpmnObject).getId());
+              }
             }
           }
         }
@@ -89,7 +93,7 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
 
     for (EObject bpmnObject : contents) {
       if (bpmnObject instanceof SequenceFlow) {
-        writeBpmnEdge((SequenceFlow) bpmnObject, "");
+        writeBpmnEdge((SequenceFlow) bpmnObject, diagram, "");
       } 
     }
     xtw.writeEndElement();
@@ -101,31 +105,51 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
     xtw.writeStartElement(BPMNDI_PREFIX, "BPMNShape", BPMNDI_NAMESPACE);
     xtw.writeAttribute("bpmnElement", subprocessId + flowNode.getId());
     xtw.writeAttribute("id", "BPMNShape_" + flowNode.getId());
+    
+    if(flowNode instanceof BoundaryEvent) {
+      if(((BoundaryEvent) flowNode).getAttachedToRef() == null || ((BoundaryEvent) flowNode).getAttachedToRef().getId() == null) {
+        xtw.writeEndElement();
+        return;
+      }
+    }
 
-    xtw.writeStartElement(OMGDC_PREFIX, "Bounds", OMGDC_NAMESPACE);
     for (Shape shape : parent.getChildren()) {
       EObject shapeBO = linkService.getBusinessObjectForLinkedPictogramElement(shape.getGraphicsAlgorithm().getPictogramElement());
       if(flowNode instanceof BoundaryEvent) {
-        if (shapeBO instanceof Task || shapeBO instanceof SubProcess && shape instanceof ContainerShape) {
-          for (Shape childShape : ((ContainerShape) shape).getChildren()) {
-            EObject childShapeBO = linkService.getBusinessObjectForLinkedPictogramElement(childShape.getGraphicsAlgorithm().getPictogramElement());
-            if(childShapeBO instanceof BoundaryEvent) {
-              if (((BoundaryEvent) childShapeBO).getId().equals(flowNode.getId())) {
-                diFlowNodeMap.put(flowNode.getId(), childShape.getGraphicsAlgorithm());
-                xtw.writeAttribute("height", "" + childShape.getGraphicsAlgorithm().getHeight());
-                xtw.writeAttribute("width", "" + childShape.getGraphicsAlgorithm().getWidth());
-                xtw.writeAttribute("x", "" + (childShape.getGraphicsAlgorithm().getX() + shape.getGraphicsAlgorithm().getX()));
-                xtw.writeAttribute("y", "" + (childShape.getGraphicsAlgorithm().getY() + shape.getGraphicsAlgorithm().getY()));
+        
+        BoundaryEvent shapeBoundaryEvent = null;
+        Shape boundaryShape = null;
+        if(shapeBO instanceof BoundaryEvent) {
+          if (((BoundaryEvent) shapeBO).getId().equals(flowNode.getId())) {
+            shapeBoundaryEvent = (BoundaryEvent) shapeBO;
+            boundaryShape = shape;
+          }
+          
+        } else if(shapeBO instanceof Task || shapeBO instanceof SubProcess) {
+        
+          if(shape instanceof ContainerShape) {
+            for (Shape childShape : ((ContainerShape) shape).getChildren()) {
+              EObject childShapeBO = linkService.getBusinessObjectForLinkedPictogramElement(childShape.getGraphicsAlgorithm().getPictogramElement());
+              if(childShapeBO instanceof BoundaryEvent) {
+                if (((BoundaryEvent) childShapeBO).getId().equals(flowNode.getId())) {
+                  shapeBoundaryEvent = (BoundaryEvent) childShapeBO;
+                  boundaryShape = childShape;
+                }
               }
             }
           }
-        } else if(shapeBO instanceof BoundaryEvent) {
-          if (((BoundaryEvent) shapeBO).getId().equals(flowNode.getId())) {
-            diFlowNodeMap.put(flowNode.getId(), shape.getGraphicsAlgorithm());
-            xtw.writeAttribute("height", "" + shape.getGraphicsAlgorithm().getHeight());
-            xtw.writeAttribute("width", "" + shape.getGraphicsAlgorithm().getWidth());
-            xtw.writeAttribute("x", "" + (shape.getGraphicsAlgorithm().getX() + parent.getGraphicsAlgorithm().getX()));
-            xtw.writeAttribute("y", "" + (shape.getGraphicsAlgorithm().getY() + parent.getGraphicsAlgorithm().getY()));
+        }
+          
+        if (shapeBoundaryEvent != null) {
+          diFlowNodeMap.put(flowNode.getId(), boundaryShape.getGraphicsAlgorithm());
+          java.awt.Point attachedPoint = findAttachedShape(shapeBoundaryEvent.getAttachedToRef().getId(), parent.getChildren());
+          if(attachedPoint != null) {
+            xtw.writeStartElement(OMGDC_PREFIX, "Bounds", OMGDC_NAMESPACE);
+            xtw.writeAttribute("height", "" + boundaryShape.getGraphicsAlgorithm().getHeight());
+            xtw.writeAttribute("width", "" + boundaryShape.getGraphicsAlgorithm().getWidth());
+            xtw.writeAttribute("x", "" + (boundaryShape.getGraphicsAlgorithm().getX() + attachedPoint.getX()));
+            xtw.writeAttribute("y", "" + (boundaryShape.getGraphicsAlgorithm().getY() + attachedPoint.getY()));
+            xtw.writeEndElement();
           }
         }
         
@@ -135,6 +159,7 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
           FlowNode shapeFlowNode = (FlowNode) shapeBO;
           if (shapeFlowNode.getId().equals(flowNode.getId())) {
             diFlowNodeMap.put(flowNode.getId(), shape.getGraphicsAlgorithm());
+            xtw.writeStartElement(OMGDC_PREFIX, "Bounds", OMGDC_NAMESPACE);
             xtw.writeAttribute("height", "" + shape.getGraphicsAlgorithm().getHeight());
             xtw.writeAttribute("width", "" + shape.getGraphicsAlgorithm().getWidth());
             if(subprocessId.length() > 0) {
@@ -144,16 +169,41 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
               xtw.writeAttribute("x", "" + shape.getGraphicsAlgorithm().getX());
               xtw.writeAttribute("y", "" + shape.getGraphicsAlgorithm().getY());
             }
+            xtw.writeEndElement();
           }
         }
       }
     }
-
-    xtw.writeEndElement();
     xtw.writeEndElement();
   }
   
-  private static void writeBpmnEdge(SequenceFlow sequenceFlow, String subprocessId) throws Exception {
+  private static java.awt.Point findAttachedShape(String shapeid, EList<Shape> shapeList) {
+    ILinkService linkService = Graphiti.getLinkService();
+    for (Shape shape : shapeList) {
+      EObject shapeBO = linkService.getBusinessObjectForLinkedPictogramElement(shape.getGraphicsAlgorithm().getPictogramElement());
+      if(shapeBO instanceof FlowNode) {
+        FlowNode shapeFlowNode = (FlowNode) shapeBO;
+        if (shapeFlowNode.getId().equals(shapeid)) {
+          ContainerShape parentContainerShape = ((ContainerShape) shape).getContainer();
+          if(parentContainerShape instanceof Diagram == false) {
+            EObject parentShapeBO = linkService.getBusinessObjectForLinkedPictogramElement(
+                    parentContainerShape.getGraphicsAlgorithm().getPictogramElement());
+            if(parentShapeBO instanceof SubProcess) {
+              return new java.awt.Point(shape.getGraphicsAlgorithm().getX() + parentContainerShape.getGraphicsAlgorithm().getX(), 
+                      shape.getGraphicsAlgorithm().getY() + parentContainerShape.getGraphicsAlgorithm().getY());
+            } else {
+              return new java.awt.Point(shape.getGraphicsAlgorithm().getX(), shape.getGraphicsAlgorithm().getY());
+            }
+          } else {
+            return new java.awt.Point(shape.getGraphicsAlgorithm().getX(), shape.getGraphicsAlgorithm().getY());
+          }
+        }
+      }
+    }
+    return null;
+  }
+  
+  private static void writeBpmnEdge(SequenceFlow sequenceFlow, ContainerShape parent, String subprocessId) throws Exception {
     if (diFlowNodeMap.containsKey(sequenceFlow.getSourceRef().getId()) && diFlowNodeMap.containsKey(sequenceFlow.getTargetRef().getId())) {
       
       ILinkService linkService = Graphiti.getLinkService();
@@ -181,6 +231,16 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
       GraphicsAlgorithm sourceConnection = diFlowNodeMap.get(sequenceFlow.getSourceRef().getId());
       GraphicsAlgorithm targetConnection = diFlowNodeMap.get(sequenceFlow.getTargetRef().getId());
       
+      int subProcessX = 0;
+      int subProcessY = 0;
+      if(subprocessId.length() > 0) {
+        GraphicsAlgorithm subProcessGraphics = diFlowNodeMap.get(subprocessId);
+        if(subProcessGraphics != null) {
+          subProcessX = subProcessGraphics.getX();
+          subProcessY = subProcessGraphics.getY();
+        }
+      }
+      
       if(sequenceFlow.getSourceRef() instanceof Gateway && getAmountOfOutgoingConnections(
               sequenceFlow.getSourceRef().getId()) > 1) {
         
@@ -190,11 +250,50 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
         } else {
           y = sourceConnection.getY() + sourceConnection.getHeight();
         }
-        createWayPoint(sourceConnection.getX() + (sourceConnection.getWidth() / 2), y, xtw);
+        createWayPoint(sourceConnection.getX() + (sourceConnection.getWidth() / 2) + subProcessX, y + subProcessY, xtw);
+      
+      } else if (sequenceFlow.getSourceRef() instanceof BoundaryEvent) {
+        
+        int boundaryPlusX = subProcessX;
+        int boundaryPlusY = subProcessY;
+        
+        for (Shape shape : parent.getChildren()) {
+          EObject shapeBO = linkService.getBusinessObjectForLinkedPictogramElement(shape.getGraphicsAlgorithm().getPictogramElement());
+          BoundaryEvent shapeBoundaryEvent = null;
+          if(shapeBO instanceof BoundaryEvent) {
+            if (((BoundaryEvent) shapeBO).getId().equals(sequenceFlow.getSourceRef().getId())) {
+              shapeBoundaryEvent = (BoundaryEvent) shapeBO;
+            }
+            
+          } else if(shapeBO instanceof Task || shapeBO instanceof SubProcess) {
+          
+            if(shape instanceof ContainerShape) {
+              for (Shape childShape : ((ContainerShape) shape).getChildren()) {
+                EObject childShapeBO = linkService.getBusinessObjectForLinkedPictogramElement(childShape.getGraphicsAlgorithm().getPictogramElement());
+                if(childShapeBO instanceof BoundaryEvent) {
+                  if (((BoundaryEvent) childShapeBO).getId().equals(sequenceFlow.getSourceRef().getId())) {
+                    shapeBoundaryEvent = (BoundaryEvent) childShapeBO;
+                  }
+                }
+              }
+            }
+          }
+            
+          if (shapeBoundaryEvent != null) {
+            java.awt.Point attachedPoint = findAttachedShape(shapeBoundaryEvent.getAttachedToRef().getId(), parent.getChildren());
+            if(attachedPoint != null) {
+              boundaryPlusX = attachedPoint.x;
+              boundaryPlusY = attachedPoint.y;
+            }
+          }
+        }
+        
+        createWayPoint(sourceConnection.getX() + (sourceConnection.getWidth() / 2) + boundaryPlusX,
+                sourceConnection.getY() + sourceConnection.getHeight() + boundaryPlusY, xtw);
         
       } else {
-        createWayPoint(sourceConnection.getX() + sourceConnection.getWidth(),
-                sourceConnection.getY() + (sourceConnection.getHeight() / 2), xtw);
+        createWayPoint(sourceConnection.getX() + sourceConnection.getWidth() + subProcessX,
+                sourceConnection.getY() + (sourceConnection.getHeight() / 2) + subProcessY, xtw);
       }
       
       if(bendPointList != null && bendPointList.size() > 0) {
@@ -212,11 +311,11 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
         } else {
           y = targetConnection.getY() + targetConnection.getHeight();
         }
-        createWayPoint(targetConnection.getX() + (targetConnection.getWidth() / 2), y, xtw);
+        createWayPoint(targetConnection.getX() + (targetConnection.getWidth() / 2) + subProcessX, y + subProcessY, xtw);
         
       } else {
-        createWayPoint(targetConnection.getX(),
-                targetConnection.getY() + (targetConnection.getHeight() / 2), xtw);
+        createWayPoint(targetConnection.getX() + subProcessX,
+                targetConnection.getY() + (targetConnection.getHeight() / 2) + subProcessY, xtw);
       }
       xtw.writeEndElement();
     }

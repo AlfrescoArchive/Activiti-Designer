@@ -612,9 +612,7 @@ public class BpmnParser {
     CallActivity callActivity = Bpmn2Factory.eINSTANCE.createCallActivity();
     callActivity.setName(xtr.getAttributeValue(null, "name"));
     if(xtr.getAttributeValue(null, "calledElement") != null && xtr.getAttributeValue(null, "calledElement").length() > 0) {
-      org.eclipse.bpmn2.Process process = Bpmn2Factory.eINSTANCE.createProcess();
-      process.setId(xtr.getAttributeValue(null, "calledElement"));
-      callActivity.setCalledElementRef(process);
+      callActivity.setCalledElement(xtr.getAttributeValue(null, "calledElement"));
     }
     return callActivity;
   }

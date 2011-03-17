@@ -1594,6 +1594,7 @@
         <details key="name" value="calledElement"/>
       </eAnnotations>
     </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="calledElement" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="CallChoreography" eSuperTypes="#//ChoreographyActivity">
     <eAnnotations source="http:///org/eclipse/emf/ecore/util/ExtendedMetaData">

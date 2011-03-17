@@ -100,9 +100,13 @@ public class CreateSequenceFlowFeature extends AbstractCreateBPMNConnectionFeatu
 		if(context.getSourcePictogramElement().eContainer() instanceof ContainerShape) {
 		  ContainerShape parentShape = (ContainerShape) context.getSourcePictogramElement().eContainer();
 		  parentObject = getBusinessObjectForPictogramElement(parentShape.getGraphicsAlgorithm().getPictogramElement());
+		  if(parentObject != null && parentObject instanceof SubProcess == false) {
+		    parentShape = (ContainerShape) context.getTargetPictogramElement().eContainer();
+		    parentObject = getBusinessObjectForPictogramElement(parentShape.getGraphicsAlgorithm().getPictogramElement());
+		  }
 		}
 		
-    if (parentObject != null && parentObject instanceof SubProcess) {
+		if (parentObject != null && parentObject instanceof SubProcess) {
       ((SubProcess) parentObject).getFlowElements().add(sequenceFlow);
     } else {
       getDiagram().eResource().getContents().add(sequenceFlow);

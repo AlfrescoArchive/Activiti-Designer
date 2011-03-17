@@ -46,7 +46,7 @@ public class BoundaryEventExport implements ActivitiNamespaceConstants {
           }
           xtw.writeAttribute("cancelActivity", "true");
           if (boundaryEvent.getAttachedToRef() != null) {
-            xtw.writeAttribute("attachedToRef", boundaryEvent.getAttachedToRef().getId());
+            xtw.writeAttribute("attachedToRef", subProcessId + boundaryEvent.getAttachedToRef().getId());
           }
           
           xtw.writeStartElement("timerEventDefinition");

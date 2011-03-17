@@ -9,6 +9,7 @@ import org.eclipse.bpmn2.Task;
 import org.eclipse.bpmn2.TimerEventDefinition;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
+import org.eclipse.graphiti.mm.pictograms.Diagram;
 
 public class CreateBoundaryTimerFeature extends AbstractCreateBPMNFeature {
 	
@@ -39,6 +40,14 @@ public class CreateBoundaryTimerFeature extends AbstractCreateBPMNFeature {
 		Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
     if (parentObject instanceof SubProcess) {
       ((SubProcess) parentObject).getFlowElements().add(boundaryEvent);
+    } else if(context.getTargetContainer().getContainer() != null && 
+            context.getTargetContainer().getContainer() instanceof Diagram == false) {
+      
+      Object containerObject = getBusinessObjectForPictogramElement(context.getTargetContainer().getContainer());
+      if (containerObject instanceof SubProcess) {
+        ((SubProcess) containerObject).getFlowElements().add(boundaryEvent);
+      }
+      
     } else {
       getDiagram().eResource().getContents().add(boundaryEvent);
     }
