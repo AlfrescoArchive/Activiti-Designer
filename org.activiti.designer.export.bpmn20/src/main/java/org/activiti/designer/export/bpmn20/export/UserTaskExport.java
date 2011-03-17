@@ -65,9 +65,7 @@ public class UserTaskExport implements ActivitiNamespaceConstants {
       if (userTask.getFormKey() != null && userTask.getFormKey().length() > 0) {
         xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "formKey", userTask.getFormKey());
       }
-
-      ExtensionListenerExport.createExtensionListenerXML(userTask.getActivitiListeners(), true, TASK_LISTENER, xtw);
-
+      
       if (userTask.getDocumentation() != null && userTask.getDocumentation().size() > 0) {
 
         final Documentation documentation = userTask.getDocumentation().get(0);
@@ -80,8 +78,6 @@ public class UserTaskExport implements ActivitiNamespaceConstants {
           if (documentation.getId() != null) {
             xtw.writeAttribute("id", documentation.getId());
           }
-          xtw.writeAttribute("textFormat", "text/plain");
-
           xtw.writeCharacters(documentation.getText());
 
           // end documentation element
@@ -89,6 +85,8 @@ public class UserTaskExport implements ActivitiNamespaceConstants {
         }
 
       }
+
+      ExtensionListenerExport.createExtensionListenerXML(userTask.getActivitiListeners(), true, TASK_LISTENER, xtw);
 
       // end UserTask element
       xtw.writeEndElement();
