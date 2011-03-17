@@ -57,6 +57,12 @@
          <propertyTab
                afterTab="org.activiti.designer.mainConfigTab"
                category="Activiti"
+               id="org.activiti.designer.formTab"
+               label="Form">
+         </propertyTab>
+         <propertyTab
+               afterTab="org.activiti.designer.mainConfigTab"
+               category="Activiti"
                id="org.activiti.designer.listenerTab"
                label="Listeners">
          </propertyTab>
@@ -149,6 +155,12 @@
                filter="org.activiti.designer.property.PropertyBusinessRuleTaskFilter"
                id="org.activiti.designer.mainConfigTab.businessruletask"
                tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyFormPropertySection"
+               filter="org.activiti.designer.property.PropertyUserTaskFilter"
+               id="org.activiti.designer.formTab.formProperty"
+               tab="org.activiti.designer.formTab">
          </propertySection>
       </propertySections>
    </extension>

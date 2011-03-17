@@ -777,6 +777,7 @@
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference BPMN20.ecore#//UserTask/candidateUsers"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference BPMN20.ecore#//UserTask/candidateGroups"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute BPMN20.ecore#//UserTask/formKey"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference BPMN20.ecore#//UserTask/formProperties"/>
     </genClasses>
     <genClasses ecoreClass="BPMN20.ecore#//CandidateUser">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute BPMN20.ecore#//CandidateUser/user"/>
@@ -819,6 +820,14 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute BPMN20.ecore#//ActivitiListener/implementation"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute BPMN20.ecore#//ActivitiListener/event"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference BPMN20.ecore#//ActivitiListener/fieldExtensions"/>
+    </genClasses>
+    <genClasses ecoreClass="BPMN20.ecore#//FormProperty">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute BPMN20.ecore#//FormProperty/name"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute BPMN20.ecore#//FormProperty/type"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute BPMN20.ecore#//FormProperty/value"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute BPMN20.ecore#//FormProperty/readable"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute BPMN20.ecore#//FormProperty/writeable"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute BPMN20.ecore#//FormProperty/required"/>
     </genClasses>
   </genPackages>
   <genPackages prefix="BpmnDi" basePackage="org.eclipse.bpmn2" resource="XML" multipleEditorPages="false"
