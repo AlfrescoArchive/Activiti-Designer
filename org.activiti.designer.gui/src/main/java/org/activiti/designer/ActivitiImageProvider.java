@@ -28,6 +28,7 @@ public class ActivitiImageProvider extends AbstractImageProvider {
   // Event image icons
   public static final String IMG_STARTEVENT_NONE = PREFIX + "startevent.none"; //$NON-NLS-1$
   public static final String IMG_ENDEVENT_NONE = PREFIX + "endevent.none"; //$NON-NLS-1$
+  public static final String IMG_ENDEVENT_ERROR = PREFIX + "endevent.error"; //$NON-NLS-1$
 
   // Gateway image icons
   public static final String IMG_GATEWAY_PARALLEL = PREFIX + "gateway.parallel"; //$NON-NLS-1$
@@ -58,6 +59,7 @@ public class ActivitiImageProvider extends AbstractImageProvider {
     addImageFilePath(IMG_EREFERENCE, "icons/ereference.gif"); //$NON-NLS-1$
     addImageFilePath(IMG_STARTEVENT_NONE, "icons/type.startevent.none.png"); //$NON-NLS-1$
     addImageFilePath(IMG_ENDEVENT_NONE, "icons/type.endevent.none.png"); //$NON-NLS-1$
+    addImageFilePath(IMG_ENDEVENT_ERROR, "icons/error.png"); //$NON-NLS-1$
     addImageFilePath(IMG_GATEWAY_PARALLEL, "icons/type.gateway.parallel.png"); //$NON-NLS-1$
     addImageFilePath(IMG_GATEWAY_EXCLUSIVE, "icons/type.gateway.exclusive.png"); //$NON-NLS-1$
     addImageFilePath(IMG_USERTASK, "icons/type.user.png"); //$NON-NLS-1$

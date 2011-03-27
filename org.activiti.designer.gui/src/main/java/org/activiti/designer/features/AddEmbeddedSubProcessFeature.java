@@ -59,7 +59,7 @@ public class AddEmbeddedSubProcessFeature extends AbstractAddShapeFeature {
 			// create and set visible rectangle inside invisible rectangle
 			roundedRectangle = gaService.createRoundedRectangle(invisibleRectangle, 5, 5);
 			roundedRectangle.setParentGraphicsAlgorithm(invisibleRectangle);
-			roundedRectangle.setStyle(StyleUtil.getStyleForEmbeddedProcess(getDiagram()));
+			roundedRectangle.setStyle(StyleUtil.getStyleForEvent(getDiagram()));
 			gaService.setLocationAndSize(roundedRectangle, 0, 0, width, height);
 
 			// if addedClass has no resource we add it to the resource of the
@@ -80,7 +80,7 @@ public class AddEmbeddedSubProcessFeature extends AbstractAddShapeFeature {
 
 			// create and set text graphics algorithm
 			final Text text = gaService.createDefaultText(shape, addedSubProcess.getName());
-			text.setStyle(StyleUtil.getStyleForEClassText(getDiagram()));
+			text.setStyle(StyleUtil.getStyleForEvent(getDiagram()));
 			text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
 			text.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);
 			text.getFont().setBold(true);

@@ -14,12 +14,14 @@ import org.activiti.designer.eclipse.common.ActivitiBPMNDiagramConstants;
 import org.activiti.designer.eclipse.extension.AbstractDiagramWorker;
 import org.activiti.designer.eclipse.extension.validation.ProcessValidator;
 import org.activiti.designer.eclipse.util.ActivitiUiUtil;
+import org.activiti.designer.features.CreateBoundaryErrorFeature;
 import org.activiti.designer.features.CreateBoundaryTimerFeature;
 import org.activiti.designer.features.CreateBusinessRuleTaskFeature;
 import org.activiti.designer.features.CreateCallActivityFeature;
 import org.activiti.designer.features.CreateCustomServiceTaskFeature;
 import org.activiti.designer.features.CreateEmbeddedSubProcessFeature;
 import org.activiti.designer.features.CreateEndEventFeature;
+import org.activiti.designer.features.CreateErrorEndEventFeature;
 import org.activiti.designer.features.CreateExclusiveGatewayFeature;
 import org.activiti.designer.features.CreateMailTaskFeature;
 import org.activiti.designer.features.CreateManualTaskFeature;
@@ -93,6 +95,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     // Setup tool mappings to palette entries
     toolMapping.put(CreateStartEventFeature.class, PaletteEntry.START_EVENT);
     toolMapping.put(CreateEndEventFeature.class, PaletteEntry.END_EVENT);
+    toolMapping.put(CreateErrorEndEventFeature.class, PaletteEntry.ERROR_END_EVENT);
     toolMapping.put(CreateExclusiveGatewayFeature.class, PaletteEntry.EXCLUSIVE_GATEWAY);
     toolMapping.put(CreateMailTaskFeature.class, PaletteEntry.MAIL_TASK);
     toolMapping.put(CreateManualTaskFeature.class, PaletteEntry.MANUAL_TASK);
@@ -103,6 +106,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     toolMapping.put(CreateEmbeddedSubProcessFeature.class, PaletteEntry.SUBPROCESS);
     toolMapping.put(CreateUserTaskFeature.class, PaletteEntry.USER_TASK);
     toolMapping.put(CreateBoundaryTimerFeature.class, PaletteEntry.BOUNDARY_TIMER);
+    toolMapping.put(CreateBoundaryErrorFeature.class, PaletteEntry.ERROR_END_EVENT);
     toolMapping.put(CreateBusinessRuleTaskFeature.class, PaletteEntry.BUSINESSRULE_TASK);
   }
 
@@ -233,6 +237,8 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
           eventCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("endevent".equalsIgnoreCase(toolEntry.getLabel())) {
           eventCompartmentEntry.getToolEntries().add(toolEntry);
+        } else if ("errorendevent".equalsIgnoreCase(toolEntry.getLabel())) {
+          eventCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("usertask".equalsIgnoreCase(toolEntry.getLabel())) {
           taskCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("scripttask".equalsIgnoreCase(toolEntry.getLabel())) {
@@ -248,6 +254,8 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
         } else if ("businessruletask".equalsIgnoreCase(toolEntry.getLabel())) {
           taskCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("timerboundaryevent".equalsIgnoreCase(toolEntry.getLabel())) {
+          boundaryEventCompartmentEntry.getToolEntries().add(toolEntry);
+        } else if ("errorboundaryevent".equalsIgnoreCase(toolEntry.getLabel())) {
           boundaryEventCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("parallelgateway".equalsIgnoreCase(toolEntry.getLabel())) {
           gatewayCompartmentEntry.getToolEntries().add(toolEntry);

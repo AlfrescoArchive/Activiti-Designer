@@ -75,12 +75,12 @@ public class BpmnFileReader {
   
   private static final int START_X = 30;
   private static final int START_Y = 200;
-  private static final int EVENT_WIDTH = 55;
-  private static final int EVENT_HEIGHT = 55;
+  private static final int EVENT_WIDTH = 35;
+  private static final int EVENT_HEIGHT = 35;
   private static final int TASK_WIDTH = 105;
   private static final int TASK_HEIGHT = 55;
-  private static final int GATEWAY_WIDTH = 60;
-  private static final int GATEWAY_HEIGHT = 60;
+  private static final int GATEWAY_WIDTH = 40;
+  private static final int GATEWAY_HEIGHT = 40;
   private static final int SEQUENCEFLOW_WIDTH = 60;
   private static final int GATEWAY_CHILD_HEIGHT = 100;
   
@@ -224,9 +224,22 @@ public class BpmnFileReader {
         
         if(sourceFlowElement instanceof Event) {
           x += EVENT_WIDTH;
+          if(newFlowElement instanceof Task) {
+            y -= 10;
+          }
         } else if(sourceFlowElement instanceof Gateway) {
           x += GATEWAY_WIDTH;
-          y = calculateDirectGatewayChildY(sourceFlowElement.getId(), newFlowElement.getId(), sourceInfo.y, bpmnParser.sequenceFlowList);
+          if(isEndGateway(sourceFlowElement.getId(), bpmnParser.sequenceFlowList) == false) {
+            y = calculateDirectGatewayChildY(sourceFlowElement.getId(), newFlowElement.getId(), sourceInfo.y, bpmnParser.sequenceFlowList);
+          } else {
+          
+            if(newFlowElement instanceof Task) {
+              y -= 7;
+            } else if(newFlowElement instanceof EndEvent) {
+              y += 3;
+            }
+          }
+          
         } else if(sourceFlowElement instanceof SubProcess) {
           x += sourceInfo.width;
         } else {
@@ -234,10 +247,20 @@ public class BpmnFileReader {
         }
         x += SEQUENCEFLOW_WIDTH;
         
+        if(newFlowElement instanceof EndEvent && sourceFlowElement instanceof Task) {
+          y += 10;
+        }
+        
         if(newFlowElement instanceof Gateway) {
           if(isEndGateway(newFlowElement.getId(), bpmnParser.sequenceFlowList)) {
-            y = START_Y;
+            y = START_Y - 3;
             x = getMaxX(newFlowElement.getId());
+          } else {
+            if(sourceFlowElement instanceof Task) {
+              y += 7;
+            } else if(sourceFlowElement instanceof StartEvent) {
+              y -= 2;
+            }
           }
         }
       }
@@ -254,7 +277,6 @@ public class BpmnFileReader {
       graphicInfo.height = EVENT_HEIGHT;
     } else if(newFlowElement instanceof Gateway) {
       graphicInfo.height = GATEWAY_HEIGHT;
-      graphicInfo.y -= 3;
     } else if(newFlowElement instanceof SubProcess) {
       int width = 0;
       int height = 0;
@@ -608,13 +630,13 @@ public class BpmnFileReader {
     addContext.setTargetContainer(parent);
     addContext.setX(graphicInfo.x);
     if(flowElement instanceof StartEvent || flowElement instanceof EndEvent) {
-      if(graphicInfo.height < 55) {
+      if(graphicInfo.height < EVENT_HEIGHT) {
         addContext.setY(graphicInfo.y - 25);
       } else {
         addContext.setY(graphicInfo.y);
       }
     } else if(flowElement instanceof ExclusiveGateway || flowElement instanceof ParallelGateway) {
-      if(graphicInfo.height < 60) {
+      if(graphicInfo.height < GATEWAY_HEIGHT) {
         addContext.setY(graphicInfo.y - 20);
       } else {
         addContext.setY(graphicInfo.y);

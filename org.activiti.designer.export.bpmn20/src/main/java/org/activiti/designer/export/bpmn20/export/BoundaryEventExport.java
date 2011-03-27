@@ -18,6 +18,7 @@ import java.util.List;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.eclipse.bpmn2.BoundaryEvent;
+import org.eclipse.bpmn2.ErrorEventDefinition;
 import org.eclipse.bpmn2.EventDefinition;
 import org.eclipse.bpmn2.FormalExpression;
 import org.eclipse.bpmn2.TimerEventDefinition;
@@ -62,6 +63,29 @@ public class BoundaryEventExport implements ActivitiNamespaceConstants {
           // end TimerBoundaryEvent element
           xtw.writeEndElement();
         }
+      } else if(eventDefinitionList.get(0) instanceof ErrorEventDefinition) {
+        ErrorEventDefinition errorDef = (ErrorEventDefinition) eventDefinitionList.get(0);
+        
+        // start ErrorBoundaryEvent element
+        xtw.writeStartElement("boundaryEvent");
+        xtw.writeAttribute("id", subProcessId + boundaryEvent.getId());
+        if (boundaryEvent.getName() != null) {
+          xtw.writeAttribute("name", boundaryEvent.getName());
+        }
+        if (boundaryEvent.getAttachedToRef() != null) {
+          xtw.writeAttribute("attachedToRef", subProcessId + boundaryEvent.getAttachedToRef().getId());
+        }
+        
+        xtw.writeStartElement("errorEventDefinition");
+        
+        if(errorDef.getErrorCode() != null && errorDef.getErrorCode().length() > 0) {
+          xtw.writeAttribute("errorRef", errorDef.getErrorCode());
+        }
+        
+        xtw.writeEndElement();
+
+        // end ErrorBoundaryEvent element
+        xtw.writeEndElement();
       }
     }
   }

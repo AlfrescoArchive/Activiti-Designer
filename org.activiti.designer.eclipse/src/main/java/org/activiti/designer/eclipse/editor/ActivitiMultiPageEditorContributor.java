@@ -1,5 +1,6 @@
 package org.activiti.designer.eclipse.editor;
 
+import org.eclipse.gef.ui.actions.DeleteAction;
 import org.eclipse.gef.ui.actions.GEFActionConstants;
 import org.eclipse.graphiti.ui.internal.action.CopyAction;
 import org.eclipse.graphiti.ui.internal.action.PasteAction;
@@ -74,7 +75,9 @@ public class ActivitiMultiPageEditorContributor extends
     } else if (actionBars != null && part instanceof ActivitiDiagramEditor) {
       
       ActivitiDiagramEditor editor = (part instanceof ActivitiDiagramEditor) ? (ActivitiDiagramEditor) part : null;
-
+      
+      actionBars.setGlobalActionHandler(
+        ActionFactory.DELETE.getId(), editor.getActionRegistryInternal().getAction("delete"));
       actionBars.setGlobalActionHandler(
         ActionFactory.UNDO.getId(),
         getAction(editor, GEFActionConstants.UNDO));

@@ -2,9 +2,8 @@ package org.activiti.designer.property;
 
 import org.activiti.designer.eclipse.util.ActivitiUiUtil;
 import org.eclipse.bpmn2.BoundaryEvent;
-import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.FormalExpression;
-import org.eclipse.bpmn2.TimerEventDefinition;
+import org.eclipse.bpmn2.EndEvent;
+import org.eclipse.bpmn2.ErrorEventDefinition;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
@@ -21,9 +20,9 @@ import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
-public class PropertyBoundaryTimerSection extends ActivitiPropertySection implements ITabbedPropertyConstants {
+public class PropertyBoundaryErrorSection extends ActivitiPropertySection implements ITabbedPropertyConstants {
 
-	private Text timeDurationText;
+	private Text errorCodeText;
 
 	@Override
 	public void createControls(Composite parent, TabbedPropertySheetPage tabbedPropertySheetPage) {
@@ -33,45 +32,54 @@ public class PropertyBoundaryTimerSection extends ActivitiPropertySection implem
 		Composite composite = factory.createFlatFormComposite(parent);
 		FormData data;
 
-		timeDurationText = factory.createText(composite, ""); //$NON-NLS-1$
+		errorCodeText = factory.createText(composite, ""); //$NON-NLS-1$
 		data = new FormData();
 		data.left = new FormAttachment(0, 120);
 		data.right = new FormAttachment(100, 0);
 		data.top = new FormAttachment(0, VSPACE);
-		timeDurationText.setLayoutData(data);
-		timeDurationText.addFocusListener(listener);
+		errorCodeText.setLayoutData(data);
+		errorCodeText.addFocusListener(listener);
 
-		CLabel elementLabel = factory.createCLabel(composite, "Time duration:"); //$NON-NLS-1$
+		CLabel elementLabel = factory.createCLabel(composite, "Error code:"); //$NON-NLS-1$
 		data = new FormData();
 		data.left = new FormAttachment(0, 0);
-		data.right = new FormAttachment(timeDurationText, -HSPACE);
-		data.top = new FormAttachment(timeDurationText, 0, SWT.TOP);
+		data.right = new FormAttachment(errorCodeText, -HSPACE);
+		data.top = new FormAttachment(errorCodeText, 0, SWT.TOP);
 		elementLabel.setLayoutData(data);
 
 	}
 
 	@Override
 	public void refresh() {
-	  timeDurationText.removeFocusListener(listener);
+	  errorCodeText.removeFocusListener(listener);
 
 		PictogramElement pe = getSelectedPictogramElement();
 		if (pe != null) {
 			Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
-			// the filter assured, that it is a EClass
 			if (bo == null)
 				return;
 			
-			BoundaryEvent boundaryEvent = (BoundaryEvent) bo;
-			String timeDuration = null;
-			if(boundaryEvent.getEventDefinitions().get(0) != null) {
-			  TimerEventDefinition timerDefinition = (TimerEventDefinition) boundaryEvent.getEventDefinitions().get(0);
-        if(timerDefinition.getTimeDuration() != null) {
-          timeDuration = ((FormalExpression) timerDefinition.getTimeDuration()).getBody();
+			String errorCode = null;
+			if(bo instanceof BoundaryEvent) {
+  			BoundaryEvent boundaryEvent = (BoundaryEvent) bo;
+  			if(boundaryEvent.getEventDefinitions().get(0) != null) {
+  			  ErrorEventDefinition errorDefinition = (ErrorEventDefinition) boundaryEvent.getEventDefinitions().get(0);
+          if(errorDefinition.getErrorCode() != null) {
+            errorCode = errorDefinition.getErrorCode();
+          }
+  			}
+			} else if(bo instanceof EndEvent) {
+			  EndEvent endEvent = (EndEvent) bo;
+			  if(endEvent.getEventDefinitions().get(0) != null) {
+          ErrorEventDefinition errorDefinition = (ErrorEventDefinition) endEvent.getEventDefinitions().get(0);
+          if(errorDefinition.getErrorCode() != null) {
+            errorCode = errorDefinition.getErrorCode();
+          }
         }
 			}
-			timeDurationText.setText(timeDuration == null ? "" : timeDuration);
+			errorCodeText.setText(errorCode == null ? "" : errorCode);
 		}
-		timeDurationText.addFocusListener(listener);
+		errorCodeText.addFocusListener(listener);
 	}
 
 	private FocusListener listener = new FocusListener() {
@@ -83,7 +91,7 @@ public class PropertyBoundaryTimerSection extends ActivitiPropertySection implem
 			PictogramElement pe = getSelectedPictogramElement();
 			if (pe != null) {
 				Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
-				if (bo instanceof BoundaryEvent) {
+				if (bo instanceof BoundaryEvent || bo instanceof EndEvent) {
 					DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
 					TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
 					ActivitiUiUtil.runModelChange(new Runnable() {
@@ -92,16 +100,15 @@ public class PropertyBoundaryTimerSection extends ActivitiPropertySection implem
 							if (bo == null) {
 								return;
 							}
-							String timeDuration = timeDurationText.getText();
-							if (timeDuration != null) {
-							  BoundaryEvent boundaryEvent = (BoundaryEvent) bo;
-							  TimerEventDefinition timerDefinition = (TimerEventDefinition) boundaryEvent.getEventDefinitions().get(0);
-							  if(timerDefinition.getTimeDuration() == null) {
-							    FormalExpression expression = Bpmn2Factory.eINSTANCE.createFormalExpression();
-							    timerDefinition.setTimeDuration(expression);
-							  }
-							  FormalExpression formalExpression = (FormalExpression) timerDefinition.getTimeDuration();
-							  formalExpression.setBody(timeDuration);
+							String errorCode = errorCodeText.getText();
+							if(bo instanceof BoundaryEvent) {
+  							BoundaryEvent boundaryEvent = (BoundaryEvent) bo;
+  						  ErrorEventDefinition errorDefinition = (ErrorEventDefinition) boundaryEvent.getEventDefinitions().get(0);
+  						  errorDefinition.setErrorCode(errorCode);
+							} else if(bo instanceof EndEvent) {
+							  EndEvent endEvent = (EndEvent) bo;
+							  ErrorEventDefinition errorDefinition = (ErrorEventDefinition) endEvent.getEventDefinitions().get(0);
+                errorDefinition.setErrorCode(errorCode);
 							}
 						}
 					}, editingDomain, "Model Update");

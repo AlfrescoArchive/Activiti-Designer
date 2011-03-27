@@ -92,10 +92,10 @@ public abstract class AddTaskFeature extends AbstractAddShapeFeature {
         gaService.setLocationAndSize(invisibleRectangle, context.getX(), context.getY(), width, height);
 
         // create and set visible rectangle inside invisible rectangle
-        roundedRectangle = gaService.createRoundedRectangle(invisibleRectangle, 5, 5);
+        roundedRectangle = gaService.createRoundedRectangle(invisibleRectangle, 20, 20);
         algorithm = roundedRectangle;
         roundedRectangle.setParentGraphicsAlgorithm(invisibleRectangle);
-        roundedRectangle.setStyle(StyleUtil.getStyleForEClass(getDiagram()));
+        roundedRectangle.setStyle(StyleUtil.getStyleForTask(getDiagram()));
         gaService.setLocationAndSize(roundedRectangle, 0, 0, width, height);
 
         // if addedClass has no resource we add it to the resource of
@@ -135,7 +135,7 @@ public abstract class AddTaskFeature extends AbstractAddShapeFeature {
         polygon = gaService.createPolygon(invisiblePolygon, xy);
         algorithm = polygon;
         polygon.setParentGraphicsAlgorithm(invisiblePolygon);
-        polygon.setStyle(StyleUtil.getStyleForEClass(getDiagram()));
+        polygon.setStyle(StyleUtil.getStyleForTask(getDiagram()));
         gaService.setLocationAndSize(polygon, 0, 0, width, height);
 
         // final Rectangle invisibleRectangle =
@@ -197,7 +197,7 @@ public abstract class AddTaskFeature extends AbstractAddShapeFeature {
         // create and set visible circle inside invisible circle
         circle = gaService.createEllipse(invisibleCircle);
         circle.setParentGraphicsAlgorithm(invisibleCircle);
-        circle.setStyle(StyleUtil.getStyleForEClass(getDiagram()));
+        circle.setStyle(StyleUtil.getStyleForTask(getDiagram()));
         gaService.setLocationAndSize(circle, 0, 0, width, height);
 
         // if addedClass has no resource we add it to the resource of the
@@ -225,10 +225,9 @@ public abstract class AddTaskFeature extends AbstractAddShapeFeature {
 
       // create and set text graphics algorithm
       final Text text = gaService.createDefaultText(shape, addedTask.getName());
-      text.setStyle(StyleUtil.getStyleForEClassText(getDiagram()));
+      text.setStyle(StyleUtil.getStyleForTask(getDiagram()));
       text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
       text.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);
-      text.getFont().setBold(true);
       if (OSUtil.getOperatingSystem() == OSEnum.Mac) {
         text.getFont().setSize(11);
       }

@@ -37,14 +37,14 @@ public class AddExclusiveGatewayFeature extends AbstractAddShapeFeature {
 
 		// check whether the context has a size (e.g. from a create feature)
 		// otherwise define a default size for the shape
-		final int width = context.getWidth() <= 0 ? 60 : context.getWidth();
-		final int height = context.getHeight() <= 0 ? 60 : context.getHeight();
+		final int width = context.getWidth() <= 0 ? 40 : context.getWidth();
+		final int height = context.getHeight() <= 0 ? 40 : context.getHeight();
 
 		final IGaService gaService = Graphiti.getGaService();
 
 		Polygon polygon;
 		{
-			int xy[] = new int[] { 0, 30, 30, 0, 60, 30, 30, 60, 0, 30 };
+			int xy[] = new int[] { 0, 20, 20, 0, 40, 20, 20, 40, 0, 20 };
 			final Polygon invisiblePolygon = gaService.createPolygon(containerShape, xy);
 			invisiblePolygon.setFilled(false);
 			invisiblePolygon.setLineVisible(false);
@@ -53,7 +53,7 @@ public class AddExclusiveGatewayFeature extends AbstractAddShapeFeature {
 			// create and set visible circle inside invisible circle
 			polygon = gaService.createPolygon(invisiblePolygon, xy);
 			polygon.setParentGraphicsAlgorithm(invisiblePolygon);
-			polygon.setStyle(StyleUtil.getStyleForEClass(getDiagram()));
+			polygon.setStyle(StyleUtil.getStyleForEvent(getDiagram()));
 			gaService.setLocationAndSize(polygon, 0, 0, width, height);
 
 			// if addedClass has no resource we add it to the resource of the
@@ -75,18 +75,16 @@ public class AddExclusiveGatewayFeature extends AbstractAddShapeFeature {
 		{
 			final Shape shape = peCreateService.createShape(containerShape, false);
 			
-			final Polyline polyline = gaService.createPolyline(shape, new int[] { width - 15, 15, 15, height-15 });
-			polyline.setLineWidth(7);
-			polyline.setStyle(StyleUtil.getStyleForEClass(getDiagram()));
+			final Polyline polyline = gaService.createPolyline(shape, new int[] { width - 10, 10, 10, height - 10 });
+			polyline.setLineWidth(5);
+			polyline.setStyle(StyleUtil.getStyleForEvent(getDiagram()));
 		}
 		
 		{
 			final Shape shape = peCreateService.createShape(containerShape, false);
-			
-			//final Polyline polyline = gaService.createPolyline(shape, new int[] { 27, 10, 27, height - 10 });
-			final Polyline polyline = gaService.createPolyline(shape, new int[] { 15, 15, width - 15, height - 15});
-			polyline.setLineWidth(7);
-			polyline.setStyle(StyleUtil.getStyleForEClass(getDiagram()));
+			final Polyline polyline = gaService.createPolyline(shape, new int[] { 10, 10, width - 10, height - 10});
+			polyline.setLineWidth(5);
+			polyline.setStyle(StyleUtil.getStyleForEvent(getDiagram()));
 		}
 
 		{

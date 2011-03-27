@@ -145,6 +145,12 @@
                tab="org.activiti.designer.mainConfigTab">
          </propertySection>
          <propertySection
+               class="org.activiti.designer.property.PropertyBoundaryErrorSection"
+               filter="org.activiti.designer.property.PropertyBoundaryErrorFilter"
+               id="org.activiti.designer.mainConfigTab.errorboundaryevent"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <propertySection
                class="org.activiti.designer.property.PropertyCallActivitySection"
                filter="org.activiti.designer.property.PropertyCallActivityFilter"
                id="org.activiti.designer.mainConfigTab.callactivity"
@@ -161,6 +167,13 @@
                filter="org.activiti.designer.property.PropertyUserTaskFilter"
                id="org.activiti.designer.formTab.formProperty"
                tab="org.activiti.designer.formTab">
+         </propertySection>
+         <propertySection
+               afterSection="org.activiti.designer.mainConfigTab.callactivity"
+               class="org.activiti.designer.property.PropertyIOParameterSection"
+               filter="org.activiti.designer.property.PropertyCallActivityFilter"
+               id="org.activiti.designer.mainConfigTab.parameter"
+               tab="org.activiti.designer.mainConfigTab">
          </propertySection>
       </propertySections>
    </extension>

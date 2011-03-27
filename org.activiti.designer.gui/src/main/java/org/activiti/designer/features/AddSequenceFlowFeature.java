@@ -95,11 +95,11 @@ public class AddSequenceFlowFeature extends AbstractAddFeature {
 					.getGraphicsAlgorithm();
 			GraphicsAlgorithm targetGraphics = getPictogramElement(addedSequenceFlow.getTargetRef())
 					.getGraphicsAlgorithm();
-			if (((sourceGraphics.getY() + 5) < targetGraphics.getY()
-					|| (sourceGraphics.getY() - 5) > targetGraphics.getY())  && 
+			if (((sourceGraphics.getY() + 10) < targetGraphics.getY()
+					|| (sourceGraphics.getY() - 10) > targetGraphics.getY())  && 
 					(sourceGraphics.getX() + (sourceGraphics.getWidth() / 2)) < targetGraphics.getX()) {
 				Point bendPoint = StylesFactory.eINSTANCE.createPoint();
-				bendPoint.setX(sourceGraphics.getX() + 30);
+				bendPoint.setX(sourceGraphics.getX() + 20);
 				bendPoint.setY(targetGraphics.getY() + (targetGraphics.getHeight() / 2));
 				connection.getBendpoints().add(bendPoint);
 			}
@@ -108,11 +108,11 @@ public class AddSequenceFlowFeature extends AbstractAddFeature {
 					.getGraphicsAlgorithm();
 			GraphicsAlgorithm targetGraphics = getPictogramElement(addedSequenceFlow.getTargetRef())
 					.getGraphicsAlgorithm();
-			if (((sourceGraphics.getY() + 5) < targetGraphics.getY()
-					|| (sourceGraphics.getY() - 5) > targetGraphics.getY()) && 
+			if (((sourceGraphics.getY() + 10) < targetGraphics.getY()
+					|| (sourceGraphics.getY() - 10) > targetGraphics.getY()) && 
 					(sourceGraphics.getX() + sourceGraphics.getWidth()) < targetGraphics.getX()) {
 				Point bendPoint = StylesFactory.eINSTANCE.createPoint();
-				bendPoint.setX(targetGraphics.getX() + 30);
+				bendPoint.setX(targetGraphics.getX() + 20);
 				bendPoint.setY(sourceGraphics.getY() + (sourceGraphics.getHeight() / 2));
 				connection.getBendpoints().add(bendPoint);
 			}
@@ -129,7 +129,7 @@ public class AddSequenceFlowFeature extends AbstractAddFeature {
 		// add dynamic text decorator for the reference name
 		ConnectionDecorator textDecorator = peCreateService.createConnectionDecorator(connection, true, 0.5, true);
 		Text text = gaService.createDefaultText(textDecorator);
-		text.setStyle(StyleUtil.getStyleForEClassText((getDiagram())));
+		text.setStyle(StyleUtil.getStyleForTask((getDiagram())));
 		gaService.setLocation(text, 10, 0);
 
 		// set reference name in the text decorator

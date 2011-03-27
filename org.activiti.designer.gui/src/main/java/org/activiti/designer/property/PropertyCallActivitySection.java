@@ -30,8 +30,8 @@ public class PropertyCallActivitySection extends ActivitiPropertySection impleme
 		Composite composite = factory.createFlatFormComposite(parent);
 		FormData data;
 
-		callElementText = factory.createText(composite, "", SWT.SINGLE); //$NON-NLS-1$
-		data = new FormData(SWT.DEFAULT, 100);
+		callElementText = factory.createText(composite, ""); //$NON-NLS-1$
+		data = new FormData();
 		data.left = new FormAttachment(0, 120);
 		data.right = new FormAttachment(100, 0);
 		data.top = new FormAttachment(0, VSPACE);

@@ -4,25 +4,23 @@ import org.activiti.designer.ActivitiImageProvider;
 import org.activiti.designer.util.StyleUtil;
 import org.eclipse.bpmn2.BoundaryEvent;
 import org.eclipse.bpmn2.SubProcess;
-import org.eclipse.bpmn2.Task;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.impl.AbstractAddShapeFeature;
 import org.eclipse.graphiti.mm.algorithms.Ellipse;
 import org.eclipse.graphiti.mm.algorithms.Image;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
-import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
 
-public class AddBoundaryTimerFeature extends AbstractAddShapeFeature {
+public class AddBoundaryErrorFeature extends AbstractAddShapeFeature {
   
   private static final int IMAGE_SIZE = 30;
 	
-	public AddBoundaryTimerFeature(IFeatureProvider fp) {
+	public AddBoundaryErrorFeature(IFeatureProvider fp) {
 		super(fp);
 	}
 
@@ -43,33 +41,7 @@ public class AddBoundaryTimerFeature extends AbstractAddShapeFeature {
       y += parent.getGraphicsAlgorithm().getY();
       
       parent = getDiagram();
-      
-    } else if(parent.getContainer() != null && 
-            parent.getContainer() instanceof Diagram == false) {
-      
-      x += parent.getGraphicsAlgorithm().getX();
-      y += parent.getGraphicsAlgorithm().getY();
-      
-      Object containerObject = getBusinessObjectForPictogramElement(parent.getContainer());
-      if (containerObject instanceof SubProcess) {
-        parent = parent.getContainer();
-      }
-      
-      if (addedEvent.eResource() == null) {
-        ((SubProcess) parentObject).getFlowElements().add(addedEvent);
-      }
-      
-    } else {
-      
-      x += parent.getGraphicsAlgorithm().getX();
-      y += parent.getGraphicsAlgorithm().getY();
-      
-      parent = getDiagram();
-      
-      if (addedEvent.eResource() == null) {
-        getDiagram().eResource().getContents().add(addedEvent);
-      }
-    }
+    } 
 
     // CONTAINER SHAPE WITH CIRCLE
     final IPeCreateService peCreateService = Graphiti.getPeCreateService();
@@ -108,11 +80,7 @@ public class AddBoundaryTimerFeature extends AbstractAddShapeFeature {
 
     {
       final Shape shape = peCreateService.createShape(containerShape, false);
-      final Image image = gaService.createImage(shape, ActivitiImageProvider.IMG_BOUNDARY_TIMER);
-      image.setStretchH(true);
-      image.setStretchV(true);
-      image.setWidth(IMAGE_SIZE);
-      image.setHeight(IMAGE_SIZE);
+      final Image image = gaService.createImage(shape, ActivitiImageProvider.IMG_ENDEVENT_ERROR);
       
       gaService.setLocationAndSize(image, (width - IMAGE_SIZE) / 2, (height - IMAGE_SIZE) / 2, IMAGE_SIZE, IMAGE_SIZE);
     }
@@ -127,7 +95,7 @@ public class AddBoundaryTimerFeature extends AbstractAddShapeFeature {
   @Override
   public boolean canAdd(IAddContext context) {
     Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-    if (parentObject instanceof SubProcess == false && parentObject instanceof Task == false) {
+    if (parentObject instanceof SubProcess == false) {
       return false;
     }
     if (context.getNewObject() instanceof BoundaryEvent == false) {

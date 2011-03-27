@@ -238,7 +238,7 @@ public abstract class TableFieldEditor extends FieldEditor {
 		GridData gridData = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
 		gridData.horizontalSpan = 2;
 		gridData.widthHint = 550;
-		gridData.heightHint = 200;
+		gridData.heightHint = 150;
 		composite.setLayoutData(gridData);
 		composite.setLayout(new GridLayout(2, false));
 
@@ -446,11 +446,8 @@ public abstract class TableFieldEditor extends FieldEditor {
 		setPresentsDefaultValue(false);
 		int index = table.getSelectionIndex();
 		if (index >= 0) {
-		  System.out.println("table removing index " + index);
 			table.remove(index);
-			System.out.println("done removing now selectioncChanged " + index);
 			selectionChanged();
-			System.out.println("done with selectioncChanged " + index);
 		}
 	}
 

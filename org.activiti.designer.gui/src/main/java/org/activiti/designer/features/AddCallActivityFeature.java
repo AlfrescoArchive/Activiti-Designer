@@ -60,7 +60,7 @@ public class AddCallActivityFeature extends AbstractAddShapeFeature {
 			// create and set visible rectangle inside invisible rectangle
 			roundedRectangle = gaService.createRoundedRectangle(invisibleRectangle, 5, 5);
 			roundedRectangle.setParentGraphicsAlgorithm(invisibleRectangle);
-			roundedRectangle.setStyle(StyleUtil.getStyleForCallActivity(getDiagram()));
+			roundedRectangle.setStyle(StyleUtil.getStyleForTask(getDiagram()));
 			roundedRectangle.setLineWidth(3);
 			gaService.setLocationAndSize(roundedRectangle, 0, 0, width, height);
 
@@ -87,7 +87,7 @@ public class AddCallActivityFeature extends AbstractAddShapeFeature {
 
 			// create and set text graphics algorithm
 			final Text text = gaService.createDefaultText(shape, addedCallActivity.getName());
-			text.setStyle(StyleUtil.getStyleForEClassText(getDiagram()));
+			text.setStyle(StyleUtil.getStyleForTask(getDiagram()));
 			text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
 			text.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);
 			text.getFont().setBold(true);

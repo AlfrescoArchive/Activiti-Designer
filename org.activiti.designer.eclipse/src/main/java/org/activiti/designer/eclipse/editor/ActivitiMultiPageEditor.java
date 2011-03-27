@@ -18,7 +18,12 @@ import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.content.IContentType;
+import org.eclipse.draw2d.IFigure;
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.gef.GraphicalViewer;
+import org.eclipse.gef.LayerConstants;
+import org.eclipse.gef.editparts.LayerManager;
+import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.ui.editor.DiagramEditorFactory;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
@@ -68,6 +73,12 @@ public class ActivitiMultiPageEditor extends MultiPageEditorPart implements IRes
       diagramEditor = new ActivitiDiagramEditor();
       int index = addPage(diagramEditor, getEditorInput());
       setPageText(index, ActivitiMultiPageEditor.DIAGRAM_PANE_TILE);
+      GraphicalViewer graphicalViewer = (GraphicalViewer) diagramEditor.getAdapter(GraphicalViewer.class);
+      if (graphicalViewer != null && graphicalViewer.getEditPartRegistry() != null) {
+        ScalableFreeformRootEditPart rootEditPart = (ScalableFreeformRootEditPart) graphicalViewer.getEditPartRegistry().get(LayerManager.ID);
+        IFigure gridFigure = ((LayerManager) rootEditPart).getLayer(LayerConstants.GRID_LAYER);
+        gridFigure.setVisible(false);
+      }
     } catch (PartInitException e) {
       ErrorDialog.openError(getSite().getShell(), "Error creating nested Activiti Diagram editor", null, e.getStatus());
     }

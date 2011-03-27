@@ -20,6 +20,7 @@ import org.eclipse.bpmn2.BoundaryEvent;
 import org.eclipse.bpmn2.BusinessRuleTask;
 import org.eclipse.bpmn2.CallActivity;
 import org.eclipse.bpmn2.EndEvent;
+import org.eclipse.bpmn2.ErrorEventDefinition;
 import org.eclipse.bpmn2.ExclusiveGateway;
 import org.eclipse.bpmn2.FlowElement;
 import org.eclipse.bpmn2.MailTask;
@@ -215,6 +216,15 @@ public class BPMN20ExportMarshaller extends AbstractExportMarshaller implements 
       xtw.writeStartElement("endEvent");
       xtw.writeAttribute("id", subProcessId + endEvent.getId());
       xtw.writeAttribute("name", endEvent.getName());
+      
+      if(endEvent.getEventDefinitions().size() > 0) {
+        ErrorEventDefinition errorDef = (ErrorEventDefinition) endEvent.getEventDefinitions().get(0);
+        if(errorDef.getErrorCode() != null && errorDef.getErrorCode().length() > 0) {
+          xtw.writeStartElement("errorEventDefinition");
+          xtw.writeAttribute("errorRef", errorDef.getErrorCode());
+          xtw.writeEndElement();
+        }
+      }
 
       // end EndEvent element
       xtw.writeEndElement();

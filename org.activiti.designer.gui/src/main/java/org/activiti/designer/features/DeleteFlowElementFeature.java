@@ -6,6 +6,7 @@ import java.util.List;
 import org.activiti.designer.property.extension.util.ExtensionUtil;
 import org.eclipse.bpmn2.Activity;
 import org.eclipse.bpmn2.BoundaryEvent;
+import org.eclipse.bpmn2.CallActivity;
 import org.eclipse.bpmn2.CustomProperty;
 import org.eclipse.bpmn2.Event;
 import org.eclipse.bpmn2.FlowElement;
@@ -27,7 +28,7 @@ public class DeleteFlowElementFeature extends DefaultDeleteFeature {
 	}
 
 	protected void deleteBusinessObject(Object bo) {
-		if (bo instanceof Task || bo instanceof Gateway || bo instanceof Event || bo instanceof SubProcess) {
+		if (bo instanceof Task || bo instanceof Gateway || bo instanceof Event || bo instanceof SubProcess || bo instanceof CallActivity) {
 		  deleteSequenceFlows((FlowNode) bo);
 		}
 
