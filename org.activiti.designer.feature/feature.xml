@@ -2,7 +2,7 @@
 <feature
       id="org.activiti.designer.feature"
       label="Activiti Eclipse BPMN 2.0 Designer"
-      version="0.8.0"
+      version="5.4"
       provider-name="Activiti">
 
    <description url="http://www.activiti.org">
@@ -17,41 +17,23 @@
       <discovery label="Activiti suite website" url="http://activiti.org"/>
    </url>
 
-   <includes
-         id="org.eclipse.emf"
-         version="2.6.0"/>
+   <includes id="org.eclipse.emf" version="2.6.0" match="greaterOrEqual" />
 
-   <includes
-         id="org.eclipse.emf.transaction"
-         version="1.4.0"/>
+   <includes id="org.eclipse.emf.transaction" version="1.4.0" match="greaterOrEqual"/>
 
-   <includes
-         id="org.eclipse.emf.validation"
-         version="1.4.0"/>
+   <includes id="org.eclipse.emf.validation" version="1.4.0" match="greaterOrEqual"/>
 
-   <includes
-         id="org.eclipse.emf.workspace"
-         version="1.4.0"/>
+   <includes id="org.eclipse.emf.workspace" version="1.4.0" match="greaterOrEqual"/>
 
-   <includes
-         id="org.eclipse.gef"
-         version="3.6.0"/>
+   <includes id="org.eclipse.gef" version="3.6.0" match="greaterOrEqual"/>
 
-   <includes
-         id="org.eclipse.graphiti.feature"
-         version="0.7.1"/>
+   <includes id="org.eclipse.graphiti.feature" version="0.7.1"/>
 
-   <includes
-         id="org.eclipse.wst.xml_ui.feature"
-         version="3.2.0"/>
+   <includes id="org.eclipse.wst.xml_ui.feature" version="3.2.0" match="greaterOrEqual"/>
 
-   <includes
-         id="org.eclipse.wst.common_core.feature"
-         version="3.2.0"/>
+   <includes id="org.eclipse.wst.common_core.feature" version="3.2.0" match="greaterOrEqual"/>
 
-   <includes
-         id="org.eclipse.wst.xml_core.feature"
-         version="3.2.0"/>
+   <includes id="org.eclipse.wst.xml_core.feature" version="3.2.0" match="greaterOrEqual"/>
 
    <requires>
       <import plugin="org.eclipse.ui"/>
@@ -83,28 +65,28 @@
          id="org.activiti.designer.gui"
          download-size="0"
          install-size="0"
-         version="0.8.0"
+         version="5.4"
          unpack="false"/>
 
    <plugin
          id="org.activiti.designer.eclipse"
          download-size="0"
          install-size="0"
-         version="0.8.0"
+         version="5.4"
          unpack="false"/>
 
    <plugin
          id="org.activiti.designer.model"
          download-size="0"
          install-size="0"
-         version="0.8.0"
+         version="5.4"
          unpack="false"/>
 
    <plugin
          id="org.activiti.designer.integration"
          download-size="0"
          install-size="0"
-         version="0.8.0"
+         version="5.4"
          unpack="false"/>
 
    <plugin
@@ -112,6 +94,7 @@
          download-size="0"
          install-size="0"
          version="1.3.4"
+         match="greaterOrEqual"
          unpack="false"/>
 
    <plugin
@@ -125,21 +108,28 @@
          id="org.activiti.designer.help"
          download-size="0"
          install-size="0"
-         version="0.8.0"
+         version="5.4"
          unpack="false"/>
 
    <plugin
          id="org.activiti.designer.export.bpmn20"
          download-size="0"
          install-size="0"
-         version="0.8.0"
+         version="5.4"
          unpack="false"/>
 
    <plugin
          id="org.activiti.designer.export.image"
          download-size="0"
          install-size="0"
-         version="0.8.0"
+         version="5.4"
+         unpack="false"/>
+   
+   <plugin
+         id="org.activiti.designer.validation.bpmn20"
+         download-size="0"
+         install-size="0"
+         version="5.4"
          unpack="false"/>
 
    <plugin
@@ -147,6 +137,7 @@
          download-size="0"
          install-size="0"
          version="1.2.0"
+         match="greaterOrEqual"
          unpack="false"/>
 
    <plugin
@@ -154,6 +145,7 @@
          download-size="0"
          install-size="0"
          version="1.1.500"
+         match="greaterOrEqual"
          unpack="false"/>
 
    <plugin
@@ -161,6 +153,7 @@
          download-size="0"
          install-size="0"
          version="3.6.0"
+         match="greaterOrEqual"
          unpack="false"/>
 
    <plugin
@@ -168,6 +161,7 @@
          download-size="0"
          install-size="0"
          version="1.4.100"
+         match="greaterOrEqual"
          unpack="false"/>
 
    <plugin
@@ -175,6 +169,7 @@
          download-size="0"
          install-size="0"
          version="1.1.202"
+         match="greaterOrEqual"
          unpack="false"/>
 
    <plugin
@@ -182,6 +177,7 @@
          download-size="0"
          install-size="0"
          version="1.2.303"
+         match="greaterOrEqual"
          unpack="false"/>
 
    <plugin
@@ -189,6 +185,7 @@
          download-size="0"
          install-size="0"
          version="2.6.0"
+         match="greaterOrEqual"
          unpack="false"/>
 
    <plugin
@@ -196,6 +193,7 @@
          download-size="0"
          install-size="0"
          version="1.1.501"
+         match="greaterOrEqual"
          unpack="false"/>
 
    <plugin
@@ -203,13 +201,7 @@
          download-size="0"
          install-size="0"
          version="2.6.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.activiti.designer.validation.bpmn20"
-         download-size="0"
-         install-size="0"
-         version="0.8.0"
+         match="greaterOrEqual"
          unpack="false"/>
 
 </feature>
