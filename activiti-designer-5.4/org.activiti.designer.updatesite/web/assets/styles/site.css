@@ -1,0 +1,101 @@
+body {
+    font-family:                        Helvetica,Arial,sans-serif;
+    text-align:                         center;
+    font-size:                          11px;
+    line-height:                        1.125em;
+    margin:                             0;
+    padding:                            0;
+}
+
+div.contained {
+    width:                              960px;
+    margin-left:                        auto;
+    margin-right:                       auto;
+    text-align:                         left;
+}
+
+div#header {
+    background-color:                   #ffffff;
+    border-bottom:                      1px solid #B9DDFA;
+    height:                             100px;
+    width:                              100%;
+    margin:                             0;
+    padding:                            0;
+}
+
+div#header div.logo {
+    padding-top:                        26px;
+}
+
+div#footer {
+
+background-color:                #FBFBFB;
+border-top:    1px solid #DDDDDD;
+height:100px;
+margin-top:24px;
+width:100%;
+
+   /* height:                             20px;
+    background-color:                   #ddd;
+    color:                              #fff;
+    border-top:                         2px solid #DD1718;
+    margin-top:                         4ex;
+    */
+}
+
+h1, h2 {
+    font-weight:                        bold;
+    color:                              #007DC3;
+}
+
+h1 {
+    font-size:                          150%;
+}
+
+h2 {
+    font-size:                          130%;
+}
+
+p {
+    font-size:                          110%;
+}
+
+table {
+    font-size:                          11px;
+}
+
+table thead th {
+    background-color:                   #ddd;
+    font-weight:                        bold;
+    font-size:                          110%;
+}
+
+table tbody td {
+    font-size:                          110%;
+}
+
+tr.alternate1 td {
+    background:                         #EEEEFF;
+}
+tr.alternate2 td {
+    background:                         #FFFFFF;
+}
+
+a {
+    color:                              #007DC3;
+    background-color:                   inherit;
+    text-decoration:                    none;
+}
+
+a:hover {
+    text-decoration:                    underline;
+}
+
+a:visited {
+    color:                              #007DC3;
+    background-color:                   inherit;
+}
+
+a img {
+    border:                             none;
+}
