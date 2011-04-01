@@ -49,8 +49,7 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
     Composite composite = factory.createFlatFormComposite(parent);
     FormData data;
 
-    idText = factory.createText(composite, "", SWT.READ_ONLY); //$NON-NLS-1$
-    idText.setEnabled(false);
+    idText = factory.createText(composite, ""); //$NON-NLS-1$
     data = new FormData();
     data.left = new FormAttachment(0, 120);
     data.right = new FormAttachment(100, -HSPACE);
