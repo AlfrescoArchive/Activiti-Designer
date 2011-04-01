@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?NLS TYPE="org.eclipse.help.toc"?>
+
+<toc label="Activiti BPMN 2.0 Designer User Guide" topic="html/toc.html">
+   <topic label="Usage">
+      <anchor id="usage"/>
+   </topic>
+   <topic label="Preferences">
+      <anchor id="preferences"/>
+   </topic>
+</toc>
