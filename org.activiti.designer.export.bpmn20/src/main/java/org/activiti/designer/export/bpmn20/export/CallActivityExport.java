@@ -34,10 +34,8 @@ public class CallActivityExport implements ActivitiNamespaceConstants {
       xtw.writeAttribute("name", callActivity.getName());
     }
 
-    if(callActivity.getCalledElementRef() != null && callActivity.getCalledElementRef().getId() != null &&
-            callActivity.getCalledElementRef().getId().length() > 0) {
-      
-      xtw.writeAttribute("calledElement", callActivity.getCalledElementRef().getId());
+    if(callActivity.getCalledElement() != null && callActivity.getCalledElement().length() > 0) {
+      xtw.writeAttribute("calledElement", callActivity.getCalledElement());
     }
     
     if(callActivity.getInParameters().size() > 0 || callActivity.getOutParameters().size() > 0) {
