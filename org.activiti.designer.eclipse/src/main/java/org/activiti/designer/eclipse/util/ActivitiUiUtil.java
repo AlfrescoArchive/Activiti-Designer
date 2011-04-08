@@ -1,8 +1,5 @@
 package org.activiti.designer.eclipse.util;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.apache.commons.lang.ArrayUtils;
 import org.eclipse.bpmn2.BaseElement;
 import org.eclipse.bpmn2.FlowElement;
@@ -38,8 +35,6 @@ import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
 
 public class ActivitiUiUtil {
-
-  private static final Map<String, Integer> idCache = new HashMap<String, Integer>();
 
   private static final String ID_PATTERN = "%s%s";
 
@@ -194,62 +189,50 @@ public class ActivitiUiUtil {
 
   public static final String getNextId(final Class featureClass, final String featureIdKey, final Diagram diagram) {
 
-    int determinedId = -1;
+    int determinedId = 0;
 
-    // If there's no id in the cache, assume we haven't loaded the diagram's
-    // current ids and proceed to do so
-    if (!idCache.containsKey(featureIdKey)) {
-      determinedId = 0;
-      for (EObject contentObject : diagram.eResource().getContents()) {
+    for (EObject contentObject : diagram.eResource().getContents()) {
+      
+      if(contentObject instanceof SubProcess) {
         
-        if(contentObject instanceof SubProcess) {
+        for (FlowElement flowElement : ((SubProcess) contentObject).getFlowElements()) {
           
-          for (FlowElement flowElement : ((SubProcess) contentObject).getFlowElements()) {
-            
-            if (flowElement.getClass() == featureClass) {
-              String contentObjectId = flowElement.getId().replace(featureIdKey, "");
-              Integer intGatewayNumber = Integer.valueOf(contentObjectId);
-              if (intGatewayNumber > determinedId) {
-                determinedId = intGatewayNumber;
-              }
-            }
-          }
-        }
-        
-        if (contentObject.getClass() == featureClass) {
-          BaseElement tempElement = (BaseElement) contentObject;
-          String contentObjectId = tempElement.getId().replace(featureIdKey, "");
-          boolean isNumber = true;
-          if(contentObjectId == null || contentObjectId.length() == 0) {
-            determinedId = 1;
-          } else {
-            
-            for(int i = 0; i < contentObjectId.length(); i++) {
-              if(Character.isDigit(contentObjectId.charAt(i)) == false) {
-                isNumber = false;
-              }
-            }
-            if(isNumber == false) {
-              determinedId = 1;
-            } else {
-              Integer intGatewayNumber = Integer.valueOf(contentObjectId);
-              if (intGatewayNumber > determinedId) {
-                determinedId = intGatewayNumber;
-              }
-            }
+          if (flowElement.getClass() == featureClass) {
+            String contentObjectId = flowElement.getId().replace(featureIdKey, "");
+            determinedId = getId(contentObjectId, determinedId);
           }
         }
       }
-    } else {
-      determinedId = idCache.get(featureIdKey);
+      
+      if (contentObject.getClass() == featureClass) {
+        BaseElement tempElement = (BaseElement) contentObject;
+        String contentObjectId = tempElement.getId().replace(featureIdKey, "");
+        determinedId = getId(contentObjectId, determinedId);
+      }
     }
-
     determinedId++;
-
-    idCache.put(featureIdKey, determinedId);
-
     return String.format(ID_PATTERN, featureIdKey, determinedId);
 
+  }
+  
+  private static int getId(String contentObjectId, int determinedId) {
+    int newdId = determinedId;
+    boolean isNumber = true;
+    if(contentObjectId != null && contentObjectId.length() > 0) {
+      
+      for(int i = 0; i < contentObjectId.length(); i++) {
+        if(Character.isDigit(contentObjectId.charAt(i)) == false) {
+          isNumber = false;
+        }
+      }
+      if(isNumber == true) {
+        Integer intNumber = Integer.valueOf(contentObjectId);
+        if (intNumber > newdId) {
+          newdId = intNumber;
+        }
+      }
+    }
+    return newdId;
   }
 
 }
