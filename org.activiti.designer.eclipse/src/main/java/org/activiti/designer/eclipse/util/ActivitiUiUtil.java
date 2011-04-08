@@ -219,9 +219,24 @@ public class ActivitiUiUtil {
         if (contentObject.getClass() == featureClass) {
           BaseElement tempElement = (BaseElement) contentObject;
           String contentObjectId = tempElement.getId().replace(featureIdKey, "");
-          Integer intGatewayNumber = Integer.valueOf(contentObjectId);
-          if (intGatewayNumber > determinedId) {
-            determinedId = intGatewayNumber;
+          boolean isNumber = true;
+          if(contentObjectId == null || contentObjectId.length() == 0) {
+            determinedId = 1;
+          } else {
+            
+            for(int i = 0; i < contentObjectId.length(); i++) {
+              if(Character.isDigit(contentObjectId.charAt(i)) == false) {
+                isNumber = false;
+              }
+            }
+            if(isNumber == false) {
+              determinedId = 1;
+            } else {
+              Integer intGatewayNumber = Integer.valueOf(contentObjectId);
+              if (intGatewayNumber > determinedId) {
+                determinedId = intGatewayNumber;
+              }
+            }
           }
         }
       }

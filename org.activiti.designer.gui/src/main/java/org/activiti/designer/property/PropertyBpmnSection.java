@@ -82,6 +82,7 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
   @Override
   public void refresh() {
     nameText.removeFocusListener(listener);
+    idText.removeFocusListener(listener);
 
     PictogramElement pe = getSelectedPictogramElement();
 
@@ -91,8 +92,10 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
       if (bo == null)
         return;
       String name = ((FlowElement) bo).getName();
-      idText.setText(((FlowElement) bo).getId());
-      nameText.setText(name == null ? "" : name); //$NON-NLS-1$
+      String id = ((FlowElement) bo).getId();
+      nameText.setText(name == null ? "" : name);
+      idText.setText(id == null ? "" : id);
+      idText.addFocusListener(listener);
       nameText.addFocusListener(listener);
     }
   }
@@ -119,13 +122,12 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
           Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(getSelectedPictogramElement());
           if (bo == null)
             return;
-
-          String name = nameText.getText();
-          if (!(bo instanceof FlowElement))
-            return;
           
-          if(name != null)
-            ((FlowElement) bo).setName(name);
+          String id = idText.getText();
+          ((FlowElement) bo).setId(id);
+          
+          String name = nameText.getText();
+          ((FlowElement) bo).setName(name);
           if (!(getSelectedPictogramElement() instanceof FreeFormConnection))
             return;
           EList<ConnectionDecorator> decoratorList = ((FreeFormConnection) getSelectedPictogramElement()).getConnectionDecorators();
