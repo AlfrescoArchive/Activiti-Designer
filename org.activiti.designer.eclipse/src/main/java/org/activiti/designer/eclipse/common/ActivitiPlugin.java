@@ -17,105 +17,108 @@ import org.osgi.framework.BundleContext;
 
 public class ActivitiPlugin extends AbstractUIPlugin {
 
-  /**
-   * The name used for the user library that contains extensions for the
-   * Activiti Designer.
-   */
-  public static final String USER_LIBRARY_NAME_EXTENSIONS = "Activiti Designer Extensions";
+	public static final String PLUGIN_ID = "org.activiti.designer.eclipse";
 
-  public static final String DESIGNER_EXTENSIONS_USER_LIB_PATH = "org.eclipse.jdt.USER_LIBRARY/" + USER_LIBRARY_NAME_EXTENSIONS;
+	/**
+	 * The name used for the user library that contains extensions for the
+	 * Activiti Designer.
+	 */
+	public static final String USER_LIBRARY_NAME_EXTENSIONS = "Activiti Designer Extensions";
 
-  public static final String EXPORT_MARSHALLER_EXTENSIONPOINT_ID = "org.activiti.designer.eclipse.extension.export.ExportMarshaller";
+	public static final String DESIGNER_EXTENSIONS_USER_LIB_PATH = "org.eclipse.jdt.USER_LIBRARY/"
+			+ USER_LIBRARY_NAME_EXTENSIONS;
 
-  public static final String PROCESS_VALIDATOR_EXTENSIONPOINT_ID = "org.activiti.designer.eclipse.extension.validation.ProcessValidator";
+	public static final String EXPORT_MARSHALLER_EXTENSIONPOINT_ID = "org.activiti.designer.eclipse.extension.export.ExportMarshaller";
 
-  private static ActivitiPlugin _plugin;
+	public static final String PROCESS_VALIDATOR_EXTENSIONPOINT_ID = "org.activiti.designer.eclipse.extension.validation.ProcessValidator";
 
-  /**
-   * Creates the Plugin and caches its default instance.
-   */
-  public ActivitiPlugin() {
-    _plugin = this;
-  }
+	private static ActivitiPlugin _plugin;
 
-  // ============ overwritten methods of AbstractUIPlugin ====================
+	/**
+	 * Creates the Plugin and caches its default instance.
+	 */
+	public ActivitiPlugin() {
+		_plugin = this;
+	}
 
-  /**
-   * This method is called upon plug-in activation.
-   * 
-   * @param context
-   *          the context
-   * 
-   * @throws Exception
-   *           the exception
-   */
-  @Override
-  public void start(BundleContext context) throws Exception {
-    super.start(context);
+	// ============ overwritten methods of AbstractUIPlugin ====================
 
-    IAdapterManager manager = Platform.getAdapterManager();
-    manager.registerAdapters(new ContentOutlinePageAdapterFactory(), DiagramEditor.class);
-  }
+	/**
+	 * This method is called upon plug-in activation.
+	 * 
+	 * @param context
+	 *            the context
+	 * 
+	 * @throws Exception
+	 *             the exception
+	 */
+	@Override
+	public void start(BundleContext context) throws Exception {
+		super.start(context);
 
-  // ======================== static access methods ==========================
+		IAdapterManager manager = Platform.getAdapterManager();
+		manager.registerAdapters(new ContentOutlinePageAdapterFactory(), DiagramEditor.class);
+	}
 
-  /**
-   * Gets the default-instance of this plugin. Actually the default-instance
-   * should always be the only instance -> Singleton.
-   * 
-   * @return the default
-   */
-  public static ActivitiPlugin getDefault() {
-    return _plugin;
-  }
+	// ======================== static access methods ==========================
 
-  // =========================== public helper methods ======================
+	/**
+	 * Gets the default-instance of this plugin. Actually the default-instance
+	 * should always be the only instance -> Singleton.
+	 * 
+	 * @return the default
+	 */
+	public static ActivitiPlugin getDefault() {
+		return _plugin;
+	}
 
-  /**
-   * Returns the current Workspace.
-   * 
-   * @return The current Workspace.
-   */
-  public static IWorkspace getWorkspace() {
-    return ResourcesPlugin.getWorkspace();
-  }
+	// =========================== public helper methods ======================
 
-  /**
-   * Returns the URL, which points to where this Plugin is installed.
-   * 
-   * @return The URL, which points to where this Plugin is installed.
-   */
-  public static URL getInstallURL() {
-    return getDefault().getBundle().getEntry("/");
-  }
+	/**
+	 * Returns the current Workspace.
+	 * 
+	 * @return The current Workspace.
+	 */
+	public static IWorkspace getWorkspace() {
+		return ResourcesPlugin.getWorkspace();
+	}
 
-  /**
-   * Returns the Plugin-ID.
-   * 
-   * @return The Plugin-ID.
-   */
-  public static String getID() {
-    return getDefault().getBundle().getSymbolicName();
-  }
+	/**
+	 * Returns the URL, which points to where this Plugin is installed.
+	 * 
+	 * @return The URL, which points to where this Plugin is installed.
+	 */
+	public static URL getInstallURL() {
+		return getDefault().getBundle().getEntry("/");
+	}
 
-  /**
-   * Returns the currently active WorkbenchPage.
-   * 
-   * @return The currently active WorkbenchPage.
-   */
-  public static IWorkbenchPage getActivePage() {
-    IWorkbenchWindow workbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
-    if (workbenchWindow != null)
-      return workbenchWindow.getActivePage();
-    return null;
-  }
+	/**
+	 * Returns the Plugin-ID.
+	 * 
+	 * @return The Plugin-ID.
+	 */
+	public static String getID() {
+		return getDefault().getBundle().getSymbolicName();
+	}
 
-  /**
-   * Returns the currently active Shell.
-   * 
-   * @return The currently active Shell.
-   */
-  public static Shell getShell() {
-    return getDefault().getWorkbench().getActiveWorkbenchWindow().getShell();
-  }
+	/**
+	 * Returns the currently active WorkbenchPage.
+	 * 
+	 * @return The currently active WorkbenchPage.
+	 */
+	public static IWorkbenchPage getActivePage() {
+		IWorkbenchWindow workbenchWindow = PlatformUI.getWorkbench().getActiveWorkbenchWindow();
+		if (workbenchWindow != null)
+			return workbenchWindow.getActivePage();
+		return null;
+	}
+
+	/**
+	 * Returns the currently active Shell.
+	 * 
+	 * @return The currently active Shell.
+	 */
+	public static Shell getShell() {
+		return getDefault().getWorkbench().getActiveWorkbenchWindow().getShell();
+	}
 }
