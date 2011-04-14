@@ -82,6 +82,18 @@
       </wizard>
       <wizard
             category="org.activiti.designer.eclipse.category"
+            class="org.activiti.designer.eclipse.ui.wizard.project.CreateDefaultActivitiProjectWizard"
+            finalPerspective="org.activiti.designer.eclipse.perspective.ActivitiPerspective"
+            icon="icons/logo/activiti.logo.gradients.16x16.png"
+            id="org.activiti.designer.eclipse.ui.wizard.project.CreateDefaultActivitiProjectWizard"
+            name="Activiti Project"
+            project="true">
+            <description>
+               Create a new Activiti Project with a basic folder structure and a Maven POM file.
+            </description>
+      </wizard>
+      <wizard
+            category="org.activiti.designer.eclipse.category"
             class="org.activiti.designer.eclipse.ui.CreateDiagramWizard"
             finalPerspective="org.activiti.designer.eclipse.perspective.ActivitiPerspective"
             icon="community_icon.png"
