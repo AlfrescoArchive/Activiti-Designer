@@ -71,6 +71,8 @@
             id="org.activiti.designer.eclipse.category"
             name="Activiti">
       </category>
+      <!-- Old wizard-->
+      <!--
       <wizard
             category="org.activiti.designer.eclipse.category"
             class="org.activiti.designer.eclipse.ui.CreateActivitiProjectWizard"
@@ -80,6 +82,7 @@
             name="Activiti project"
             project="true">
       </wizard>
+      -->
       <wizard
             category="org.activiti.designer.eclipse.category"
             class="org.activiti.designer.eclipse.ui.wizard.project.CreateDefaultActivitiProjectWizard"
@@ -92,6 +95,9 @@
                Create a new Activiti Project with a basic folder structure and a Maven POM file.
             </description>
       </wizard>
+      
+      <!-- Old wizard-->
+      <!--
       <wizard
             category="org.activiti.designer.eclipse.category"
             class="org.activiti.designer.eclipse.ui.CreateDiagramWizard"
@@ -99,6 +105,19 @@
             icon="community_icon.png"
             id="org.activiti.designer.eclipse.ui.CreateDiagramWizard"
             name="Activiti diagram">
+      </wizard>
+      -->
+      
+       <wizard
+            category="org.activiti.designer.eclipse.category"
+            class="org.activiti.designer.eclipse.ui.wizard.diagram.CreateDefaultActivitiDiagramWizard"
+            finalPerspective="org.activiti.designer.eclipse.perspective.ActivitiPerspective"
+            icon="icons/logo/activiti.logo.gradients.16x16.png"
+            id="org.activiti.designer.eclipse.ui.wizard.diagram.CreateDefaultActivitiDiagramWizard"
+            name="Activiti Diagram">
+             <description>
+               Create a new Activiti BPMN 2.0 Diagram.
+            </description>
       </wizard>
    </extension>
    <extension

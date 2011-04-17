@@ -1,4 +1,4 @@
-package org.activiti.designer.eclipse.ui;
+package org.activiti.designer.eclipse.ui.wizard.diagram;
 
 import java.io.InputStream;
 
@@ -34,11 +34,9 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 
 /**
- * The Class CreateDiagramWizard.
+ * The Class CreateDefaultActivitiDiagramWizard.
  */
-public class CreateDiagramWizard extends BasicNewResourceWizard {
-
-  private static final String PAGE_NAME_DIAGRAM_NAME = "Diagram Name";
+public class CreateDefaultActivitiDiagramWizard extends BasicNewResourceWizard {
 
   private Diagram diagram;
 
@@ -50,7 +48,8 @@ public class CreateDiagramWizard extends BasicNewResourceWizard {
   @Override
   public void addPages() {
     super.addPages();
-    addPage(new DiagramNameWizardPage(PAGE_NAME_DIAGRAM_NAME));
+    // addPage(new CreateDefaultActivitiDiagramNameWizardPage());
+    addPage(new CreateDefaultActivitiDiagramNameWizardPage2(super.getSelection()));
   }
 
   /*
@@ -85,8 +84,8 @@ public class CreateDiagramWizard extends BasicNewResourceWizard {
 
     final String diagramTypeId = "BPMNdiagram";
 
-    ITextProvider namePage = (ITextProvider) getPage(PAGE_NAME_DIAGRAM_NAME);
-    final String diagramName = namePage.getText();
+    CreateDefaultActivitiDiagramNameWizardPage2 namePage = (CreateDefaultActivitiDiagramNameWizardPage2) getPage(CreateDefaultActivitiDiagramNameWizardPage2.PAGE_NAME);
+    final String diagramName = namePage.getDiagramName();
 
     IProject project = null;
     IFolder diagramFolder = null;
@@ -126,7 +125,7 @@ public class CreateDiagramWizard extends BasicNewResourceWizard {
       diagramFolder = project.getFolder(ActivitiBPMNDiagramConstants.DIAGRAM_FOLDER);
     }
 
-    IFile diagramFile = diagramFolder.getFile(diagramName + ActivitiBPMNDiagramConstants.DIAGRAM_EXTENSION);
+    IFile diagramFile = diagramFolder.getFile(diagramName);
     URI uri = URI.createPlatformResourceURI(diagramFile.getFullPath().toString(), true);
 
     TransactionalEditingDomain domain = null;
@@ -191,4 +190,5 @@ public class CreateDiagramWizard extends BasicNewResourceWizard {
   public Diagram getDiagram() {
     return diagram;
   }
+
 }
