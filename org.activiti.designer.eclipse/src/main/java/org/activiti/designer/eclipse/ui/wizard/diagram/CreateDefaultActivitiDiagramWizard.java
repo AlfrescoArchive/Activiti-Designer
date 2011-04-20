@@ -168,13 +168,15 @@ public class CreateDefaultActivitiDiagramWizard extends BasicNewResourceWizard {
 
           org.eclipse.bpmn2.Process process = Bpmn2Factory.eINSTANCE.createProcess();
 
-          final String diagramId = StringUtils.deleteWhitespace(WordUtils.capitalize(diagramName));
+          final String simpleDiagramName = StringUtils.substringBefore(diagramName, ActivitiBPMNDiagramConstants.DIAGRAM_EXTENSION);
+
+          final String diagramId = StringUtils.deleteWhitespace(WordUtils.capitalize(simpleDiagramName));
 
           process.setId(diagramId);
-          process.setName(diagramName);
+          process.setName(simpleDiagramName);
           Documentation documentation = Bpmn2Factory.eINSTANCE.createDocumentation();
           documentation.setId("documentation_process");
-          documentation.setText(String.format("Place documentation for the '%s' process here.", diagramName));
+          documentation.setText(String.format("Place documentation for the '%s' process here.", simpleDiagramName));
           process.getDocumentation().add(documentation);
 
           diagram.eResource().getContents().add(process);
