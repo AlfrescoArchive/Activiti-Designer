@@ -1,54 +1,46 @@
 package org.activiti.designer.eclipse.ui.wizard.diagram;
 
+import org.activiti.designer.eclipse.common.ActivitiBPMNDiagramConstants;
 import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.eclipse.common.PluginImage;
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.jface.wizard.WizardPage;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.widgets.Composite;
-import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.forms.widgets.FormToolkit;
-import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.ui.dialogs.WizardNewFileCreationPage;
 
-public class CreateDefaultActivitiDiagramNameWizardPage extends WizardPage implements ITabbedPropertyConstants {
+public class CreateDefaultActivitiDiagramNameWizardPage extends WizardNewFileCreationPage {
 
   public static final String PAGE_NAME = "createDefaultActivitiDiagramNameWizardPage";
 
-  private Text diagramName;
-
-  public CreateDefaultActivitiDiagramNameWizardPage() {
-    super(PAGE_NAME, "New Activiti Diagram", ActivitiPlugin.getImageDescriptor(PluginImage.ACTIVITI_LOGO_64x64));
+  public CreateDefaultActivitiDiagramNameWizardPage(IStructuredSelection selection) {
+    super(PAGE_NAME, selection);
+    setTitle("New Activiti Diagram");
+    setImageDescriptor(ActivitiPlugin.getImageDescriptor(PluginImage.ACTIVITI_LOGO_64x64));
     setDescription("Create a new Activiti BPMN 2.0 Diagram.");
+    setFileExtension(StringUtils.substringAfter(ActivitiBPMNDiagramConstants.DIAGRAM_EXTENSION, "."));
   }
 
   @Override
-  public void createControl(Composite parent) {
+  public boolean isPageComplete() {
+    return getWizard().canFinish();
+  }
 
-    FormToolkit toolkit = new FormToolkit(parent.getDisplay());
-
-    // GridData data = new GridData(20, 20, true, false);
-
-    // parent.setLayoutData(data);
-
-    final Label diagramNameLabel = toolkit.createLabel(parent, "Diagram name", SWT.NONE);
-    diagramNameLabel.setToolTipText("Provide a name for the diagram");
-    // data = new GridData(20, 20, true, false);
-    // data.left = new FormAttachment(HSPACE);
-    // diagramNameLabel.setLayoutData(data);
-
-    diagramName = toolkit.createText(parent, "default.activiti", SWT.BORDER);
-    // data = new FormData();
-    // data.left = new FormAttachment(diagramNameLabel, HSPACE);
-    // diagramName.setLayoutData(data);
-
-    super.setControl(parent);
-
+  @Override
+  protected IStatus validateLinkedResource() {
+    boolean valid = getWizard().canFinish();
+    if (!valid) {
+      final String errorMessage = String.format("A file with the name '%s' already exists in the project. Choose a different name for the diagram.",
+              getDiagramName());
+      this.setErrorMessage(errorMessage);
+      return new Status(IStatus.ERROR, ActivitiPlugin.PLUGIN_ID, errorMessage);
+    }
+    return super.validateLinkedResource();
   }
 
   public String getDiagramName() {
-    if (StringUtils.isNotBlank(diagramName.getText())) {
-      return diagramName.getText();
+    if (StringUtils.isNotBlank(super.getFileName())) {
+      return super.getFileName();
     }
     return null;
   }

@@ -9,6 +9,8 @@ import org.activiti.designer.eclipse.navigator.nodes.base.AbstractInstancesOfTyp
 import org.activiti.designer.eclipse.preferences.Preferences;
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.eclipse.util.Util;
+import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.WordUtils;
 import org.eclipse.bpmn2.Bpmn2Factory;
 import org.eclipse.bpmn2.Documentation;
 import org.eclipse.core.resources.IFile;
@@ -28,6 +30,7 @@ import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.internal.core.PackageFragment;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.viewers.IStructuredSelection;
+import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
@@ -40,52 +43,32 @@ public class CreateDefaultActivitiDiagramWizard extends BasicNewResourceWizard {
 
   private Diagram diagram;
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.eclipse.jface.wizard.Wizard#addPages()
-   */
   @Override
   public void addPages() {
     super.addPages();
-    // addPage(new CreateDefaultActivitiDiagramNameWizardPage());
-    addPage(new CreateDefaultActivitiDiagramNameWizardPage2(super.getSelection()));
+    addPage(new CreateDefaultActivitiDiagramNameWizardPage(super.getSelection()));
+    addPage(new CreateDefaultActivitiDiagramInitialContentPage());
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.eclipse.jface.wizard.Wizard#canFinish()
-   */
   @Override
   public boolean canFinish() {
-    return super.canFinish();
+    return canCreateDiagramFile();
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.eclipse.ui.wizards.newresource.BasicNewResourceWizard#init(org.eclipse
-   * .ui.IWorkbench, org.eclipse.jface.viewers.IStructuredSelection)
-   */
-  @Override
-  public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
-    super.init(workbench, currentSelection);
+  private boolean canCreateDiagramFile() {
+    final IFile fileToCreate = getDiagramFile();
+    if (fileToCreate != null) {
+      return !fileToCreate.exists();
+    }
+    return false;
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see org.eclipse.jface.wizard.Wizard#performFinish()
-   */
-  @Override
-  public boolean performFinish() {
+  private IFile getDiagramFile() {
 
-    final String diagramTypeId = "BPMNdiagram";
-
-    CreateDefaultActivitiDiagramNameWizardPage2 namePage = (CreateDefaultActivitiDiagramNameWizardPage2) getPage(CreateDefaultActivitiDiagramNameWizardPage2.PAGE_NAME);
-    final String diagramName = namePage.getDiagramName();
+    final String diagramName = getDiagramName();
+    if (StringUtils.isBlank(diagramName)) {
+      return null;
+    }
 
     IProject project = null;
     IFolder diagramFolder = null;
@@ -118,14 +101,50 @@ public class CreateDefaultActivitiDiagramWizard extends BasicNewResourceWizard {
       String error = "No open project was found for the current selection. Select a project and restart the wizard.";
       IStatus status = new Status(IStatus.ERROR, ActivitiPlugin.getID(), error);
       ErrorDialog.openError(getShell(), "No Project Found", null, status);
-      return false;
+      return null;
     }
 
     if (diagramFolder == null) {
       diagramFolder = project.getFolder(ActivitiBPMNDiagramConstants.DIAGRAM_FOLDER);
     }
 
-    IFile diagramFile = diagramFolder.getFile(diagramName);
+    return diagramFolder.getFile(diagramName);
+
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see
+   * org.eclipse.ui.wizards.newresource.BasicNewResourceWizard#init(org.eclipse
+   * .ui.IWorkbench, org.eclipse.jface.viewers.IStructuredSelection)
+   */
+  @Override
+  public void init(IWorkbench workbench, IStructuredSelection currentSelection) {
+    super.init(workbench, currentSelection);
+  }
+
+  @Override
+  public IWizardPage getNextPage(IWizardPage page) {
+    if (page instanceof CreateDefaultActivitiDiagramNameWizardPage) {
+
+    }
+    return super.getNextPage(page);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.eclipse.jface.wizard.Wizard#performFinish()
+   */
+  @Override
+  public boolean performFinish() {
+
+    final String diagramTypeId = "BPMNdiagram";
+
+    final IFile diagramFile = getDiagramFile();
+    final String diagramName = getDiagramName();
+
     URI uri = URI.createPlatformResourceURI(diagramFile.getFullPath().toString(), true);
 
     TransactionalEditingDomain domain = null;
@@ -148,11 +167,14 @@ public class CreateDefaultActivitiDiagramWizard extends BasicNewResourceWizard {
         public void run() {
 
           org.eclipse.bpmn2.Process process = Bpmn2Factory.eINSTANCE.createProcess();
-          process.setId("helloworld");
-          process.setName("helloworld");
+
+          final String diagramId = StringUtils.deleteWhitespace(WordUtils.capitalize(diagramName));
+
+          process.setId(diagramId);
+          process.setName(diagramName);
           Documentation documentation = Bpmn2Factory.eINSTANCE.createDocumentation();
           documentation.setId("documentation_process");
-          documentation.setText("");
+          documentation.setText(String.format("Place documentation for the '%s' process here.", diagramName));
           process.getDocumentation().add(documentation);
 
           diagram.eResource().getContents().add(process);
@@ -189,6 +211,14 @@ public class CreateDefaultActivitiDiagramWizard extends BasicNewResourceWizard {
    */
   public Diagram getDiagram() {
     return diagram;
+  }
+
+  private CreateDefaultActivitiDiagramNameWizardPage getNamePage() {
+    return (CreateDefaultActivitiDiagramNameWizardPage) getPage(CreateDefaultActivitiDiagramNameWizardPage.PAGE_NAME);
+  }
+
+  private String getDiagramName() {
+    return getNamePage().getDiagramName();
   }
 
 }
