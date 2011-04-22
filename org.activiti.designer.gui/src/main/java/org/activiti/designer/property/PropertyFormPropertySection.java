@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.activiti.designer.property.ui.FormPropertyEditor;
 import org.eclipse.bpmn2.FormProperty;
+import org.eclipse.bpmn2.StartEvent;
 import org.eclipse.bpmn2.UserTask;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
@@ -60,7 +61,14 @@ public class PropertyFormPropertySection extends ActivitiPropertySection impleme
       if (bo == null)
         return;
       
-      List<FormProperty> formPropertyList = ((UserTask) bo).getFormProperties();
+      List<FormProperty> formPropertyList = null;
+      if(bo instanceof UserTask) {
+        formPropertyList = ((UserTask) bo).getFormProperties();
+      } else if(bo instanceof StartEvent) {
+        formPropertyList = ((StartEvent) bo).getFormProperties();
+      } else {
+        return;
+      }
       
       formPropertyEditor.pictogramElement = pe;
       formPropertyEditor.diagramEditor = getDiagramEditor();

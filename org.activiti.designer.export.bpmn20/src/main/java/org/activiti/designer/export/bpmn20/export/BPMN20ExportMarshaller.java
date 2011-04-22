@@ -207,6 +207,12 @@ public class BPMN20ExportMarshaller extends AbstractExportMarshaller implements 
         xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "formKey", startEvent.getFormKey());
       }
       
+      if(startEvent.getFormProperties().size() > 0) {
+        xtw.writeStartElement("extensionElements");
+        FormPropertiesExport.createFormPropertiesXML(startEvent.getFormProperties(), xtw);
+        xtw.writeEndElement();
+      }
+      
       // end StartEvent element
       xtw.writeEndElement();
 

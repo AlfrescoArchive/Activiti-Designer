@@ -65,28 +65,28 @@
          id="org.activiti.designer.gui"
          download-size="0"
          install-size="0"
-         version="5.4"
+         version="5.5"
          unpack="false"/>
 
    <plugin
          id="org.activiti.designer.eclipse"
          download-size="0"
          install-size="0"
-         version="5.4"
+         version="5.5"
          unpack="false"/>
 
    <plugin
          id="org.activiti.designer.model"
          download-size="0"
          install-size="0"
-         version="5.4"
+         version="5.5"
          unpack="false"/>
 
    <plugin
          id="org.activiti.designer.integration"
          download-size="0"
          install-size="0"
-         version="5.4"
+         version="5.5"
          unpack="false"/>
 
    <plugin
@@ -108,28 +108,28 @@
          id="org.activiti.designer.help"
          download-size="0"
          install-size="0"
-         version="5.4"
+         version="5.5"
          unpack="false"/>
 
    <plugin
          id="org.activiti.designer.export.bpmn20"
          download-size="0"
          install-size="0"
-         version="5.4"
+         version="5.5"
          unpack="false"/>
 
    <plugin
          id="org.activiti.designer.export.image"
          download-size="0"
          install-size="0"
-         version="5.4"
+         version="5.5"
          unpack="false"/>
    
    <plugin
          id="org.activiti.designer.validation.bpmn20"
          download-size="0"
          install-size="0"
-         version="5.4"
+         version="5.5"
          unpack="false"/>
 
    <plugin

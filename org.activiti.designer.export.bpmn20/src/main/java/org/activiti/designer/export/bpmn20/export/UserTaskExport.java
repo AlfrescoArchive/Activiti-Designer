@@ -20,7 +20,6 @@ import javax.xml.stream.XMLStreamWriter;
 import org.eclipse.bpmn2.CandidateGroup;
 import org.eclipse.bpmn2.CandidateUser;
 import org.eclipse.bpmn2.Documentation;
-import org.eclipse.bpmn2.FormProperty;
 import org.eclipse.bpmn2.UserTask;
 import org.eclipse.emf.ecore.EObject;
 
@@ -93,28 +92,7 @@ public class UserTaskExport implements ActivitiNamespaceConstants {
         xtw.writeStartElement("extensionElements");
       }
       
-      for (FormProperty formProperty : userTask.getFormProperties()) {
-        xtw.writeStartElement(ACTIVITI_EXTENSIONS_PREFIX, "formProperty", ACTIVITI_EXTENSIONS_NAMESPACE);
-        xtw.writeAttribute("id", formProperty.getId());
-        if(formProperty.getName() != null && formProperty.getName().length() > 0) {
-          xtw.writeAttribute("name", formProperty.getName());
-        }
-        if(formProperty.getType() != null && formProperty.getType().length() > 0) {
-          xtw.writeAttribute("type", formProperty.getType());
-        }
-        if(formProperty.getValue() != null && formProperty.getValue().length() > 0) {
-          if(formProperty.getValue().contains("#{")) {
-            xtw.writeAttribute("expression", formProperty.getValue());
-          } else {
-            xtw.writeAttribute("variable", formProperty.getValue());
-          }
-        }
-        xtw.writeAttribute("required", "" + formProperty.isRequired());
-        xtw.writeAttribute("readable", "" + formProperty.isReadable());
-        xtw.writeAttribute("writable", "" + formProperty.isWriteable());
-        xtw.writeEndElement();
-      }
-
+      FormPropertiesExport.createFormPropertiesXML(userTask.getFormProperties(), xtw);
       ExtensionListenerExport.createExtensionListenerXML(userTask.getActivitiListeners(), extensionsElement, TASK_LISTENER, xtw);
       
       if(extensionsElement == false) {

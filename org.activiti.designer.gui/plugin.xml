@@ -164,7 +164,7 @@
          </propertySection>
          <propertySection
                class="org.activiti.designer.property.PropertyFormPropertySection"
-               filter="org.activiti.designer.property.PropertyUserTaskFilter"
+               filter="org.activiti.designer.property.PropertyFormPropertyFilter"
                id="org.activiti.designer.formTab.formProperty"
                tab="org.activiti.designer.formTab">
          </propertySection>

@@ -27,7 +27,6 @@ import javax.xml.stream.XMLStreamReader;
 import org.activiti.designer.eclipse.bpmn.BpmnParser;
 import org.activiti.designer.eclipse.bpmn.GraphicInfo;
 import org.activiti.designer.eclipse.bpmn.SequenceFlowModel;
-import org.activiti.designer.eclipse.util.ActivitiUiUtil;
 import org.eclipse.bpmn2.BoundaryEvent;
 import org.eclipse.bpmn2.Bpmn2Factory;
 import org.eclipse.bpmn2.BusinessRuleTask;
@@ -36,7 +35,9 @@ import org.eclipse.bpmn2.CandidateGroup;
 import org.eclipse.bpmn2.CandidateUser;
 import org.eclipse.bpmn2.Documentation;
 import org.eclipse.bpmn2.EndEvent;
+import org.eclipse.bpmn2.ErrorEventDefinition;
 import org.eclipse.bpmn2.Event;
+import org.eclipse.bpmn2.EventDefinition;
 import org.eclipse.bpmn2.ExclusiveGateway;
 import org.eclipse.bpmn2.FieldExtension;
 import org.eclipse.bpmn2.FlowElement;
@@ -160,8 +161,8 @@ public class BpmnFileReader {
     List<FlowElement> wrongOrderList = new ArrayList<FlowElement>();
     for (FlowElement flowElement : flowList) {
       
-      FlowElement sourceElement = sourceRef(flowElement.getId());
-      if(flowElement instanceof StartEvent == false) {
+      FlowElement sourceElement = sourceRef(flowElement.getId(), yMap);
+      if(flowElement instanceof StartEvent == false && flowElement instanceof BoundaryEvent == false) {
         if(sourceElement == null) {
           wrongOrderList.add(flowElement);
           continue;
@@ -201,13 +202,20 @@ public class BpmnFileReader {
     GraphicInfo graphicInfo = new GraphicInfo();
     GraphicInfo sourceInfo = null;
     if(sourceFlowElement != null) {
+      int initX = 0;
+      int initY = 0;
       if(sourceFlowElement instanceof BoundaryEvent) {
         BoundaryEvent boundaryEvent = (BoundaryEvent) sourceFlowElement;
         if(yMap.containsKey(boundaryEvent.getAttachedToRef().getId())) {
           sourceInfo = yMap.get(boundaryEvent.getAttachedToRef().getId());
+          initX = sourceInfo.x;
+          initY = sourceInfo.y;
         }
-      } else if(yMap.containsKey(sourceFlowElement.getId())) {
+      }
+      if(yMap.containsKey(sourceFlowElement.getId())) {
         sourceInfo = yMap.get(sourceFlowElement.getId());
+        sourceInfo.x += initX;
+        sourceInfo.y += initY;
       }
     }
     
@@ -275,6 +283,14 @@ public class BpmnFileReader {
     
     if(newFlowElement instanceof Event) {
       graphicInfo.height = EVENT_HEIGHT;
+      if(newFlowElement instanceof BoundaryEvent) {
+        BoundaryEvent boundaryEvent = (BoundaryEvent) newFlowElement;
+        if(boundaryEvent.getAttachedToRef() instanceof SubProcess && yMap.containsKey(boundaryEvent.getAttachedToRef().getId())) {
+          GraphicInfo attachGraphInfo = yMap.get(boundaryEvent.getAttachedToRef().getId());
+          graphicInfo.x = attachGraphInfo.width / 2;
+          graphicInfo.y = attachGraphInfo.height - 15;
+        }
+      }
     } else if(newFlowElement instanceof Gateway) {
       graphicInfo.height = GATEWAY_HEIGHT;
     } else if(newFlowElement instanceof SubProcess) {
@@ -285,17 +301,22 @@ public class BpmnFileReader {
       for(FlowElement subFlowElement : ((SubProcess) newFlowElement).getFlowElements()) {
         GraphicInfo subGraphicInfo = null;
         if(subFlowElement instanceof StartEvent == false) {
-          FlowElement subSourceElement = sourceRef(subFlowElement.getId());
+          FlowElement subSourceElement = sourceRef(subFlowElement.getId(), subYMap);
           subGraphicInfo = getNextGraphicInfo(subSourceElement, subFlowElement, subYMap);
+          if(subGraphicInfo.y < 0) {
+            subGraphicInfo.y = 0;
+          }
         } else {
           subGraphicInfo = new GraphicInfo();
           subGraphicInfo.x = 20;
-          subGraphicInfo.y = 30;
+          subGraphicInfo.y = 50;
         }
         subYMap.put(subFlowElement.getId(), subGraphicInfo);
         subFlowElementList.add(subFlowElement);
-        width = subGraphicInfo.x;
-        height = subGraphicInfo.y;
+        if(subGraphicInfo.x > width)
+          width = subGraphicInfo.x;
+        if(subGraphicInfo.y > height)
+          height = subGraphicInfo.y;
       }
       graphicInfo.width = width + TASK_WIDTH + 40;
       graphicInfo.height = height + 40 + TASK_HEIGHT;
@@ -318,11 +339,11 @@ public class BpmnFileReader {
     return graphicInfo;
   }
   
-  private FlowElement sourceRef(String id) {
+  private FlowElement sourceRef(String id, Map<String, GraphicInfo> graphInfoMap) {
     FlowElement sourceRef = null;
     String sourceRefString = null;
     for (SequenceFlowModel sequenceFlowModel : bpmnParser.sequenceFlowList) {
-      if(sequenceFlowModel.targetRef.equals(id) && yMap.containsKey(sequenceFlowModel.sourceRef)) {
+      if(sequenceFlowModel.targetRef.equals(id) && graphInfoMap.containsKey(sequenceFlowModel.sourceRef)) {
         sourceRefString = sequenceFlowModel.sourceRef;
       }
     }
@@ -413,56 +434,78 @@ public class BpmnFileReader {
     return isEnd;
   }
   
-  /*private void drawDiagramWithBPMNDI(Diagram diagram, IFeatureProvider featureProvider, List<FlowElement> bpmnList, 
+  private void drawDiagramWithBPMNDI(Diagram diagram, IFeatureProvider featureProvider, List<FlowElement> bpmnList, 
           List<SequenceFlowModel> sequenceFlowList, Map<String, GraphicInfo> locationMap) {
     
     for (FlowElement flowElement : bpmnList) {
       String elementid = flowElement.getId();
       GraphicInfo graphicInfo = locationMap.get(elementid);
-      addBpmnElementToDiagram(flowElement, graphicInfo, diagram, diagram, featureProvider);
+      addBpmnElementToDiagram(flowElement, graphicInfo, diagram);
     }
-    drawSequenceFlows(diagram, featureProvider, bpmnList, sequenceFlowList);
-  }*/
+    drawSequenceFlows();
+  }
   
   private void setFriendlyIds() {
+    Map<String, Integer> idMap = new HashMap<String, Integer>();
     for (FlowElement flowElement : bpmnParser.bpmnList) {
       if(flowElement instanceof StartEvent) {
-        flowElement.setId(ActivitiUiUtil.getNextId(StartEvent.class, "startevent", diagram));
+        flowElement.setId(getNextId("startevent", idMap));
       } else if(flowElement instanceof EndEvent) {
-        flowElement.setId(ActivitiUiUtil.getNextId(EndEvent.class, "endevent", diagram));
+        if(((EndEvent) flowElement).getEventDefinitions().size() > 0) {
+          flowElement.setId(getNextId("errorendevent", idMap));
+        } else {
+          flowElement.setId(getNextId("endevent", idMap));
+        }
       } else if(flowElement instanceof ExclusiveGateway) {
-        flowElement.setId(ActivitiUiUtil.getNextId(ExclusiveGateway.class, "exclusivegateway", diagram));
+        flowElement.setId(getNextId("exclusivegateway", idMap));
       } else if(flowElement instanceof ParallelGateway) {
-        flowElement.setId(ActivitiUiUtil.getNextId(ParallelGateway.class, "parallelgateway", diagram));
+        flowElement.setId(getNextId("parallelgateway", idMap));
       } else if(flowElement instanceof UserTask) {
-        flowElement.setId(ActivitiUiUtil.getNextId(UserTask.class, "usertask", diagram));
+        flowElement.setId(getNextId("usertask", idMap));
       } else if(flowElement instanceof ScriptTask) {
-        flowElement.setId(ActivitiUiUtil.getNextId(ScriptTask.class, "scripttask", diagram));
+        flowElement.setId(getNextId("scripttask", idMap));
       } else if(flowElement instanceof ServiceTask) {
-        flowElement.setId(ActivitiUiUtil.getNextId(ServiceTask.class, "servicetask", diagram));
+        flowElement.setId(getNextId("servicetask", idMap));
       } else if(flowElement instanceof ManualTask) {
-        flowElement.setId(ActivitiUiUtil.getNextId(ManualTask.class, "manualtask", diagram));
+        flowElement.setId(getNextId("manualtask", idMap));
       } else if(flowElement instanceof ReceiveTask) {
-        flowElement.setId(ActivitiUiUtil.getNextId(ReceiveTask.class, "receivetask", diagram));
+        flowElement.setId(getNextId("receivetask", idMap));
       } else if(flowElement instanceof BusinessRuleTask) {
-        flowElement.setId(ActivitiUiUtil.getNextId(ReceiveTask.class, "businessruletask", diagram));
+        flowElement.setId(getNextId("businessruletask", idMap));
       } else if(flowElement instanceof MailTask) {
-        flowElement.setId(ActivitiUiUtil.getNextId(MailTask.class, "mailtask", diagram));
+        flowElement.setId(getNextId("mailtask", idMap));
       } else if(flowElement instanceof BoundaryEvent) {
-        flowElement.setId(ActivitiUiUtil.getNextId(BoundaryEvent.class, "boundarytimer", diagram));
+        if(((BoundaryEvent) flowElement).getEventDefinitions().size() > 0) {
+          EventDefinition definition = ((BoundaryEvent) flowElement).getEventDefinitions().get(0);
+          if(definition instanceof ErrorEventDefinition) {
+            flowElement.setId(getNextId("boundaryerror", idMap));
+          } else {
+            flowElement.setId(getNextId("boundarytimer", idMap));
+          }
+        }
       } else if(flowElement instanceof CallActivity) {
-        flowElement.setId(ActivitiUiUtil.getNextId(CallActivity.class, "callactivity", diagram));
+        flowElement.setId(getNextId("callactivity", idMap));
       } else if(flowElement instanceof SubProcess) {
-        flowElement.setId(ActivitiUiUtil.getNextId(ReceiveTask.class, "subprocess", diagram));
+        flowElement.setId(getNextId("subprocess", idMap));
       }
     }
   }
   
+  private String getNextId(String elementName, Map<String, Integer> idMap) {
+    if(idMap.containsKey(elementName)) {
+      idMap.put(elementName, idMap.get(elementName) + 1);
+    } else {
+      idMap.put(elementName, 1);
+    }
+    return elementName + idMap.get(elementName);
+  }
+  
   private void drawSequenceFlows() {
-    
+    int sequenceCounter = 1;
     for(SequenceFlowModel sequenceFlowModel : bpmnParser.sequenceFlowList) {
       SequenceFlow sequenceFlow = Bpmn2Factory.eINSTANCE.createSequenceFlow();
-      sequenceFlow.setId(ActivitiUiUtil.getNextId(SequenceFlow.class, "flow", diagram));
+      sequenceFlow.setId("flow" + sequenceCounter);
+      sequenceCounter++;
       sequenceFlow.setSourceRef(getFlowNode(sequenceFlowModel.sourceRef));
       sequenceFlow.setTargetRef(getFlowNode(sequenceFlowModel.targetRef));
       if(sequenceFlow.getSourceRef() == null || sequenceFlow.getSourceRef().getId() == null || 
@@ -592,7 +635,7 @@ public class BpmnFileReader {
       addContext.setNewObject(boundaryEvent);
       if(parentIsSubProcess == true) {
         addContext.setX(addContext.getTargetContainer().getGraphicsAlgorithm().getWidth() / 2);
-        addContext.setY(addContext.getTargetContainer().getGraphicsAlgorithm().getHeight() - 30);
+        addContext.setY(addContext.getTargetContainer().getGraphicsAlgorithm().getHeight() - 15);
       } else {
         addContext.setX(TASK_WIDTH - 25);
         addContext.setY(TASK_HEIGHT - 25);

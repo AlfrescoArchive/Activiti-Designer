@@ -20,6 +20,11 @@ import org.eclipse.bpmn2.BoundaryEvent;
  * @author Tijs Rademakers
  */
 public class BoundaryEventModel {
+  
+  public static final String TIMEEVENT = "timeevent";
+  public static final String ERROREVENT = "errorevent";
+  
   public BoundaryEvent boundaryEvent;
   public String attachedRef;
+  public String type;
 }

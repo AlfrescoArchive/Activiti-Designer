@@ -163,7 +163,8 @@ public class ActivitiMultiPageEditor extends MultiPageEditorPart implements IRes
           String processName = bpmnFile.substring(bpmnFile.lastIndexOf(File.separator) + 1);
           processName = processName.replace(".xml", "");
           processName = processName.replace(".bpmn20", "");
-          ImportBpmnUtil.createDiagram(processName, bpmnFile, associatedBPMN2File.getProject());
+          ImportBpmnUtil.createDiagram(processName, bpmnFile, 
+                  associatedBPMN2File.getProject(), associatedBPMN2File.getParent());
         }
         final IEditorInput diagramFileEditorInput = new FileEditorInput(diagramFile);
 

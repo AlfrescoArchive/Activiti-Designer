@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Activiti Designer - Eclipse
 Bundle-SymbolicName: org.activiti.designer.eclipse;singleton:=true
-Bundle-Version: 5.4
+Bundle-Version: 5.5
 Require-Bundle: org.eclipse.graphiti,
  org.eclipse.graphiti.pattern,
  org.eclipse.graphiti.ui,
@@ -44,5 +44,8 @@ Export-Package:
  org.activiti.designer.eclipse.util,
  org.activiti.designer.eclipse.util.uiprovider
 Bundle-Activator: org.activiti.designer.eclipse.common.ActivitiPlugin
-Bundle-ClassPath: .
 Import-Package: org.activiti.designer.eclipse.bpmn
+Bundle-ClassPath: .,
+ jdi.jar,
+ jdimodel.jar,
+ junit.jar

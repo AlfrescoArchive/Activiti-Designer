@@ -62,7 +62,8 @@ public class ImportBpmnMenu implements org.eclipse.ui.IObjectActionDelegate{
     processName = processName.replace(".xml", "");
     processName = processName.replace(".bpmn20", "");
 
-    ImportBpmnElementsCommand operation = ImportBpmnUtil.createDiagram(processName, bpmnFile, javaProject.getProject());
+    ImportBpmnElementsCommand operation = ImportBpmnUtil.createDiagram(processName, bpmnFile, 
+            javaProject.getProject(), diagramFolder);
 
     // Open the editor
     String platformString = operation.getCreatedResource().getURI().toPlatformString(true);

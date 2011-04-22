@@ -11,6 +11,7 @@ import java.util.zip.ZipOutputStream;
 
 import org.activiti.designer.eclipse.common.ActivitiBPMNDiagramConstants;
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -31,7 +32,6 @@ import org.eclipse.ui.progress.IProgressService;
 
 public class DeploymentMenu implements org.eclipse.ui.IObjectActionDelegate{
 
-  private static final String RESOURCES_DIR = "src/main/resources";
 	ISelection fSelection;
 	List<IFile> memberList;
 
@@ -59,12 +59,12 @@ public class DeploymentMenu implements org.eclipse.ui.IObjectActionDelegate{
             IProject project = javaProject.getProject();
             
         		// Create folder structures
-            IFolder rootFolder = project.getFolder("deployment");
-            if (rootFolder.exists()) {
-              rootFolder.delete(true, new NullProgressMonitor());
+            IFolder deploymentFolder = project.getFolder("deployment");
+            if (deploymentFolder.exists()) {
+              deploymentFolder.delete(true, new NullProgressMonitor());
             }
         
-            rootFolder.create(true, true, new NullProgressMonitor());
+            deploymentFolder.create(true, true, new NullProgressMonitor());
             
             IFolder tempbarFolder = project.getFolder("tempbar");
             if (tempbarFolder.exists()) {
@@ -82,9 +82,8 @@ public class DeploymentMenu implements org.eclipse.ui.IObjectActionDelegate{
         
             // processdefinition
             String processName = "";
-            IFolder resourceFolder = project.getFolder(RESOURCES_DIR);
             memberList = new ArrayList<IFile>();
-            getMembersWithFilter(resourceFolder, ".bpmn20.xml");
+            getMembersWithFilter(project, ".bpmn20.xml");
             if(memberList.size() > 0) {
               for (IFile bpmnResource : memberList) {
                 String bpmnFilename = bpmnResource.getName();
@@ -95,7 +94,7 @@ public class DeploymentMenu implements org.eclipse.ui.IObjectActionDelegate{
           
               // task forms
               memberList = new ArrayList<IFile>();
-              getMembersWithFilter(resourceFolder, ".form");
+              getMembersWithFilter(project, ".form");
               for (IFile formResource : memberList) {
                 String formFilename = formResource.getName();
                 IPath packagePath = formResource.getFullPath().removeFirstSegments(4).removeLastSegments(1);
@@ -106,7 +105,7 @@ public class DeploymentMenu implements org.eclipse.ui.IObjectActionDelegate{
               
               // png
               memberList = new ArrayList<IFile>();
-              getMembersWithFilter(resourceFolder, ".png");
+              getMembersWithFilter(project, ".png");
               for (IFile pngResource : memberList) {
                 String pngFilename = pngResource.getName();
                 pngResource.copy(tempbarFolder.getFile(pngFilename).getFullPath(), true, new NullProgressMonitor());
@@ -114,13 +113,13 @@ public class DeploymentMenu implements org.eclipse.ui.IObjectActionDelegate{
               
               // drl
               memberList = new ArrayList<IFile>();
-              getMembersWithFilter(resourceFolder, ".drl");
+              getMembersWithFilter(project, ".drl");
               for (IFile drlResource : memberList) {
                 String drlFilename = drlResource.getName();
                 drlResource.copy(tempbarFolder.getFile(drlFilename).getFullPath(), true, new NullProgressMonitor());
               }
           
-              compressPackage(rootFolder, tempbarFolder, processName + ".bar");
+              compressPackage(deploymentFolder, tempbarFolder, processName + ".bar");
               
               IFolder classesFolder = project.getFolder("target/classes");
               memberList = new ArrayList<IFile>();
@@ -133,11 +132,11 @@ public class DeploymentMenu implements org.eclipse.ui.IObjectActionDelegate{
                   createFolderStructure(newPackageFolder);
                   classResource.copy(newPackageFolder.getFile(classFilename).getFullPath(), true, new NullProgressMonitor());
                 }
-                compressPackage(rootFolder, tempclassesFolder, processName + ".jar");
+                compressPackage(deploymentFolder, tempclassesFolder, processName + ".jar");
               }
           
               // refresh the output folder to reflect changes
-              rootFolder.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+              deploymentFolder.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
             }
             
           } catch(Exception e) {
@@ -159,14 +158,14 @@ public class DeploymentMenu implements org.eclipse.ui.IObjectActionDelegate{
 	  newFolder.create(true, true, new NullProgressMonitor());
 	}
 	
-	private void getMembersWithFilter(IFolder folder, String extension) {
+	private void getMembersWithFilter(IContainer root, String extension) {
 	  try {
-  	  for (IResource resource : folder.members()) {
+  	  for (IResource resource : root.members()) {
         if (resource instanceof IFile) {
           if(resource.getName().contains(extension)) {
             memberList.add((IFile) resource);
           }
-        } else if(resource instanceof IFolder) {
+        } else if(resource instanceof IFolder && ((IFolder) resource).getName().contains("target") == false) {
           getMembersWithFilter((IFolder) resource, extension);
         }
       }

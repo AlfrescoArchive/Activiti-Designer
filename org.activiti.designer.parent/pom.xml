@@ -3,12 +3,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.activiti.designer</groupId>
 	<artifactId>org.activiti.designer.parent</artifactId>
-	<version>5.4</version>
+	<version>5.5</version>
 	<packaging>pom</packaging>
 	<name>Activiti Designer - Parent project</name>
 
 	<properties>
-		<tycho-version>0.10.0</tycho-version>
+		<tycho-version>0.11.0</tycho-version>
 	</properties>
 
 	<modules>

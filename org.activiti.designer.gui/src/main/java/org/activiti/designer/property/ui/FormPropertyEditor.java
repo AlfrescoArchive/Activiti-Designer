@@ -6,6 +6,7 @@ import java.util.List;
 import org.activiti.designer.eclipse.util.ActivitiUiUtil;
 import org.eclipse.bpmn2.Bpmn2Factory;
 import org.eclipse.bpmn2.FormProperty;
+import org.eclipse.bpmn2.StartEvent;
 import org.eclipse.bpmn2.UserTask;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -95,16 +96,29 @@ public class FormPropertyEditor extends TableFieldEditor {
     saveFormProperties();
   }
   
+  private List<FormProperty> getFormProperties(Object bo) {
+    List<FormProperty> formPropertyList = null;
+    if(bo instanceof UserTask) {
+      formPropertyList = ((UserTask) bo).getFormProperties();
+    } else if(bo instanceof StartEvent) {
+      formPropertyList = ((StartEvent) bo).getFormProperties();
+    }
+    return formPropertyList;
+  }
+  
   private void saveFormProperties() {
     if (pictogramElement != null) {
       final Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pictogramElement);
       if (bo == null) {
         return;
       }
-      final List<FormProperty> formPropertyList = ((UserTask) bo).getFormProperties();
+      final List<FormProperty> formPropertyList = getFormProperties(bo);
+      if(formPropertyList == null) return;
+      
       if(formPropertiesChanged(formPropertyList, getItems()) == false) {
         return;
       }
+      
       TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
       ActivitiUiUtil.runModelChange(new Runnable() {
         public void run() {
@@ -147,11 +161,11 @@ public class FormPropertyEditor extends TableFieldEditor {
                 if(writeable != null && writeable.length() > 0) {
                   newFormProperty.setWriteable(Boolean.valueOf(writeable.toLowerCase()));
                 }
-                ((UserTask) bo).getFormProperties().add(newFormProperty);
+                getFormProperties(bo).add(newFormProperty);
               }
             }
           }
-          removeFormPropertiesNotInList(getItems(), (UserTask) bo);
+          removeFormPropertiesNotInList(getItems(), bo);
         }
       }, editingDomain, "Model Update");
     }
@@ -225,8 +239,8 @@ public class FormPropertyEditor extends TableFieldEditor {
     return null;
   }
   
-  private void removeFormPropertiesNotInList(TableItem[] items, UserTask bo) {
-    List<FormProperty> formPropertyList = bo.getFormProperties();
+  private void removeFormPropertiesNotInList(TableItem[] items, Object bo) {
+    List<FormProperty> formPropertyList = getFormProperties(bo);
     List<FormProperty> toDeleteList = new ArrayList<FormProperty>();
     for (FormProperty formProperty : formPropertyList) {
       boolean found = false;
@@ -241,7 +255,7 @@ public class FormPropertyEditor extends TableFieldEditor {
       }
     }
     for (FormProperty formProperty : toDeleteList) {
-     bo.getFormProperties().remove(formProperty);
+     getFormProperties(bo).remove(formProperty);
     }
   }
 	

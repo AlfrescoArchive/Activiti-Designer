@@ -7,6 +7,7 @@ import org.activiti.designer.util.StyleUtil;
 import org.eclipse.bpmn2.FlowNode;
 import org.eclipse.bpmn2.Gateway;
 import org.eclipse.bpmn2.SequenceFlow;
+import org.eclipse.bpmn2.SubProcess;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -81,6 +82,22 @@ public class AddSequenceFlowFeature extends AbstractAddFeature {
 		if(sourceAnchor == null || targetAnchor == null) {
 		  return null;
 		}
+		
+		boolean inSubProcess = false;
+		Object parentObject = null;
+		ContainerShape parentShape = null;
+    if(sourceAnchor.eContainer() instanceof ContainerShape) {
+      parentShape = (ContainerShape) sourceAnchor.eContainer().eContainer();
+      parentObject = getBusinessObjectForPictogramElement(parentShape.getGraphicsAlgorithm().getPictogramElement());
+      if(parentObject != null && parentObject instanceof SubProcess == false) {
+        parentShape = (ContainerShape) targetAnchor.eContainer().eContainer();
+        parentObject = getBusinessObjectForPictogramElement(parentShape.getGraphicsAlgorithm().getPictogramElement());
+      }
+    }
+    
+    if (parentObject != null && parentObject instanceof SubProcess) {
+      inSubProcess = true;
+    }
 
 		IPeCreateService peCreateService = Graphiti.getPeCreateService();
 		// CONNECTION WITH POLYLINE
@@ -99,8 +116,13 @@ public class AddSequenceFlowFeature extends AbstractAddFeature {
 					|| (sourceGraphics.getY() - 10) > targetGraphics.getY())  && 
 					(sourceGraphics.getX() + (sourceGraphics.getWidth() / 2)) < targetGraphics.getX()) {
 				Point bendPoint = StylesFactory.eINSTANCE.createPoint();
-				bendPoint.setX(sourceGraphics.getX() + 20);
-				bendPoint.setY(targetGraphics.getY() + (targetGraphics.getHeight() / 2));
+				if(inSubProcess == true) {
+  				bendPoint.setX(parentShape.getGraphicsAlgorithm().getX() + sourceGraphics.getX() + 20);
+  				bendPoint.setY(parentShape.getGraphicsAlgorithm().getY() + targetGraphics.getY() + (targetGraphics.getHeight() / 2));
+				} else {
+				  bendPoint.setX(sourceGraphics.getX() + 20);
+          bendPoint.setY(targetGraphics.getY() + (targetGraphics.getHeight() / 2));
+				}
 				connection.getBendpoints().add(bendPoint);
 			}
 		} else if (addedSequenceFlow.getTargetRef() instanceof Gateway) {
@@ -112,8 +134,13 @@ public class AddSequenceFlowFeature extends AbstractAddFeature {
 					|| (sourceGraphics.getY() - 10) > targetGraphics.getY()) && 
 					(sourceGraphics.getX() + sourceGraphics.getWidth()) < targetGraphics.getX()) {
 				Point bendPoint = StylesFactory.eINSTANCE.createPoint();
-				bendPoint.setX(targetGraphics.getX() + 20);
-				bendPoint.setY(sourceGraphics.getY() + (sourceGraphics.getHeight() / 2));
+				if(inSubProcess == true) {
+  				bendPoint.setX(parentShape.getGraphicsAlgorithm().getX() + targetGraphics.getX() + 20);
+  				bendPoint.setY(parentShape.getGraphicsAlgorithm().getY() + sourceGraphics.getY() + (sourceGraphics.getHeight() / 2));
+				} else {
+				  bendPoint.setX(targetGraphics.getX() + 20);
+          bendPoint.setY(sourceGraphics.getY() + (sourceGraphics.getHeight() / 2));
+				}
 				connection.getBendpoints().add(bendPoint);
 			}
 		}

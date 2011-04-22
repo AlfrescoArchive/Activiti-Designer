@@ -3,7 +3,7 @@
    <description name="Activiti Eclipse BPMN 2.0 Designer Update Site" url="http://activiti.org/designer/update">
       Activiti Eclipse BPMN 2.0 Designer Update Site
    </description>
-   <feature url="features/org.activiti.designer.feature_5.4.jar" id="org.activiti.designer.feature" version="5.4">
+   <feature url="features/org.activiti.designer.feature_5.5.jar" id="org.activiti.designer.feature" version="5.5">
       <category name="designer"/>
    </feature>
    <category-def name="designer" label="Activiti BPMN Designer">

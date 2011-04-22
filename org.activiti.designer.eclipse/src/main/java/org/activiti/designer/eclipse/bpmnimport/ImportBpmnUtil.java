@@ -16,6 +16,7 @@ package org.activiti.designer.eclipse.bpmnimport;
 import java.io.IOException;
 
 import org.activiti.designer.eclipse.common.ActivitiPlugin;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
@@ -32,7 +33,9 @@ import org.eclipse.swt.widgets.Display;
  */
 public class ImportBpmnUtil {
   
-  public static ImportBpmnElementsCommand createDiagram(String processName, String bpmnFile, IProject project) {
+  public static ImportBpmnElementsCommand createDiagram(String processName, String bpmnFile, 
+          IProject project, IContainer targetFolder) {
+    
     // Get the default resource set to hold the new resource
     ResourceSet resourceSet = new ResourceSetImpl();
     TransactionalEditingDomain editingDomain = TransactionUtil.getEditingDomain(resourceSet);
@@ -45,8 +48,8 @@ public class ImportBpmnUtil {
     // the command since finishing the command will trigger setting the 
     // modification flag on the resource which will be used by the save
     // operation to determine which resources need to be saved)
-    ImportBpmnElementsCommand operation = new ImportBpmnElementsCommand(project, 
-            editingDomain, processName, bpmnFile);
+    ImportBpmnElementsCommand operation = new ImportBpmnElementsCommand( 
+            editingDomain, processName, bpmnFile, targetFolder);
     editingDomain.getCommandStack().execute(operation);
     try {
       operation.getCreatedResource().save(null);

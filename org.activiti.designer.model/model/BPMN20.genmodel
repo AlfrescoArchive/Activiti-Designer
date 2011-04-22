@@ -738,6 +738,7 @@
     <genClasses ecoreClass="BPMN20.ecore#//StartEvent">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute BPMN20.ecore#//StartEvent/isInterrupting"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute BPMN20.ecore#//StartEvent/formKey"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference BPMN20.ecore#//StartEvent/formProperties"/>
     </genClasses>
     <genClasses ecoreClass="BPMN20.ecore#//SubChoreography">
       <genFeatures property="None" notify="false" createChild="false" ecoreFeature="ecore:EReference BPMN20.ecore#//SubChoreography/artifacts"/>
