@@ -78,10 +78,18 @@ public class BpmnBOUtil {
     List<FieldExtensionModel> fieldList = new ArrayList<FieldExtensionModel>();
     for (String field : fieldStringList) {
       String[] fieldExtensionStringList = field.split(":");
-      if(fieldExtensionStringList != null && fieldExtensionStringList.length == 2) {
+      if(fieldExtensionStringList != null && fieldExtensionStringList.length >= 2) {
         FieldExtensionModel fieldExtension = new FieldExtensionModel();
         fieldExtension.fieldName = fieldExtensionStringList[0];
-        fieldExtension.expression = fieldExtensionStringList[1];
+        String expression = null;
+        for(int i = 1; i < fieldExtensionStringList.length; i++) {
+          if(i == 1) {
+            expression = fieldExtensionStringList[i];
+          } else {
+            expression += ":" + fieldExtensionStringList[i];
+          }
+        }
+        fieldExtension.expression = expression;
         fieldList.add(fieldExtension);
       }
     }

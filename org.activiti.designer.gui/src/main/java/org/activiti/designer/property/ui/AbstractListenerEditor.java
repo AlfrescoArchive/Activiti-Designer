@@ -299,7 +299,15 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
 	      listener.getFieldExtensions().add(fieldExtension);
 	    }
 	    fieldExtension.setFieldname(fieldExtensionStringList[0]);
-	    fieldExtension.setExpression(fieldExtensionStringList[1]);
+	    String expression = null;
+	    for(int i = 1; i < fieldExtensionStringList.length; i++) {
+	      if(i == 1) {
+	        expression = fieldExtensionStringList[i];
+	      } else {
+	        expression += ":" + fieldExtensionStringList[i];
+	      }
+	    }
+	    fieldExtension.setExpression(expression);
     }
 	  removeFieldExtensionsNotInList(listener.getFieldExtensions(), fieldStringList);
 	}
