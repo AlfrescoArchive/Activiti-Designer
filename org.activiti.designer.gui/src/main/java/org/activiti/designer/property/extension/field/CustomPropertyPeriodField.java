@@ -53,7 +53,7 @@ public class CustomPropertyPeriodField extends AbstractCustomPropertyField {
   @Override
   public void refresh() {
 
-    final String value = getSimpleValueFromModel();
+    final String value = getSimpleValueOrDefault();
 
     if (StringUtils.isNotEmpty(value)) {
 

@@ -47,7 +47,7 @@ public class CustomPropertyTextField extends AbstractCustomPropertyField {
 
   @Override
   public void refresh() {
-    textControl.setText(getSimpleValueFromModel());
+    textControl.setText(getSimpleValueOrDefault());
   }
 
   @Override

@@ -26,6 +26,7 @@ import org.activiti.designer.integration.servicetask.validator.FieldValidator;
 import org.activiti.designer.integration.servicetask.validator.ValidationException;
 import org.activiti.designer.property.PropertyCustomServiceTaskSection;
 import org.activiti.designer.property.extension.util.ExtensionUtil;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.bpmn2.ComplexDataType;
 import org.eclipse.bpmn2.CustomProperty;
 import org.eclipse.bpmn2.ServiceTask;
@@ -120,13 +121,32 @@ public abstract class AbstractCustomPropertyField implements CustomPropertyField
   }
 
   protected String getSimpleValueFromModel() {
-    String result = "";
+    String result = null;
     final CustomProperty property = ExtensionUtil.getCustomProperty(serviceTask, customPropertyId);
     if (property != null) {
       final String propertyValue = property.getSimpleValue();
       if (propertyValue != null) {
         result = propertyValue;
       }
+    }
+    return result;
+  }
+
+  /**
+   * Extends {@link #getSimpleValueFromModel()} by evaluating if the field has a
+   * default value configured and providing that if there is no value stored in
+   * the model (i.e., {@link #getSimpleValueFromModel()} returns null)s.
+   * 
+   * @return the result of {@link #getSimpleValueFromModel()} if it exists,
+   *         otherwise the default value for the field if one exists, an empty
+   *         string otherwise. This method will never return null.
+   */
+  protected String getSimpleValueOrDefault() {
+    String result = getSimpleValueFromModel();
+    if (result == null && StringUtils.isNotBlank(getPropertyAnnotation().defaultValue())) {
+      result = getPropertyAnnotation().defaultValue();
+    } else if (result == null) {
+      result = "";
     }
     return result;
   }

@@ -58,9 +58,10 @@ public class CustomPropertyRadioChoiceField extends AbstractCustomPropertyField 
 
   @Override
   public void refresh() {
-    final String storedValue = getSimpleValueFromModel();
+    final String value = getSimpleValueOrDefault();
+
     for (final Entry<String, String> entry : values.entrySet()) {
-      if (entry.getKey().equals(storedValue)) {
+      if (entry.getKey().equals(value)) {
         for (final Control currentControl : parentControl.getChildren()) {
 
           if (currentControl instanceof Button) {

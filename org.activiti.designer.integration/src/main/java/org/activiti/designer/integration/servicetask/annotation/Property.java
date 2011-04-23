@@ -50,4 +50,11 @@ public @interface Property {
    */
   int order() default 1;
 
+  /**
+   * The default value that should be set to the field if no existing value
+   * (even an empty one) was found in the loaded model. This property is only
+   * applied to Property annotated fields that have a simple value.
+   */
+  String defaultValue() default "";
+
 }

@@ -54,9 +54,9 @@ public class CustomPropertyComboboxChoiceField extends AbstractCustomPropertyFie
 
   @Override
   public void refresh() {
-    final String storedValue = getSimpleValueFromModel();
+    final String value = getSimpleValueOrDefault();
     for (final Entry<String, String> entry : values.entrySet()) {
-      if (entry.getKey().equals(storedValue)) {
+      if (entry.getKey().equals(value)) {
         comboControl.setText(entry.getValue());
         break;
       }

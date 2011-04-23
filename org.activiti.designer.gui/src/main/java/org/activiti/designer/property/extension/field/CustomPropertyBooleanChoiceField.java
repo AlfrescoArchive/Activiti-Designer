@@ -46,7 +46,7 @@ public class CustomPropertyBooleanChoiceField extends AbstractCustomPropertyFiel
 
   @Override
   public void refresh() {
-    buttonControl.setSelection(Boolean.parseBoolean(getSimpleValueFromModel()));
+    buttonControl.setSelection(Boolean.parseBoolean(getSimpleValueOrDefault()));
   }
 
   @Override

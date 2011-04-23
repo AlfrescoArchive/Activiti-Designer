@@ -54,11 +54,13 @@ public class CustomPropertyDatePickerField extends AbstractCustomPropertyField {
 
   @Override
   public void refresh() {
-    final String modelValue = getSimpleValueFromModel();
-    if (StringUtils.isNotBlank(modelValue)) {
+
+    final String value = getSimpleValueOrDefault();
+
+    if (StringUtils.isNotBlank(value)) {
       Date date;
       try {
-        date = sdf.parse(modelValue);
+        date = sdf.parse(value);
         final Calendar calendar = Calendar.getInstance();
         calendar.clear();
         calendar.setTime(date);

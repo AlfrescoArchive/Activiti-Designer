@@ -52,7 +52,7 @@ public class AcmeMoneyTask extends AbstractCustomServiceTask {
   private static final String LIMIT_HIGH_LABEL = "High (2500)";
   private static final String LIMIT_HIGH_VALUE = "2500";
 
-  @Property(type = PropertyType.TEXT, displayName = "Account Number", required = true)
+  @Property(type = PropertyType.TEXT, displayName = "Account Number", required = true, defaultValue = "1234567890")
   @Help(displayHelpShort = "Provide an account number", displayHelpLong = HELP_ACCOUNT_NUMBER_LONG)
   private String accountNumber;
 
@@ -60,7 +60,7 @@ public class AcmeMoneyTask extends AbstractCustomServiceTask {
   @Help(displayHelpShort = "Provide comments", displayHelpLong = "You can add comments to the node to provide a brief description.")
   private String comments;
 
-  @Property(type = PropertyType.PERIOD, displayName = "Processing Time", required = true)
+  @Property(type = PropertyType.PERIOD, displayName = "Processing Time", required = true, defaultValue = "0y 0mo 2w 0d 0h 0m 0s")
   @Help(displayHelpShort = "The maximum allowed time for processing", displayHelpLong = "Processing must take no longer than the period you specify here.")
   private String maximumProcessingTime;
 
@@ -69,11 +69,11 @@ public class AcmeMoneyTask extends AbstractCustomServiceTask {
   @Help(displayHelpShort = "People authorized for this account", displayHelpLong = "Specify the details of people allowed to manage this account.")
   private List<AccountManager> accountManagers;
 
-  @Property(type = PropertyType.BOOLEAN_CHOICE, displayName = "VIP Customer")
+  @Property(type = PropertyType.BOOLEAN_CHOICE, displayName = "VIP Customer", defaultValue = "false")
   @Help(displayHelpShort = "Is the customer a VIP?", displayHelpLong = "VIP customers enjoy special privileges. Check this field to indicate the customer is a VIP.")
   private String vipCustomer;
 
-  @Property(type = PropertyType.COMBOBOX_CHOICE, displayName = "Account type", required = true)
+  @Property(type = PropertyType.COMBOBOX_CHOICE, displayName = "Account type", required = true, defaultValue = ACCOUNT_TYPE_STUDENT_VALUE)
   @Help(displayHelpShort = "The type of account", displayHelpLong = "Choose a type of account from the list of options")
   @PropertyItems({ ACCOUNT_TYPE_SAVINGS_LABEL, ACCOUNT_TYPE_SAVINGS_VALUE, ACCOUNT_TYPE_JUNIOR_LABEL, ACCOUNT_TYPE_JUNIOR_VALUE, ACCOUNT_TYPE_JOINT_LABEL,
       ACCOUNT_TYPE_JOINT_VALUE, ACCOUNT_TYPE_TRANSACTIONAL_LABEL, ACCOUNT_TYPE_TRANSACTIONAL_VALUE, ACCOUNT_TYPE_STUDENT_LABEL, ACCOUNT_TYPE_STUDENT_VALUE,

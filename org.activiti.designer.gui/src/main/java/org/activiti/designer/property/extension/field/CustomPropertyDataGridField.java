@@ -283,8 +283,7 @@ public class CustomPropertyDataGridField extends AbstractCustomPropertyField {
 
             final Text propertyText = factory.createText(dataGridControl, "", SWT.BORDER_SOLID);
             propertyText.setEnabled(true);
-
-            propertyText.setText(field.getSimpleValue());
+            propertyText.setText(getSimpleValueOrDefault(field, propertyAnnotation));
             propertyText.addFocusListener(new GridFieldListener(propertyText, field));
             propertyText.addFocusListener(sharedFocusListener);
 
@@ -305,7 +304,8 @@ public class CustomPropertyDataGridField extends AbstractCustomPropertyField {
           case MULTILINE_TEXT:
 
             final Text multiControl = factory.createText(dataGridControl, "", SWT.BORDER_SOLID);
-            multiControl.setText(field.getSimpleValue());
+
+            multiControl.setText(getSimpleValueOrDefault(field, propertyAnnotation));
             multiControl.setToolTipText("Double-click this field to edit");
             multiControl.setEnabled(true);
 
@@ -353,7 +353,8 @@ public class CustomPropertyDataGridField extends AbstractCustomPropertyField {
             break;
           case PERIOD:
             final Text periodControl = factory.createText(dataGridControl, "", SWT.BORDER_SOLID);
-            periodControl.setText(field.getSimpleValue());
+
+            periodControl.setText(getSimpleValueOrDefault(field, propertyAnnotation));
             periodControl.setToolTipText("Double-click this field to edit");
             final String fieldName = propertyAnnotation.displayName();
             periodControl.setEnabled(true);
@@ -531,6 +532,19 @@ public class CustomPropertyDataGridField extends AbstractCustomPropertyField {
       }
     }
   }
+  private String getSimpleValueOrDefault(DataGridField field, Property propertyAnnotation) {
+    String value = field.getSimpleValue();
+    if (value == null) {
+      if (StringUtils.isNotBlank(propertyAnnotation.defaultValue())) {
+        value = propertyAnnotation.defaultValue();
+      } else {
+        value = "";
+      }
+    }
+
+    return value;
+  }
+
   private void createFooter() {
     final Button addButton = factory.createButton(dataGridControl, "Add item", SWT.BUTTON1);
     addButton.setImage(PlatformUI.getWorkbench().getSharedImages().getImage(ISharedImages.IMG_OBJ_ADD));
@@ -548,7 +562,7 @@ public class CustomPropertyDataGridField extends AbstractCustomPropertyField {
         for (final FieldInfo fieldInfo : gridFields) {
           final DataGridField newField = Bpmn2Factory.eINSTANCE.createDataGridField();
           newField.setName(fieldInfo.getFieldName());
-          newField.setSimpleValue("");
+          newField.setSimpleValue(null);
           newRow.getField().add(newField);
         }
 

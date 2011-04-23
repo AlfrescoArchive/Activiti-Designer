@@ -47,7 +47,7 @@ public class CustomPropertyMultilineTextField extends AbstractCustomPropertyFiel
 
   @Override
   public void refresh() {
-    textControl.setText(getSimpleValueFromModel());
+    textControl.setText(getSimpleValueOrDefault());
   }
 
   @Override
