@@ -193,13 +193,12 @@ public class CreateDefaultActivitiProjectWizard extends BasicNewProjectResourceW
     buffer.append("  <packaging>jar</packaging>\n");
     buffer.append("  <name>BPMN 2.0 with Activiti - Examples</name>\n");
     buffer.append("  <properties>\n");
-    buffer.append("    <activiti-version>5.4</activiti-version>\n");
+    buffer.append("    <activiti-version>5.5</activiti-version>\n");
     buffer.append("  </properties>\n");
     buffer.append("  <dependencies>\n");
     addDependency(buffer, "org.activiti", "activiti-engine", "${activiti-version}");
     addDependency(buffer, "org.activiti", "activiti-spring", "${activiti-version}");
     addDependency(buffer, "org.codehaus.groovy", "groovy", "1.7.5");
-    addDependency(buffer, "hsqldb", "hsqldb", "1.8.0.7");
     addDependency(buffer, "com.h2database", "h2", "1.2.132");
     addDependency(buffer, "junit", "junit", "4.8.1");
     buffer.append("  </dependencies>\n");
