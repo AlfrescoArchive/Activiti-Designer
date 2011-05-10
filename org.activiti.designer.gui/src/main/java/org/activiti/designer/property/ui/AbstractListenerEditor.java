@@ -70,7 +70,7 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
       if(fieldExtensions != null) {
         for (FieldExtension fieldExtension : fieldExtensions) {
           if(fieldString.length() > 0) {
-            fieldString += ", ";
+            fieldString += "± ";
           }
           fieldString += fieldExtension.getFieldname() + ":" + fieldExtension.getExpression();
         }
@@ -290,7 +290,7 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
 	    }
 	    return;
 	  }
-	  String[] fieldStringList = fieldString.split(", ");
+	  String[] fieldStringList = fieldString.split("±");
 	  for (String field : fieldStringList) {
 	    String[] fieldExtensionStringList = field.split(":");
 	    FieldExtension fieldExtension = fieldExtensionExists(listener.getFieldExtensions(), fieldExtensionStringList[0]);

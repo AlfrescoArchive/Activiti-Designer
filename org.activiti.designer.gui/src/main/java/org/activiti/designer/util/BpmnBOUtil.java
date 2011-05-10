@@ -74,7 +74,7 @@ public class BpmnBOUtil {
   }
   
   public static List<FieldExtensionModel> getFieldModelList(String fieldString) {
-    String[] fieldStringList = fieldString.split(", ");
+    String[] fieldStringList = fieldString.split("± ");
     List<FieldExtensionModel> fieldList = new ArrayList<FieldExtensionModel>();
     for (String field : fieldStringList) {
       String[] fieldExtensionStringList = field.split(":");

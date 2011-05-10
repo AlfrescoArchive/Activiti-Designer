@@ -37,6 +37,7 @@ import org.eclipse.bpmn2.FormProperty;
 import org.eclipse.bpmn2.FormalExpression;
 import org.eclipse.bpmn2.MailTask;
 import org.eclipse.bpmn2.ManualTask;
+import org.eclipse.bpmn2.MultiInstanceLoopCharacteristics;
 import org.eclipse.bpmn2.ParallelGateway;
 import org.eclipse.bpmn2.ReceiveTask;
 import org.eclipse.bpmn2.ScriptTask;
@@ -281,6 +282,43 @@ public class BpmnParser {
     }
   }
   
+  private void parseMultiInstanceDef(MultiInstanceLoopCharacteristics multiInstanceDef, XMLStreamReader xtr) {
+    if(xtr.getAttributeValue(null, "isSequential") != null) {
+      multiInstanceDef.setIsSequential(Boolean.valueOf(xtr.getAttributeValue(null, "isSequential")));
+    }
+    
+    if(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "collection") != null) {
+      multiInstanceDef.setInputDataItem(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "collection"));
+    }
+    if(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "elementVariable") != null) {
+      multiInstanceDef.setElementVariable(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "elementVariable"));
+    }
+    
+    boolean readyWithMultiInstance = false;
+    try {
+      while (readyWithMultiInstance == false && xtr.hasNext()) {
+        xtr.next();
+        if (xtr.isStartElement() && "loopCardinality".equalsIgnoreCase(xtr.getLocalName())) {
+          multiInstanceDef.setLoopCardinality(xtr.getElementText());
+          
+        } else if (xtr.isStartElement() && "loopDataInputRef".equalsIgnoreCase(xtr.getLocalName())) {
+          multiInstanceDef.setInputDataItem(xtr.getElementText());
+          
+        } else if (xtr.isStartElement() && "inputDataItem".equalsIgnoreCase(xtr.getLocalName())) {
+          if(xtr.getAttributeValue(null, "name") != null) {
+            multiInstanceDef.setElementVariable(xtr.getAttributeValue(null, "name"));
+          }
+          
+        } else if (xtr.isStartElement() && "completionCondition".equalsIgnoreCase(xtr.getLocalName())) {
+          multiInstanceDef.setCompletionCondition(xtr.getElementText());
+        
+        } else if (xtr.isEndElement() && "multiInstanceLoopCharacteristics".equalsIgnoreCase(xtr.getLocalName())) {
+          readyWithMultiInstance = true;
+        }
+      }
+    } catch(Exception e) {}
+  }
+  
   private EndEvent parseEndEvent(XMLStreamReader xtr) {
     EndEvent endEvent = Bpmn2Factory.eINSTANCE.createEndEvent();
     endEvent.setName("End");
@@ -420,6 +458,11 @@ public class BpmnParser {
           FormProperty property = Bpmn2Factory.eINSTANCE.createFormProperty();
           userTask.getFormProperties().add(property);
           parseFormProperty(property, xtr);
+          
+        } else if (xtr.isStartElement() && "multiInstanceLoopCharacteristics".equalsIgnoreCase(xtr.getLocalName())) {
+          MultiInstanceLoopCharacteristics multiInstanceDef = Bpmn2Factory.eINSTANCE.createMultiInstanceLoopCharacteristics();
+          userTask.setLoopCharacteristics(multiInstanceDef);
+          parseMultiInstanceDef(multiInstanceDef, xtr);
           
         } else if(xtr.isEndElement() && "userTask".equalsIgnoreCase(xtr.getLocalName())) {
           readyWithUserTask = true;
@@ -598,10 +641,10 @@ public class BpmnParser {
         while (readyWithFieldExtension == false && xtr.hasNext()) {
           xtr.next();
           if (xtr.isStartElement() && "string".equalsIgnoreCase(xtr.getLocalName())) {
-            return xtr.getElementText();
+            return readStringWithLineBreak(xtr.getElementText());
             
           } else if (xtr.isStartElement() && "expression".equalsIgnoreCase(xtr.getLocalName())) {
-            return xtr.getElementText();
+            return readStringWithLineBreak(xtr.getElementText().trim());
             
           } else if (xtr.isEndElement() && "field".equalsIgnoreCase(xtr.getLocalName())) {
             return null;
@@ -612,6 +655,28 @@ public class BpmnParser {
       }
     }
     return null;
+  }
+  
+  private static String readStringWithLineBreak(String value) {
+    if(value == null) return null;
+    List<String> lineList = new ArrayList<String>();
+    int startIndex = 0;
+    int endIndex = 0;
+    for (int i = 0; i < value.length(); i++) {
+      if(value.charAt(i) == '\n') {
+        endIndex = i;
+        lineList.add(value.substring(startIndex, endIndex).trim());
+        startIndex = i + 1;
+      }
+    }
+    StringBuilder lineBuilder = new StringBuilder();
+    for (String string : lineList) {
+      if(lineBuilder.length() > 0) {
+        lineBuilder.append("\n");
+      }
+      lineBuilder.append(string);
+    }
+    return lineBuilder.toString();
   }
   
   private static List<ActivitiListener> parseListeners(XMLStreamReader xtr) {

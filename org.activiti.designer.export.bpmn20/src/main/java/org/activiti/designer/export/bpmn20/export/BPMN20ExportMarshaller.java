@@ -282,6 +282,7 @@ public class BPMN20ExportMarshaller extends AbstractExportMarshaller implements 
       if (exclusiveGateway.getName() != null) {
         xtw.writeAttribute("name", exclusiveGateway.getName());
       }
+      DefaultFlowExport.createDefaultFlow(object, subProcessId, xtw);
 
       // end ExclusiveGateway element
       xtw.writeEndElement();
@@ -299,6 +300,8 @@ public class BPMN20ExportMarshaller extends AbstractExportMarshaller implements 
         if (subProcess.getName() != null) {
           xtw.writeAttribute("name", subProcess.getName());
         }
+        
+        MultiInstanceExport.createMultiInstance(object, subProcessId, xtw);
         
         for (FlowElement flowElement : flowElementList) {
           createXML(flowElement, subProcess.getId());

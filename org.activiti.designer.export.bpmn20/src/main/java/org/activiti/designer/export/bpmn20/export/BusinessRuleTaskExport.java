@@ -32,7 +32,7 @@ public class BusinessRuleTaskExport implements ActivitiNamespaceConstants {
     if (businessRuleTask.getName() != null) {
       xtw.writeAttribute("name", businessRuleTask.getName());
     }
-    
+    DefaultFlowExport.createDefaultFlow(object, subProcessId, xtw);
     if(businessRuleTask.getRuleNames().size() > 0) {
       StringBuilder ruleNameBuilder = new StringBuilder();
       for (String ruleName: businessRuleTask.getRuleNames()) {
@@ -66,6 +66,8 @@ public class BusinessRuleTaskExport implements ActivitiNamespaceConstants {
       xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, 
               "resultVariableName", businessRuleTask.getResultVariableName());
     }
+    
+    MultiInstanceExport.createMultiInstance(object, subProcessId, xtw);
 
     // end BusinessRuleTask element
     xtw.writeEndElement();

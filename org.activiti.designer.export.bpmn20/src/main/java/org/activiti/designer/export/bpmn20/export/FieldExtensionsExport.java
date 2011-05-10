@@ -34,6 +34,7 @@ public class FieldExtensionsExport implements ActivitiNamespaceConstants {
       for (FieldExtension fieldExtension : fieldExtensionList) {
         xtw.writeStartElement(ACTIVITI_EXTENSIONS_PREFIX, "field", ACTIVITI_EXTENSIONS_NAMESPACE);
         xtw.writeAttribute("name", fieldExtension.getFieldname());
+        System.out.println("name " + fieldExtension.getFieldname());
         if (fieldExtension.getExpression().contains("${")) {
           xtw.writeStartElement(ACTIVITI_EXTENSIONS_PREFIX, "expression", ACTIVITI_EXTENSIONS_NAMESPACE);
         } else {

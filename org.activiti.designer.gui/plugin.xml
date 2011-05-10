@@ -66,6 +66,12 @@
                id="org.activiti.designer.listenerTab"
                label="Listeners">
          </propertyTab>
+         <propertyTab
+               afterTab="org.activiti.designer.mainConfigTab"
+               category="Activiti"
+               id="org.activiti.designer.multiInstanceTab"
+               label="Multi instance">
+         </propertyTab>
       </propertyTabs>
    </extension>
    <extension
@@ -174,6 +180,12 @@
                filter="org.activiti.designer.property.PropertyCallActivityFilter"
                id="org.activiti.designer.mainConfigTab.parameter"
                tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyMultiInstanceSection"
+               filter="org.activiti.designer.property.PropertyMultiInstanceFilter"
+               id="org.activiti.designer.multiInstanceTab.multiInstance"
+               tab="org.activiti.designer.multiInstanceTab">
          </propertySection>
       </propertySections>
    </extension>

@@ -15,8 +15,13 @@
  *******************************************************************************/
 package org.activiti.designer.property;
 
+import java.util.List;
+
 import org.activiti.designer.eclipse.util.ActivitiUiUtil;
+import org.eclipse.bpmn2.Activity;
+import org.eclipse.bpmn2.ExclusiveGateway;
 import org.eclipse.bpmn2.FlowElement;
+import org.eclipse.bpmn2.SequenceFlow;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.ConnectionDecorator;
@@ -25,6 +30,7 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -40,6 +46,8 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
 
   private Text idText;
   private Text nameText;
+  private CCombo defaultCombo;
+  private CLabel defaultLabel;
 
   @Override
   public void createControls(Composite parent, TabbedPropertySheetPage tabbedPropertySheetPage) {
@@ -77,12 +85,30 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
     data.right = new FormAttachment(nameText, -HSPACE);
     data.top = new FormAttachment(nameText, 0, SWT.CENTER);
     valueLabel.setLayoutData(data);
+    
+    defaultCombo = factory.createCCombo(composite, SWT.NONE);
+    data = new FormData();
+    data.left = new FormAttachment(0, 120);
+    data.right = new FormAttachment(100, 0);
+    data.top = new FormAttachment(nameText, VSPACE);
+    defaultCombo.setLayoutData(data);
+    defaultCombo.setVisible(false);
+    defaultCombo.addFocusListener(listener);
+
+    defaultLabel = factory.createCLabel(composite, "Default flow:"); //$NON-NLS-1$
+    data = new FormData();
+    data.left = new FormAttachment(0, 0);
+    data.right = new FormAttachment(defaultCombo, -HSPACE);
+    data.top = new FormAttachment(defaultCombo, 0, SWT.CENTER);
+    defaultLabel.setLayoutData(data);
+    defaultLabel.setVisible(false);
   }
 
   @Override
   public void refresh() {
     nameText.removeFocusListener(listener);
     idText.removeFocusListener(listener);
+    defaultCombo.removeFocusListener(listener);
 
     PictogramElement pe = getSelectedPictogramElement();
 
@@ -95,8 +121,49 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
       String id = ((FlowElement) bo).getId();
       nameText.setText(name == null ? "" : name);
       idText.setText(id == null ? "" : id);
+      
+      boolean disableDefault = true;
+      
+      if (bo instanceof Activity == true || bo instanceof ExclusiveGateway == true) {
+        
+        defaultCombo.removeAll();
+        List<SequenceFlow> flowList = null;
+        if(bo instanceof Activity == true) {
+          flowList = ((Activity) bo).getOutgoing();
+        } else {
+          flowList = ((ExclusiveGateway) bo).getOutgoing();
+        }
+        if(flowList != null && flowList.size() > 1) {
+          
+          for (SequenceFlow flow : flowList) {
+            defaultCombo.add(flow.getId());
+          }
+          
+          SequenceFlow defaultFlow;
+          if(bo instanceof Activity == true) {
+            defaultFlow = ((Activity) bo).getDefault();
+          } else {
+            defaultFlow = ((ExclusiveGateway) bo).getDefault();
+          }
+          if(defaultFlow != null) {
+            defaultCombo.select(defaultCombo.indexOf(defaultFlow.getId()));
+          }
+          disableDefault = false;
+        }
+      }
+      
+      if(disableDefault == true) {
+        defaultCombo.setVisible(false);
+        defaultLabel.setVisible(false);
+        
+      } else {
+        defaultCombo.setVisible(true);
+        defaultLabel.setVisible(true);
+      }
+      
       idText.addFocusListener(listener);
       nameText.addFocusListener(listener);
+      defaultCombo.addFocusListener(listener);
     }
   }
 
@@ -128,6 +195,32 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
           
           String name = nameText.getText();
           ((FlowElement) bo).setName(name);
+          
+          if((bo instanceof Activity || bo instanceof ExclusiveGateway)
+                  && defaultCombo.isVisible() == true) {
+            
+            String defaultValue = defaultCombo.getText();
+            SequenceFlow defaultFlow = null;
+            if(defaultValue != null && defaultValue.length() > 0) {
+              List<SequenceFlow> flowList = null;
+              if(bo instanceof Activity) {
+                flowList = ((Activity) bo).getOutgoing();
+              } else {
+                flowList = ((ExclusiveGateway) bo).getOutgoing();
+              }
+              for (SequenceFlow flow : flowList) {
+                if(flow.getId().equals(defaultValue)) {
+                  defaultFlow = flow;
+                }
+              }
+            }
+            if(bo instanceof Activity) {
+              ((Activity) bo).setDefault(defaultFlow);
+            } else {
+              ((ExclusiveGateway) bo).setDefault(defaultFlow);
+            }
+          }
+          
           if (!(getSelectedPictogramElement() instanceof FreeFormConnection))
             return;
           EList<ConnectionDecorator> decoratorList = ((FreeFormConnection) getSelectedPictogramElement()).getConnectionDecorators();

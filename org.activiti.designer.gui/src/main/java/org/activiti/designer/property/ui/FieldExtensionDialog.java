@@ -51,10 +51,10 @@ public class FieldExtensionDialog extends Dialog {
 		Shell shell = new Shell(getParent(), getStyle());
 		shell.setText(getText());
 		shell.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
-		shell.setSize(500, 150);
+		shell.setSize(700, 300);
 		Point location = getParent().getShell().getLocation();
 		Point size = getParent().getShell().getSize();
-		shell.setLocation((location.x + size.x - 300) / 2, (location.y + size.y - 150) / 2);
+		shell.setLocation((location.x + size.x - 500) / 2, (location.y + size.y - 300) / 2);
 		createContents(shell);
 		shell.open();
 		Display display = getParent().getDisplay();
@@ -73,7 +73,7 @@ public class FieldExtensionDialog extends Dialog {
 	 *            the dialog window
 	 */
 	private void createContents(final Shell shell) {
-		shell.setLayout(new GridLayout(2, true));
+		shell.setLayout(new GridLayout(2, false));
 
 		Label fieldLabel = new Label(shell, SWT.NONE);
 		fieldLabel.setText("Field name");
@@ -84,17 +84,22 @@ public class FieldExtensionDialog extends Dialog {
 		  fieldText.setText(savedFieldName);
 		}
 		GridData data = new GridData(GridData.FILL_HORIZONTAL);
+		data.widthHint = 200;
 		fieldText.setLayoutData(data);
 		
 		Label valueLabel = new Label(shell, SWT.NONE);
 		valueLabel.setText("Expression");
 		valueLabel.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
 
-		final Text valueText = new Text(shell, SWT.BORDER);
+		final Text valueText = new Text(shell, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
+		valueText.setSize(500, 150);
 		if(savedFieldValue != null) {
 		  valueText.setText(savedFieldValue);
     }
-		data = new GridData(GridData.FILL_HORIZONTAL);
+		data = new GridData(GridData.FILL_BOTH);
+		data.widthHint = 500;
+		data.grabExcessHorizontalSpace = true;
+		data.grabExcessVerticalSpace = true;
 		valueText.setLayoutData(data);
 
 		Button ok = new Button(shell, SWT.PUSH);

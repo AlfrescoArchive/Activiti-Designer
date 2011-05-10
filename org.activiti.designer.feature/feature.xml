@@ -2,7 +2,7 @@
 <feature
       id="org.activiti.designer.feature"
       label="Activiti Eclipse BPMN 2.0 Designer"
-      version="5.4"
+      version="5.5"
       provider-name="Activiti">
 
    <description url="http://www.activiti.org">

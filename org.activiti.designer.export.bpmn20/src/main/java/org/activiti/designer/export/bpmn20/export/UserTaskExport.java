@@ -41,6 +41,7 @@ public class UserTaskExport implements ActivitiNamespaceConstants {
       if (userTask.getName() != null) {
         xtw.writeAttribute("name", userTask.getName());
       }
+      DefaultFlowExport.createDefaultFlow(object, subProcessId, xtw);
 
       // TODO revisit once the designer supports mixing these
       // configurations as they are now exclusive
@@ -93,11 +94,14 @@ public class UserTaskExport implements ActivitiNamespaceConstants {
       }
       
       FormPropertiesExport.createFormPropertiesXML(userTask.getFormProperties(), xtw);
+      System.out.println("usertask id " + userTask.getId());
       ExtensionListenerExport.createExtensionListenerXML(userTask.getActivitiListeners(), extensionsElement, TASK_LISTENER, xtw);
       
       if(extensionsElement == false) {
         xtw.writeEndElement();
       }
+      
+      MultiInstanceExport.createMultiInstance(object, subProcessId, xtw);
 
       // end UserTask element
       xtw.writeEndElement();

@@ -52,15 +52,19 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
 	protected Combo eventDropDown;
 	protected Button classTypeButton;
 	protected Button expressionTypeButton;
+	protected Button delegateExpressionTypeButton;
 	protected Text classNameText;
 	protected Button classSelectButton;
 	protected CLabel classSelectLabel;
 	protected Text expressionText;
 	protected CLabel expressionLabel;
+	protected Text delegateExpressionText;
+	protected CLabel delegateExpressionLabel;
 	protected FieldExtensionEditor fieldEditor;
 	
 	private final static String CLASS_TYPE = "classType";
   private final static String EXPRESSION_TYPE = "expressionType";
+  private final static String DELEGATE_EXPRESSION_TYPE = "delegateExpressionType";
 
 	public AbstractListenerDialog(Shell parent, TableItem[] fieldList) {
 		// Pass the default styles here
@@ -163,6 +167,7 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
       public void widgetSelected(SelectionEvent event) {
         setVisibleClassType(true);
         setVisibleExpressionType(false);
+        setVisibleDelegateExpressionType(false);
         setImplementationType(CLASS_TYPE);
       }
 
@@ -179,11 +184,31 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
       public void widgetSelected(SelectionEvent event) {
         setVisibleClassType(false);
         setVisibleExpressionType(true);
+        setVisibleDelegateExpressionType(false);
         setImplementationType(EXPRESSION_TYPE);
       }
 
       @Override
       public void widgetDefaultSelected(SelectionEvent event) {
+      }
+      
+    });
+    
+    delegateExpressionTypeButton = new Button(radioTypeComposite, SWT.RADIO);
+    delegateExpressionTypeButton.setText("Delegate expression");
+    delegateExpressionTypeButton.addSelectionListener(new SelectionListener() {
+      
+      @Override
+      public void widgetSelected(SelectionEvent event) {
+        setVisibleClassType(false);
+        setVisibleExpressionType(false);
+        setVisibleDelegateExpressionType(true);
+        setImplementationType(DELEGATE_EXPRESSION_TYPE);
+      }
+    
+      @Override
+      public void widgetDefaultSelected(SelectionEvent event) {
+        //
       }
       
     });
@@ -226,35 +251,10 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
           if (dialog.open() == SelectionDialog.OK) {
             Object[] result = dialog.getResult();
             String className = ((IType) result[0]).getFullyQualifiedName();
-            IJavaProject containerProject = ((IType) result[0]).getJavaProject();
-
+            
             if (className != null) {
               classNameText.setText(className);
             }
-
-            /*DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
-            TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
-
-            ActivitiUiUtil.runModelChange(new Runnable() {
-              public void run() {
-                Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(
-                    getSelectedPictogramElement());
-                if (bo == null) {
-                  return;
-                }
-                String implementationName = classNameText.getText();
-                if (implementationName != null) {
-                  if (bo instanceof ServiceTask) {
-
-                    ((ServiceTask) bo).setImplementation(implementationName);
-                  }
-                }
-              }
-            }, editingDomain, "Model Update");
-
-            IProject currentProject = ActivitiUiUtil.getProjectFromDiagram(getDiagram());
-
-            ActivitiUiUtil.doProjectReferenceChange(currentProject, containerProject, className);*/
           }
         } catch (Exception ex) {
           ex.printStackTrace();
@@ -291,6 +291,26 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
     data.top = new FormAttachment(expressionText, 0, SWT.TOP);
     expressionLabel.setLayoutData(data);
     expressionLabel.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
+    
+    delegateExpressionText = new Text(shell, SWT.BORDER);
+    if(DELEGATE_EXPRESSION_TYPE.equals(savedImplementationType)) {
+      delegateExpressionText.setText(savedImplementation);
+    } else {
+      delegateExpressionText.setText("");
+    }
+    data = new FormData();
+    data.left = new FormAttachment(0, 120);
+    data.right = new FormAttachment(100, 0);
+    data.top = new FormAttachment(radioTypeComposite, VSPACE);
+    delegateExpressionText.setLayoutData(data);
+        
+    delegateExpressionLabel = new CLabel(shell, SWT.NONE);
+    delegateExpressionLabel.setText("Delegate expression");
+    data = new FormData();
+    data.left = new FormAttachment(0, 0);
+    data.right = new FormAttachment(delegateExpressionText, -HSPACE);
+    data.top = new FormAttachment(delegateExpressionText, 0, SWT.TOP);
+    delegateExpressionLabel.setLayoutData(data);
     
     Composite extensionsComposite = new Composite(shell, SWT.WRAP);
     data = new FormData();
@@ -350,9 +370,15 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
           MessageDialog.openError(shell, "Validation error", "Expression must be filled.");
           return;
         }
+				if(DELEGATE_EXPRESSION_TYPE.equals(implementationType) && (delegateExpressionText.getText() == null || delegateExpressionText.getText().length() == 0)) {
+          MessageDialog.openError(shell, "Validation error", "Delegate expression must be filled.");
+          return;
+        }
 				eventName = eventDropDown.getText();
 				if(CLASS_TYPE.equals(implementationType)) {
 				  implementation = classNameText.getText();
+				} else if(DELEGATE_EXPRESSION_TYPE.equals(implementationType)){
+				  implementation = delegateExpressionText.getText();
 				} else {
 				  implementation = expressionText.getText();
 				}
@@ -379,11 +405,19 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
       setImplementationType(CLASS_TYPE);
       setVisibleClassType(true);
       setVisibleExpressionType(false);
-    } else {
+      setVisibleDelegateExpressionType(false);
+    } else if(EXPRESSION_TYPE.equals(savedImplementationType)){
       expressionTypeButton.setSelection(true);
       setImplementationType(EXPRESSION_TYPE);
       setVisibleClassType(false);
       setVisibleExpressionType(true);
+      setVisibleDelegateExpressionType(false);
+    } else {
+      delegateExpressionTypeButton.setSelection(true);
+      setImplementationType(DELEGATE_EXPRESSION_TYPE);
+      setVisibleClassType(false);
+      setVisibleExpressionType(false);
+      setVisibleDelegateExpressionType(true);
     }
 	}
 	
@@ -406,5 +440,11 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
     expressionTypeButton.setSelection(visible);
     expressionText.setVisible(visible);
     expressionLabel.setVisible(visible);
+  }
+  
+  private void setVisibleDelegateExpressionType(boolean visible) {
+    delegateExpressionTypeButton.setSelection(visible);
+    delegateExpressionText.setVisible(visible);
+    delegateExpressionLabel.setVisible(visible);
   }
 }

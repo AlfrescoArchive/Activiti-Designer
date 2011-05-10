@@ -34,7 +34,7 @@ public class ServiceTaskExport implements ActivitiNamespaceConstants {
     if (serviceTask.getName() != null) {
       xtw.writeAttribute("name", serviceTask.getName());
     }
-
+    DefaultFlowExport.createDefaultFlow(object, subProcessId, xtw);
     ImplementationValueExport.writeImplementationValue(xtw, serviceTask.getImplementationType(), serviceTask.getImplementation(), true);
 
     if (serviceTask.getResultVariableName() != null && serviceTask.getResultVariableName().length() > 0) {
@@ -65,6 +65,9 @@ public class ServiceTaskExport implements ActivitiNamespaceConstants {
         xtw.writeEndElement();
       }
     }
+    
+    MultiInstanceExport.createMultiInstance(object, subProcessId, xtw);
+    
     // end ServiceTask element
     xtw.writeEndElement();
   }

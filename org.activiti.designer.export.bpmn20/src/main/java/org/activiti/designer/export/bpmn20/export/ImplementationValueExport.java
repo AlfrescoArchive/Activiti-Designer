@@ -23,7 +23,7 @@ public class ImplementationValueExport implements ActivitiNamespaceConstants {
   public static void writeImplementationValue(XMLStreamWriter xtw, String implementationType, String implementation, boolean namespace) throws Exception {
     if (implementationType == null || implementationType.length() == 0 || CLASS_TYPE.equals(implementationType)) {
       writeImplementationValueAndType(xtw, "class", implementation, namespace);
-    } else if (implementationType.equals("delegateExpressionType")){
+    } else if (implementationType.equals(DELEGATE_EXPRESSION_TYPE)){
       writeImplementationValueAndType(xtw, "delegateExpression", implementation, namespace);
     } else {
       writeImplementationValueAndType(xtw, "expression", implementation, namespace);

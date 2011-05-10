@@ -32,6 +32,7 @@ public class MailTaskExport implements ActivitiNamespaceConstants {
     if (mailTask.getName() != null) {
       xtw.writeAttribute("name", mailTask.getName());
     }
+    DefaultFlowExport.createDefaultFlow(object, subProcessId, xtw);
     xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "type", "mail");
 
     xtw.writeStartElement("extensionElements");
@@ -84,6 +85,8 @@ public class MailTaskExport implements ActivitiNamespaceConstants {
       xtw.writeEndElement();
     }
     xtw.writeEndElement();
+    
+    MultiInstanceExport.createMultiInstance(object, subProcessId, xtw);
 
     // end MailTask element
     xtw.writeEndElement();
