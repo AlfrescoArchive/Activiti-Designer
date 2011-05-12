@@ -67,6 +67,10 @@ public class UserTaskExport implements ActivitiNamespaceConstants {
         xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "formKey", userTask.getFormKey());
       }
       
+      if (userTask.getPriority() != null) {
+        xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "priority", userTask.getPriority().toString());
+      }
+      
       if (userTask.getDocumentation() != null && userTask.getDocumentation().size() > 0) {
 
         final Documentation documentation = userTask.getDocumentation().get(0);

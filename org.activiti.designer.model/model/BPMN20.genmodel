@@ -783,6 +783,7 @@
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference BPMN20.ecore#//UserTask/candidateGroups"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute BPMN20.ecore#//UserTask/formKey"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference BPMN20.ecore#//UserTask/formProperties"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute BPMN20.ecore#//UserTask/priority"/>
     </genClasses>
     <genClasses ecoreClass="BPMN20.ecore#//CandidateUser">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute BPMN20.ecore#//CandidateUser/user"/>

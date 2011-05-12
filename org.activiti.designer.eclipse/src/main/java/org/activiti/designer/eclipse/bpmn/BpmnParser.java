@@ -453,6 +453,14 @@ public class BpmnParser {
       userTask.setFormKey(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "formKey"));
     }
     
+    if(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "priority") != null) {
+      Integer priorityValue = null;
+      try {
+        priorityValue = Integer.valueOf(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "priority"));
+      } catch(Exception e) {}
+      userTask.setPriority(priorityValue);
+    }
+    
     boolean readyWithUserTask = false;
     try {
       while(readyWithUserTask == false && xtr.hasNext()) {

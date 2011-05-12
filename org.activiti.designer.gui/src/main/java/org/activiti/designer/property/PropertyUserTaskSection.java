@@ -14,7 +14,6 @@ import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
-import org.eclipse.graphiti.ui.platform.GFPropertySection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
@@ -23,6 +22,7 @@ import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
@@ -35,7 +35,7 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
   private String currentType = "Assignee";
   private Text expressionText;
   private Text formKeyText;
-
+  private Text priorityText;
   private Text documentationText;
 
   @Override
@@ -49,64 +49,32 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
     performerTypeCombo = factory.createCCombo(composite, SWT.NONE);
     performerTypeCombo.setItems((String[]) performerTypes.toArray());
     data = new FormData();
-    data.left = new FormAttachment(0, 120);
+    data.left = new FormAttachment(0, 160);
     data.right = new FormAttachment(100, 0);
     data.top = new FormAttachment(0, VSPACE);
     performerTypeCombo.setLayoutData(data);
     performerTypeCombo.addFocusListener(listener);
 
-    CLabel performerTypeLabel = factory.createCLabel(composite, "Performer type:"); //$NON-NLS-1$
-    data = new FormData();
-    data.left = new FormAttachment(0, 0);
-    data.right = new FormAttachment(performerTypeCombo, -HSPACE);
-    data.top = new FormAttachment(performerTypeCombo, 0, SWT.CENTER);
-    performerTypeLabel.setLayoutData(data);
+    createLabel("Performer type:", composite, factory, performerTypeCombo);
 
-    expressionText = factory.createText(composite, ""); //$NON-NLS-1$
-    data = new FormData();
-    data.left = new FormAttachment(0, 120);
-    data.right = new FormAttachment(100, 0);
-    data.top = new FormAttachment(performerTypeCombo, VSPACE);
-    expressionText.setLayoutData(data);
-    expressionText.addFocusListener(listener);
+    expressionText = createText(composite, factory, performerTypeCombo);
+    createLabel("Expression:", composite, factory, expressionText);
 
-    CLabel expressionLabel = factory.createCLabel(composite, "Expression:"); //$NON-NLS-1$
-    data = new FormData();
-    data.left = new FormAttachment(0, 0);
-    data.right = new FormAttachment(expressionText, -HSPACE);
-    data.top = new FormAttachment(expressionText, 0, SWT.TOP);
-    expressionLabel.setLayoutData(data);
-
-    formKeyText = factory.createText(composite, ""); //$NON-NLS-1$
-    data = new FormData();
-    data.left = new FormAttachment(0, 120);
-    data.right = new FormAttachment(100, 0);
-    data.top = new FormAttachment(expressionText, VSPACE);
-    formKeyText.setLayoutData(data);
-    formKeyText.addFocusListener(listener);
-
-    CLabel formKeyLabel = factory.createCLabel(composite, "Form key:"); //$NON-NLS-1$
-    data = new FormData();
-    data.left = new FormAttachment(0, 0);
-    data.right = new FormAttachment(formKeyText, -HSPACE);
-    data.top = new FormAttachment(formKeyText, 0, SWT.TOP);
-    formKeyLabel.setLayoutData(data);
+    formKeyText = createText(composite, factory, expressionText);
+    createLabel("Form key:", composite, factory, formKeyText);
+    
+    priorityText = createText(composite, factory, formKeyText);
+    createLabel("Priority:", composite, factory, priorityText);
 
     documentationText = factory.createText(composite, "", SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL); //$NON-NLS-1$
     data = new FormData(SWT.DEFAULT, 100);
-    data.left = new FormAttachment(0, 120);
+    data.left = new FormAttachment(0, 160);
     data.right = new FormAttachment(100, 0);
-    data.top = new FormAttachment(formKeyText, VSPACE);
+    data.top = new FormAttachment(priorityText, VSPACE);
     documentationText.setLayoutData(data);
     documentationText.addFocusListener(listener);
 
-    CLabel scriptLabel = factory.createCLabel(composite, "Documentation:"); //$NON-NLS-1$
-    data = new FormData();
-    data.left = new FormAttachment(0, 0);
-    data.right = new FormAttachment(documentationText, -HSPACE);
-    data.top = new FormAttachment(documentationText, 0, SWT.TOP);
-    scriptLabel.setLayoutData(data);
-
+    createLabel("Documentation:", composite, factory, documentationText);
   }
 
   @Override
@@ -114,6 +82,8 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
     performerTypeCombo.removeFocusListener(listener);
     expressionText.removeFocusListener(listener);
     formKeyText.removeFocusListener(listener);
+    priorityText.removeFocusListener(listener);
+    documentationText.removeFocusListener(listener);
     PictogramElement pe = getSelectedPictogramElement();
     if (pe != null) {
       Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
@@ -153,6 +123,11 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
       if (userTask.getFormKey() != null && userTask.getFormKey().length() > 0) {
         formKeyText.setText(userTask.getFormKey());
       }
+      
+      priorityText.setText("");
+      if(userTask.getPriority() != null) {
+        priorityText.setText(userTask.getPriority().toString());
+      }
 
       documentationText.setText("");
       if (userTask.getDocumentation() != null && userTask.getDocumentation().size() > 0) {
@@ -163,8 +138,8 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
       performerTypeCombo.addFocusListener(listener);
       expressionText.addFocusListener(listener);
       formKeyText.addFocusListener(listener);
+      priorityText.addFocusListener(listener);
       documentationText.addFocusListener(listener);
-
     }
   }
 
@@ -242,6 +217,13 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
                 userTask.setFormKey(formKey);
               } else {
                 userTask.setFormKey("");
+              }
+              if(priorityText.getText() != null && priorityText.getText().length() > 0) {
+                Integer priorityValue = null;
+                try {
+                  priorityValue = Integer.valueOf(priorityText.getText());
+                } catch(Exception e) {}
+                userTask.setPriority(priorityValue);
               }
 
               String documentation = documentationText.getText();
@@ -340,5 +322,30 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
     }
 
   };
+  
+  private Text createText(Composite parent, TabbedPropertySheetWidgetFactory factory, Control top) {
+    Text text = factory.createText(parent, ""); //$NON-NLS-1$
+    FormData data = new FormData();
+    data.left = new FormAttachment(0, 160);
+    data.right = new FormAttachment(100, -HSPACE);
+    if(top == null) {
+      data.top = new FormAttachment(0, VSPACE);
+    } else {
+      data.top = new FormAttachment(top, VSPACE);
+    }
+    text.setLayoutData(data);
+    text.addFocusListener(listener);
+    return text;
+  }
+  
+  private CLabel createLabel(String text, Composite parent, TabbedPropertySheetWidgetFactory factory, Control control) {
+    CLabel label = factory.createCLabel(parent, text);
+    FormData data = new FormData();
+    data.left = new FormAttachment(0, 0);
+    data.right = new FormAttachment(control, -HSPACE);
+    data.top = new FormAttachment(control, 0, SWT.CENTER);
+    label.setLayoutData(data);
+    return label;
+  }
 
 }
