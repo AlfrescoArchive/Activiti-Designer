@@ -126,6 +126,13 @@ public class BpmnParser {
             if(activeSubProcess != null) activeSubProcess.getFlowElements().add(task);
             bpmnList.add(task);
           
+          } else if(xtr.isStartElement() && "task".equalsIgnoreCase(xtr.getLocalName())) {
+            String elementid = xtr.getAttributeValue(null, "id");
+            ServiceTask task = parseTask(xtr);
+            task.setId(elementid);
+            if(activeSubProcess != null) activeSubProcess.getFlowElements().add(task);
+            bpmnList.add(task);
+          
           } else if(xtr.isStartElement() && "scriptTask".equalsIgnoreCase(xtr.getLocalName())) {
             String elementid = xtr.getAttributeValue(null, "id");
             ScriptTask scriptTask = parseScriptTask(xtr);
@@ -381,6 +388,10 @@ public class BpmnParser {
   
   private static FormalExpression parseSequenceFlowCondition(XMLStreamReader xtr, SequenceFlowModel sequenceFlow) {
     FormalExpression condition = null;
+    if(xtr.getAttributeValue(null, "name") != null && xtr.getAttributeValue(null, "name").contains("${")) {
+      condition = Bpmn2Factory.eINSTANCE.createFormalExpression();
+      condition.setBody(xtr.getAttributeValue(null, "name"));
+    }
     boolean readyWithSequenceFlow = false;
     try {
       while (readyWithSequenceFlow == false && xtr.hasNext()) {
@@ -549,6 +560,12 @@ public class BpmnParser {
     } catch(Exception e) {
       e.printStackTrace();
     }
+    return serviceTask;
+  }
+  
+  private ServiceTask parseTask(XMLStreamReader xtr) {
+    ServiceTask serviceTask = Bpmn2Factory.eINSTANCE.createServiceTask();
+    serviceTask.setName(xtr.getAttributeValue(null, "name"));
     return serviceTask;
   }
   
