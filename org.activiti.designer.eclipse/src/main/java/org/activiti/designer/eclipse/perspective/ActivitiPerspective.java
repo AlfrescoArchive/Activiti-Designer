@@ -62,6 +62,7 @@ public class ActivitiPerspective implements IPerspectiveFactory {
 				editorArea);
 		bottomRight.addView(IPageLayout.ID_PROP_SHEET);
 		bottomRight.addView(IPageLayout.ID_PROBLEM_VIEW);
+		bottomRight.addView("org.eclipse.ant.ui.views.AntView");
 		bottomRight.addView("org.eclipse.pde.runtime.LogView");
 	}
 }

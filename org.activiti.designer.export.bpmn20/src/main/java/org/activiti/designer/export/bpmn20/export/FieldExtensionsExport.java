@@ -32,17 +32,20 @@ public class FieldExtensionsExport implements ActivitiNamespaceConstants {
         xtw.writeStartElement("extensionElements");
 
       for (FieldExtension fieldExtension : fieldExtensionList) {
-        xtw.writeStartElement(ACTIVITI_EXTENSIONS_PREFIX, "field", ACTIVITI_EXTENSIONS_NAMESPACE);
-        xtw.writeAttribute("name", fieldExtension.getFieldname());
-        System.out.println("name " + fieldExtension.getFieldname());
-        if (fieldExtension.getExpression().contains("${")) {
-          xtw.writeStartElement(ACTIVITI_EXTENSIONS_PREFIX, "expression", ACTIVITI_EXTENSIONS_NAMESPACE);
-        } else {
-          xtw.writeStartElement(ACTIVITI_EXTENSIONS_PREFIX, "string", ACTIVITI_EXTENSIONS_NAMESPACE);
+        if(fieldExtension.getFieldname() != null && fieldExtension.getFieldname().length() > 0 &&
+                fieldExtension.getExpression() != null && fieldExtension.getExpression().length() > 0) {
+          
+          xtw.writeStartElement(ACTIVITI_EXTENSIONS_PREFIX, "field", ACTIVITI_EXTENSIONS_NAMESPACE);
+          xtw.writeAttribute("name", fieldExtension.getFieldname());
+          if (fieldExtension.getExpression().contains("${")) {
+            xtw.writeStartElement(ACTIVITI_EXTENSIONS_PREFIX, "expression", ACTIVITI_EXTENSIONS_NAMESPACE);
+          } else {
+            xtw.writeStartElement(ACTIVITI_EXTENSIONS_PREFIX, "string", ACTIVITI_EXTENSIONS_NAMESPACE);
+          }
+          xtw.writeCharacters(fieldExtension.getExpression());
+          xtw.writeEndElement();
+          xtw.writeEndElement();
         }
-        xtw.writeCharacters(fieldExtension.getExpression());
-        xtw.writeEndElement();
-        xtw.writeEndElement();
       }
 
       if (writeExtensionsElement)
