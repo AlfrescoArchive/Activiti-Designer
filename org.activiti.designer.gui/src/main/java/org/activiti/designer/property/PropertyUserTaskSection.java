@@ -102,6 +102,7 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
           }
           expressionBuffer.append(user.getUser());
         }
+        currentType = "Candidate users";
         expressionText.setText(expressionBuffer.toString());
       } else if (userTask.getCandidateGroups() != null && userTask.getCandidateGroups().size() > 0) {
         performerIndex = performerTypes.indexOf("Candidate groups");
@@ -112,10 +113,12 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
           }
           expressionBuffer.append(group.getGroup());
         }
+        currentType = "Candidate groups";
         expressionText.setText(expressionBuffer.toString());
       } else {
         performerIndex = performerTypes.indexOf("Assignee");
         if (userTask.getAssignee() != null && userTask.getAssignee().length() > 0) {
+          currentType = "Assignee";
           expressionText.setText(userTask.getAssignee());
         }
       }
