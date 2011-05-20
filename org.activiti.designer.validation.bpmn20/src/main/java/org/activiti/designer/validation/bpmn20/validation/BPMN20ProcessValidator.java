@@ -3,44 +3,47 @@
  */
 package org.activiti.designer.validation.bpmn20.validation;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+
+import org.activiti.designer.eclipse.Logger;
 import org.activiti.designer.eclipse.common.ActivitiBPMNDiagramConstants;
 import org.activiti.designer.eclipse.extension.validation.AbstractProcessValidator;
-import org.activiti.designer.property.extension.util.ExtensionUtil;
-import org.eclipse.bpmn2.FlowElement;
-import org.eclipse.bpmn2.ScriptTask;
-import org.eclipse.bpmn2.SequenceFlow;
-import org.eclipse.bpmn2.ServiceTask;
-import org.eclipse.bpmn2.SubProcess;
-import org.eclipse.bpmn2.UserTask;
+import org.activiti.designer.validation.bpmn20.bundle.PluginConstants;
+import org.activiti.designer.validation.bpmn20.validation.worker.ProcessValidationWorkerInfo;
+import org.activiti.designer.validation.bpmn20.validation.worker.ProcessValidationWorkerMarker;
+import org.activiti.designer.validation.bpmn20.validation.worker.impl.ScriptTaskValidationWorker;
+import org.activiti.designer.validation.bpmn20.validation.worker.impl.SequenceFlowValidationWorker;
+import org.activiti.designer.validation.bpmn20.validation.worker.impl.ServiceTaskValidationWorker;
+import org.activiti.designer.validation.bpmn20.validation.worker.impl.SubProcessValidationWorker;
+import org.activiti.designer.validation.bpmn20.validation.worker.impl.UserTaskValidationWorker;
+import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.emf.common.util.EList;
+import org.eclipse.core.runtime.SubProgressMonitor;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 
 /**
  * @author Tiese Barrell
  * @since 0.6.1
- * @version 1
+ * @version 2
  * 
  */
 public class BPMN20ProcessValidator extends AbstractProcessValidator {
 
-  private static final String BPMN2_NAMESPACE = "http://www.omg.org/spec/BPMN/20100524/MODEL";
-  private static final String XSI_NAMESPACE = "http://www.w3.org/2001/XMLSchema-instance";
-  private static final String SCHEMA_NAMESPACE = "http://www.w3.org/2001/XMLSchema";
-  private static final String XPATH_NAMESPACE = "http://www.w3.org/1999/XPath";
-  private static final String PROCESS_NAMESPACE = "http://www.activiti.org/test";
-  private static final String ACTIVITI_EXTENSIONS_NAMESPACE = "http://activiti.org/bpmn";
-  private static final String ACTIVITI_EXTENSIONS_PREFIX = "activiti";
-  private static final String VALIDATION_TITLE = "BPMN 2.0 Validation";
-
-  private IProgressMonitor monitor;
-  private Diagram diagram;
+  private boolean overallResult;
 
   /**
 	 * 
 	 */
   public BPMN20ProcessValidator() {
+  }
+
+  @Override
+  public String getValidatorId() {
+    return ActivitiBPMNDiagramConstants.BPMN_VALIDATOR_ID;
   }
 
   @Override
@@ -55,91 +58,65 @@ public class BPMN20ProcessValidator extends AbstractProcessValidator {
 
   @Override
   public boolean validateDiagram(Diagram diagram, IProgressMonitor monitor) {
-    this.monitor = monitor;
-    this.diagram = diagram;
 
-    boolean validBpmn = true;
-    
-    monitor.beginTask("", 100);
+    this.overallResult = true;
+
+    monitor.beginTask("", PluginConstants.WORK_TOTAL);
 
     // Clear problems for this diagram first
     clearMarkers(getResource(diagram.eResource().getURI()));
 
-    validateDiagram(getResourceForDiagram(diagram).getContents());
+    final Map<String, List<EObject>> processNodes = extractProcessConstructs(getResourceForDiagram(diagram).getContents(), new SubProgressMonitor(monitor,
+            PluginConstants.WORK_EXTRACT_CONSTRUCTS));
 
-    if (getMarkers(getResource(diagram.eResource().getURI())) != null && 
-            getMarkers(getResource(diagram.eResource().getURI())).length > 0) {
-      
-      validBpmn = false;
-    }
-    return validBpmn;
-  }
+    final List<ProcessValidationWorkerInfo> workers = getWorkers();
 
-  private void validateDiagram(EList<EObject> contents) {
+    for (final ProcessValidationWorkerInfo worker : workers) {
 
-    for (EObject object : contents) {
-      if(object instanceof FlowElement) {
-        validateElement((FlowElement) object);
-      }
-    }
-  }
-  
-  private void validateElement(FlowElement flowElement) {
-    if (flowElement instanceof UserTask) {
-      UserTask userTask = (UserTask) flowElement;
-      boolean potentialOwnerIsSet = false;
-      if (userTask.getAssignee() != null && userTask.getAssignee().length() > 0) {
-        potentialOwnerIsSet = true;
-      }
-      if (userTask.getCandidateUsers() != null && userTask.getCandidateUsers().size() > 0) {
-        potentialOwnerIsSet = true;
-      }
-      if (userTask.getCandidateGroups() != null && userTask.getCandidateGroups().size() > 0) {
-        potentialOwnerIsSet = true;
-      }
-      if (potentialOwnerIsSet == false) {
-        createErrorMessage("UserTask " + userTask.getName() + " has no assignee, candidate users, candidate groups set");
-      }
+      Logger.logDebug(String.format("Processing validator %s", worker.getProcessValidationWorker().getClass().getCanonicalName()));
 
-    } else if (flowElement instanceof ScriptTask) {
-      ScriptTask scriptTask = (ScriptTask) flowElement;
-      if (scriptTask.getScriptFormat() == null || scriptTask.getScriptFormat().length() == 0) {
-        createErrorMessage("ScriptTask " + scriptTask.getName() + " has no format specified");
-      }
-      if (scriptTask.getScript() == null || scriptTask.getScript().length() == 0) {
-        createErrorMessage("ScriptTask " + scriptTask.getName() + " has no script logic specified");
-      }
-
-    } else if (flowElement instanceof ServiceTask && ExtensionUtil.isCustomServiceTask(flowElement) == false) {
-      ServiceTask serviceTask = (ServiceTask) flowElement;
-      if ((serviceTask.getImplementationType() == null || serviceTask.getImplementationType().length() == 0 || "classType".equalsIgnoreCase(serviceTask
-              .getImplementationType())) && serviceTask.getImplementation() == null || serviceTask.getImplementation().length() == 0) {
-        createErrorMessage("ServiceTask " + serviceTask.getName() + " has no class specified");
-      }
-    } else if (flowElement instanceof SequenceFlow) {
-      SequenceFlow sequenceFlow = (SequenceFlow) flowElement;
-      if (sequenceFlow.getSourceRef() == null || sequenceFlow.getSourceRef().getId() == null || sequenceFlow.getSourceRef().getId().length() == 0) {
-        createErrorMessage("SequenceFlow " + sequenceFlow.getName() + " has no source activity");
-      }
-      if (sequenceFlow.getTargetRef() == null || sequenceFlow.getTargetRef().getId() == null || sequenceFlow.getTargetRef().getId().length() == 0) {
-        createErrorMessage("SequenceFlow " + sequenceFlow.getName() + " has no target activity");
-      }
-    } else if (flowElement instanceof SubProcess) {
-      SubProcess subProcess = (SubProcess) flowElement;
-      if(subProcess.getFlowElements() != null) {
-        for (FlowElement subElement : subProcess.getFlowElements()) {
-          validateElement(subElement);
+      Collection<ProcessValidationWorkerMarker> result = worker.getProcessValidationWorker().validate(diagram, processNodes);
+      if (result.size() > 0) {
+        for (final ProcessValidationWorkerMarker marker : result) {
+          final String markerMessage = String.format(PluginConstants.MARKER_MESSAGE_PATTERN, marker.getCode().getDisplayName(), marker.getMessage());
+          switch (marker.getSeverity()) {
+          case IMarker.SEVERITY_ERROR:
+            addProblemToDiagram(diagram, markerMessage, marker.getNodeId());
+            break;
+          case IMarker.SEVERITY_WARNING:
+            addWarningToDiagram(diagram, markerMessage, marker.getNodeId());
+            break;
+          case IMarker.SEVERITY_INFO:
+            addInfoToDiagram(diagram, markerMessage, marker.getNodeId());
+            break;
+          }
         }
       }
+      monitor.worked(worker.getWork());
     }
+
+    monitor.done();
+    return overallResult;
   }
 
-  private void createErrorMessage(String message) {
-    addProblemToDiagram(diagram, message, null);
+  private List<ProcessValidationWorkerInfo> getWorkers() {
+
+    List<ProcessValidationWorkerInfo> result = new ArrayList<ProcessValidationWorkerInfo>();
+
+    result.add(new ProcessValidationWorkerInfo(new UserTaskValidationWorker(), PluginConstants.WORK_USER_TASK));
+    result.add(new ProcessValidationWorkerInfo(new ScriptTaskValidationWorker(), PluginConstants.WORK_SCRIPT_TASK));
+    result.add(new ProcessValidationWorkerInfo(new ServiceTaskValidationWorker(), PluginConstants.WORK_SERVICE_TASK));
+    result.add(new ProcessValidationWorkerInfo(new SequenceFlowValidationWorker(), PluginConstants.WORK_SEQUENCE_FLOW));
+    result.add(new ProcessValidationWorkerInfo(new SubProcessValidationWorker(), PluginConstants.WORK_SUB_PROCESS));
+
+    return result;
+
   }
 
   @Override
-  public String getValidatorId() {
-    return ActivitiBPMNDiagramConstants.BPMN_VALIDATOR_ID;
+  protected void addProblemToDiagram(Diagram diagram, String message, String nodeId) {
+    super.addProblemToDiagram(diagram, message, nodeId);
+    overallResult = false;
   }
+
 }
