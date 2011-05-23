@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Activiti Designer - Alfresco GUI
+Bundle-SymbolicName: com.alfresco.designer.gui;singleton:=true
+Bundle-Version: 5.5
+Bundle-Activator: com.alfresco.designer.gui.Activator
+Bundle-Vendor: Alfresco
+Require-Bundle: org.eclipse.core.runtime,
+ org.activiti.designer.model,
+ org.eclipse.graphiti,
+ org.activiti.designer.util,
+ org.eclipse.graphiti.ui,
+ org.eclipse.jface,
+ org.eclipse.ui.views.properties.tabbed,
+ org.eclipse.gef,
+ org.activiti.designer.eclipse
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: .
+Export-Package: com.alfresco.designer.gui.features,
+ com.alfresco.designer.gui.property

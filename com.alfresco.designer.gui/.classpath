@@ -1,0 +1,29 @@
+<classpath>
+  <classpathentry kind="src" path="src/main/java" including="**/*.java"/>
+  <classpathentry kind="output" path="target/classes"/>
+  <classpathentry kind="lib" path="/Users/tijsrademakers/.m2/repository/p2/osgi/bundle/org.eclipse.ant.core/3.2.201.v20110203_r362/org.eclipse.ant.core-3.2.201.v20110203_r362.jar"/>
+  <classpathentry kind="lib" path="/Users/tijsrademakers/.m2/repository/p2/osgi/bundle/org.eclipse.core.contenttype/3.4.100.v20100505-1235/org.eclipse.core.contenttype-3.4.100.v20100505-1235.jar"/>
+  <classpathentry kind="lib" path="/Users/tijsrademakers/.m2/repository/p2/osgi/bundle/org.eclipse.core.expressions/3.4.200.v20100505/org.eclipse.core.expressions-3.4.200.v20100505.jar"/>
+  <classpathentry kind="lib" path="/Users/tijsrademakers/.m2/repository/p2/osgi/bundle/org.eclipse.core.filesystem/1.3.1.R36x_v20100727-0745/org.eclipse.core.filesystem-1.3.1.R36x_v20100727-0745.jar"/>
+  <classpathentry kind="lib" path="/Users/tijsrademakers/.m2/repository/p2/osgi/bundle/org.eclipse.core.jobs/3.5.1.R36x_v20100824/org.eclipse.core.jobs-3.5.1.R36x_v20100824.jar"/>
+  <classpathentry kind="lib" path="/Users/tijsrademakers/.m2/repository/p2/osgi/bundle/org.eclipse.core.resources/3.6.1.R36x_v20110131-1630/org.eclipse.core.resources-3.6.1.R36x_v20110131-1630.jar"/>
+  <classpathentry kind="lib" path="/Users/tijsrademakers/.m2/repository/p2/osgi/bundle/org.eclipse.core.runtime/3.6.0.v20100505/org.eclipse.core.runtime-3.6.0.v20100505.jar"/>
+  <classpathentry kind="lib" path="/Users/tijsrademakers/.m2/repository/p2/osgi/bundle/org.eclipse.core.runtime.compatibility.auth/3.2.200.v20100517/org.eclipse.core.runtime.compatibility.auth-3.2.200.v20100517.jar"/>
+  <classpathentry kind="lib" path="/Users/tijsrademakers/.m2/repository/p2/osgi/bundle/org.eclipse.core.variables/3.2.400.v20100505/org.eclipse.core.variables-3.2.400.v20100505.jar"/>
+  <classpathentry kind="lib" path="/Users/tijsrademakers/.m2/repository/p2/osgi/bundle/org.eclipse.emf.common/2.6.0.v20100914-1218/org.eclipse.emf.common-2.6.0.v20100914-1218.jar"/>
+  <classpathentry kind="lib" path="/Users/tijsrademakers/.m2/repository/p2/osgi/bundle/org.eclipse.emf.ecore/2.6.1.v20100914-1218/org.eclipse.emf.ecore-2.6.1.v20100914-1218.jar"/>
+  <classpathentry kind="lib" path="/Users/tijsrademakers/.m2/repository/p2/osgi/bundle/org.eclipse.emf.ecore.change/2.5.1.v20100907-1643/org.eclipse.emf.ecore.change-2.5.1.v20100907-1643.jar"/>
+  <classpathentry kind="lib" path="/Users/tijsrademakers/.m2/repository/p2/osgi/bundle/org.eclipse.emf.ecore.xmi/2.5.0.v20100521-1846/org.eclipse.emf.ecore.xmi-2.5.0.v20100521-1846.jar"/>
+  <classpathentry kind="lib" path="/Users/tijsrademakers/.m2/repository/p2/osgi/bundle/org.eclipse.emf.edit/2.6.0.v20100914-1218/org.eclipse.emf.edit-2.6.0.v20100914-1218.jar"/>
+  <classpathentry kind="lib" path="/Users/tijsrademakers/.m2/repository/p2/osgi/bundle/org.eclipse.emf.transaction/1.4.0.v20100331-1738/org.eclipse.emf.transaction-1.4.0.v20100331-1738.jar"/>
+  <classpathentry kind="lib" path="/Users/tijsrademakers/.m2/repository/p2/osgi/bundle/org.eclipse.emf.validation/1.4.0.v20100428-2315/org.eclipse.emf.validation-1.4.0.v20100428-2315.jar"/>
+  <classpathentry kind="lib" path="/Users/tijsrademakers/.m2/repository/p2/osgi/bundle/org.eclipse.equinox.app/1.3.1.R36x_v20100803/org.eclipse.equinox.app-1.3.1.R36x_v20100803.jar"/>
+  <classpathentry kind="lib" path="/Users/tijsrademakers/.m2/repository/p2/osgi/bundle/org.eclipse.equinox.common/3.6.0.v20100503/org.eclipse.equinox.common-3.6.0.v20100503.jar"/>
+  <classpathentry kind="lib" path="/Users/tijsrademakers/.m2/repository/p2/osgi/bundle/org.eclipse.equinox.preferences/3.3.0.v20100503/org.eclipse.equinox.preferences-3.3.0.v20100503.jar"/>
+  <classpathentry kind="lib" path="/Users/tijsrademakers/.m2/repository/p2/osgi/bundle/org.eclipse.equinox.registry/3.5.0.v20100503/org.eclipse.equinox.registry-3.5.0.v20100503.jar"/>
+  <classpathentry kind="lib" path="/Users/tijsrademakers/.m2/repository/p2/osgi/bundle/org.eclipse.graphiti/0.7.1.v20110110-1225/org.eclipse.graphiti-0.7.1.v20110110-1225.jar"/>
+  <classpathentry kind="lib" path="/Users/tijsrademakers/.m2/repository/p2/osgi/bundle/org.eclipse.graphiti.mm/0.7.1.v20110110-1225/org.eclipse.graphiti.mm-0.7.1.v20110110-1225.jar"/>
+  <classpathentry kind="lib" path="/Users/tijsrademakers/.m2/repository/p2/osgi/bundle/org.eclipse.osgi/3.6.2.R36x_v20110210/org.eclipse.osgi-3.6.2.R36x_v20110210.jar"/>
+  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+  <classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+</classpath>
