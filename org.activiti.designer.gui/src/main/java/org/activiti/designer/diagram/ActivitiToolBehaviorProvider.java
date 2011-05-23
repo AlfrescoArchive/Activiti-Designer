@@ -13,7 +13,7 @@ import org.activiti.designer.ActivitiImageProvider;
 import org.activiti.designer.eclipse.common.ActivitiBPMNDiagramConstants;
 import org.activiti.designer.eclipse.extension.AbstractDiagramWorker;
 import org.activiti.designer.eclipse.extension.validation.ProcessValidator;
-import org.activiti.designer.eclipse.util.ActivitiUiUtil;
+import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.features.CreateBoundaryErrorFeature;
 import org.activiti.designer.features.CreateBoundaryTimerFeature;
 import org.activiti.designer.features.CreateBusinessRuleTaskFeature;
@@ -36,6 +36,8 @@ import org.activiti.designer.features.SaveBpmnModelFeature;
 import org.activiti.designer.integration.palette.PaletteEntry;
 import org.activiti.designer.property.extension.CustomServiceTaskContext;
 import org.activiti.designer.property.extension.util.ExtensionUtil;
+import org.activiti.designer.util.eclipse.ActivitiUiUtil;
+import org.activiti.designer.util.preferences.Preferences;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.bpmn2.SequenceFlow;
 import org.eclipse.bpmn2.ServiceTask;
@@ -85,6 +87,9 @@ import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.PlatformUI;
 
+import com.alfresco.designer.gui.features.CreateAlfrescoStartEventFeature;
+import com.alfresco.designer.gui.features.CreateAlfrescoUserTaskFeature;
+
 public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
 
   private static final Map<Class< ? extends ICreateFeature>, PaletteEntry> toolMapping = new HashMap<Class< ? extends ICreateFeature>, PaletteEntry>();
@@ -94,6 +99,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
 
     // Setup tool mappings to palette entries
     toolMapping.put(CreateStartEventFeature.class, PaletteEntry.START_EVENT);
+    toolMapping.put(CreateAlfrescoStartEventFeature.class, PaletteEntry.ALFRESCO_START_EVENT);
     toolMapping.put(CreateEndEventFeature.class, PaletteEntry.END_EVENT);
     toolMapping.put(CreateErrorEndEventFeature.class, PaletteEntry.ERROR_END_EVENT);
     toolMapping.put(CreateExclusiveGatewayFeature.class, PaletteEntry.EXCLUSIVE_GATEWAY);
@@ -105,6 +111,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     toolMapping.put(CreateCallActivityFeature.class, PaletteEntry.CALL_ACTIVITY);
     toolMapping.put(CreateEmbeddedSubProcessFeature.class, PaletteEntry.SUBPROCESS);
     toolMapping.put(CreateUserTaskFeature.class, PaletteEntry.USER_TASK);
+    toolMapping.put(CreateAlfrescoUserTaskFeature.class, PaletteEntry.ALFRESCO_USER_TASK);
     toolMapping.put(CreateBoundaryTimerFeature.class, PaletteEntry.BOUNDARY_TIMER);
     toolMapping.put(CreateBoundaryErrorFeature.class, PaletteEntry.ERROR_END_EVENT);
     toolMapping.put(CreateBusinessRuleTaskFeature.class, PaletteEntry.BUSINESSRULE_TASK);
@@ -218,6 +225,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     IPaletteCompartmentEntry taskCompartmentEntry = new PaletteCompartmentEntry("Task", null);
     IPaletteCompartmentEntry gatewayCompartmentEntry = new PaletteCompartmentEntry("Gateway", null);
     IPaletteCompartmentEntry boundaryEventCompartmentEntry = new PaletteCompartmentEntry("Boundary event", null);
+    IPaletteCompartmentEntry alfrescoCompartmentEntry = new PaletteCompartmentEntry("Alfresco", ActivitiImageProvider.IMG_ALFRESCO_LOGO);
 
     for (int i = 0; i < superCompartments.length; i++) {
 
@@ -265,6 +273,10 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
           taskCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("callactivity".equalsIgnoreCase(toolEntry.getLabel())) {
           taskCompartmentEntry.getToolEntries().add(toolEntry);
+        } else if ("alfrescousertask".equalsIgnoreCase(toolEntry.getLabel())) {
+          alfrescoCompartmentEntry.getToolEntries().add(toolEntry);
+        } else if ("alfrescostartevent".equalsIgnoreCase(toolEntry.getLabel())) {
+          alfrescoCompartmentEntry.getToolEntries().add(toolEntry);
         }
       }
     }
@@ -282,6 +294,11 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     }
     if (boundaryEventCompartmentEntry.getToolEntries().size() > 0) {
       ret.add(boundaryEventCompartmentEntry);
+    }
+    if (PreferencesUtil.getBooleanPreference(Preferences.ALFRESCO_ENABLE) && 
+            alfrescoCompartmentEntry.getToolEntries().size() > 0) {
+      
+      ret.add(alfrescoCompartmentEntry);
     }
 
     final Map<String, List<CustomServiceTaskContext>> tasksInDrawers = new HashMap<String, List<CustomServiceTaskContext>>();

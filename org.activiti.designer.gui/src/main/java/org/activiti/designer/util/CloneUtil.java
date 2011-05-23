@@ -3,7 +3,6 @@
  */
 package org.activiti.designer.util;
 
-import org.activiti.designer.eclipse.util.ActivitiUiUtil;
 import org.activiti.designer.features.CreateEndEventFeature;
 import org.activiti.designer.features.CreateExclusiveGatewayFeature;
 import org.activiti.designer.features.CreateMailTaskFeature;
@@ -13,6 +12,7 @@ import org.activiti.designer.features.CreateServiceTaskFeature;
 import org.activiti.designer.features.CreateStartEventFeature;
 import org.activiti.designer.features.CreateUserTaskFeature;
 import org.activiti.designer.property.extension.util.ExtensionUtil;
+import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.eclipse.bpmn2.Bpmn2Factory;
 import org.eclipse.bpmn2.ComplexDataType;
 import org.eclipse.bpmn2.CustomProperty;

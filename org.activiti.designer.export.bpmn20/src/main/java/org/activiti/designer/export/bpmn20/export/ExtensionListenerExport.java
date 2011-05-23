@@ -38,7 +38,7 @@ public class ExtensionListenerExport implements ActivitiNamespaceConstants {
       if (listener.getEvent() != null) {
         xtw.writeAttribute("event", listener.getEvent());
       }
-      ImplementationValueExport.writeImplementationValue(xtw, listener.getImplementationType(), listener.getImplementation(), false);
+      ImplementationValueExport.writeImplementationValue(xtw, listenerType, listener.getImplementationType(), listener.getImplementation(), false);
       FieldExtensionsExport.writeFieldExtensions(xtw, listener.getFieldExtensions(), false);
       xtw.writeEndElement();
     }

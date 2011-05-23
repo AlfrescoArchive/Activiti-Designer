@@ -98,7 +98,6 @@ public class UserTaskExport implements ActivitiNamespaceConstants {
       }
       
       FormPropertiesExport.createFormPropertiesXML(userTask.getFormProperties(), xtw);
-      System.out.println("usertask id " + userTask.getId());
       ExtensionListenerExport.createExtensionListenerXML(userTask.getActivitiListeners(), extensionsElement, TASK_LISTENER, xtw);
       
       if(extensionsElement == false) {

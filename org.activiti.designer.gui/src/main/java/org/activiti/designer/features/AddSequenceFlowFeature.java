@@ -3,7 +3,7 @@ package org.activiti.designer.features;
 import java.util.Collection;
 import java.util.List;
 
-import org.activiti.designer.util.StyleUtil;
+import org.activiti.designer.util.style.StyleUtil;
 import org.eclipse.bpmn2.FlowNode;
 import org.eclipse.bpmn2.Gateway;
 import org.eclipse.bpmn2.SequenceFlow;

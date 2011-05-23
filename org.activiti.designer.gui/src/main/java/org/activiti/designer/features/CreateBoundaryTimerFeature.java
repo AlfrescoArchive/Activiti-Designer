@@ -1,6 +1,7 @@
 package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
+import org.activiti.designer.util.features.AbstractCreateBPMNFeature;
 import org.eclipse.bpmn2.Activity;
 import org.eclipse.bpmn2.BoundaryEvent;
 import org.eclipse.bpmn2.Bpmn2Factory;

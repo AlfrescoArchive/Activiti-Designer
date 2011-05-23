@@ -1,6 +1,7 @@
 package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
+import org.activiti.designer.util.features.AbstractCreateBPMNFeature;
 import org.eclipse.bpmn2.Bpmn2Factory;
 import org.eclipse.bpmn2.ReceiveTask;
 import org.eclipse.bpmn2.SubProcess;

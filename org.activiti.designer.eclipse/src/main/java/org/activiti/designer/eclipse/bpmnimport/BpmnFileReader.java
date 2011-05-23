@@ -15,6 +15,7 @@ package org.activiti.designer.eclipse.bpmnimport;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -88,6 +89,8 @@ public class BpmnFileReader {
   private Diagram diagram;
   private IFeatureProvider featureProvider;
   private String filename;
+  private InputStream fileStream;
+  private String processName;
   
   private BpmnParser bpmnParser = new BpmnParser();
   private Map<String, GraphicInfo> yMap = new HashMap<String, GraphicInfo>();
@@ -98,19 +101,33 @@ public class BpmnFileReader {
     this.diagram = diagram;
     this.featureProvider = featureProvider;
   }
-
-  public void readBpmn() {
+  
+  public BpmnFileReader(InputStream fileStream, String processName, Diagram diagram, IFeatureProvider featureProvider) {
+    this.fileStream = fileStream;
+    this.processName = processName;
+    this.diagram = diagram;
+    this.featureProvider = featureProvider;
+  }
+  
+  public void openStream() {
     File bpmnFile = new File(filename);
     if(bpmnFile.exists() == false) {
       System.out.println("bpmn file does not exist " + filename);
       return;
     }
-    String processName = filename.substring(filename.lastIndexOf(File.separator) + 1);
+    processName = filename.substring(filename.lastIndexOf(File.separator) + 1);
     processName = processName.substring(0, processName.indexOf("."));
     try {
-      FileInputStream inStream = new FileInputStream(bpmnFile);
+      fileStream = new FileInputStream(bpmnFile);
+    } catch(Exception e) {
+      e.printStackTrace();
+    }
+  }
+
+  public void readBpmn() {
+    try {
       XMLInputFactory xif = XMLInputFactory.newInstance();
-      InputStreamReader in = new InputStreamReader(inStream, "UTF-8");
+      InputStreamReader in = new InputStreamReader(fileStream, "UTF-8");
       XMLStreamReader xtr = xif.createXMLStreamReader(in);
       bpmnParser.parseBpmn(xtr);
       
@@ -149,7 +166,7 @@ public class BpmnFileReader {
       setFriendlyIds();
       xtr.close();
       in.close();
-      inStream.close();
+      fileStream.close();
       
     } catch(Exception e) {
       e.printStackTrace();

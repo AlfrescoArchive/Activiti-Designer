@@ -1,6 +1,6 @@
 package org.activiti.designer.gui.actions;
 
-import org.activiti.designer.eclipse.util.ActivitiUiUtil;
+import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
 import org.eclipse.core.commands.IHandler;

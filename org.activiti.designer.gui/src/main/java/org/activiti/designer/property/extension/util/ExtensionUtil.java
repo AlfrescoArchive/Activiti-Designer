@@ -13,7 +13,6 @@ import java.util.jar.Manifest;
 
 import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.eclipse.extension.ExtensionConstants;
-import org.activiti.designer.eclipse.util.ActivitiUiUtil;
 import org.activiti.designer.integration.palette.AbstractDefaultPaletteCustomizer;
 import org.activiti.designer.integration.palette.DefaultPaletteCustomizer;
 import org.activiti.designer.integration.palette.PaletteEntry;
@@ -22,6 +21,7 @@ import org.activiti.designer.integration.servicetask.CustomServiceTask;
 import org.activiti.designer.property.extension.CustomServiceTaskContext;
 import org.activiti.designer.property.extension.CustomServiceTaskContextImpl;
 import org.activiti.designer.property.extension.JarClassLoader;
+import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.bpmn2.CustomProperty;
 import org.eclipse.bpmn2.ServiceTask;

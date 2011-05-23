@@ -1,8 +1,8 @@
 package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
-import org.activiti.designer.eclipse.util.ActivitiUiUtil;
-import org.activiti.designer.util.StyleUtil;
+import org.activiti.designer.util.eclipse.ActivitiUiUtil;
+import org.activiti.designer.util.style.StyleUtil;
 import org.eclipse.bpmn2.EndEvent;
 import org.eclipse.bpmn2.Event;
 import org.eclipse.bpmn2.SubProcess;

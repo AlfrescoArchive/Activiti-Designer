@@ -839,6 +839,8 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute BPMN20.ecore#//IOParameter/source"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute BPMN20.ecore#//IOParameter/target"/>
     </genClasses>
+    <genClasses ecoreClass="BPMN20.ecore#//AlfrescoUserTask"/>
+    <genClasses ecoreClass="BPMN20.ecore#//AlfrescoStartEvent"/>
   </genPackages>
   <genPackages prefix="BpmnDi" basePackage="org.eclipse.bpmn2" resource="XML" multipleEditorPages="false"
       generateModelWizard="false" ecorePackage="BPMNDI.ecore#/">

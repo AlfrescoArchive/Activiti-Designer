@@ -3,8 +3,8 @@ package org.activiti.designer.property.ui;
 import java.util.Iterator;
 import java.util.List;
 
-import org.activiti.designer.eclipse.util.ActivitiUiUtil;
 import org.activiti.designer.model.FieldExtensionModel;
+import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.eclipse.bpmn2.Bpmn2Factory;
 import org.eclipse.bpmn2.FieldExtension;
 import org.eclipse.bpmn2.ServiceTask;

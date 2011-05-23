@@ -19,7 +19,8 @@ Require-Bundle: org.eclipse.graphiti,
  org.eclipse.wst.sse.ui,
  org.eclipse.jface.text,
  org.eclipse.wst.sse.core,
- org.junit
+ org.junit,
+ org.activiti.designer.util
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: 

@@ -1,5 +1,6 @@
 package org.activiti.designer.property;
 
+import org.eclipse.bpmn2.AlfrescoStartEvent;
 import org.eclipse.bpmn2.StartEvent;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
@@ -11,7 +12,7 @@ public class PropertyStartEventFilter extends AbstractPropertySectionFilter {
 	@Override
 	protected boolean accept(PictogramElement pe) {
 		EObject bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
-		if (bo instanceof StartEvent) {
+		if (bo instanceof StartEvent && bo instanceof AlfrescoStartEvent == false) {
 			return true;
 		}
 		return false;

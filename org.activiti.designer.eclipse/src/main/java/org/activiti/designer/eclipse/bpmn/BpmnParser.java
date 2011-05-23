@@ -20,6 +20,8 @@ import java.util.Map;
 
 import javax.xml.stream.XMLStreamReader;
 
+import org.activiti.designer.eclipse.preferences.PreferencesUtil;
+import org.activiti.designer.util.preferences.Preferences;
 import org.eclipse.bpmn2.ActivitiListener;
 import org.eclipse.bpmn2.Activity;
 import org.eclipse.bpmn2.BoundaryEvent;
@@ -58,6 +60,7 @@ public class BpmnParser {
   private static final String CLASS_TYPE = "classType";
   private static final String EXPRESSION_TYPE = "expressionType";
   private static final String DELEGATE_EXPRESSION_TYPE = "delegateExpressionType";
+  private static final String ALFRESCO_TYPE = "alfrescoScriptType";
   
   public boolean bpmdiInfoFound;
   public List<FlowElement> bpmnList = new ArrayList<FlowElement>();
@@ -243,7 +246,18 @@ public class BpmnParser {
   }
   
   private StartEvent parseStartEvent(XMLStreamReader xtr) {
-    StartEvent startEvent = Bpmn2Factory.eINSTANCE.createStartEvent();
+    StartEvent startEvent = null;
+    if(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "formKey") != null) {
+      String[] formTypes = PreferencesUtil.getStringArray(Preferences.ALFRESCO_FORMTYPES_STARTEVENT);
+      for (String form : formTypes) {
+        if(form.equals(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "formKey"))) {
+          startEvent = Bpmn2Factory.eINSTANCE.createAlfrescoStartEvent();
+        }
+      }
+    }
+    if(startEvent == null) {
+      startEvent = Bpmn2Factory.eINSTANCE.createStartEvent();
+    } 
     startEvent.setName("Start");
     if(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "formKey") != null) {
       startEvent.setFormKey(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "formKey"));
@@ -413,7 +427,19 @@ public class BpmnParser {
 
   
   private UserTask parseUserTask(XMLStreamReader xtr) {
-    UserTask userTask = Bpmn2Factory.eINSTANCE.createUserTask();
+    UserTask userTask = null;
+    if(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "formKey") != null) {
+      String[] formTypes = PreferencesUtil.getStringArray(Preferences.ALFRESCO_FORMTYPES_USERTASK);
+      for (String form : formTypes) {
+        if(form.equals(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "formKey"))) {
+          userTask = Bpmn2Factory.eINSTANCE.createAlfrescoUserTask();
+        }
+      }
+    }
+    if(userTask == null) {
+      userTask = Bpmn2Factory.eINSTANCE.createUserTask();
+    }
+    
     userTask.setName(xtr.getAttributeValue(null, "name"));
     
     if(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "assignee") != null) {
@@ -714,7 +740,30 @@ public class BpmnParser {
         if(xtr.isStartElement() && ("executionListener".equalsIgnoreCase(xtr.getLocalName()) ||
                 "taskListener".equalsIgnoreCase(xtr.getLocalName()))) {
           
-          listener = parseListener(xtr);
+          if(xtr.getAttributeValue(null, "class") != null &&
+                  "org.alfresco.repo.workflow.activiti.listener.ScriptExecutionListener".equals(xtr.getAttributeValue(null, "class")) ||
+                  "org.alfresco.repo.workflow.activiti.tasklistener.ScriptTaskListener".equals(xtr.getAttributeValue(null, "class"))) {
+              
+            listener = Bpmn2Factory.eINSTANCE.createActivitiListener();
+            listener.setEvent(xtr.getAttributeValue(null, "event"));
+            listener.setImplementationType(ALFRESCO_TYPE);
+            boolean readyWithAlfrescoType = false;
+            while(readyWithAlfrescoType == false && xtr.hasNext()) {
+              xtr.next();
+              if(xtr.isStartElement() && "field".equalsIgnoreCase(xtr.getLocalName())) {
+                String script = getFieldExtensionValue(xtr);
+                if(script != null && script.length() > 0) {
+                  listener.setImplementation(script);
+                }
+                readyWithAlfrescoType = true;
+              } else if(xtr.isEndElement() && "extensionElements".equalsIgnoreCase(xtr.getLocalName())) {
+                readyWithAlfrescoType = true;
+                readyWithListener = true;
+              }
+            }
+          } else {
+            listener = parseListener(xtr);
+          }
           listenerList.add(listener);
           
         } else if(xtr.isStartElement() && "field".equalsIgnoreCase(xtr.getLocalName())) {

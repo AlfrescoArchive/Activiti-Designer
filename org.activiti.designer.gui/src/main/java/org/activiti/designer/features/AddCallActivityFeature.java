@@ -1,10 +1,10 @@
 package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
-import org.activiti.designer.eclipse.util.ActivitiUiUtil;
-import org.activiti.designer.util.OSEnum;
-import org.activiti.designer.util.OSUtil;
-import org.activiti.designer.util.StyleUtil;
+import org.activiti.designer.util.eclipse.ActivitiUiUtil;
+import org.activiti.designer.util.platform.OSEnum;
+import org.activiti.designer.util.platform.OSUtil;
+import org.activiti.designer.util.style.StyleUtil;
 import org.eclipse.bpmn2.CallActivity;
 import org.eclipse.bpmn2.SubProcess;
 import org.eclipse.graphiti.features.IDirectEditingInfo;

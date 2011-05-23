@@ -20,11 +20,27 @@ import javax.xml.stream.XMLStreamWriter;
  */
 public class ImplementationValueExport implements ActivitiNamespaceConstants {
 
-  public static void writeImplementationValue(XMLStreamWriter xtw, String implementationType, String implementation, boolean namespace) throws Exception {
+  public static void writeImplementationValue(XMLStreamWriter xtw, String listenerType, String implementationType, 
+          String implementation, boolean namespace) throws Exception {
     if (implementationType == null || implementationType.length() == 0 || CLASS_TYPE.equals(implementationType)) {
       writeImplementationValueAndType(xtw, "class", implementation, namespace);
-    } else if (implementationType.equals(DELEGATE_EXPRESSION_TYPE)){
+    } else if (implementationType.equals(DELEGATE_EXPRESSION_TYPE)) {
       writeImplementationValueAndType(xtw, "delegateExpression", implementation, namespace);
+    } else if (implementationType.equals(ALFRESCO_TYPE)) {
+      String className = null;
+      if(EXECUTION_LISTENER.equals(listenerType)) {
+        className = "org.alfresco.repo.workflow.activiti.listener.ScriptExecutionListener";
+      } else {
+        className = "org.alfresco.repo.workflow.activiti.tasklistener.ScriptTaskListener";
+      }
+      xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "class", className);
+      xtw.writeStartElement(ACTIVITI_EXTENSIONS_PREFIX, "field", ACTIVITI_EXTENSIONS_NAMESPACE);
+      xtw.writeAttribute("name", "script");
+      xtw.writeStartElement(ACTIVITI_EXTENSIONS_PREFIX, "string", ACTIVITI_EXTENSIONS_NAMESPACE);
+      xtw.writeCharacters(implementation);
+      xtw.writeEndElement();
+      xtw.writeEndElement();
+      
     } else {
       writeImplementationValueAndType(xtw, "expression", implementation, namespace);
     }

@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.activiti.designer.model.FieldExtensionModel;
 import org.activiti.designer.util.BpmnBOUtil;
-import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jdt.ui.IJavaElementSearchConstants;
@@ -26,9 +25,9 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Text;
@@ -53,18 +52,23 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
 	protected Button classTypeButton;
 	protected Button expressionTypeButton;
 	protected Button delegateExpressionTypeButton;
+	protected Button alfrescoTypeButton;
 	protected Text classNameText;
 	protected Button classSelectButton;
 	protected CLabel classSelectLabel;
 	protected Text expressionText;
 	protected CLabel expressionLabel;
 	protected Text delegateExpressionText;
+	protected Text scriptText;
+	protected CLabel scriptLabel;
 	protected CLabel delegateExpressionLabel;
 	protected FieldExtensionEditor fieldEditor;
+	protected CLabel extensionLabel;
 	
 	private final static String CLASS_TYPE = "classType";
   private final static String EXPRESSION_TYPE = "expressionType";
   private final static String DELEGATE_EXPRESSION_TYPE = "delegateExpressionType";
+  private final static String ALFRESCO_TYPE = "alfrescoScriptType";
 
 	public AbstractListenerDialog(Shell parent, TableItem[] fieldList) {
 		// Pass the default styles here
@@ -141,14 +145,7 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
     data.top = new FormAttachment(0, VSPACE);
     eventDropDown.setLayoutData(data);
     
-    CLabel eventLabel = new CLabel(shell, SWT.NONE);
-    eventLabel.setText("Event");
-    data = new FormData();
-    data.left = new FormAttachment(0, 0);
-    data.right = new FormAttachment(eventDropDown, -HSPACE);
-    data.top = new FormAttachment(eventDropDown, 0, SWT.TOP);
-    eventLabel.setLayoutData(data);
-    eventLabel.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
+    createLabel(shell, "Event", eventDropDown);
 		
 		Composite radioTypeComposite = new Composite(shell, SWT.NULL);
     radioTypeComposite.setBackground(shell.getBackground());
@@ -165,10 +162,7 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
 
       @Override
       public void widgetSelected(SelectionEvent event) {
-        setVisibleClassType(true);
-        setVisibleExpressionType(false);
-        setVisibleDelegateExpressionType(false);
-        setImplementationType(CLASS_TYPE);
+        enableClassType();
       }
 
       @Override
@@ -182,10 +176,7 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
 
       @Override
       public void widgetSelected(SelectionEvent event) {
-        setVisibleClassType(false);
-        setVisibleExpressionType(true);
-        setVisibleDelegateExpressionType(false);
-        setImplementationType(EXPRESSION_TYPE);
+        enableExpressionType();
       }
 
       @Override
@@ -200,10 +191,7 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
       
       @Override
       public void widgetSelected(SelectionEvent event) {
-        setVisibleClassType(false);
-        setVisibleExpressionType(false);
-        setVisibleDelegateExpressionType(true);
-        setImplementationType(DELEGATE_EXPRESSION_TYPE);
+        enableDelegateExpressionType();
       }
     
       @Override
@@ -213,13 +201,23 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
       
     });
     
-    Label typeLabel = new Label(shell, SWT.NONE);
-    data = new FormData();
-    data.left = new FormAttachment(0, 0);
-    data.right = new FormAttachment(radioTypeComposite, -HSPACE);
-    data.top = new FormAttachment(radioTypeComposite, 0, SWT.TOP);
-    typeLabel.setText("Type");
-    typeLabel.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
+    alfrescoTypeButton = new Button(radioTypeComposite, SWT.RADIO);
+    alfrescoTypeButton.setText("Alfresco script");
+    alfrescoTypeButton.addSelectionListener(new SelectionListener() {
+      
+      @Override
+      public void widgetSelected(SelectionEvent event) {
+        enableAlfrescoType();
+      }
+    
+      @Override
+      public void widgetDefaultSelected(SelectionEvent event) {
+        //
+      }
+      
+    });
+    
+    createLabel(shell, "Type", radioTypeComposite);
 
     classNameText = new Text(shell, SWT.BORDER);
     if(CLASS_TYPE.equals(savedImplementationType)) {
@@ -262,14 +260,7 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
       }
     });
     
-    classSelectLabel = new CLabel(shell, SWT.NONE);
-    classSelectLabel.setText("Service class:");
-    data = new FormData();
-    data.left = new FormAttachment(0, 0);
-    data.right = new FormAttachment(classNameText, -HSPACE);
-    data.top = new FormAttachment(classNameText, -2, SWT.TOP);
-    classSelectLabel.setLayoutData(data);
-    classSelectLabel.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
+    classSelectLabel = createLabel(shell, "Service class", expressionText);
     
     expressionText = new Text(shell, SWT.BORDER);
     if(EXPRESSION_TYPE.equals(savedImplementationType)) {
@@ -283,14 +274,7 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
     data.top = new FormAttachment(radioTypeComposite, VSPACE);
     expressionText.setLayoutData(data);
     
-    expressionLabel = new CLabel(shell, SWT.NONE);
-    expressionLabel.setText("Expression");
-    data = new FormData();
-    data.left = new FormAttachment(0, 0);
-    data.right = new FormAttachment(expressionText, -HSPACE);
-    data.top = new FormAttachment(expressionText, 0, SWT.TOP);
-    expressionLabel.setLayoutData(data);
-    expressionLabel.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
+    expressionLabel = createLabel(shell, "Expression", expressionText);
     
     delegateExpressionText = new Text(shell, SWT.BORDER);
     if(DELEGATE_EXPRESSION_TYPE.equals(savedImplementationType)) {
@@ -304,13 +288,21 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
     data.top = new FormAttachment(radioTypeComposite, VSPACE);
     delegateExpressionText.setLayoutData(data);
         
-    delegateExpressionLabel = new CLabel(shell, SWT.NONE);
-    delegateExpressionLabel.setText("Delegate expression");
-    data = new FormData();
-    data.left = new FormAttachment(0, 0);
-    data.right = new FormAttachment(delegateExpressionText, -HSPACE);
-    data.top = new FormAttachment(delegateExpressionText, 0, SWT.TOP);
-    delegateExpressionLabel.setLayoutData(data);
+    delegateExpressionLabel = createLabel(shell, "Delegate expression", delegateExpressionText);
+    
+    scriptText = new Text(shell, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
+    if(ALFRESCO_TYPE.equals(savedImplementationType)) {
+      scriptText.setText(savedImplementation);
+    } else {
+      scriptText.setText("");
+    }
+    data = new FormData(SWT.DEFAULT, 100);
+    data.left = new FormAttachment(0, 120);
+    data.right = new FormAttachment(100, 0);
+    data.top = new FormAttachment(radioTypeComposite, VSPACE);
+    scriptText.setLayoutData(data);
+    
+    scriptLabel = createLabel(shell, "Script", scriptText);
     
     Composite extensionsComposite = new Composite(shell, SWT.WRAP);
     data = new FormData();
@@ -329,14 +321,7 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
       fieldEditor.initializeModel(fieldList);
     }
     
-    CLabel extensionLabel = new CLabel(shell, SWT.NONE);
-    extensionLabel.setText("Fields");
-    data = new FormData();
-    data.left = new FormAttachment(0, 0);
-    data.right = new FormAttachment(extensionsComposite, -HSPACE);
-    data.top = new FormAttachment(extensionsComposite, 0, SWT.TOP);
-    extensionLabel.setLayoutData(data);
-    extensionLabel.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
+    extensionLabel = createLabel(shell, "Fields", extensionsComposite);
     
     // Create the cancel button and add a handler
     // so that pressing it will set input to null
@@ -379,6 +364,8 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
 				  implementation = classNameText.getText();
 				} else if(DELEGATE_EXPRESSION_TYPE.equals(implementationType)){
 				  implementation = delegateExpressionText.getText();
+				} else if(ALFRESCO_TYPE.equals(implementationType)){
+				  implementation = scriptText.getText();
 				} else {
 				  implementation = expressionText.getText();
 				}
@@ -402,22 +389,16 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
 		
 		if(savedImplementationType == null || CLASS_TYPE.equals(savedImplementationType)) {
       classTypeButton.setSelection(true);
-      setImplementationType(CLASS_TYPE);
-      setVisibleClassType(true);
-      setVisibleExpressionType(false);
-      setVisibleDelegateExpressionType(false);
+      enableClassType();
     } else if(EXPRESSION_TYPE.equals(savedImplementationType)){
       expressionTypeButton.setSelection(true);
-      setImplementationType(EXPRESSION_TYPE);
-      setVisibleClassType(false);
-      setVisibleExpressionType(true);
-      setVisibleDelegateExpressionType(false);
+      enableExpressionType();
+    } else if(ALFRESCO_TYPE.equals(savedImplementationType)){
+      alfrescoTypeButton.setSelection(true);
+      enableAlfrescoType();
     } else {
       delegateExpressionTypeButton.setSelection(true);
-      setImplementationType(DELEGATE_EXPRESSION_TYPE);
-      setVisibleClassType(false);
-      setVisibleExpressionType(false);
-      setVisibleDelegateExpressionType(true);
+      enableDelegateExpressionType();
     }
 	}
 	
@@ -427,6 +408,38 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
 	
 	private void setImplementationType(final String type) {
     implementationType = type;
+  }
+	
+	private void enableClassType() {
+	  setVisibleClassType(true);
+    setVisibleExpressionType(false);
+    setVisibleDelegateExpressionType(false);
+    setVisibleAlfrescoType(false);
+    setImplementationType(CLASS_TYPE);
+	}
+	
+	private void enableExpressionType() {
+	  setVisibleClassType(false);
+    setVisibleExpressionType(true);
+    setVisibleDelegateExpressionType(false);
+    setVisibleAlfrescoType(false);
+    setImplementationType(EXPRESSION_TYPE);
+  }
+	
+	private void enableDelegateExpressionType() {
+	  setVisibleClassType(false);
+    setVisibleExpressionType(false);
+    setVisibleDelegateExpressionType(true);
+    setVisibleAlfrescoType(false);
+    setImplementationType(DELEGATE_EXPRESSION_TYPE);
+  }
+	
+	private void enableAlfrescoType() {
+    setVisibleClassType(false);
+    setVisibleExpressionType(false);
+    setVisibleDelegateExpressionType(false);
+    setVisibleAlfrescoType(true);
+    setImplementationType(ALFRESCO_TYPE);
   }
 	
 	private void setVisibleClassType(boolean visible) {
@@ -446,5 +459,25 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
     delegateExpressionTypeButton.setSelection(visible);
     delegateExpressionText.setVisible(visible);
     delegateExpressionLabel.setVisible(visible);
+  }
+  
+  private void setVisibleAlfrescoType(boolean visible) {
+    alfrescoTypeButton.setSelection(visible);
+    scriptText.setVisible(visible);
+    scriptLabel.setVisible(visible);
+    extensionLabel.setVisible(!visible);
+    fieldEditor.setVisible(!visible);
+  }
+  
+  private CLabel createLabel(Composite parent, String text, Control control) {
+    CLabel label = new CLabel(parent, SWT.NONE);
+    label.setText(text);
+    FormData data = new FormData();
+    data.left = new FormAttachment(0, 0);
+    data.right = new FormAttachment(control, -HSPACE);
+    data.top = new FormAttachment(control, 0, SWT.TOP);
+    label.setLayoutData(data);
+    label.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
+    return label;
   }
 }

@@ -492,5 +492,12 @@ public abstract class TableFieldEditor extends FieldEditor {
 		editButton.setEnabled(enabled);
 		removeButton.setEnabled(enabled);
 	}
+	
+	public void setVisible(boolean visible) {
+	  table.setVisible(visible);
+	  addButton.setVisible(visible);
+	  editButton.setVisible(visible);
+	  removeButton.setVisible(visible);
+	}
 
 }

@@ -1,7 +1,7 @@
 package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
-import org.activiti.designer.util.StyleUtil;
+import org.activiti.designer.util.style.StyleUtil;
 import org.eclipse.bpmn2.BoundaryEvent;
 import org.eclipse.bpmn2.SubProcess;
 import org.eclipse.bpmn2.Task;

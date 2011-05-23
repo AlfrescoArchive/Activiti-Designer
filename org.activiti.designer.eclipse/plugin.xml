@@ -146,19 +146,20 @@
             icon="community_icon.png"
             id="org.activiti.designer.editor.bpmn"
             name="Activiti BPMN 2.0 XML Editor">
+         <contentTypeBinding
+               contentTypeId="org.activiti.designer.editor.bpmn.contenttype">
+         </contentTypeBinding>
       </editor>
    <editor
-         class="org.activiti.designer.eclipse.editor.ActivitiMultiPageEditor"
-         contributorClass="org.activiti.designer.eclipse.editor.ActivitiMultiPageEditorContributor"
+         class="org.activiti.designer.eclipse.editor.ActivitiDiagramEditor"
+         contributorClass="org.eclipse.graphiti.ui.editor.DiagramEditorActionBarContributor"
+         default="false"
          extensions="activiti"
          icon="community_icon.png"
          id="org.activiti.designer.editor.multiPageEditor"
          name="Activiti Diagram Editor">
       <contentTypeBinding
             contentTypeId="org.activiti.designer.editor.diagram.contenttype">
-      </contentTypeBinding>
-      <contentTypeBinding
-            contentTypeId="org.activiti.designer.editor.bpmn.contenttype">
       </contentTypeBinding>
    </editor>
    </extension>
@@ -183,13 +184,6 @@
           id="org.activiti.designer.editor.bpmn.contenttype"
           name="Activiti BPMN Editor File"
           priority="normal">
-       <describer
-             class="org.eclipse.core.runtime.content.XMLRootElementContentDescriber2">
-          <parameter
-                name="element"
-                value="definitions">
-          </parameter>
-       </describer>
     </content-type>
     <content-type
           base-type="org.eclipse.core.runtime.xml"

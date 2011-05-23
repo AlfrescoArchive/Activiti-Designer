@@ -15,6 +15,8 @@
 		<module>../org.activiti.designer.model</module>
 		<module>../org.activiti.designer.eclipse</module>
 		<module>../org.activiti.designer.gui</module>
+		<module>../org.activiti.designer.util</module>
+		<module>../com.alfresco.designer.gui</module>
 		<module>../org.activiti.designer.help</module>
 		<module>../org.activiti.designer.feature</module>
 		<module>../org.activiti.designer.updatesite</module>

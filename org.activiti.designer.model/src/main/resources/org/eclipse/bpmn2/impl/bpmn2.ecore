@@ -4523,4 +4523,6 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="source" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="target" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="AlfrescoUserTask" eSuperTypes="#//UserTask"/>
+  <eClassifiers xsi:type="ecore:EClass" name="AlfrescoStartEvent" eSuperTypes="#//StartEvent"/>
 </ecore:EPackage>

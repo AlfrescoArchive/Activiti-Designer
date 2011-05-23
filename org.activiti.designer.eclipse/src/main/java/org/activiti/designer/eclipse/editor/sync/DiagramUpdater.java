@@ -28,7 +28,7 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.activiti.designer.eclipse.bpmn.BpmnParser;
 import org.activiti.designer.eclipse.bpmn.SequenceFlowModel;
-import org.activiti.designer.eclipse.util.ActivitiUiUtil;
+import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.eclipse.bpmn2.BaseElement;
 import org.eclipse.bpmn2.CandidateGroup;
 import org.eclipse.bpmn2.CandidateUser;

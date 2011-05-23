@@ -4,7 +4,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import org.activiti.designer.eclipse.util.ActivitiUiUtil;
+import org.activiti.designer.util.eclipse.ActivitiUiUtil;
+import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.eclipse.bpmn2.Bpmn2Factory;
 import org.eclipse.bpmn2.CandidateGroup;
 import org.eclipse.bpmn2.CandidateUser;
@@ -46,15 +47,7 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
     Composite composite = factory.createFlatFormComposite(parent);
     FormData data;
 
-    performerTypeCombo = factory.createCCombo(composite, SWT.NONE);
-    performerTypeCombo.setItems((String[]) performerTypes.toArray());
-    data = new FormData();
-    data.left = new FormAttachment(0, 160);
-    data.right = new FormAttachment(100, 0);
-    data.top = new FormAttachment(0, VSPACE);
-    performerTypeCombo.setLayoutData(data);
-    performerTypeCombo.addFocusListener(listener);
-
+    performerTypeCombo = createCCombo(composite, (String[]) performerTypes.toArray(), factory, null);
     createLabel("Performer type:", composite, factory, performerTypeCombo);
 
     expressionText = createText(composite, factory, performerTypeCombo);
@@ -122,9 +115,13 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
           expressionText.setText(userTask.getAssignee());
         }
       }
-      formKeyText.setText("");
-      if (userTask.getFormKey() != null && userTask.getFormKey().length() > 0) {
-        formKeyText.setText(userTask.getFormKey());
+      if(formKeyText != null) {
+        formKeyText.setText("");
+        if (userTask.getFormKey() != null && userTask.getFormKey().length() > 0) {
+          formKeyText.setText(userTask.getFormKey());
+        }
+      } else {
+        
       }
       
       priorityText.setText("");
@@ -351,4 +348,19 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
     return label;
   }
 
+  private CCombo createCCombo(Composite parent, String[] values, TabbedPropertySheetWidgetFactory factory, Control top) {
+    CCombo combo = factory.createCCombo(parent, SWT.NONE);
+    combo.setItems(values);
+    FormData data = new FormData();
+    data.left = new FormAttachment(0, 160);
+    data.right = new FormAttachment(100, 0);
+    if(top == null) {
+      data.top = new FormAttachment(0, VSPACE);
+    } else {
+      data.top = new FormAttachment(top, VSPACE);
+    }
+    combo.setLayoutData(data);
+    combo.addFocusListener(listener);
+    return combo;
+  }
 }

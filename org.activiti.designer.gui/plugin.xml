@@ -187,6 +187,18 @@
                id="org.activiti.designer.multiInstanceTab.multiInstance"
                tab="org.activiti.designer.multiInstanceTab">
          </propertySection>
+         <propertySection
+               class="com.alfresco.designer.gui.property.PropertyAlfrescoUserTaskSection"
+               filter="com.alfresco.designer.gui.property.PropertyAlfrescoUserTaskFilter"
+               id="org.activiti.designer.mainConfigTab.alfrescoUsertask"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <propertySection
+               class="com.alfresco.designer.gui.property.PropertyAlfrescoStartEventSection"
+               filter="com.alfresco.designer.gui.property.PropertyAlfrescoStartEventFilter"
+               id="org.activiti.designer.mainConfigTab.alfrescoStartevent"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
       </propertySections>
    </extension>
    <extension
@@ -207,6 +219,12 @@
             class="org.activiti.designer.preferences.ActivitiSavePreferencesPage"
             id="org.activiti.designer.gui.savepage"
             name="Save">
+      </page>
+      <page
+            category="org.activiti.designer.preferences"
+            class="org.activiti.designer.preferences.AlfrescoPreferencesPage"
+            id="org.activiti.designer.gui.preferences.alfresco"
+            name="Alfresco settings">
       </page>
    </extension>
    <extension

@@ -1,6 +1,7 @@
 package org.activiti.designer.property;
 
-import org.activiti.designer.eclipse.util.ActivitiUiUtil;
+import org.activiti.designer.util.eclipse.ActivitiUiUtil;
+import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.eclipse.bpmn2.CallActivity;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;

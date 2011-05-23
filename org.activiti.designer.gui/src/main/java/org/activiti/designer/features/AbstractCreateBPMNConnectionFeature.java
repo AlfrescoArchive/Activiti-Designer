@@ -3,7 +3,7 @@
  */
 package org.activiti.designer.features;
 
-import org.activiti.designer.eclipse.util.ActivitiUiUtil;
+import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.impl.AbstractCreateConnectionFeature;
 

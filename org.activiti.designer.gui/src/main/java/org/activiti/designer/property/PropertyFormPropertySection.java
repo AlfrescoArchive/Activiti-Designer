@@ -3,6 +3,7 @@ package org.activiti.designer.property;
 import java.util.List;
 
 import org.activiti.designer.property.ui.FormPropertyEditor;
+import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.eclipse.bpmn2.FormProperty;
 import org.eclipse.bpmn2.StartEvent;
 import org.eclipse.bpmn2.UserTask;

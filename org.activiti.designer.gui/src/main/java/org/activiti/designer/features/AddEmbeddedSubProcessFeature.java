@@ -1,17 +1,16 @@
 package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
-import org.activiti.designer.eclipse.util.ActivitiUiUtil;
-import org.activiti.designer.util.OSEnum;
-import org.activiti.designer.util.OSUtil;
-import org.activiti.designer.util.StyleUtil;
+import org.activiti.designer.util.eclipse.ActivitiUiUtil;
+import org.activiti.designer.util.platform.OSEnum;
+import org.activiti.designer.util.platform.OSUtil;
+import org.activiti.designer.util.style.StyleUtil;
 import org.eclipse.bpmn2.SubProcess;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.impl.AbstractAddShapeFeature;
 import org.eclipse.graphiti.mm.algorithms.Ellipse;
-import org.eclipse.graphiti.mm.algorithms.Image;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.RoundedRectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;

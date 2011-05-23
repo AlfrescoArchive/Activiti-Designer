@@ -1,7 +1,7 @@
 package org.activiti.designer.preferences;
 
 import org.activiti.designer.eclipse.common.ActivitiPlugin;
-import org.activiti.designer.eclipse.preferences.Preferences;
+import org.activiti.designer.util.preferences.Preferences;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;

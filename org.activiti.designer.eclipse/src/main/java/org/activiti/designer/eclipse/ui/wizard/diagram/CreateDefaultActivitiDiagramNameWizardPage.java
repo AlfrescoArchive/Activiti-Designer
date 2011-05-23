@@ -16,7 +16,7 @@ public class CreateDefaultActivitiDiagramNameWizardPage extends WizardNewFileCre
 
   public static final String PAGE_NAME = "createDefaultActivitiDiagramNameWizardPage";
 
-  private static final String DEFAULT_DIAGRAM_NAME = "My Process";
+  private static final String DEFAULT_DIAGRAM_NAME = "MyProcess";
 
   public CreateDefaultActivitiDiagramNameWizardPage(IStructuredSelection selection) {
     super(PAGE_NAME, selection);

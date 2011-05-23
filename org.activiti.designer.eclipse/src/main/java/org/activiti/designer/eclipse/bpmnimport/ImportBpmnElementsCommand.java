@@ -44,6 +44,7 @@ public class ImportBpmnElementsCommand extends RecordingCommand {
         "org.activiti.designer.diagram.ActivitiBPMNDiagramTypeProvider"); //$NON-NLS-1$
     IFeatureProvider featureProvider = dtp.getFeatureProvider();
     BpmnFileReader bpmnFileReader = new BpmnFileReader(bpmnFileName, diagram, featureProvider);
+    bpmnFileReader.openStream();
     bpmnFileReader.readBpmn();
 	}
 

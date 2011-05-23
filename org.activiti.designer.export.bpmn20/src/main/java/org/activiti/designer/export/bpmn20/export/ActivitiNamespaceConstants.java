@@ -36,6 +36,7 @@ public interface ActivitiNamespaceConstants {
   public static final String CLASS_TYPE = "classType";
   public static final String EXPRESSION_TYPE = "expressionType";
   public static final String DELEGATE_EXPRESSION_TYPE = "delegateExpressionType";
+  public static final String ALFRESCO_TYPE = "alfrescoScriptType";
   public static final String EXECUTION_LISTENER = "executionListener";
   public static final String TASK_LISTENER = "taskListener";
 

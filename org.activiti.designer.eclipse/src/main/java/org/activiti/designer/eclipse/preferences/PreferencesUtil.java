@@ -5,6 +5,7 @@ package org.activiti.designer.eclipse.preferences;
 
 import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.eclipse.extension.export.ExportMarshaller;
+import org.activiti.designer.util.preferences.Preferences;
 import org.eclipse.jface.preference.IPreferenceStore;
 
 /**
@@ -96,5 +97,13 @@ public final class PreferencesUtil {
   public static final String getExportMarshallerPreferenceId(final String marshallerName) {
     return Preferences.SAVE_TO_FORMAT.getPreferenceId() + "." + marshallerName;
   }
-
+  
+  public static final String[] getStringArray(final Preferences preferenceName) {
+    String defaultFormTypes = PreferencesUtil.getStringPreference(preferenceName);
+    if(defaultFormTypes != null && defaultFormTypes.length() > 0) {
+      String[] formList = defaultFormTypes.split("±");
+      return formList;
+    }
+    return new String[] {};
+  }
 }

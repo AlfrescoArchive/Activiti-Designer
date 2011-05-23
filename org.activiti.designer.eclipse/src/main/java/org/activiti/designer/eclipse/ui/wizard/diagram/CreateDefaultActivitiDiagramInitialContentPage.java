@@ -4,25 +4,27 @@ import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.eclipse.common.PluginImage;
 import org.eclipse.jface.wizard.WizardPage;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Group;
+import org.eclipse.swt.widgets.Table;
+import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.ui.forms.widgets.FormToolkit;
 
 public class CreateDefaultActivitiDiagramInitialContentPage extends WizardPage {
 
   public static final String PAGE_NAME = "createDefaultActivitiDiagramInitialContentPage";
 
-  private Composite container;
-
-  private Group contentSourceGroup;
-
-  private Button contentSourceNone;
-  private Button contentSourceImport;
-  private Button contentSourceTemplate;
+  public Button contentSourceNone;
+  public Button contentSourceImport;
+  public Button contentSourceTemplate;
+  public Table templateTable;
 
   public CreateDefaultActivitiDiagramInitialContentPage() {
     super(PAGE_NAME);
@@ -37,15 +39,14 @@ public class CreateDefaultActivitiDiagramInitialContentPage extends WizardPage {
     FormToolkit toolkit = new FormToolkit(parent.getDisplay());
     toolkit.setBackground(parent.getBackground());
 
-    container = toolkit.createComposite(parent, SWT.NULL);
-
+    Composite container = toolkit.createComposite(parent, SWT.NULL);
     GridLayout layout = new GridLayout();
     container.setLayout(layout);
     layout.numColumns = 1;
 
     GridData data = null;
 
-    contentSourceGroup = new Group(container, SWT.SHADOW_IN);
+    Group contentSourceGroup = new Group(container, SWT.SHADOW_IN);
     contentSourceGroup.setText("Do you want to add content to your diagram to start editing?");
     data = new GridData();
     data.grabExcessHorizontalSpace = true;
@@ -61,7 +62,48 @@ public class CreateDefaultActivitiDiagramInitialContentPage extends WizardPage {
     contentSourceImport.setEnabled(false);
 
     contentSourceTemplate = toolkit.createButton(contentSourceGroup, "Yes, use a template", SWT.RADIO);
-    contentSourceTemplate.setEnabled(false);
+    contentSourceTemplate.setEnabled(true);
+    
+    Group templateGroup = new Group(container, SWT.SHADOW_IN);
+    templateGroup.setText("Choose template");
+    data = new GridData();
+    data.grabExcessHorizontalSpace = true;
+    data.horizontalAlignment = SWT.FILL;
+    templateGroup.setLayoutData(data);
+    templateGroup.setLayout(new RowLayout(SWT.VERTICAL));
+    templateTable = toolkit.createTable(templateGroup, SWT.BORDER);
+    for (String description : TemplateInfo.templateDescriptions) {
+      TableItem tableItem = new TableItem(templateTable, SWT.NONE);
+      tableItem.setText(description);
+    }
+    templateTable.setEnabled(false);
+    templateTable.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
+    
+    contentSourceNone.addSelectionListener(new SelectionListener() {
+
+      @Override
+      public void widgetSelected(SelectionEvent event) {
+        templateTable.setEnabled(false);
+      }
+
+      @Override
+      public void widgetDefaultSelected(SelectionEvent event) {
+      }
+      
+    });
+    
+    contentSourceTemplate.addSelectionListener(new SelectionListener() {
+
+      @Override
+      public void widgetSelected(SelectionEvent event) {
+        templateTable.setEnabled(true);
+      }
+
+      @Override
+      public void widgetDefaultSelected(SelectionEvent event) {
+      }
+      
+    });
 
     setControl(container);
     setPageComplete(false);

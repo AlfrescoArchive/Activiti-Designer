@@ -5,10 +5,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.activiti.designer.eclipse.common.FileService;
-import org.activiti.designer.eclipse.preferences.Preferences;
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
-import org.activiti.designer.eclipse.util.ActivitiUiUtil;
 import org.activiti.designer.eclipse.util.Util;
+import org.activiti.designer.util.eclipse.ActivitiUiUtil;
+import org.activiti.designer.util.preferences.Preferences;
 import org.eclipse.bpmn2.SubProcess;
 import org.eclipse.bpmn2.impl.SubProcessImpl;
 import org.eclipse.core.resources.IFile;

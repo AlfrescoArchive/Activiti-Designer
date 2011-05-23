@@ -3,6 +3,7 @@ package org.activiti.designer.property;
 import java.util.List;
 
 import org.activiti.designer.property.ui.TaskListenerEditor;
+import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.eclipse.bpmn2.ActivitiListener;
 import org.eclipse.bpmn2.UserTask;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;

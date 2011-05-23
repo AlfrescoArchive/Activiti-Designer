@@ -121,7 +121,7 @@ public class ActivitiMultiPageEditor extends MultiPageEditorPart implements IRes
       FileEditorInput bpmn2EditorInput = (FileEditorInput) getEditor(1).getEditorInput();
       
       IStorage bpmnStorage = bpmn2EditorInput.getStorage();
-      DiagramUpdater.syncDiagram(diagramEditor, diagram, bpmnStorage);
+      //DiagramUpdater.syncDiagram(diagramEditor, diagram, bpmnStorage);
 
       // Save BPMN editor contents
       getEditor(0).doSave(monitor);

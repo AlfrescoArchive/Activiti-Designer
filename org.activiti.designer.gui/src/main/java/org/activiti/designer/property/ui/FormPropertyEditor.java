@@ -3,7 +3,7 @@ package org.activiti.designer.property.ui;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.designer.eclipse.util.ActivitiUiUtil;
+import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.eclipse.bpmn2.Bpmn2Factory;
 import org.eclipse.bpmn2.FormProperty;
 import org.eclipse.bpmn2.StartEvent;

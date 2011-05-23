@@ -1,8 +1,8 @@
 package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
-import org.activiti.designer.eclipse.preferences.Preferences;
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
+import org.activiti.designer.util.preferences.Preferences;
 import org.eclipse.bpmn2.Bpmn2Factory;
 import org.eclipse.bpmn2.EndEvent;
 import org.eclipse.bpmn2.FlowNode;

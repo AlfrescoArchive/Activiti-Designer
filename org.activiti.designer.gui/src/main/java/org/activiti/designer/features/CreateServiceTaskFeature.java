@@ -4,9 +4,10 @@ import java.util.List;
 
 import org.activiti.designer.ActivitiImageProvider;
 import org.activiti.designer.eclipse.extension.ExtensionConstants;
-import org.activiti.designer.eclipse.util.ActivitiUiUtil;
 import org.activiti.designer.integration.servicetask.CustomServiceTask;
 import org.activiti.designer.property.extension.util.ExtensionUtil;
+import org.activiti.designer.util.eclipse.ActivitiUiUtil;
+import org.activiti.designer.util.features.AbstractCreateBPMNFeature;
 import org.eclipse.bpmn2.Bpmn2Factory;
 import org.eclipse.bpmn2.CustomProperty;
 import org.eclipse.bpmn2.ServiceTask;

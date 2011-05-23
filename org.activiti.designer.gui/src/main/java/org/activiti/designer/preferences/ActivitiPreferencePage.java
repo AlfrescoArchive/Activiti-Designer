@@ -13,15 +13,11 @@ public class ActivitiPreferencePage extends FieldEditorPreferencePage implements
 	}
 
 	public void createFieldEditors() {
-		/*addField(new DirectoryFieldEditor(Preferences.ECLIPSE_ACTIVITI_JAR_LOCATION.getPreferenceId(),
-				"&Directory with Activiti jars:", getFieldEditorParent()));*/
 	}
 
 	@Override
 	public void init(IWorkbench workbench) {
 		IPreferenceStore prefStore = ActivitiPlugin.getDefault().getPreferenceStore();
 		setPreferenceStore(prefStore);
-		/*setDescription("Set the location of your Activiti install base.");
-		String test = prefStore.getString(Preferences.ECLIPSE_ACTIVITI_JAR_LOCATION.getPreferenceId());*/
 	}
 }

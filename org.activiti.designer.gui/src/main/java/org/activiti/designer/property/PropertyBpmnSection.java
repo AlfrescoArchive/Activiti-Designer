@@ -17,7 +17,8 @@ package org.activiti.designer.property;
 
 import java.util.List;
 
-import org.activiti.designer.eclipse.util.ActivitiUiUtil;
+import org.activiti.designer.util.eclipse.ActivitiUiUtil;
+import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.eclipse.bpmn2.Activity;
 import org.eclipse.bpmn2.ExclusiveGateway;
 import org.eclipse.bpmn2.FlowElement;

@@ -9,12 +9,20 @@ import org.activiti.designer.eclipse.ui.ActivitiEditorContextMenuProvider;
 import org.activiti.designer.eclipse.ui.ExportMarshallerRunnable;
 import org.activiti.designer.eclipse.util.ExtensionPointUtil;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.draw2d.IFigure;
 import org.eclipse.gef.ContextMenuProvider;
 import org.eclipse.gef.GraphicalViewer;
+import org.eclipse.gef.LayerConstants;
+import org.eclipse.gef.editparts.LayerManager;
+import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorPart;
+import org.eclipse.ui.IEditorSite;
+import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.IProgressService;
 
@@ -25,6 +33,22 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 
 	public ActivitiDiagramEditor() {
 		super();
+	}
+	
+	@Override
+	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
+	  super.init(site, input);
+	}
+	
+	@Override
+	public void createPartControl(Composite parent) {
+	  super.createPartControl(parent);
+	  GraphicalViewer graphicalViewer = (GraphicalViewer) getAdapter(GraphicalViewer.class);
+    if (graphicalViewer != null && graphicalViewer.getEditPartRegistry() != null) {
+      ScalableFreeformRootEditPart rootEditPart = (ScalableFreeformRootEditPart) graphicalViewer.getEditPartRegistry().get(LayerManager.ID);
+      IFigure gridFigure = ((LayerManager) rootEditPart).getLayer(LayerConstants.GRID_LAYER);
+      gridFigure.setVisible(false);
+    }
 	}
 
 	@SuppressWarnings("rawtypes")
@@ -37,25 +61,14 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 	public void doSave(final IProgressMonitor monitor) {
 		// Get a reference to the editor part
 
-		final IEditorPart editorPart;
-		if (PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-				.getActivePage().getActiveEditor() instanceof ActivitiMultiPageEditor) {
-			editorPart = ((ActivitiMultiPageEditor) PlatformUI.getWorkbench()
-					.getActiveWorkbenchWindow().getActivePage()
-					.getActiveEditor()).getActivitiDiagramEditor();
-		} else {
-			editorPart = PlatformUI.getWorkbench().getActiveWorkbenchWindow()
-					.getActivePage().getActiveEditor();
-		}
+		final IEditorPart editorPart = getEditorSite().getPage().getActiveEditor();
 		final DiagramEditorInput editorInput;
 
 		editorInput = (DiagramEditorInput) editorPart.getEditorInput();
 		SequenceFlowSynchronizer.synchronize(editorInput.getDiagram()
 				.getConnections(), (DiagramEditor) editorPart);
 
-		activeGraphicalViewer = (GraphicalViewer) PlatformUI.getWorkbench()
-				.getActiveWorkbenchWindow().getActivePage().getActiveEditor()
-				.getAdapter(GraphicalViewer.class);
+		activeGraphicalViewer = (GraphicalViewer) getAdapter(GraphicalViewer.class);
 
 		// Regular save
 		try {

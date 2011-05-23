@@ -43,6 +43,8 @@ import org.activiti.designer.features.PasteFlowElementFeature;
 import org.activiti.designer.features.SaveBpmnModelFeature;
 import org.activiti.designer.features.SubProcessResizeFeature;
 import org.activiti.designer.features.UpdateFlowElementFeature;
+import org.eclipse.bpmn2.AlfrescoStartEvent;
+import org.eclipse.bpmn2.AlfrescoUserTask;
 import org.eclipse.bpmn2.BoundaryEvent;
 import org.eclipse.bpmn2.BusinessRuleTask;
 import org.eclipse.bpmn2.CallActivity;
@@ -89,6 +91,11 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
 
+import com.alfresco.designer.gui.features.AddAlfrescoStartEventFeature;
+import com.alfresco.designer.gui.features.AddAlfrescoUserTaskFeature;
+import com.alfresco.designer.gui.features.CreateAlfrescoStartEventFeature;
+import com.alfresco.designer.gui.features.CreateAlfrescoUserTaskFeature;
+
 public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 
 	public ActivitiBPMNFeatureProvider(IDiagramTypeProvider dtp) {
@@ -99,7 +106,11 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 	public IAddFeature getAddFeature(IAddContext context) {
 		// is object for add request a EClass?
 		if (context.getNewObject() instanceof StartEvent) {
-			return new AddStartEventFeature(this);
+		  if(context.getNewObject() instanceof AlfrescoStartEvent) {
+		    return new AddAlfrescoStartEventFeature(this);
+		  } else {
+		    return new AddStartEventFeature(this);
+		  }
 		} else if (context.getNewObject() instanceof EndEvent) {
 		  if(((EndEvent) context.getNewObject()).getEventDefinitions().size() > 0) {
 		    return new AddErrorEndEventFeature(this);
@@ -109,7 +120,11 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 		} else if (context.getNewObject() instanceof SequenceFlow) {
 			return new AddSequenceFlowFeature(this);
 		} else if (context.getNewObject() instanceof UserTask) {
-			return new AddUserTaskFeature(this);
+		  if(context.getNewObject() instanceof AlfrescoUserTask) {
+		    return new AddAlfrescoUserTaskFeature(this);
+		  } else {
+		    return new AddUserTaskFeature(this);
+		  }
 		} else if (context.getNewObject() instanceof ScriptTask) {
 			return new AddScriptTaskFeature(this);
 		} else if (context.getNewObject() instanceof ServiceTask) {
@@ -146,9 +161,11 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 	@Override
 	public ICreateFeature[] getCreateFeatures() {
 		return new ICreateFeature[] { new CreateStartEventFeature(this), 
+		        new CreateAlfrescoStartEventFeature(this),
 		        new CreateEndEventFeature(this),
 		        new CreateErrorEndEventFeature(this),
-		        new CreateUserTaskFeature(this), 
+		        new CreateUserTaskFeature(this),
+		        new CreateAlfrescoUserTaskFeature(this),
 		        new CreateScriptTaskFeature(this), 
 		        new CreateServiceTaskFeature(this),
 		        new CreateMailTaskFeature(this), 

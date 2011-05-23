@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.activiti.designer.property.ui.ExecutionListenerEditor;
 import org.activiti.designer.util.BpmnBOUtil;
+import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.eclipse.bpmn2.ActivitiListener;
 import org.eclipse.bpmn2.SequenceFlow;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
