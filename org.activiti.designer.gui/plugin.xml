@@ -199,6 +199,12 @@
                id="org.activiti.designer.mainConfigTab.alfrescoStartevent"
                tab="org.activiti.designer.mainConfigTab">
          </propertySection>
+         <propertySection
+               class="com.alfresco.designer.gui.property.PropertyAlfrescoScriptTaskSection"
+               filter="com.alfresco.designer.gui.property.PropertyAlfrescoScriptTaskFilter"
+               id="org.activiti.designer.mainConfigTab.alfrescoScripttask"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
       </propertySections>
    </extension>
    <extension

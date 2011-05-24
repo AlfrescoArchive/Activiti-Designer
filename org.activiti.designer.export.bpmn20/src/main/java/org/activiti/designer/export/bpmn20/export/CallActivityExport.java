@@ -40,8 +40,12 @@ public class CallActivityExport implements ActivitiNamespaceConstants {
       xtw.writeAttribute("calledElement", callActivity.getCalledElement());
     }
     
+    ExtensionListenerExport.createExtensionListenerXML(callActivity.getActivitiListeners(), true, EXECUTION_LISTENER, xtw);
+    
     if(callActivity.getInParameters().size() > 0 || callActivity.getOutParameters().size() > 0) {
-      xtw.writeStartElement("extensionElements");
+      if(callActivity.getActivitiListeners().size() > 0) {
+        xtw.writeStartElement("extensionElements");
+      }
       
       for(IOParameter parameter : callActivity.getInParameters()) {
         writeParameter(parameter, "in", xtw);
@@ -51,7 +55,9 @@ public class CallActivityExport implements ActivitiNamespaceConstants {
         writeParameter(parameter, "out", xtw);
       }
       
-      xtw.writeEndElement();
+      if(callActivity.getActivitiListeners().size() > 0) {
+        xtw.writeEndElement();
+      }
     }
     
     MultiInstanceExport.createMultiInstance(object, subProcessId, xtw);

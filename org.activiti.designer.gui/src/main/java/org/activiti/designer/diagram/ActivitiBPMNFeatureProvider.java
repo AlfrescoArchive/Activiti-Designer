@@ -43,6 +43,7 @@ import org.activiti.designer.features.PasteFlowElementFeature;
 import org.activiti.designer.features.SaveBpmnModelFeature;
 import org.activiti.designer.features.SubProcessResizeFeature;
 import org.activiti.designer.features.UpdateFlowElementFeature;
+import org.eclipse.bpmn2.AlfrescoScriptTask;
 import org.eclipse.bpmn2.AlfrescoStartEvent;
 import org.eclipse.bpmn2.AlfrescoUserTask;
 import org.eclipse.bpmn2.BoundaryEvent;
@@ -91,8 +92,10 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
 
+import com.alfresco.designer.gui.features.AddAlfrescoScriptTaskFeature;
 import com.alfresco.designer.gui.features.AddAlfrescoStartEventFeature;
 import com.alfresco.designer.gui.features.AddAlfrescoUserTaskFeature;
+import com.alfresco.designer.gui.features.CreateAlfrescoScriptTaskFeature;
 import com.alfresco.designer.gui.features.CreateAlfrescoStartEventFeature;
 import com.alfresco.designer.gui.features.CreateAlfrescoUserTaskFeature;
 
@@ -154,7 +157,9 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
       return new AddEmbeddedSubProcessFeature(this);
 		} else if (context.getNewObject() instanceof CallActivity) {
 			return new AddCallActivityFeature(this);
-		}
+		} else if (context.getNewObject() instanceof AlfrescoScriptTask) {
+      return new AddAlfrescoScriptTaskFeature(this);
+    }
 		return super.getAddFeature(context);
 	}
 
@@ -177,7 +182,8 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 		        new CreateBoundaryTimerFeature(this),
 		        new CreateBoundaryErrorFeature(this),
 		        new CreateEmbeddedSubProcessFeature(this), 
-		        new CreateCallActivityFeature(this) };
+		        new CreateCallActivityFeature(this),
+		        new CreateAlfrescoScriptTaskFeature(this)};
 	}
 
 	@Override

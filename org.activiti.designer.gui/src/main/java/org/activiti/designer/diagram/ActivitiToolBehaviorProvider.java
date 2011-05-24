@@ -87,6 +87,7 @@ import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.PlatformUI;
 
+import com.alfresco.designer.gui.features.CreateAlfrescoScriptTaskFeature;
 import com.alfresco.designer.gui.features.CreateAlfrescoStartEventFeature;
 import com.alfresco.designer.gui.features.CreateAlfrescoUserTaskFeature;
 
@@ -115,6 +116,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     toolMapping.put(CreateBoundaryTimerFeature.class, PaletteEntry.BOUNDARY_TIMER);
     toolMapping.put(CreateBoundaryErrorFeature.class, PaletteEntry.ERROR_END_EVENT);
     toolMapping.put(CreateBusinessRuleTaskFeature.class, PaletteEntry.BUSINESSRULE_TASK);
+    toolMapping.put(CreateAlfrescoScriptTaskFeature.class, PaletteEntry.ALFRESCO_SCRIPT_TASK);
   }
 
   @Override
@@ -276,6 +278,8 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
         } else if ("alfrescousertask".equalsIgnoreCase(toolEntry.getLabel())) {
           alfrescoCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("alfrescostartevent".equalsIgnoreCase(toolEntry.getLabel())) {
+          alfrescoCompartmentEntry.getToolEntries().add(toolEntry);
+        } else if ("alfrescoscripttask".equalsIgnoreCase(toolEntry.getLabel())) {
           alfrescoCompartmentEntry.getToolEntries().add(toolEntry);
         }
       }

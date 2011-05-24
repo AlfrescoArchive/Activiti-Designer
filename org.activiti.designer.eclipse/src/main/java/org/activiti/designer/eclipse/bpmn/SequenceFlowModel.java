@@ -24,6 +24,8 @@ import org.eclipse.bpmn2.FormalExpression;
  * @author Tijs Rademakers
  */
 public class SequenceFlowModel {
+  
+  public String id;
   public String sourceRef;
   public String targetRef;
   public FormalExpression conditionExpression;

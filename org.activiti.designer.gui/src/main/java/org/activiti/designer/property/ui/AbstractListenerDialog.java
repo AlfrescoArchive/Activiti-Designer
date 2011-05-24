@@ -3,8 +3,10 @@ package org.activiti.designer.property.ui;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.model.FieldExtensionModel;
 import org.activiti.designer.util.BpmnBOUtil;
+import org.activiti.designer.util.preferences.Preferences;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jdt.ui.IJavaElementSearchConstants;
@@ -201,21 +203,23 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
       
     });
     
-    alfrescoTypeButton = new Button(radioTypeComposite, SWT.RADIO);
-    alfrescoTypeButton.setText("Alfresco script");
-    alfrescoTypeButton.addSelectionListener(new SelectionListener() {
+    if(PreferencesUtil.getBooleanPreference(Preferences.ALFRESCO_ENABLE)) {
+      alfrescoTypeButton = new Button(radioTypeComposite, SWT.RADIO);
+      alfrescoTypeButton.setText("Alfresco script");
+      alfrescoTypeButton.addSelectionListener(new SelectionListener() {
+        
+        @Override
+        public void widgetSelected(SelectionEvent event) {
+          enableAlfrescoType();
+        }
       
-      @Override
-      public void widgetSelected(SelectionEvent event) {
-        enableAlfrescoType();
-      }
-    
-      @Override
-      public void widgetDefaultSelected(SelectionEvent event) {
-        //
-      }
-      
-    });
+        @Override
+        public void widgetDefaultSelected(SelectionEvent event) {
+          //
+        }
+        
+      });
+    }
     
     createLabel(shell, "Type", radioTypeComposite);
 
@@ -393,7 +397,7 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
     } else if(EXPRESSION_TYPE.equals(savedImplementationType)){
       expressionTypeButton.setSelection(true);
       enableExpressionType();
-    } else if(ALFRESCO_TYPE.equals(savedImplementationType)){
+    } else if(PreferencesUtil.getBooleanPreference(Preferences.ALFRESCO_ENABLE) && ALFRESCO_TYPE.equals(savedImplementationType)){
       alfrescoTypeButton.setSelection(true);
       enableAlfrescoType();
     } else {
@@ -462,11 +466,13 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
   }
   
   private void setVisibleAlfrescoType(boolean visible) {
-    alfrescoTypeButton.setSelection(visible);
-    scriptText.setVisible(visible);
-    scriptLabel.setVisible(visible);
-    extensionLabel.setVisible(!visible);
-    fieldEditor.setVisible(!visible);
+    if(PreferencesUtil.getBooleanPreference(Preferences.ALFRESCO_ENABLE)) {
+      alfrescoTypeButton.setSelection(visible);
+      scriptText.setVisible(visible);
+      scriptLabel.setVisible(visible);
+      extensionLabel.setVisible(!visible);
+      fieldEditor.setVisible(!visible);
+    }
   }
   
   private CLabel createLabel(Composite parent, String text, Control control) {

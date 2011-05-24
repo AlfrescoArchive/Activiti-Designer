@@ -1410,6 +1410,8 @@
         <details key="name" value="startQuantity"/>
       </eAnnotations>
     </eStructuralFeatures>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="activitiListeners" upperBound="-1"
+        eType="#//ActivitiListener" containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EEnum" name="AdHocOrdering">
     <eLiterals name="Parallel"/>
@@ -4308,8 +4310,6 @@
       <details key="name" value="tTask"/>
       <details key="kind" value="elementOnly"/>
     </eAnnotations>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="activitiListeners" upperBound="-1"
-        eType="#//ActivitiListener" containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="TerminateEventDefinition" eSuperTypes="#//EventDefinition">
     <eAnnotations source="http:///org/eclipse/emf/ecore/util/ExtendedMetaData">
@@ -4522,6 +4522,13 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="source" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="target" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="AlfrescoUserTask" eSuperTypes="#//UserTask"/>
-  <eClassifiers xsi:type="ecore:EClass" name="AlfrescoStartEvent" eSuperTypes="#//StartEvent"/>
+  <eClassifiers xsi:type="ecore:EClass" name="AlfrescoUserTask" eSuperTypes="#//UserTask #//AlfrescoScriptBase"/>
+  <eClassifiers xsi:type="ecore:EClass" name="AlfrescoStartEvent" eSuperTypes="#//StartEvent #//AlfrescoScriptBase"/>
+  <eClassifiers xsi:type="ecore:EClass" name="AlfrescoScriptTask" eSuperTypes="#//Task #//AlfrescoScriptBase">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="script" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="AlfrescoScriptBase" eSuperTypes="#//BaseElement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="runAs" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="scriptProcessor" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
 </ecore:EPackage>

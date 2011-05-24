@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -28,6 +29,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.activiti.designer.eclipse.bpmn.BpmnParser;
 import org.activiti.designer.eclipse.bpmn.GraphicInfo;
 import org.activiti.designer.eclipse.bpmn.SequenceFlowModel;
+import org.eclipse.bpmn2.Activity;
 import org.eclipse.bpmn2.BoundaryEvent;
 import org.eclipse.bpmn2.Bpmn2Factory;
 import org.eclipse.bpmn2.BusinessRuleTask;
@@ -607,6 +609,21 @@ public class BpmnFileReader {
       AddConnectionContext addContext = new AddConnectionContext(sourceAnchor, targetAnchor);
       addContext.setNewObject(sequenceFlow);
       featureProvider.addIfPossible(addContext);
+      
+      if(bpmnParser.defaultFlowMap.containsValue(sequenceFlowModel.id)) {
+        Iterator<FlowNode> itDefaultFlow = bpmnParser.defaultFlowMap.keySet().iterator();
+        while(itDefaultFlow.hasNext()) {
+          FlowNode flowNode = itDefaultFlow.next();
+          String defaultId = bpmnParser.defaultFlowMap.get(flowNode);
+          if(defaultId.equalsIgnoreCase(sequenceFlowModel.id)) {
+            if(flowNode instanceof ExclusiveGateway) {
+              ((ExclusiveGateway) flowNode).setDefault(sequenceFlow);
+            } else {
+              ((Activity) flowNode).setDefault(sequenceFlow);
+            }
+          }
+        }
+      }
     }
   }
   

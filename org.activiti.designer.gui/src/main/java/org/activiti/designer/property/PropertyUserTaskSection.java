@@ -120,8 +120,6 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
         if (userTask.getFormKey() != null && userTask.getFormKey().length() > 0) {
           formKeyText.setText(userTask.getFormKey());
         }
-      } else {
-        
       }
       
       priorityText.setText("");

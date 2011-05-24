@@ -16,6 +16,7 @@ import org.activiti.designer.eclipse.extension.export.AbstractExportMarshaller;
 import org.activiti.designer.eclipse.extension.export.ExportMarshaller;
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.util.preferences.Preferences;
+import org.eclipse.bpmn2.AlfrescoScriptTask;
 import org.eclipse.bpmn2.BoundaryEvent;
 import org.eclipse.bpmn2.BusinessRuleTask;
 import org.eclipse.bpmn2.CallActivity;
@@ -258,6 +259,9 @@ public class BPMN20ExportMarshaller extends AbstractExportMarshaller implements 
     
     } else if (object instanceof BusinessRuleTask) {
       BusinessRuleTaskExport.createBusinessRuleTask(object, subProcessId, xtw);
+    
+    } else if (object instanceof AlfrescoScriptTask) {
+      AlfrescoScriptTaskExport.createScriptTask(object, subProcessId, xtw);
       
     } else if (object instanceof CallActivity) {
       CallActivityExport.createCallActivity(object, subProcessId, xtw);
@@ -301,6 +305,7 @@ public class BPMN20ExportMarshaller extends AbstractExportMarshaller implements 
           xtw.writeAttribute("name", subProcess.getName());
         }
         
+        ExtensionListenerExport.createExtensionListenerXML(subProcess.getActivitiListeners(), true, EXECUTION_LISTENER, xtw);
         MultiInstanceExport.createMultiInstance(object, subProcessId, xtw);
         
         for (FlowElement flowElement : flowElementList) {

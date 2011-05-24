@@ -24,6 +24,7 @@ import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.util.preferences.Preferences;
 import org.eclipse.bpmn2.ActivitiListener;
 import org.eclipse.bpmn2.Activity;
+import org.eclipse.bpmn2.AlfrescoScriptTask;
 import org.eclipse.bpmn2.BoundaryEvent;
 import org.eclipse.bpmn2.Bpmn2Factory;
 import org.eclipse.bpmn2.BusinessRuleTask;
@@ -35,6 +36,7 @@ import org.eclipse.bpmn2.ErrorEventDefinition;
 import org.eclipse.bpmn2.ExclusiveGateway;
 import org.eclipse.bpmn2.FieldExtension;
 import org.eclipse.bpmn2.FlowElement;
+import org.eclipse.bpmn2.FlowNode;
 import org.eclipse.bpmn2.FormProperty;
 import org.eclipse.bpmn2.FormalExpression;
 import org.eclipse.bpmn2.MailTask;
@@ -67,6 +69,7 @@ public class BpmnParser {
   public List<SequenceFlowModel> sequenceFlowList = new ArrayList<SequenceFlowModel>();
   private List<BoundaryEventModel> boundaryList = new ArrayList<BoundaryEventModel>();
   public Map<String, GraphicInfo> locationMap = new HashMap<String, GraphicInfo>();
+  public Map<FlowNode, String> defaultFlowMap = new HashMap<FlowNode, String>();
   public org.eclipse.bpmn2.Process process;
   
   public void parseBpmn(XMLStreamReader xtr) {
@@ -109,6 +112,14 @@ public class BpmnParser {
             subProcess.setId(elementid);
             activeSubProcess = subProcess;
             bpmnList.add(subProcess);
+          
+          } else if(activeSubProcess != null && xtr.isStartElement() && "extensionElements".equalsIgnoreCase(xtr.getLocalName())) {
+            activeSubProcess.getActivitiListeners().addAll(parseListeners(xtr));
+                
+          } else if (activeSubProcess != null && xtr.isStartElement() && "multiInstanceLoopCharacteristics".equalsIgnoreCase(xtr.getLocalName())) {
+            MultiInstanceLoopCharacteristics multiInstanceDef = Bpmn2Factory.eINSTANCE.createMultiInstanceLoopCharacteristics();
+            activeSubProcess.setLoopCharacteristics(multiInstanceDef);
+            parseMultiInstanceDef(multiInstanceDef, xtr);
             
           } else if(xtr.isStartElement() && "userTask".equalsIgnoreCase(xtr.getLocalName())) {
             String elementid = xtr.getAttributeValue(null, "id");
@@ -122,6 +133,9 @@ public class BpmnParser {
             Task task = null;
             if("mail".equalsIgnoreCase(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "type"))) {
               task = parseMailTask(xtr);
+            } else if("org.alfresco.repo.workflow.activiti.script.AlfrescoScriptDelegate".equalsIgnoreCase(
+                    xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "class"))) {
+              task = parseAlfrescoScriptTask(xtr);
             } else {
               task = parseServiceTask(xtr);
             }
@@ -381,6 +395,9 @@ public class BpmnParser {
     } else {
       exclusiveGateway.setName(xtr.getAttributeValue(null, "id"));
     }
+    if(xtr.getAttributeValue(null, "default") != null) {
+      defaultFlowMap.put(exclusiveGateway, xtr.getAttributeValue(null, "default"));
+    }
     return exclusiveGateway;
   }
   
@@ -395,6 +412,7 @@ public class BpmnParser {
     SequenceFlowModel sequenceFlow = new SequenceFlowModel();
     sequenceFlow.sourceRef = xtr.getAttributeValue(null, "sourceRef");
     sequenceFlow.targetRef = xtr.getAttributeValue(null, "targetRef");
+    sequenceFlow.id = xtr.getAttributeValue(null, "id");
     FormalExpression conditionValue = parseSequenceFlowCondition(xtr, sequenceFlow);
     sequenceFlow.conditionExpression = conditionValue;
     return sequenceFlow;
@@ -487,6 +505,10 @@ public class BpmnParser {
       userTask.setPriority(priorityValue);
     }
     
+    if(xtr.getAttributeValue(null, "default") != null) {
+      defaultFlowMap.put(userTask, xtr.getAttributeValue(null, "default"));
+    }
+    
     boolean readyWithUserTask = false;
     try {
       while(readyWithUserTask == false && xtr.hasNext()) {
@@ -521,6 +543,9 @@ public class BpmnParser {
     ScriptTask scriptTask = Bpmn2Factory.eINSTANCE.createScriptTask();
     scriptTask.setName(xtr.getAttributeValue(null, "name"));
     scriptTask.setScriptFormat(xtr.getAttributeValue(null, "scriptFormat"));
+    if(xtr.getAttributeValue(null, "default") != null) {
+      defaultFlowMap.put(scriptTask, xtr.getAttributeValue(null, "default"));
+    }
     boolean readyWithScriptTask = false;
     try {
       while(readyWithScriptTask == false && xtr.hasNext()) {
@@ -530,6 +555,11 @@ public class BpmnParser {
         
         } else if(xtr.isStartElement() && "extensionElements".equalsIgnoreCase(xtr.getLocalName())) {
           scriptTask.getActivitiListeners().addAll(parseListeners(xtr));
+        
+        } else if (xtr.isStartElement() && "multiInstanceLoopCharacteristics".equalsIgnoreCase(xtr.getLocalName())) {
+          MultiInstanceLoopCharacteristics multiInstanceDef = Bpmn2Factory.eINSTANCE.createMultiInstanceLoopCharacteristics();
+          scriptTask.setLoopCharacteristics(multiInstanceDef);
+          parseMultiInstanceDef(multiInstanceDef, xtr);
           
         } else if(xtr.isEndElement() && "scriptTask".equalsIgnoreCase(xtr.getLocalName())) {
           readyWithScriptTask = true;
@@ -544,13 +574,20 @@ public class BpmnParser {
   private MailTask parseMailTask(XMLStreamReader xtr) {
     MailTask mailTask = Bpmn2Factory.eINSTANCE.createMailTask();
     mailTask.setName(xtr.getAttributeValue(null, "name"));
-    
+    if(xtr.getAttributeValue(null, "default") != null) {
+      defaultFlowMap.put(mailTask, xtr.getAttributeValue(null, "default"));
+    }
     boolean readyWithServiceTask = false;
     try {
       while(readyWithServiceTask == false && xtr.hasNext()) {
         xtr.next();
         if(xtr.isStartElement() && "extensionElements".equalsIgnoreCase(xtr.getLocalName())) {
           fillExtensionsForMailTask(xtr, mailTask);
+        
+        } else if (xtr.isStartElement() && "multiInstanceLoopCharacteristics".equalsIgnoreCase(xtr.getLocalName())) {
+          MultiInstanceLoopCharacteristics multiInstanceDef = Bpmn2Factory.eINSTANCE.createMultiInstanceLoopCharacteristics();
+          mailTask.setLoopCharacteristics(multiInstanceDef);
+          parseMultiInstanceDef(multiInstanceDef, xtr);
           
         } else if(xtr.isEndElement() && "serviceTask".equalsIgnoreCase(xtr.getLocalName())) {
           readyWithServiceTask = true;
@@ -560,6 +597,87 @@ public class BpmnParser {
       e.printStackTrace();
     }
     return mailTask;
+  }
+  
+  private AlfrescoScriptTask parseAlfrescoScriptTask(XMLStreamReader xtr) {
+    AlfrescoScriptTask scriptTask = Bpmn2Factory.eINSTANCE.createAlfrescoScriptTask();
+    scriptTask.setName(xtr.getAttributeValue(null, "name"));
+    if(xtr.getAttributeValue(null, "default") != null) {
+      defaultFlowMap.put(scriptTask, xtr.getAttributeValue(null, "default"));
+    }
+    List<FieldModel> fieldList = new ArrayList<FieldModel>();
+    boolean readyWithExtensions = false;
+    ActivitiListener listener = null;
+    try {
+      while(readyWithExtensions == false && xtr.hasNext()) {
+        xtr.next();
+        if(xtr.isStartElement() && "field".equalsIgnoreCase(xtr.getLocalName())) {
+          FieldModel field = parseFieldModel(xtr);
+          fieldList.add(field);
+          
+        } else if(xtr.isStartElement() && "executionListener".equalsIgnoreCase(xtr.getLocalName())) {
+          if(fieldList.size() > 0) {
+            fillAlfrescoScriptTaskElements(scriptTask, fieldList);
+            fieldList = new ArrayList<FieldModel>();
+          }
+          listener = parseListener(xtr);
+          scriptTask.getActivitiListeners().add(listener);
+          
+        } else if(xtr.isEndElement() && "executionListener".equalsIgnoreCase(xtr.getLocalName())) {
+          if(fieldList.size() > 0) {
+            fillListenerWithFields(listener, fieldList);
+            fieldList = new ArrayList<FieldModel>();
+          }
+          scriptTask.getActivitiListeners().add(listener);
+          
+        } else if(xtr.isEndElement() && "extensionElements".equalsIgnoreCase(xtr.getLocalName())) {
+          if(fieldList.size() > 0) {
+            fillAlfrescoScriptTaskElements(scriptTask, fieldList);
+          }
+          
+        } else if (xtr.isStartElement() && "multiInstanceLoopCharacteristics".equalsIgnoreCase(xtr.getLocalName())) {
+          MultiInstanceLoopCharacteristics multiInstanceDef = Bpmn2Factory.eINSTANCE.createMultiInstanceLoopCharacteristics();
+          scriptTask.setLoopCharacteristics(multiInstanceDef);
+          parseMultiInstanceDef(multiInstanceDef, xtr);
+        
+        } else if(xtr.isEndElement() && "serviceTask".equalsIgnoreCase(xtr.getLocalName())) {
+          readyWithExtensions = true;
+        }
+      }
+    } catch(Exception e) {
+      e.printStackTrace();
+    }
+    return scriptTask;
+  }
+  
+  private static FieldModel parseFieldModel(XMLStreamReader xtr) {
+    FieldModel field = new FieldModel();
+    field.name = xtr.getAttributeValue(null, "name");
+    field.value = getFieldExtensionValue(xtr);
+    return field;
+  }
+  
+  private void fillAlfrescoScriptTaskElements(AlfrescoScriptTask scriptTask, List<FieldModel> fieldList) {
+    if(fieldList == null || fieldList.size() == 0) return;
+    for (FieldModel field : fieldList) {
+      if("script".equalsIgnoreCase(field.name)) {
+        scriptTask.setScript(field.value);
+      } else if("runAs".equalsIgnoreCase(field.name)) {
+        scriptTask.setRunAs(field.value);
+      } else if("scriptProcessor".equalsIgnoreCase(field.name)) {
+        scriptTask.setScriptProcessor(field.value);
+      }
+    }
+  }
+  
+  private void fillListenerWithFields(ActivitiListener listener, List<FieldModel> fieldList) {
+    if(fieldList == null || fieldList.size() == 0) return;
+    for (FieldModel field : fieldList) {
+      FieldExtension extension = Bpmn2Factory.eINSTANCE.createFieldExtension();
+      extension.setFieldname(field.name);
+      extension.setExpression(field.value);
+      listener.getFieldExtensions().add(extension);
+    }
   }
   
   private ServiceTask parseServiceTask(XMLStreamReader xtr) {
@@ -580,12 +698,21 @@ public class BpmnParser {
       serviceTask.setResultVariableName(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "resultVariableName"));
     }
     
+    if(xtr.getAttributeValue(null, "default") != null) {
+      defaultFlowMap.put(serviceTask, xtr.getAttributeValue(null, "default"));
+    }
+    
     boolean readyWithServiceTask = false;
     try {
       while(readyWithServiceTask == false && xtr.hasNext()) {
         xtr.next();
         if(xtr.isStartElement() && "extensionElements".equalsIgnoreCase(xtr.getLocalName())) {
           fillExtensionsForServiceTask(xtr, serviceTask);
+        
+        } else if (xtr.isStartElement() && "multiInstanceLoopCharacteristics".equalsIgnoreCase(xtr.getLocalName())) {
+          MultiInstanceLoopCharacteristics multiInstanceDef = Bpmn2Factory.eINSTANCE.createMultiInstanceLoopCharacteristics();
+          serviceTask.setLoopCharacteristics(multiInstanceDef);
+          parseMultiInstanceDef(multiInstanceDef, xtr);
           
         } else if(xtr.isEndElement() && "serviceTask".equalsIgnoreCase(xtr.getLocalName())) {
           readyWithServiceTask = true;
@@ -795,12 +922,20 @@ public class BpmnParser {
   private ManualTask parseManualTask(XMLStreamReader xtr) {
     ManualTask manualTask = Bpmn2Factory.eINSTANCE.createManualTask();
     manualTask.setName(xtr.getAttributeValue(null, "name"));
+    if(xtr.getAttributeValue(null, "default") != null) {
+      defaultFlowMap.put(manualTask, xtr.getAttributeValue(null, "default"));
+    }
     boolean readyWithTask = false;
     try {
       while(readyWithTask == false && xtr.hasNext()) {
         xtr.next();
         if(xtr.isStartElement() && "extensionElements".equalsIgnoreCase(xtr.getLocalName())) {
           manualTask.getActivitiListeners().addAll(parseListeners(xtr));
+          
+        } else if (xtr.isStartElement() && "multiInstanceLoopCharacteristics".equalsIgnoreCase(xtr.getLocalName())) {
+          MultiInstanceLoopCharacteristics multiInstanceDef = Bpmn2Factory.eINSTANCE.createMultiInstanceLoopCharacteristics();
+          manualTask.setLoopCharacteristics(multiInstanceDef);
+          parseMultiInstanceDef(multiInstanceDef, xtr);
           
         } else if(xtr.isEndElement() && "manualTask".equalsIgnoreCase(xtr.getLocalName())) {
           readyWithTask = true;
@@ -818,18 +953,48 @@ public class BpmnParser {
     if(xtr.getAttributeValue(null, "calledElement") != null && xtr.getAttributeValue(null, "calledElement").length() > 0) {
       callActivity.setCalledElement(xtr.getAttributeValue(null, "calledElement"));
     }
+    if(xtr.getAttributeValue(null, "default") != null) {
+      defaultFlowMap.put(callActivity, xtr.getAttributeValue(null, "default"));
+    }
+    boolean readyWithTask = false;
+    try {
+      while(readyWithTask == false && xtr.hasNext()) {
+        xtr.next();
+        if(xtr.isStartElement() && "extensionElements".equalsIgnoreCase(xtr.getLocalName())) {
+          callActivity.getActivitiListeners().addAll(parseListeners(xtr));
+          
+        } else if (xtr.isStartElement() && "multiInstanceLoopCharacteristics".equalsIgnoreCase(xtr.getLocalName())) {
+          MultiInstanceLoopCharacteristics multiInstanceDef = Bpmn2Factory.eINSTANCE.createMultiInstanceLoopCharacteristics();
+          callActivity.setLoopCharacteristics(multiInstanceDef);
+          parseMultiInstanceDef(multiInstanceDef, xtr);
+          
+        } else if(xtr.isEndElement() && "callActivity".equalsIgnoreCase(xtr.getLocalName())) {
+          readyWithTask = true;
+        }
+      }
+    } catch(Exception e) {
+      e.printStackTrace();
+    }
     return callActivity;
   }
   
   private ReceiveTask parseReceiveTask(XMLStreamReader xtr) {
     ReceiveTask receiveTask = Bpmn2Factory.eINSTANCE.createReceiveTask();
     receiveTask.setName(xtr.getAttributeValue(null, "name"));
+    if(xtr.getAttributeValue(null, "default") != null) {
+      defaultFlowMap.put(receiveTask, xtr.getAttributeValue(null, "default"));
+    }
     boolean readyWithTask = false;
     try {
       while(readyWithTask == false && xtr.hasNext()) {
         xtr.next();
         if(xtr.isStartElement() && "extensionElements".equalsIgnoreCase(xtr.getLocalName())) {
           receiveTask.getActivitiListeners().addAll(parseListeners(xtr));
+          
+        } else if (xtr.isStartElement() && "multiInstanceLoopCharacteristics".equalsIgnoreCase(xtr.getLocalName())) {
+          MultiInstanceLoopCharacteristics multiInstanceDef = Bpmn2Factory.eINSTANCE.createMultiInstanceLoopCharacteristics();
+          receiveTask.setLoopCharacteristics(multiInstanceDef);
+          parseMultiInstanceDef(multiInstanceDef, xtr);
           
         } else if(xtr.isEndElement() && "receiveTask".equalsIgnoreCase(xtr.getLocalName())) {
           readyWithTask = true;
@@ -844,6 +1009,9 @@ public class BpmnParser {
   private BusinessRuleTask parseBusinessRuleTask(XMLStreamReader xtr) {
     BusinessRuleTask businessRuleTask = Bpmn2Factory.eINSTANCE.createBusinessRuleTask();
     businessRuleTask.setName(xtr.getAttributeValue(null, "name"));
+    if(xtr.getAttributeValue(null, "default") != null) {
+      defaultFlowMap.put(businessRuleTask, xtr.getAttributeValue(null, "default"));
+    }
     if(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "rules") != null) {
       String ruleNames = xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "rules");
       if (ruleNames != null && ruleNames.length() > 0) {
@@ -880,6 +1048,27 @@ public class BpmnParser {
       businessRuleTask.setResultVariableName(xtr.getAttributeValue(
               ACTIVITI_EXTENSIONS_NAMESPACE, "resultVariableName"));
     }
+    
+    boolean readyWithTask = false;
+    try {
+      while(readyWithTask == false && xtr.hasNext()) {
+        xtr.next();
+        if(xtr.isStartElement() && "extensionElements".equalsIgnoreCase(xtr.getLocalName())) {
+          businessRuleTask.getActivitiListeners().addAll(parseListeners(xtr));
+          
+        } else if (xtr.isStartElement() && "multiInstanceLoopCharacteristics".equalsIgnoreCase(xtr.getLocalName())) {
+          MultiInstanceLoopCharacteristics multiInstanceDef = Bpmn2Factory.eINSTANCE.createMultiInstanceLoopCharacteristics();
+          businessRuleTask.setLoopCharacteristics(multiInstanceDef);
+          parseMultiInstanceDef(multiInstanceDef, xtr);
+          
+        } else if(xtr.isEndElement() && "businessRuleTask".equalsIgnoreCase(xtr.getLocalName())) {
+          readyWithTask = true;
+        }
+      }
+    } catch(Exception e) {
+      e.printStackTrace();
+    }
+    
     return businessRuleTask;
   }
   
@@ -909,6 +1098,22 @@ public class BpmnParser {
           FormalExpression expression = Bpmn2Factory.eINSTANCE.createFormalExpression();
           expression.setBody(xtr.getElementText());
           eventDef.setTimeDuration(expression);
+          boundaryEvent.getEventDefinitions().add(eventDef);
+          readyWithEvent = true;
+        
+        } else if(xtr.isStartElement() && "timeDate".equalsIgnoreCase(xtr.getLocalName())) {
+          TimerEventDefinition eventDef = Bpmn2Factory.eINSTANCE.createTimerEventDefinition();
+          FormalExpression expression = Bpmn2Factory.eINSTANCE.createFormalExpression();
+          expression.setBody(xtr.getElementText());
+          eventDef.setTimeDate(expression);
+          boundaryEvent.getEventDefinitions().add(eventDef);
+          readyWithEvent = true;
+          
+        } else if(xtr.isStartElement() && "timeCycle".equalsIgnoreCase(xtr.getLocalName())) {
+          TimerEventDefinition eventDef = Bpmn2Factory.eINSTANCE.createTimerEventDefinition();
+          FormalExpression expression = Bpmn2Factory.eINSTANCE.createFormalExpression();
+          expression.setBody(xtr.getElementText());
+          eventDef.setTimeCycle(expression);
           boundaryEvent.getEventDefinitions().add(eventDef);
           readyWithEvent = true;
           

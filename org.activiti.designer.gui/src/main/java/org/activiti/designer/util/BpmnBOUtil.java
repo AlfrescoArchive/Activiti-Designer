@@ -19,8 +19,8 @@ import java.util.List;
 import org.activiti.designer.model.FieldExtensionModel;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.eclipse.bpmn2.ActivitiListener;
+import org.eclipse.bpmn2.Activity;
 import org.eclipse.bpmn2.SequenceFlow;
-import org.eclipse.bpmn2.Task;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
@@ -43,8 +43,8 @@ public class BpmnBOUtil {
 
   public static List<ActivitiListener> getListeners(Object bo) {
     List<ActivitiListener> listenerList = null;
-    if(bo instanceof Task) {
-      listenerList = ((Task) bo).getActivitiListeners();
+    if(bo instanceof Activity) {
+      listenerList = ((Activity) bo).getActivitiListeners();
     } else if(bo instanceof SequenceFlow) {
       listenerList = ((SequenceFlow) bo).getExecutionListeners();
     } else if(bo instanceof org.eclipse.bpmn2.Process) {
@@ -54,8 +54,8 @@ public class BpmnBOUtil {
   }
   
   public static void addListener(Object bo, ActivitiListener listener) {
-    if(bo instanceof Task) {
-      ((Task) bo).getActivitiListeners().add(listener);
+    if(bo instanceof Activity) {
+      ((Activity) bo).getActivitiListeners().add(listener);
     } else if(bo instanceof SequenceFlow) {
       ((SequenceFlow) bo).getExecutionListeners().add(listener);
     } else if(bo instanceof org.eclipse.bpmn2.Process) {
@@ -64,8 +64,8 @@ public class BpmnBOUtil {
   }
   
   public static void removeExecutionListener(Object bo, ActivitiListener listener) {
-    if(bo instanceof Task) {
-      ((Task) bo).getActivitiListeners().remove(listener);
+    if(bo instanceof Activity) {
+      ((Activity) bo).getActivitiListeners().remove(listener);
     } else if(bo instanceof SequenceFlow) {
       ((SequenceFlow) bo).getExecutionListeners().remove(listener);
     } else if(bo instanceof org.eclipse.bpmn2.Process) {

@@ -16,7 +16,4 @@ Require-Bundle: org.eclipse.core.runtime,
  org.apache.commons.lang
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
-Bundle-ClassPath: .,
- jdi.jar,
- jdimodel.jar,
- junit.jar
+Bundle-ClassPath: .

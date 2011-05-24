@@ -36,8 +36,15 @@ public class BoundaryEventExport implements ActivitiNamespaceConstants {
     if(eventDefinitionList.size() == 1) {
       if(eventDefinitionList.get(0) instanceof TimerEventDefinition) {
         TimerEventDefinition timerDef = (TimerEventDefinition) eventDefinitionList.get(0);
-        if(timerDef.getTimeDuration() != null && ((FormalExpression) timerDef.getTimeDuration()).getBody() != null &&
-          ((FormalExpression) timerDef.getTimeDuration()).getBody().length() > 0) {
+        if(timerDef.getTimeDuration() != null && 
+                ((((FormalExpression) timerDef.getTimeDuration()).getBody() != null && 
+                        ((FormalExpression) timerDef.getTimeDuration()).getBody().length() > 0) ||
+                        
+                        (((FormalExpression) timerDef.getTimeDate()).getBody() != null && 
+                                ((FormalExpression) timerDef.getTimeDate()).getBody().length() > 0) ||
+                                
+                                (((FormalExpression) timerDef.getTimeCycle()).getBody() != null && 
+                                        ((FormalExpression) timerDef.getTimeCycle()).getBody().length() > 0))) {
           
           // start TimerBoundaryEvent element
           xtw.writeStartElement("boundaryEvent");
@@ -52,11 +59,26 @@ public class BoundaryEventExport implements ActivitiNamespaceConstants {
           
           xtw.writeStartElement("timerEventDefinition");
           
-          xtw.writeStartElement("timeDuration");
+          if(((FormalExpression) timerDef.getTimeDuration()).getBody() != null && 
+                        ((FormalExpression) timerDef.getTimeDuration()).getBody().length() > 0) {
+            
+            xtw.writeStartElement("timeDuration");
+            xtw.writeCharacters(((FormalExpression) timerDef.getTimeDuration()).getBody());
+            xtw.writeEndElement();
           
-          xtw.writeCharacters(((FormalExpression) timerDef.getTimeDuration()).getBody());
+          } else if(((FormalExpression) timerDef.getTimeDate()).getBody() != null && 
+                        ((FormalExpression) timerDef.getTimeDate()).getBody().length() > 0) {
+            
+            xtw.writeStartElement("timeDate");
+            xtw.writeCharacters(((FormalExpression) timerDef.getTimeDate()).getBody());
+            xtw.writeEndElement();
           
-          xtw.writeEndElement();
+          } else {
+            
+            xtw.writeStartElement("timeCycle");
+            xtw.writeCharacters(((FormalExpression) timerDef.getTimeCycle()).getBody());
+            xtw.writeEndElement();
+          }
           
           xtw.writeEndElement();
 
