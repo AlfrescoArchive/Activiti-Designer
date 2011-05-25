@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Activiti Designer - Util
 Bundle-SymbolicName: org.activiti.designer.util;singleton:=true
-Bundle-Version: 5.5
+Bundle-Version: 5.6
 Bundle-Activator: org.activiti.designer.util.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
@@ -18,7 +18,6 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.emf.transaction
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Bundle-ClassPath: .
 Export-Package: org.activiti.designer.util.eclipse,
  org.activiti.designer.util.editor,
  org.activiti.designer.util.features,
@@ -26,3 +25,4 @@ Export-Package: org.activiti.designer.util.eclipse,
  org.activiti.designer.util.preferences,
  org.activiti.designer.util.property,
  org.activiti.designer.util.style
+Bundle-ClassPath: .

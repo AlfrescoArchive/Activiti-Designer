@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Activiti Designer - GUI
 Bundle-SymbolicName: org.activiti.designer.gui;singleton:=true
-Bundle-Version: 5.5
+Bundle-Version: 5.6
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.graphiti,
@@ -33,4 +33,7 @@ Export-Package: org.activiti.designer,
  org.activiti.designer.property.extension.util
 Bundle-Vendor: Eclipse Modeling Project
 Bundle-Activator: org.activiti.designer.Activator
-Bundle-ClassPath: .
+Bundle-ClassPath: .,
+ jdi.jar,
+ jdimodel.jar,
+ junit.jar

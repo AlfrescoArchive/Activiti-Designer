@@ -73,8 +73,6 @@ public class BPMN20ProcessValidator extends AbstractProcessValidator {
 
     for (final ProcessValidationWorkerInfo worker : workers) {
 
-      Logger.logDebug(String.format("Processing validator %s", worker.getProcessValidationWorker().getClass().getCanonicalName()));
-
       Collection<ProcessValidationWorkerMarker> result = worker.getProcessValidationWorker().validate(diagram, processNodes);
       if (result.size() > 0) {
         for (final ProcessValidationWorkerMarker marker : result) {
