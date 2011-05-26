@@ -20,6 +20,7 @@ import java.util.Map;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.eclipse.bpmn2.BoundaryEvent;
+import org.eclipse.bpmn2.Event;
 import org.eclipse.bpmn2.FlowElement;
 import org.eclipse.bpmn2.FlowNode;
 import org.eclipse.bpmn2.Gateway;
@@ -282,9 +283,13 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
           if(lastWayPoint.getX() == targetMiddleX) {
             
             if(lastWayPoint.getY() > targetMiddleY) {
+            	
               createWayPoint(targetMiddleX, targetY + targetHeight, xtw);
               
             } else {
+            	if(sequenceFlow.getTargetRef() instanceof Event) {
+              	targetHeight = 0;
+              }
               createWayPoint(targetMiddleX, targetY - targetHeight, xtw);
             }
             

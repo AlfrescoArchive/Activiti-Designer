@@ -1,7 +1,12 @@
 package org.activiti.designer.util.eclipse;
 
+import java.util.List;
+
 import org.apache.commons.lang.ArrayUtils;
+import org.eclipse.bpmn2.Activity;
 import org.eclipse.bpmn2.BaseElement;
+import org.eclipse.bpmn2.BoundaryEvent;
+import org.eclipse.bpmn2.EventDefinition;
 import org.eclipse.bpmn2.FlowElement;
 import org.eclipse.bpmn2.SubProcess;
 import org.eclipse.core.resources.IProject;
@@ -201,6 +206,18 @@ public class ActivitiUiUtil {
             String contentObjectId = flowElement.getId().replace(featureIdKey, "");
             determinedId = getId(contentObjectId, determinedId);
           }
+          if (flowElement instanceof Activity) {
+          	List<BoundaryEvent> eventList = ((Activity) flowElement).getBoundaryEventRefs();
+          	for (BoundaryEvent boundaryEvent : eventList) {
+	            List<EventDefinition> definitionList = boundaryEvent.getEventDefinitions();
+	            for (EventDefinition eventDefinition : definitionList) {
+	              if(eventDefinition.getClass() == featureClass) {
+	              	String contentObjectId = eventDefinition.getId().replace(featureIdKey, "");
+	                determinedId = getId(contentObjectId, determinedId);
+	              }
+              }
+            }
+          }
         }
       }
       
@@ -208,6 +225,18 @@ public class ActivitiUiUtil {
         BaseElement tempElement = (BaseElement) contentObject;
         String contentObjectId = tempElement.getId().replace(featureIdKey, "");
         determinedId = getId(contentObjectId, determinedId);
+      }
+      if (contentObject instanceof Activity) {
+      	List<BoundaryEvent> eventList = ((Activity) contentObject).getBoundaryEventRefs();
+      	for (BoundaryEvent boundaryEvent : eventList) {
+          List<EventDefinition> definitionList = boundaryEvent.getEventDefinitions();
+          for (EventDefinition eventDefinition : definitionList) {
+            if(eventDefinition.getClass() == featureClass) {
+            	String contentObjectId = boundaryEvent.getId().replace(featureIdKey, "");
+              determinedId = getId(contentObjectId, determinedId);
+            }
+          }
+        }
       }
     }
     determinedId++;
