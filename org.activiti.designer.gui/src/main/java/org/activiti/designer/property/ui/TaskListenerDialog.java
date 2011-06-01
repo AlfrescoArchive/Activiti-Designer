@@ -1,5 +1,6 @@
 package org.activiti.designer.property.ui;
 
+import org.eclipse.bpmn2.ActivitiListener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableItem;
 
@@ -9,9 +10,8 @@ public class TaskListenerDialog extends AbstractListenerDialog {
     super(parent, fieldList);
   }
 
-  public TaskListenerDialog(Shell parent, TableItem[] fieldList, String savedImplementationType, String savedImplementation, String savedEventName,
-          String savedFields) {
-    super(parent, fieldList, savedImplementationType, savedImplementation, savedEventName, savedFields);
+  public TaskListenerDialog(Shell parent, TableItem[] fieldList, ActivitiListener savedListener) {
+    super(parent, fieldList, savedListener);
   }
 
   @Override

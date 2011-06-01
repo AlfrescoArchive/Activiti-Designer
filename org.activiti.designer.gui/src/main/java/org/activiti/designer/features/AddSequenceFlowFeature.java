@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.activiti.designer.util.style.StyleUtil;
+import org.eclipse.bpmn2.EndEvent;
 import org.eclipse.bpmn2.FlowNode;
 import org.eclipse.bpmn2.Gateway;
 import org.eclipse.bpmn2.SequenceFlow;
@@ -107,11 +108,12 @@ public class AddSequenceFlowFeature extends AbstractAddFeature {
 		sourceAnchor.getOutgoingConnections().add(connection);
 		targetAnchor.getIncomingConnections().add(connection);
 
+		GraphicsAlgorithm sourceGraphics = getPictogramElement(
+				addedSequenceFlow.getSourceRef()).getGraphicsAlgorithm();
+		GraphicsAlgorithm targetGraphics = getPictogramElement(
+				addedSequenceFlow.getTargetRef()).getGraphicsAlgorithm();
+		
 		if (addedSequenceFlow.getSourceRef() instanceof Gateway) {
-			GraphicsAlgorithm sourceGraphics = getPictogramElement(addedSequenceFlow.getSourceRef())
-					.getGraphicsAlgorithm();
-			GraphicsAlgorithm targetGraphics = getPictogramElement(addedSequenceFlow.getTargetRef())
-					.getGraphicsAlgorithm();
 			if (((sourceGraphics.getY() + 10) < targetGraphics.getY()
 					|| (sourceGraphics.getY() - 10) > targetGraphics.getY())  && 
 					(sourceGraphics.getX() + (sourceGraphics.getWidth() / 2)) < targetGraphics.getX()) {
@@ -126,10 +128,6 @@ public class AddSequenceFlowFeature extends AbstractAddFeature {
 				connection.getBendpoints().add(bendPoint);
 			}
 		} else if (addedSequenceFlow.getTargetRef() instanceof Gateway) {
-			GraphicsAlgorithm sourceGraphics = getPictogramElement(addedSequenceFlow.getSourceRef())
-					.getGraphicsAlgorithm();
-			GraphicsAlgorithm targetGraphics = getPictogramElement(addedSequenceFlow.getTargetRef())
-					.getGraphicsAlgorithm();
 			if (((sourceGraphics.getY() + 10) < targetGraphics.getY()
 					|| (sourceGraphics.getY() - 10) > targetGraphics.getY()) && 
 					(sourceGraphics.getX() + sourceGraphics.getWidth()) < targetGraphics.getX()) {
@@ -139,6 +137,19 @@ public class AddSequenceFlowFeature extends AbstractAddFeature {
   				bendPoint.setY(parentShape.getGraphicsAlgorithm().getY() + sourceGraphics.getY() + (sourceGraphics.getHeight() / 2));
 				} else {
 				  bendPoint.setX(targetGraphics.getX() + 20);
+          bendPoint.setY(sourceGraphics.getY() + (sourceGraphics.getHeight() / 2));
+				}
+				connection.getBendpoints().add(bendPoint);
+			}
+		} else if (addedSequenceFlow.getTargetRef() instanceof EndEvent) {
+			if ((sourceGraphics.getY() + 10) < targetGraphics.getY() && 
+					(sourceGraphics.getX() + sourceGraphics.getWidth()) < targetGraphics.getX()) {
+				Point bendPoint = StylesFactory.eINSTANCE.createPoint();
+				if(inSubProcess == true) {
+  				bendPoint.setX(parentShape.getGraphicsAlgorithm().getX() + targetGraphics.getX() + (targetGraphics.getWidth() / 2));
+  				bendPoint.setY(parentShape.getGraphicsAlgorithm().getY() + sourceGraphics.getY() + (sourceGraphics.getHeight() / 2));
+				} else {
+				  bendPoint.setX(targetGraphics.getX() + (targetGraphics.getWidth() / 2));
           bendPoint.setY(sourceGraphics.getY() + (sourceGraphics.getHeight() / 2));
 				}
 				connection.getBendpoints().add(bendPoint);

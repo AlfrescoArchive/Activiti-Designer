@@ -5,8 +5,8 @@ import java.util.List;
 
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.model.FieldExtensionModel;
-import org.activiti.designer.util.BpmnBOUtil;
 import org.activiti.designer.util.preferences.Preferences;
+import org.eclipse.bpmn2.ActivitiListener;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jdt.ui.IJavaElementSearchConstants;
@@ -41,12 +41,11 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
 	public String implementationType;
 	public String implementation;
 	public String eventName;
+	public String runAs;
+	public String scriptProcessor;
 	public List<FieldExtensionModel> fieldExtensionList;
 	
-	protected String savedImplementationType;
-	protected String savedImplementation;
-	protected String savedEventName;
-	protected String savedFields;
+	protected ActivitiListener savedListener;
 	
 	protected TableItem[] fieldList;
 	
@@ -63,6 +62,10 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
 	protected Text delegateExpressionText;
 	protected Text scriptText;
 	protected CLabel scriptLabel;
+	private Text runAsText;
+	protected CLabel runAsLabel;
+	private Text scriptProcessorText;
+	protected CLabel scriptProcessorLabel;
 	protected CLabel delegateExpressionLabel;
 	protected FieldExtensionEditor fieldEditor;
 	protected CLabel extensionLabel;
@@ -77,14 +80,10 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
 		this(parent, fieldList, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 	}
 	
-	public AbstractListenerDialog(Shell parent, TableItem[] fieldList, String savedImplementationType, 
-	        String savedImplementation, String savedEventName, String savedFields) {
+	public AbstractListenerDialog(Shell parent, TableItem[] fieldList, ActivitiListener listener) {
     // Pass the default styles here
     this(parent, fieldList, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
-    this.savedImplementationType = savedImplementationType;
-    this.savedImplementation = savedImplementation;
-    this.savedEventName = savedEventName;
-    this.savedFields = savedFields;
+    this.savedListener = listener;
   }
 
 	public AbstractListenerDialog(Shell parent, TableItem[] fieldList, int style) {
@@ -136,8 +135,8 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
 	    eventDropDown.add(event);
 	  }
 	  
-	  if(savedEventName != null) {
-	    eventDropDown.setText(savedEventName);
+	  if(savedListener != null && savedListener.getEvent() != null) {
+	    eventDropDown.setText(savedListener.getEvent());
 	  } else {
 	    eventDropDown.setText(getDefaultEvent());
 	  }
@@ -224,8 +223,8 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
     createLabel(shell, "Type", radioTypeComposite);
 
     classNameText = new Text(shell, SWT.BORDER);
-    if(CLASS_TYPE.equals(savedImplementationType)) {
-      classNameText.setText(savedImplementation);
+    if(savedListener != null && CLASS_TYPE.equals(savedListener.getImplementationType())) {
+      classNameText.setText(savedListener.getImplementation());
     } else {
       classNameText.setText("");
     }
@@ -267,8 +266,8 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
     classSelectLabel = createLabel(shell, "Service class", expressionText);
     
     expressionText = new Text(shell, SWT.BORDER);
-    if(EXPRESSION_TYPE.equals(savedImplementationType)) {
-      expressionText.setText(savedImplementation);
+    if(savedListener != null && EXPRESSION_TYPE.equals(savedListener.getImplementationType())) {
+      expressionText.setText(savedListener.getImplementation());
     } else {
       expressionText.setText("");
     }
@@ -281,8 +280,8 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
     expressionLabel = createLabel(shell, "Expression", expressionText);
     
     delegateExpressionText = new Text(shell, SWT.BORDER);
-    if(DELEGATE_EXPRESSION_TYPE.equals(savedImplementationType)) {
-      delegateExpressionText.setText(savedImplementation);
+    if(savedListener != null && DELEGATE_EXPRESSION_TYPE.equals(savedListener.getImplementationType())) {
+      delegateExpressionText.setText(savedListener.getImplementation());
     } else {
       delegateExpressionText.setText("");
     }
@@ -295,8 +294,8 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
     delegateExpressionLabel = createLabel(shell, "Delegate expression", delegateExpressionText);
     
     scriptText = new Text(shell, SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
-    if(ALFRESCO_TYPE.equals(savedImplementationType)) {
-      scriptText.setText(savedImplementation);
+    if(savedListener != null && ALFRESCO_TYPE.equals(savedListener.getImplementationType())) {
+      scriptText.setText(savedListener.getImplementation());
     } else {
       scriptText.setText("");
     }
@@ -307,6 +306,32 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
     scriptText.setLayoutData(data);
     
     scriptLabel = createLabel(shell, "Script", scriptText);
+    
+    runAsText = new Text(shell, SWT.BORDER);
+    if(savedListener != null && savedListener.getRunAs() != null) {
+    	runAsText.setText(savedListener.getRunAs());
+    } else {
+    	runAsText.setText("");
+    }
+    data = new FormData();
+    data.left = new FormAttachment(0, 120);
+    data.right = new FormAttachment(100, 0);
+    data.top = new FormAttachment(scriptText, VSPACE);
+    runAsText.setLayoutData(data);
+		runAsLabel = createLabel(shell, "Run as", runAsText);
+		
+		scriptProcessorText = new Text(shell, SWT.BORDER);
+		if(savedListener != null && savedListener.getScriptProcessor() != null) {
+			scriptProcessorText.setText(savedListener.getScriptProcessor());
+    } else {
+    	scriptProcessorText.setText("");
+    }
+    data = new FormData();
+    data.left = new FormAttachment(0, 120);
+    data.right = new FormAttachment(100, 0);
+    data.top = new FormAttachment(runAsText, VSPACE);
+    scriptProcessorText.setLayoutData(data);
+    scriptProcessorLabel = createLabel(shell, "Script processor", scriptProcessorText);
     
     Composite extensionsComposite = new Composite(shell, SWT.WRAP);
     data = new FormData();
@@ -320,9 +345,8 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
     extensionsComposite.setLayout(fieldLayout);
     fieldEditor = new FieldExtensionEditor("fieldEditor", extensionsComposite);
     fieldEditor.getLabelControl(extensionsComposite).setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
-    if(savedFields != null && savedFields.length() > 0) {
-      List<FieldExtensionModel> fieldList = BpmnBOUtil.getFieldModelList(savedFields);
-      fieldEditor.initializeModel(fieldList);
+    if(savedListener != null && savedListener.getFieldExtensions() != null && savedListener.getFieldExtensions().size() > 0) {
+      fieldEditor.initializeModel(savedListener.getFieldExtensions());
     }
     
     extensionLabel = createLabel(shell, "Fields", extensionsComposite);
@@ -370,6 +394,8 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
 				  implementation = delegateExpressionText.getText();
 				} else if(ALFRESCO_TYPE.equals(implementationType)){
 				  implementation = scriptText.getText();
+				  runAs = runAsText.getText();
+				  scriptProcessor = scriptProcessorText.getText();
 				} else {
 				  implementation = expressionText.getText();
 				}
@@ -391,13 +417,13 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
 		// to dismiss
 		shell.setDefaultButton(ok);
 		
-		if(savedImplementationType == null || CLASS_TYPE.equals(savedImplementationType)) {
+		if(savedListener == null || savedListener.getImplementationType() == null || CLASS_TYPE.equals(savedListener.getImplementationType())) {
       classTypeButton.setSelection(true);
       enableClassType();
-    } else if(EXPRESSION_TYPE.equals(savedImplementationType)){
+    } else if(EXPRESSION_TYPE.equals(savedListener.getImplementationType())){
       expressionTypeButton.setSelection(true);
       enableExpressionType();
-    } else if(PreferencesUtil.getBooleanPreference(Preferences.ALFRESCO_ENABLE) && ALFRESCO_TYPE.equals(savedImplementationType)){
+    } else if(PreferencesUtil.getBooleanPreference(Preferences.ALFRESCO_ENABLE) && ALFRESCO_TYPE.equals(savedListener.getImplementationType())){
       alfrescoTypeButton.setSelection(true);
       enableAlfrescoType();
     } else {
@@ -470,6 +496,10 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
       alfrescoTypeButton.setSelection(visible);
       scriptText.setVisible(visible);
       scriptLabel.setVisible(visible);
+      runAsText.setVisible(visible);
+      runAsLabel.setVisible(visible);
+      scriptProcessorText.setVisible(visible);
+      scriptProcessorLabel.setVisible(visible);
       extensionLabel.setVisible(!visible);
       fieldEditor.setVisible(!visible);
     }

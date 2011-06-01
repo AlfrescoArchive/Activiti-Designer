@@ -3,7 +3,6 @@ package org.activiti.designer.property.ui;
 import java.util.Iterator;
 import java.util.List;
 
-import org.activiti.designer.model.FieldExtensionModel;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.eclipse.bpmn2.Bpmn2Factory;
 import org.eclipse.bpmn2.FieldExtension;
@@ -40,11 +39,11 @@ public class FieldExtensionEditor extends TableFieldEditor {
 		}
 	}
 	
-	public void initializeModel(List<FieldExtensionModel> fieldList) {
+	public void initializeModel(List<FieldExtension> fieldList) {
 	  removeTableItems();
     if(fieldList == null || fieldList.size() == 0) return;
-    for (FieldExtensionModel fieldExtension : fieldList) {
-      addTableItem(fieldExtension.fieldName, fieldExtension.expression);
+    for (FieldExtension fieldExtension : fieldList) {
+      addTableItem(fieldExtension.getFieldname(), fieldExtension.getExpression());
     }
 	}
 
@@ -99,6 +98,11 @@ public class FieldExtensionEditor extends TableFieldEditor {
     } else {
       return null;
     }
+  }
+	
+	@Override
+  protected void removedItem(int index) {
+	  // TODO Auto-generated method stub 
   }
 	
 	@Override

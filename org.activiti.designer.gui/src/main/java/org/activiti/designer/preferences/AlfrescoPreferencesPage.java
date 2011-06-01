@@ -23,13 +23,13 @@ public class AlfrescoPreferencesPage extends FieldEditorPreferencePage implement
   public void createFieldEditors() {
 
     Group group = new Group(getFieldEditorParent(), SWT.BORDER);
-    group.setLayoutData(new GridData(SWT.FILL, SWT.NULL, true, false));
+    group.setLayoutData(new GridData(SWT.FILL, SWT.NULL, true, false, 2, 1));
 
     addField(new BooleanFieldEditor(Preferences.ALFRESCO_ENABLE.getPreferenceId(),
             "&Enable Alfresco elements", group));
 
     Group groupStartEvent = new Group(getFieldEditorParent(), SWT.BORDER);
-    groupStartEvent.setLayoutData(new GridData(SWT.FILL, SWT.NULL, true, false));
+    groupStartEvent.setLayoutData(new GridData(SWT.FILL, SWT.NULL, true, false, 2, 1));
     addField(new ModifiableListEditor(Preferences.ALFRESCO_FORMTYPES_STARTEVENT.getPreferenceId(), 
             "&Start event form types", groupStartEvent) {
       
@@ -79,9 +79,9 @@ public class AlfrescoPreferencesPage extends FieldEditorPreferencePage implement
     });
     
     Group groupUsertask = new Group(getFieldEditorParent(), SWT.BORDER);
-    groupUsertask.setLayoutData(new GridData(SWT.FILL, SWT.NULL, true, false));
+    groupUsertask.setLayoutData(new GridData(SWT.FILL, SWT.NULL, true, false, 2, 1));
     addField(new ModifiableListEditor(Preferences.ALFRESCO_FORMTYPES_USERTASK.getPreferenceId(), 
-            "&Start event form types", groupUsertask) {
+            "&User task form types", groupUsertask) {
       
       @Override
       protected String[] parseString(String input) {

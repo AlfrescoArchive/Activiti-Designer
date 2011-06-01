@@ -85,6 +85,11 @@ public class IOParameterEditor extends TableFieldEditor {
   }
   
   @Override
+  protected void removedItem(int index) {
+	  // TODO Auto-generated method stub 
+  }
+  
+  @Override
   protected void selectionChanged() {
     super.selectionChanged();
     saveFormProperties();

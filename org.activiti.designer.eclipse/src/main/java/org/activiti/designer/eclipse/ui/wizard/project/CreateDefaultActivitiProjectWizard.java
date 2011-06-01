@@ -193,7 +193,7 @@ public class CreateDefaultActivitiProjectWizard extends BasicNewProjectResourceW
     buffer.append("  <packaging>jar</packaging>\n");
     buffer.append("  <name>BPMN 2.0 with Activiti - Examples</name>\n");
     buffer.append("  <properties>\n");
-    buffer.append("    <activiti-version>5.5</activiti-version>\n");
+    buffer.append("    <activiti-version>5.6</activiti-version>\n");
     buffer.append("  </properties>\n");
     buffer.append("  <dependencies>\n");
     addDependency(buffer, "org.activiti", "activiti-engine", "${activiti-version}");
@@ -238,8 +238,17 @@ public class CreateDefaultActivitiProjectWizard extends BasicNewProjectResourceW
   }
 
   private void addDependency(StringBuilder buffer, String groupId, String artifactId, String version) {
-    buffer.append("    <dependency>\n").append("      <groupId>").append(groupId).append("</groupId>\n").append("      <artifactId>").append(artifactId)
-            .append("</artifactId>\n").append("      <version>").append(version).append("</version>\n").append("    </dependency>\n");
+    buffer.append("    <dependency>\n")
+    		.append("      <groupId>")
+    		.append(groupId)
+    		.append("</groupId>\n")
+    		.append("      <artifactId>")
+    		.append(artifactId)
+        .append("</artifactId>\n")
+        .append("      <version>")
+        .append(version)
+        .append("</version>\n")
+        .append("    </dependency>\n");
   }
 
 }

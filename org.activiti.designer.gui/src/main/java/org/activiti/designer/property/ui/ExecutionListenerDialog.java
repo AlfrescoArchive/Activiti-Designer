@@ -1,5 +1,6 @@
 package org.activiti.designer.property.ui;
 
+import org.eclipse.bpmn2.ActivitiListener;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableItem;
 
@@ -13,9 +14,9 @@ public class ExecutionListenerDialog extends AbstractListenerDialog {
   }
 
   public ExecutionListenerDialog(Shell parent, TableItem[] fieldList, boolean isSequenceFlow, 
-          String savedImplementationType, String savedImplementation, String savedEventName, String savedFields) {
+          ActivitiListener savedListener) {
     
-    super(parent, fieldList, savedImplementationType, savedImplementation, savedEventName, savedFields);
+    super(parent, fieldList, savedListener);
     this.isSequenceFlow = isSequenceFlow;
   }
 
