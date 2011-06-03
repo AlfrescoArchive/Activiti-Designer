@@ -40,12 +40,16 @@ public class CallActivityExport implements ActivitiNamespaceConstants {
       xtw.writeAttribute("calledElement", callActivity.getCalledElement());
     }
     
-    ExtensionListenerExport.createExtensionListenerXML(callActivity.getActivitiListeners(), true, EXECUTION_LISTENER, xtw);
+    if(callActivity.getActivitiListeners().size() > 0 || 
+    		callActivity.getInParameters().size() > 0 || 
+    		callActivity.getOutParameters().size() > 0) {
+    	
+      xtw.writeStartElement("extensionElements");
+    }
+    
+    ExtensionListenerExport.createExtensionListenerXML(callActivity.getActivitiListeners(), false, EXECUTION_LISTENER, xtw);
     
     if(callActivity.getInParameters().size() > 0 || callActivity.getOutParameters().size() > 0) {
-      if(callActivity.getActivitiListeners().size() > 0) {
-        xtw.writeStartElement("extensionElements");
-      }
       
       for(IOParameter parameter : callActivity.getInParameters()) {
         writeParameter(parameter, "in", xtw);
@@ -54,10 +58,13 @@ public class CallActivityExport implements ActivitiNamespaceConstants {
       for(IOParameter parameter : callActivity.getOutParameters()) {
         writeParameter(parameter, "out", xtw);
       }
-      
-      if(callActivity.getActivitiListeners().size() > 0) {
-        xtw.writeEndElement();
-      }
+    }
+    
+    if(callActivity.getActivitiListeners().size() > 0 || 
+    		callActivity.getInParameters().size() > 0 || 
+    		callActivity.getOutParameters().size() > 0) {
+    	
+      xtw.writeEndElement();
     }
     
     MultiInstanceExport.createMultiInstance(object, subProcessId, xtw);
