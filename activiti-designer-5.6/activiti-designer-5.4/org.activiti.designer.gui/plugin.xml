@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.graphiti.ui.diagramTypes">
+      <diagramType
+            description="The BPMN diagram for the Activiti process engine"
+            id="org.activiti.designer.DiagramTypeBPMN"
+            name="Activiti BPMN diagram type"
+            type="BPMNdiagram">
+      </diagramType>
+   </extension>
+   <extension
+         point="org.eclipse.graphiti.ui.diagramTypeProviders">
+      <diagramTypeProvider
+            class="org.activiti.designer.diagram.ActivitiBPMNDiagramTypeProvider"
+            id="org.activiti.designer.diagram.ActivitiBPMNDiagramTypeProvider"
+            name="Activiti BPMN editor">
+         <diagramType
+               id="org.activiti.designer.DiagramTypeBPMN">
+         </diagramType>
+         <imageProvider
+               id="org.activiti.designer.ActivitiImageProvider">
+         </imageProvider>
+      </diagramTypeProvider>
+   </extension>
+   <extension
+         point="org.eclipse.graphiti.ui.imageProviders">
+      <imageProvider
+            class="org.activiti.designer.ActivitiImageProvider"
+            id="org.activiti.designer.ActivitiImageProvider">
+      </imageProvider>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
+      <propertyContributor
+            contributorId="BPMNdiagram.PropertyContributor">
+         <propertyCategory
+               category="Activiti"></propertyCategory>
+      </propertyContributor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
+      <propertyTabs
+            contributorId="BPMNdiagram.PropertyContributor">
+         <propertyTab
+               category="Activiti"
+               id="org.activiti.designer.generalTab"
+               label="General">
+         </propertyTab>
+         <propertyTab
+               afterTab="org.activiti.designer.generalTab"
+               category="Activiti"
+               id="org.activiti.designer.mainConfigTab"
+               label="Main config">
+         </propertyTab>
+         <propertyTab
+               afterTab="org.activiti.designer.mainConfigTab"
+               category="Activiti"
+               id="org.activiti.designer.formTab"
+               label="Form">
+         </propertyTab>
+         <propertyTab
+               afterTab="org.activiti.designer.mainConfigTab"
+               category="Activiti"
+               id="org.activiti.designer.listenerTab"
+               label="Listeners">
+         </propertyTab>
+      </propertyTabs>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views.properties.tabbed.propertySections">
+      <propertySections
+            contributorId="BPMNdiagram.PropertyContributor">
+         <propertySection
+               class="org.activiti.designer.property.PropertyDiagramSection"
+               filter="org.activiti.designer.property.PropertyDiagramFilter"
+               id="org.activiti.designer.generalTab.diagram"
+               tab="org.activiti.designer.generalTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertySequenceFlowSection"
+               filter="org.activiti.designer.property.PropertySequenceFlowFilter"
+               id="org.activiti.designer.mainConfigTab.sequenceflow"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyScriptTaskSection"
+               filter="org.activiti.designer.property.PropertyScriptTaskFilter"
+               id="org.activiti.designer.mainConfigTab.scripttask"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyServiceTaskSection"
+               filter="org.activiti.designer.property.PropertyServiceTaskFilter"
+               id="org.activiti.designer.mainConfigTab.servicetask"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyCustomServiceTaskSection"
+               filter="org.activiti.designer.property.PropertyCustomServiceTaskFilter"
+               id="org.activiti.designer.mainConfigTab.customservicetask"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyUserTaskSection"
+               filter="org.activiti.designer.property.PropertyUserTaskFilter"
+               id="org.activiti.designer.mainConfigTab.usertask"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyMailTaskSection"
+               filter="org.activiti.designer.property.PropertyMailTaskFilter"
+               id="org.activiti.designer.mainConfigTab.mailtask"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyBpmnSection"
+               filter="org.activiti.designer.property.PropertyBpmnFilter"
+               id="org.activiti.designer.generalTab.flowelement"
+               tab="org.activiti.designer.generalTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyExecutionListenerSection"
+               filter="org.activiti.designer.property.PropertyExecutionListenerFilter"
+               id="org.activiti.designer.listenerTab.ExecutionTab"
+               tab="org.activiti.designer.listenerTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyTaskListenerSection"
+               filter="org.activiti.designer.property.PropertyTaskListenerFilter"
+               id="org.activiti.designer.listenerTab.TaskTab"
+               tab="org.activiti.designer.listenerTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyStartEventSection"
+               filter="org.activiti.designer.property.PropertyStartEventFilter"
+               id="org.activiti.designer.mainConfigTab.startevent"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyBoundaryTimerSection"
+               filter="org.activiti.designer.property.PropertyBoundaryTimerFilter"
+               id="org.activiti.designer.mainConfigTab.timerboundaryevent"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyBoundaryErrorSection"
+               filter="org.activiti.designer.property.PropertyBoundaryErrorFilter"
+               id="org.activiti.designer.mainConfigTab.errorboundaryevent"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyCallActivitySection"
+               filter="org.activiti.designer.property.PropertyCallActivityFilter"
+               id="org.activiti.designer.mainConfigTab.callactivity"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyBusinessRuleTaskSection"
+               filter="org.activiti.designer.property.PropertyBusinessRuleTaskFilter"
+               id="org.activiti.designer.mainConfigTab.businessruletask"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyFormPropertySection"
+               filter="org.activiti.designer.property.PropertyUserTaskFilter"
+               id="org.activiti.designer.formTab.formProperty"
+               tab="org.activiti.designer.formTab">
+         </propertySection>
+         <propertySection
+               afterSection="org.activiti.designer.mainConfigTab.callactivity"
+               class="org.activiti.designer.property.PropertyIOParameterSection"
+               filter="org.activiti.designer.property.PropertyCallActivityFilter"
+               id="org.activiti.designer.mainConfigTab.parameter"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+      </propertySections>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="org.activiti.designer.preferences.ActivitiPreferencePage"
+            id="org.activiti.designer.preferences"
+            name="Activiti">
+      </page>
+      <page
+            category="org.activiti.designer.preferences"
+            class="org.activiti.designer.preferences.ActivitiEditorPreferencesPage"
+            id="org.activiti.designer.gui.editorpage"
+            name="Editor">
+      </page>
+      <page
+            category="org.activiti.designer.preferences"
+            class="org.activiti.designer.preferences.ActivitiSavePreferencesPage"
+            id="org.activiti.designer.gui.savepage"
+            name="Save">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.popupMenus">
+      <objectContribution
+            adaptable="false"
+            id="org.activiti.designer.gui.unitTestContribution"
+            nameFilter="*.bpmn20.xml"
+            objectClass="org.eclipse.core.resources.IFile">
+         <menu
+               id="org.activiti.designer.gui.menu1"
+               label="Activiti"
+               path="additions">
+            <separator
+                  name="group1">
+            </separator>
+         </menu>
+         <action
+               class="org.activiti.designer.actions.GenerateUnitTestAction"
+               id="org.activiti.designer.gui.generateUnitTestAction"
+               label="Generate unit test"
+               menubarPath="org.activiti.designer.gui.menu1/group1">
+         </action>
+      </objectContribution>
+   </extension>
+   <extension point="org.eclipse.ui.commands">
+   	<command
+    	id="org.activiti.designer.gui.actions.copyCommand"
+        name="Copy Diagram Element(s)" />
+    <command
+    	id="org.activiti.designer.gui.actions.pasteCommand"
+        name="Paste Diagram Element(s)" />
+   	
+</extension>
+<extension point="org.eclipse.ui.handlers">
+  <handler
+        class="org.activiti.designer.gui.actions.CopyActionHandler"
+        commandId="org.activiti.designer.gui.actions.copyCommand">
+     <activeWhen>
+        <with variable="activePartId">
+           <equals value="org.activiti.designer.bpmneditor"/>
+           </with>
+     </activeWhen>
+  </handler>
+   <handler
+        class="org.activiti.designer.gui.actions.PasteActionHandler"
+        commandId="org.activiti.designer.gui.actions.pasteCommand">
+     <activeWhen>
+        <with variable="activePartId">
+           <equals value="org.activiti.designer.bpmneditor"/>
+           </with>
+     </activeWhen>
+  </handler>
+</extension>
+<extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:edit">
+         <command
+               commandId="org.activiti.designer.gui.actions.copyCommand"
+               label="Copy diagram item(s)"
+               style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                     <with variable="activePartId">
+           				<equals value="org.activiti.designer.bpmneditor"/>
+           		     </with>
+               </visibleWhen>
+         </command>
+         <command
+               commandId="org.activiti.designer.gui.actions.pasteCommand"
+               label="Paste diagram item(s)"
+               style="push">
+               <visibleWhen
+                     checkEnabled="false">
+                     <with variable="activePartId">
+           				<equals value="org.activiti.designer.bpmneditor"/>
+           		     </with>
+               </visibleWhen>
+         </command>
+      </menuContribution>
+   </extension>
+<extension point="org.eclipse.ui.bindings">
+  <key
+        commandId="org.activiti.designer.gui.actions.copyCommand"
+        schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+        sequence="Ctrl+C">
+  </key>
+  <key
+        commandId="org.activiti.designer.gui.actions.pasteCommand"
+        schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
+        sequence="Ctrl+V">
+  </key>
+</extension>
+<extension
+      point="org.eclipse.ui.popupMenus">
+   <objectContribution
+         adaptable="false"
+         id="org.activiti.designer.gui.import"
+         objectClass="org.eclipse.jdt.core.IJavaProject">
+      <action
+            class="org.activiti.designer.popupmenus.ImportBpmnMenu"
+            icon="icons/type.service.png"
+            id="org.activiti.designer.gui.importAction"
+            label="Import BPMN 2.0 file"
+            menubarPath="Properties">
+      </action>
+   </objectContribution>
+   <objectContribution
+         adaptable="false"
+         id="org.activiti.designer.gui.deployment"
+         objectClass="org.eclipse.jdt.core.IJavaProject">
+      <action
+            class="org.activiti.designer.popupmenus.DeploymentMenu"
+            icon="icons/type.send.png"
+            id="org.activiti.designer.gui.deploymentAction"
+            label="Create deployment artifacts"
+            menubarPath="Properties">
+      </action>
+   </objectContribution>
+</extension>
+
+</plugin>
