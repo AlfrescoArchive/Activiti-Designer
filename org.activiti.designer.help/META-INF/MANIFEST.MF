@@ -1,0 +1,10 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Activiti Designer - Help
+Bundle-SymbolicName: org.activiti.designer.help;singleton:=true
+Bundle-Version: 5.6
+Bundle-Activator: org.activiti.designer.help.Activator
+Require-Bundle: org.eclipse.core.runtime
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ClassPath: .
