@@ -53,8 +53,8 @@ public class MoveBoundaryEventFeature extends DefaultMoveShapeFeature {
       int parentWidth = parent.getGraphicsAlgorithm().getWidth();
       int parentHeight = parent.getGraphicsAlgorithm().getHeight();
       
-     if(x > parentX && x < (parentX + parentWidth) &&
-            y > parentY && y < (parentY + parentHeight)) {   
+      if(x > parentX && x < (parentX + parentWidth) &&
+            (y + height - 5) > parentY && y < (parentY + parentHeight - 5)) {   
         return true;
       }
     }
