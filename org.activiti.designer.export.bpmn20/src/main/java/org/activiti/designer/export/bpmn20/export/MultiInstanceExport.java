@@ -37,7 +37,7 @@ public class MultiInstanceExport implements ActivitiNamespaceConstants {
     if(multiInstanceDef.getInputDataItem() != null && multiInstanceDef.getInputDataItem().contains("${")) {
       xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "collection", multiInstanceDef.getInputDataItem());
       if(multiInstanceDef.getElementVariable() != null && multiInstanceDef.getElementVariable().length() > 0) {
-        xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "elementVariable", multiInstanceDef.getInputDataItem());
+        xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "elementVariable", multiInstanceDef.getElementVariable());
       }
     }
     if (multiInstanceDef.getLoopCardinality() != null && multiInstanceDef.getLoopCardinality().length() > 0) {

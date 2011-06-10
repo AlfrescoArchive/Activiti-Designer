@@ -13,7 +13,6 @@ import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.platform.IDiagramEditor;
-import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
@@ -97,6 +96,7 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
 	@Override
   protected String[] getChangedInputObject(TableItem item) {
 		
+		int index = table.getSelectionIndex();
 	  AbstractListenerDialog dialog = getDialog(parent.getShell(), getItems(), 
 	  		listenerList.get(table.getSelectionIndex()));
     dialog.open();
@@ -104,7 +104,7 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
             dialog.implementation != null && dialog.implementation.length() > 0 &&
             dialog.implementationType != null && dialog.implementationType.length() > 0) {
       
-    	saveChangedObject(dialog);
+    	saveChangedObject(dialog, index);
       return new String[] { dialog.implementation, dialog.implementationType, dialog.eventName, getFieldString(dialog.fieldExtensionList) };
     } else {
       return null;
@@ -138,7 +138,7 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
 	
 	private void saveNewObject(final AbstractListenerDialog dialog) {
 		if (pictogramElement != null) {
-		  final Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pictogramElement);
+		  final Object bo = BpmnBOUtil.getExecutionListenerBO(pictogramElement, diagram);
 		  if (bo == null) {
         return;
       }
@@ -160,17 +160,16 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
 		}
 	}
 	
-	private void saveChangedObject(final AbstractListenerDialog dialog) {
+	private void saveChangedObject(final AbstractListenerDialog dialog, final int index) {
 		if (pictogramElement != null) {
-		  final Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pictogramElement);
+		  final Object bo = BpmnBOUtil.getExecutionListenerBO(pictogramElement, diagram);
 		  if (bo == null) {
         return;
       }
-		  final List<ActivitiListener> listenerList = BpmnBOUtil.getListeners(bo);
 			TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
 			ActivitiUiUtil.runModelChange(new Runnable() {
 				public void run() {
-					ActivitiListener listener = listenerExists(listenerList, dialog);
+					ActivitiListener listener = listenerList.get(index);
 					if(listener != null) {
 					  listener.setEvent(dialog.eventName);
 					  listener.setImplementation(dialog.implementation);
@@ -180,7 +179,9 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
 					  	listener.setScriptProcessor(dialog.scriptProcessor);
 					  }
 					  setFieldsInListener(listener, dialog.fieldExtensionList);
-					} 
+					  BpmnBOUtil.setListener(bo, listener, index);
+					}
+					
 				}
 			}, editingDomain, "Model Update");
 		}
@@ -188,14 +189,14 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
 	
 	private void saveRemovedObject(final ActivitiListener listener) {
 		if (pictogramElement != null) {
-		  final Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pictogramElement);
+		  final Object bo = BpmnBOUtil.getExecutionListenerBO(pictogramElement, diagram);
 		  if (bo == null) {
         return;
 		  }
 			TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
 			ActivitiUiUtil.runModelChange(new Runnable() {
 				public void run() {
-					BpmnBOUtil.removeExecutionListener(bo, listener);
+					BpmnBOUtil.removeListener(bo, listener);
 				}
 			}, editingDomain, "Model Update");
 		}
@@ -250,18 +251,5 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
         entryIterator.remove();
       }
     }
-	}
-	
-	private ActivitiListener listenerExists(List<ActivitiListener> listenerList, AbstractListenerDialog dialog) {
-		if(listenerList == null) return null;
-		for(ActivitiListener listener : listenerList) {
-			if(dialog.eventName.equalsIgnoreCase(listener.getEvent()) &&
-			        dialog.implementationType.equalsIgnoreCase(listener.getImplementationType()) &&
-			        dialog.implementation.equalsIgnoreCase(listener.getImplementation())) {
-			  
-				return listener;
-			}
-		}
-		return null;
 	}
 }

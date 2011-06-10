@@ -63,7 +63,17 @@ public class BpmnBOUtil {
     }
   }
   
-  public static void removeExecutionListener(Object bo, ActivitiListener listener) {
+  public static void setListener(Object bo, ActivitiListener listener, int index) {
+    if(bo instanceof Activity) {
+      ((Activity) bo).getActivitiListeners().set(index, listener);
+    } else if(bo instanceof SequenceFlow) {
+      ((SequenceFlow) bo).getExecutionListeners().set(index, listener);
+    } else if(bo instanceof org.eclipse.bpmn2.Process) {
+      ((org.eclipse.bpmn2.Process) bo).getExecutionListeners().set(index, listener);
+    }
+  }
+  
+  public static void removeListener(Object bo, ActivitiListener listener) {
     if(bo instanceof Activity) {
       ((Activity) bo).getActivitiListeners().remove(listener);
     } else if(bo instanceof SequenceFlow) {
