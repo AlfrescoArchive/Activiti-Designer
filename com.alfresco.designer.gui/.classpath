@@ -51,6 +51,7 @@
   <classpathentry kind="lib" path="/Users/trademakers/.m2/repository/p2/osgi/bundle/org.eclipse.equinox.p2.repository/2.0.2.R36x_v20110111-1500/org.eclipse.equinox.p2.repository-2.0.2.R36x_v20110111-1500.jar"/>
   <classpathentry kind="lib" path="/Users/trademakers/.m2/repository/p2/osgi/bundle/org.eclipse.equinox.preferences/3.3.0.v20100503/org.eclipse.equinox.preferences-3.3.0.v20100503.jar"/>
   <classpathentry kind="lib" path="/Users/trademakers/.m2/repository/p2/osgi/bundle/org.eclipse.equinox.registry/3.5.0.v20100503/org.eclipse.equinox.registry-3.5.0.v20100503.jar"/>
+  <classpathentry kind="lib" path="/Users/trademakers/.m2/repository/p2/osgi/bundle/org.eclipse.equinox.servletbridge.extensionbundle/1.2.0.v20100503/org.eclipse.equinox.servletbridge.extensionbundle-1.2.0.v20100503.jar"/>
   <classpathentry kind="lib" path="/Users/trademakers/.m2/repository/p2/osgi/bundle/org.eclipse.gef/3.6.2.v20110110-2020/org.eclipse.gef-3.6.2.v20110110-2020.jar"/>
   <classpathentry kind="lib" path="/Users/trademakers/.m2/repository/p2/osgi/bundle/org.eclipse.graphiti/0.7.1.v20110110-1225/org.eclipse.graphiti-0.7.1.v20110110-1225.jar"/>
   <classpathentry kind="lib" path="/Users/trademakers/.m2/repository/p2/osgi/bundle/org.eclipse.graphiti.mm/0.7.1.v20110110-1225/org.eclipse.graphiti.mm-0.7.1.v20110110-1225.jar"/>
