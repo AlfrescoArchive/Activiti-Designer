@@ -43,6 +43,7 @@ import org.activiti.designer.features.PasteFlowElementFeature;
 import org.activiti.designer.features.SaveBpmnModelFeature;
 import org.activiti.designer.features.SubProcessResizeFeature;
 import org.activiti.designer.features.UpdateFlowElementFeature;
+import org.eclipse.bpmn2.AlfrescoMailTask;
 import org.eclipse.bpmn2.AlfrescoScriptTask;
 import org.eclipse.bpmn2.AlfrescoStartEvent;
 import org.eclipse.bpmn2.AlfrescoUserTask;
@@ -92,9 +93,11 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
 
+import com.alfresco.designer.gui.features.AddAlfrescoMailTaskFeature;
 import com.alfresco.designer.gui.features.AddAlfrescoScriptTaskFeature;
 import com.alfresco.designer.gui.features.AddAlfrescoStartEventFeature;
 import com.alfresco.designer.gui.features.AddAlfrescoUserTaskFeature;
+import com.alfresco.designer.gui.features.CreateAlfrescoMailTaskFeature;
 import com.alfresco.designer.gui.features.CreateAlfrescoScriptTaskFeature;
 import com.alfresco.designer.gui.features.CreateAlfrescoStartEventFeature;
 import com.alfresco.designer.gui.features.CreateAlfrescoUserTaskFeature;
@@ -133,7 +136,11 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 		} else if (context.getNewObject() instanceof ServiceTask) {
 			return new AddServiceTaskFeature(this);
 		} else if (context.getNewObject() instanceof MailTask) {
-			return new AddMailTaskFeature(this);
+			if(context.getNewObject() instanceof AlfrescoMailTask) {
+				return new AddAlfrescoMailTaskFeature(this);
+			} else {
+				return new AddMailTaskFeature(this);
+			}
 		} else if (context.getNewObject() instanceof ManualTask) {
 			return new AddManualTaskFeature(this);
 		} else if (context.getNewObject() instanceof ReceiveTask) {
@@ -183,7 +190,8 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 		        new CreateBoundaryErrorFeature(this),
 		        new CreateEmbeddedSubProcessFeature(this), 
 		        new CreateCallActivityFeature(this),
-		        new CreateAlfrescoScriptTaskFeature(this)};
+		        new CreateAlfrescoScriptTaskFeature(this),
+		        new CreateAlfrescoMailTaskFeature(this)};
 	}
 
 	@Override

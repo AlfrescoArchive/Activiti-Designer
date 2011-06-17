@@ -22,8 +22,10 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.util.preferences.Preferences;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.bpmn2.ActivitiListener;
 import org.eclipse.bpmn2.Activity;
+import org.eclipse.bpmn2.AlfrescoMailTask;
 import org.eclipse.bpmn2.AlfrescoScriptTask;
 import org.eclipse.bpmn2.BoundaryEvent;
 import org.eclipse.bpmn2.Bpmn2Factory;
@@ -599,15 +601,15 @@ public class BpmnParser {
     return mailTask;
   }
   
-  private AlfrescoScriptTask parseAlfrescoScriptTask(XMLStreamReader xtr) {
-    AlfrescoScriptTask scriptTask = Bpmn2Factory.eINSTANCE.createAlfrescoScriptTask();
-    scriptTask.setName(xtr.getAttributeValue(null, "name"));
-    if(xtr.getAttributeValue(null, "default") != null) {
-      defaultFlowMap.put(scriptTask, xtr.getAttributeValue(null, "default"));
-    }
+  private Task parseAlfrescoScriptTask(XMLStreamReader xtr) {
+    String name = xtr.getAttributeValue(null, "name");
+    String defaultValue = xtr.getAttributeValue(null, "default");
     List<FieldModel> fieldList = new ArrayList<FieldModel>();
     boolean readyWithExtensions = false;
     ActivitiListener listener = null;
+    Task task = null;
+    MultiInstanceLoopCharacteristics multiInstanceDef = null;
+    List<ActivitiListener> listenerList = new ArrayList<ActivitiListener>();
     try {
       while(readyWithExtensions == false && xtr.hasNext()) {
         xtr.next();
@@ -617,27 +619,26 @@ public class BpmnParser {
           
         } else if(xtr.isStartElement() && "executionListener".equalsIgnoreCase(xtr.getLocalName())) {
           if(fieldList.size() > 0) {
-            fillAlfrescoScriptTaskElements(scriptTask, fieldList);
+          	task = fillAlfrescoScriptTaskElements(fieldList);
             fieldList = new ArrayList<FieldModel>();
           }
           listener = parseListener(xtr);
-          scriptTask.getActivitiListeners().add(listener);
+          listenerList.add(listener);
           
         } else if(xtr.isEndElement() && "executionListener".equalsIgnoreCase(xtr.getLocalName())) {
           if(fieldList.size() > 0) {
             fillListenerWithFields(listener, fieldList);
             fieldList = new ArrayList<FieldModel>();
           }
-          scriptTask.getActivitiListeners().add(listener);
+          listenerList.add(listener);
           
         } else if(xtr.isEndElement() && "extensionElements".equalsIgnoreCase(xtr.getLocalName())) {
           if(fieldList.size() > 0) {
-            fillAlfrescoScriptTaskElements(scriptTask, fieldList);
+            task = fillAlfrescoScriptTaskElements(fieldList);
           }
           
         } else if (xtr.isStartElement() && "multiInstanceLoopCharacteristics".equalsIgnoreCase(xtr.getLocalName())) {
-          MultiInstanceLoopCharacteristics multiInstanceDef = Bpmn2Factory.eINSTANCE.createMultiInstanceLoopCharacteristics();
-          scriptTask.setLoopCharacteristics(multiInstanceDef);
+          multiInstanceDef = Bpmn2Factory.eINSTANCE.createMultiInstanceLoopCharacteristics();
           parseMultiInstanceDef(multiInstanceDef, xtr);
         
         } else if(xtr.isEndElement() && "serviceTask".equalsIgnoreCase(xtr.getLocalName())) {
@@ -647,7 +648,26 @@ public class BpmnParser {
     } catch(Exception e) {
       e.printStackTrace();
     }
-    return scriptTask;
+    
+    if(task == null) {
+    	return null;
+    }
+    
+    task.setName(name);
+  
+    if(defaultValue != null) {
+    	defaultFlowMap.put(task, xtr.getAttributeValue(null, "default"));
+    }
+    
+    if(multiInstanceDef != null) {
+    	task.setLoopCharacteristics(multiInstanceDef);
+    }
+    
+    if(listenerList.size() > 0) {
+    	task.getActivitiListeners().addAll(listenerList);
+    }
+    
+    return task;
   }
   
   private static FieldModel parseFieldModel(XMLStreamReader xtr) {
@@ -657,17 +677,92 @@ public class BpmnParser {
     return field;
   }
   
-  private void fillAlfrescoScriptTaskElements(AlfrescoScriptTask scriptTask, List<FieldModel> fieldList) {
-    if(fieldList == null || fieldList.size() == 0) return;
+  private Task fillAlfrescoScriptTaskElements(List<FieldModel> fieldList) {
+    if(fieldList == null || fieldList.size() == 0) return null;
+    boolean isMailScript = false;
+    String mailScript = null;
     for (FieldModel field : fieldList) {
-      if("script".equalsIgnoreCase(field.name)) {
-        scriptTask.setScript(field.value);
-      } else if("runAs".equalsIgnoreCase(field.name)) {
-        scriptTask.setRunAs(field.value);
-      } else if("scriptProcessor".equalsIgnoreCase(field.name)) {
-        scriptTask.setScriptProcessor(field.value);
+      if("script".equalsIgnoreCase(field.name) && isMailScript(field.value)) {
+      		isMailScript = true;
+      		mailScript = field.value;
       }
     }
+    Task task = null;
+    
+    if(isMailScript == true) {
+    	AlfrescoMailTask mailTask = Bpmn2Factory.eINSTANCE.createAlfrescoMailTask();
+    	String value = getMailParamValue(mailScript, "mail.parameters.to");
+    	if(StringUtils.isNotEmpty(value)) {
+    		mailTask.setTo(value);
+    	}
+    	value = getMailParamValue(mailScript, "mail.parameters.to_many");
+    	if(StringUtils.isNotEmpty(value)) {
+    		mailTask.setToMany(value);
+    	}
+    	value = getMailParamValue(mailScript, "mail.parameters.subject");
+    	if(StringUtils.isNotEmpty(value)) {
+    		mailTask.setSubject(value);
+    	}
+    	value = getMailParamValue(mailScript, "mail.parameters.from");
+    	if(StringUtils.isNotEmpty(value)) {
+    		mailTask.setFrom(value);
+    	}
+    	value = getMailParamValue(mailScript, "mail.parameters.template");
+    	if(StringUtils.isNotEmpty(value)) {
+    		mailTask.setTemplate(value);
+    	}
+    	value = getMailParamValue(mailScript, "mail.parameters.template_model");
+    	if(StringUtils.isNotEmpty(value)) {
+    		mailTask.setTemplateModel(value);
+    	}
+    	value = getMailParamValue(mailScript, "mail.parameters.text");
+    	if(StringUtils.isNotEmpty(value)) {
+    		mailTask.setText(value);
+    	}
+    	value = getMailParamValue(mailScript, "mail.parameters.html");
+    	if(StringUtils.isNotEmpty(value)) {
+    		mailTask.setHtml(value);
+    	}
+    	task = mailTask;
+    	
+    } else {
+    
+	    AlfrescoScriptTask scriptTask = Bpmn2Factory.eINSTANCE.createAlfrescoScriptTask();
+	    for (FieldModel field : fieldList) {
+	    	if("script".equalsIgnoreCase(field.name)) {
+	        scriptTask.setScript(field.value);
+	      } else if("runAs".equalsIgnoreCase(field.name)) {
+	        scriptTask.setRunAs(field.value);
+	      } else if("scriptProcessor".equalsIgnoreCase(field.name)) {
+	        scriptTask.setScriptProcessor(field.value);
+	      }
+	    }
+	    task = scriptTask;
+    }
+    return task;
+  }
+  
+  private String getMailParamValue(String mailScript, String searchString) {
+  	int index = mailScript.indexOf(searchString);
+  	if(index > -1) {
+	  	int startIndex = mailScript.indexOf("=", index);
+	  	int endIndex = mailScript.indexOf(";", index);
+	  	return mailScript.substring(startIndex + 1, endIndex).trim();
+  	} else {
+  		return null;
+  	}
+  }
+  
+  private boolean isMailScript(String script) {
+  	boolean isMailScript = false;
+  	if(script != null) {
+  		if(script.contains("var mail = actions.create(\"mail\");") &&
+  				script.contains("mail.execute(bpm_package);")) {
+  			
+  			isMailScript = true;
+  		}
+  	}
+  	return isMailScript;
   }
   
   private void fillListenerWithFields(ActivitiListener listener, List<FieldModel> fieldList) {

@@ -205,6 +205,12 @@
                id="org.activiti.designer.mainConfigTab.alfrescoScripttask"
                tab="org.activiti.designer.mainConfigTab">
          </propertySection>
+         <propertySection
+               class="com.alfresco.designer.gui.property.PropertyAlfrescoMailTaskSection"
+               filter="com.alfresco.designer.gui.property.PropertyAlfrescoMailTaskFilter"
+               id="org.activiti.designer.mainConfigTab.alfrescoMailtask"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
       </propertySections>
    </extension>
    <extension

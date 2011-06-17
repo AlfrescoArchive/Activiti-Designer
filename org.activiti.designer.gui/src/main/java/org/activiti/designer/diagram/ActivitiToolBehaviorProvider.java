@@ -87,6 +87,7 @@ import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.PlatformUI;
 
+import com.alfresco.designer.gui.features.CreateAlfrescoMailTaskFeature;
 import com.alfresco.designer.gui.features.CreateAlfrescoScriptTaskFeature;
 import com.alfresco.designer.gui.features.CreateAlfrescoStartEventFeature;
 import com.alfresco.designer.gui.features.CreateAlfrescoUserTaskFeature;
@@ -117,6 +118,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     toolMapping.put(CreateBoundaryErrorFeature.class, PaletteEntry.ERROR_END_EVENT);
     toolMapping.put(CreateBusinessRuleTaskFeature.class, PaletteEntry.BUSINESSRULE_TASK);
     toolMapping.put(CreateAlfrescoScriptTaskFeature.class, PaletteEntry.ALFRESCO_SCRIPT_TASK);
+    toolMapping.put(CreateAlfrescoMailTaskFeature.class, PaletteEntry.ALFRESCO_MAIL_TASK);
   }
 
   @Override
@@ -280,6 +282,8 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
         } else if ("alfrescostartevent".equalsIgnoreCase(toolEntry.getLabel())) {
           alfrescoCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("alfrescoscripttask".equalsIgnoreCase(toolEntry.getLabel())) {
+          alfrescoCompartmentEntry.getToolEntries().add(toolEntry);
+        } else if ("alfrescomailtask".equalsIgnoreCase(toolEntry.getLabel())) {
           alfrescoCompartmentEntry.getToolEntries().add(toolEntry);
         }
       }

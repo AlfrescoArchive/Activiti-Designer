@@ -849,6 +849,11 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute BPMN20.ecore#//AlfrescoScriptBase/runAs"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute BPMN20.ecore#//AlfrescoScriptBase/scriptProcessor"/>
     </genClasses>
+    <genClasses ecoreClass="BPMN20.ecore#//AlfrescoMailTask">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute BPMN20.ecore#//AlfrescoMailTask/toMany"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute BPMN20.ecore#//AlfrescoMailTask/template"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute BPMN20.ecore#//AlfrescoMailTask/templateModel"/>
+    </genClasses>
   </genPackages>
   <genPackages prefix="BpmnDi" basePackage="org.eclipse.bpmn2" resource="XML" multipleEditorPages="false"
       generateModelWizard="false" ecorePackage="BPMNDI.ecore#/">
