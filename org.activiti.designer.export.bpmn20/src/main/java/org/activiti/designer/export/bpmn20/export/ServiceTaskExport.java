@@ -50,6 +50,9 @@ public class ServiceTaskExport implements ActivitiNamespaceConstants {
         if (ExtensionConstants.PROPERTY_ID_CUSTOM_SERVICE_TASK.equals(customProperty.getName())) {
           continue;
         }
+        if (customProperty.getSimpleValue() == null || customProperty.getSimpleValue().length() == 0) {
+        	continue;
+        }
         if (firstCustomProperty == true) {
           xtw.writeStartElement("extensionElements");
           firstCustomProperty = false;
