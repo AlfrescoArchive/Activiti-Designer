@@ -1,23 +1,29 @@
 package org.activiti.designer.features;
 
+import org.activiti.designer.ActivitiImageProvider;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.style.StyleUtil;
 import org.eclipse.bpmn2.EndEvent;
 import org.eclipse.bpmn2.Event;
+import org.eclipse.bpmn2.StartEvent;
 import org.eclipse.bpmn2.SubProcess;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.impl.AbstractAddShapeFeature;
 import org.eclipse.graphiti.mm.algorithms.Ellipse;
+import org.eclipse.graphiti.mm.algorithms.Image;
 import org.eclipse.graphiti.mm.pictograms.BoxRelativeAnchor;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
+import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
 
 public class AddEventFeature extends AbstractAddShapeFeature {
+	
+	private static final int IMAGE_SIZE = 30;
 
 	public AddEventFeature(IFeatureProvider fp) {
 		super(fp);
@@ -83,6 +89,19 @@ public class AddEventFeature extends AbstractAddShapeFeature {
 			final Ellipse ellipse = ActivitiUiUtil.createInvisibleEllipse(boxAnchor, gaService);
 			gaService.setLocationAndSize(ellipse, 0, 0, 0, 0);
 		}
+		
+		if (addedEvent instanceof StartEvent && ((StartEvent) addedEvent).getEventDefinitions().size() > 0) {
+			
+			final Shape shape = peCreateService.createShape(containerShape, false);
+      final Image image = gaService.createImage(shape, ActivitiImageProvider.IMG_BOUNDARY_TIMER);
+      image.setStretchH(true);
+      image.setStretchV(true);
+      image.setWidth(IMAGE_SIZE);
+      image.setHeight(IMAGE_SIZE);
+      
+      gaService.setLocationAndSize(image, (width - IMAGE_SIZE) / 2, (height - IMAGE_SIZE) / 2, IMAGE_SIZE, IMAGE_SIZE);
+		}
+		
 		layoutPictogramElement(containerShape);
 
 		return containerShape;

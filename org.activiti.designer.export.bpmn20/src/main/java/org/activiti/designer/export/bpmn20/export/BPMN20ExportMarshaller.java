@@ -24,6 +24,7 @@ import org.eclipse.bpmn2.EndEvent;
 import org.eclipse.bpmn2.ErrorEventDefinition;
 import org.eclipse.bpmn2.ExclusiveGateway;
 import org.eclipse.bpmn2.FlowElement;
+import org.eclipse.bpmn2.FormalExpression;
 import org.eclipse.bpmn2.MailTask;
 import org.eclipse.bpmn2.ManualTask;
 import org.eclipse.bpmn2.ParallelGateway;
@@ -34,6 +35,7 @@ import org.eclipse.bpmn2.SequenceFlow;
 import org.eclipse.bpmn2.ServiceTask;
 import org.eclipse.bpmn2.StartEvent;
 import org.eclipse.bpmn2.SubProcess;
+import org.eclipse.bpmn2.TimerEventDefinition;
 import org.eclipse.bpmn2.UserTask;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
@@ -206,6 +208,51 @@ public class BPMN20ExportMarshaller extends AbstractExportMarshaller implements 
 
       if(startEvent.getFormKey() != null && startEvent.getFormKey().length() > 0) {
         xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "formKey", startEvent.getFormKey());
+      }
+      
+      if(startEvent.getInitiator() != null && startEvent.getInitiator().length() > 0) {
+        xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "initiator", startEvent.getInitiator());
+      }
+      
+      if(startEvent.getEventDefinitions().size() > 0) {
+      	
+      	TimerEventDefinition timerDef = (TimerEventDefinition) startEvent.getEventDefinitions().get(0);
+      	
+      	if(timerDef.getTimeDuration() != null && 
+            ((((FormalExpression) timerDef.getTimeDuration()).getBody() != null && 
+                    ((FormalExpression) timerDef.getTimeDuration()).getBody().length() > 0) ||
+                    
+                    (((FormalExpression) timerDef.getTimeDate()).getBody() != null && 
+                            ((FormalExpression) timerDef.getTimeDate()).getBody().length() > 0) ||
+                            
+                            (((FormalExpression) timerDef.getTimeCycle()).getBody() != null && 
+                                    ((FormalExpression) timerDef.getTimeCycle()).getBody().length() > 0))) {
+      	
+	      	xtw.writeStartElement("timerEventDefinition");
+	        
+	        if(((FormalExpression) timerDef.getTimeDuration()).getBody() != null && 
+	                      ((FormalExpression) timerDef.getTimeDuration()).getBody().length() > 0) {
+	          
+	          xtw.writeStartElement("timeDuration");
+	          xtw.writeCharacters(((FormalExpression) timerDef.getTimeDuration()).getBody());
+	          xtw.writeEndElement();
+	        
+	        } else if(((FormalExpression) timerDef.getTimeDate()).getBody() != null && 
+	                      ((FormalExpression) timerDef.getTimeDate()).getBody().length() > 0) {
+	          
+	          xtw.writeStartElement("timeDate");
+	          xtw.writeCharacters(((FormalExpression) timerDef.getTimeDate()).getBody());
+	          xtw.writeEndElement();
+	        
+	        } else {
+	          
+	          xtw.writeStartElement("timeCycle");
+	          xtw.writeCharacters(((FormalExpression) timerDef.getTimeCycle()).getBody());
+	          xtw.writeEndElement();
+	        }
+	        
+	        xtw.writeEndElement();
+      	}
       }
       
       if(startEvent.getFormProperties().size() > 0) {

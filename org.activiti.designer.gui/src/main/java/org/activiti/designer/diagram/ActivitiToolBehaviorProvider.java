@@ -29,6 +29,7 @@ import org.activiti.designer.features.CreateParallelGatewayFeature;
 import org.activiti.designer.features.CreateScriptTaskFeature;
 import org.activiti.designer.features.CreateServiceTaskFeature;
 import org.activiti.designer.features.CreateStartEventFeature;
+import org.activiti.designer.features.CreateTimerStartEventFeature;
 import org.activiti.designer.features.CreateUserTaskFeature;
 import org.activiti.designer.features.DeleteSequenceFlowFeature;
 import org.activiti.designer.features.ExpandCollapseSubProcessFeature;
@@ -101,6 +102,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
 
     // Setup tool mappings to palette entries
     toolMapping.put(CreateStartEventFeature.class, PaletteEntry.START_EVENT);
+    toolMapping.put(CreateTimerStartEventFeature.class, PaletteEntry.TIMER_START_EVENT);
     toolMapping.put(CreateAlfrescoStartEventFeature.class, PaletteEntry.ALFRESCO_START_EVENT);
     toolMapping.put(CreateEndEventFeature.class, PaletteEntry.END_EVENT);
     toolMapping.put(CreateErrorEndEventFeature.class, PaletteEntry.ERROR_END_EVENT);
@@ -246,6 +248,8 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
         if ("sequenceflow".equalsIgnoreCase(toolEntry.getLabel())) {
           connectionCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("startevent".equalsIgnoreCase(toolEntry.getLabel())) {
+          eventCompartmentEntry.getToolEntries().add(toolEntry);
+        } else if ("timerstartevent".equalsIgnoreCase(toolEntry.getLabel())) {
           eventCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("endevent".equalsIgnoreCase(toolEntry.getLabel())) {
           eventCompartmentEntry.getToolEntries().add(toolEntry);

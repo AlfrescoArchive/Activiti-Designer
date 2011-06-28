@@ -273,7 +273,10 @@ public class BpmnParser {
     }
     if(startEvent == null) {
       startEvent = Bpmn2Factory.eINSTANCE.createStartEvent();
-    } 
+    }
+    if(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "initiator") != null) {
+      startEvent.setInitiator(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "initiator"));
+    }
     startEvent.setName("Start");
     if(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "formKey") != null) {
       startEvent.setFormKey(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "formKey"));
@@ -287,12 +290,39 @@ public class BpmnParser {
           startEvent.getFormProperties().add(property);
           parseFormProperty(property, xtr);
         
+        } else if(xtr.isStartElement() && "timeDuration".equalsIgnoreCase(xtr.getLocalName())) {
+        	addTimerEvent(startEvent, xtr.getLocalName(), xtr.getElementText());
+        
+        } else if(xtr.isStartElement() && "timeDate".equalsIgnoreCase(xtr.getLocalName())) {
+        	addTimerEvent(startEvent, xtr.getLocalName(), xtr.getElementText());
+          
+        } else if(xtr.isStartElement() && "timeCycle".equalsIgnoreCase(xtr.getLocalName())) {
+        	addTimerEvent(startEvent, xtr.getLocalName(), xtr.getElementText());
+        
         } else if (xtr.isEndElement() && "startEvent".equalsIgnoreCase(xtr.getLocalName())) {
           readyWithStartEvent = true;
         }
       }
     } catch(Exception e) {}
     return startEvent;
+  }
+  
+  private void addTimerEvent(StartEvent startEvent, String type, String value) {
+  	TimerEventDefinition eventDef = Bpmn2Factory.eINSTANCE.createTimerEventDefinition();
+    FormalExpression expression = Bpmn2Factory.eINSTANCE.createFormalExpression();
+    expression.setBody(value);
+    if("timeDuration".equalsIgnoreCase(type)) {
+    	eventDef.setTimeDuration(expression);
+    } else if("timeDate".equalsIgnoreCase(type)) {
+    	eventDef.setTimeDate(expression);
+    } else {
+    	eventDef.setTimeCycle(expression);
+    }
+    if(startEvent.getEventDefinitions().size() == 0) {
+    	startEvent.getEventDefinitions().add(eventDef);
+    } else {
+    	startEvent.getEventDefinitions().set(0, eventDef);
+    }
   }
   
   private void parseFormProperty(FormProperty property, XMLStreamReader xtr) {

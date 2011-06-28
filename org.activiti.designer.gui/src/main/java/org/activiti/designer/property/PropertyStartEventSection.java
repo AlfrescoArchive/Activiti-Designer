@@ -14,6 +14,7 @@ import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
@@ -21,6 +22,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
 public class PropertyStartEventSection extends ActivitiPropertySection implements ITabbedPropertyConstants {
 	
+	private Text initiatorText;
 	private Text formKeyText;
 	
 	@Override
@@ -29,27 +31,18 @@ public class PropertyStartEventSection extends ActivitiPropertySection implement
 
 		TabbedPropertySheetWidgetFactory factory = getWidgetFactory();
 		Composite composite = factory.createFlatFormComposite(parent);
-		FormData data;
+		
+		initiatorText = createText(composite, factory, null);
+		createLabel(composite, "Initiator", initiatorText, factory); //$NON-NLS-1$
 
-		formKeyText = factory.createText(composite, ""); //$NON-NLS-1$
-    data = new FormData();
-    data.left = new FormAttachment(0, 120);
-    data.right = new FormAttachment(100, 0);
-    data.top = new FormAttachment(0, VSPACE);
-    formKeyText.setLayoutData(data);
-    formKeyText.addFocusListener(listener);
-
-    CLabel formKeyLabel = factory.createCLabel(composite, "Form key:"); //$NON-NLS-1$
-    data = new FormData();
-    data.left = new FormAttachment(0, 0);
-    data.right = new FormAttachment(formKeyText, -HSPACE);
-    data.top = new FormAttachment(formKeyText, 0, SWT.TOP);
-    formKeyLabel.setLayoutData(data);
-
+		formKeyText = createText(composite, factory, initiatorText);
+		createLabel(composite, "Form key:", formKeyText, factory); //$NON-NLS-1$
 	}
 
 	@Override
 	public void refresh() {
+		initiatorText.removeFocusListener(listener);
+		formKeyText.removeFocusListener(listener);
 		PictogramElement pe = getSelectedPictogramElement();
 		if (pe != null) {
 			Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
@@ -58,16 +51,23 @@ public class PropertyStartEventSection extends ActivitiPropertySection implement
 				return;
 
 			StartEvent startEvent = ((StartEvent) bo);
+			
+			if(startEvent.getInitiator() != null) {
+				initiatorText.setText(startEvent.getInitiator());
+			} else {
+				initiatorText.setText("");
+			}
+			
 			if(startEvent.getFormKey() != null) {
 				
-				formKeyText.removeFocusListener(listener);
 				String condition = startEvent.getFormKey();
 				formKeyText.setText(condition);
-				formKeyText.addFocusListener(listener);
 			} else {
 			  formKeyText.setText("");
 			}
 		}
+		initiatorText.addFocusListener(listener);
+		formKeyText.addFocusListener(listener);
 	}
 
 	private FocusListener listener = new FocusListener() {
@@ -92,6 +92,15 @@ public class PropertyStartEventSection extends ActivitiPropertySection implement
 								return;
 							}
 							StartEvent startEvent = (StartEvent) bo;
+							
+							String initator = initiatorText.getText();
+							if (initator != null && initator.length() > 0) {
+							  startEvent.setInitiator(initator);
+								
+							} else {
+								startEvent.setInitiator("");
+							}
+							
 							String formKey = formKeyText.getText();
 							if (formKey != null && formKey.length() > 0) {
 							  startEvent.setFormKey(formKey);
@@ -106,5 +115,30 @@ public class PropertyStartEventSection extends ActivitiPropertySection implement
 			}
 		}
 	};
+	
+	private Text createText(Composite parent, TabbedPropertySheetWidgetFactory factory, Control top) {
+    Text text = factory.createText(parent, ""); //$NON-NLS-1$
+    FormData data = new FormData();
+    data.left = new FormAttachment(0, 160);
+    data.right = new FormAttachment(100, -HSPACE);
+    if(top == null) {
+      data.top = new FormAttachment(0, VSPACE);
+    } else {
+      data.top = new FormAttachment(top, VSPACE);
+    }
+    text.setLayoutData(data);
+    text.addFocusListener(listener);
+    return text;
+  }
+  
+  private CLabel createLabel(Composite parent, String text, Control control, TabbedPropertySheetWidgetFactory factory) {
+    CLabel label = factory.createCLabel(parent, text); //$NON-NLS-1$
+    FormData data = new FormData();
+    data.left = new FormAttachment(0, 0);
+    data.right = new FormAttachment(control, -HSPACE);
+    data.top = new FormAttachment(control, 0, SWT.TOP);
+    label.setLayoutData(data);
+    return label;
+  }
 
 }

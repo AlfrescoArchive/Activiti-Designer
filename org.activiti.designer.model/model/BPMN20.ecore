@@ -4251,6 +4251,7 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="formKey" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="formProperties" upperBound="-1"
         eType="#//FormProperty" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="initiator" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="SubChoreography" eSuperTypes="#//ChoreographyActivity #//FlowElementsContainer">
     <eAnnotations source="http:///org/eclipse/emf/ecore/util/ExtendedMetaData">

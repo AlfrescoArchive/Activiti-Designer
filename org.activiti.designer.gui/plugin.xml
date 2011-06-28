@@ -145,6 +145,12 @@
                tab="org.activiti.designer.mainConfigTab">
          </propertySection>
          <propertySection
+               class="org.activiti.designer.property.PropertyTimerStartEventSection"
+               filter="org.activiti.designer.property.PropertyTimerStartEventFilter"
+               id="org.activiti.designer.mainConfigTab.startevent"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <propertySection
                class="org.activiti.designer.property.PropertyBoundaryTimerSection"
                filter="org.activiti.designer.property.PropertyBoundaryTimerFilter"
                id="org.activiti.designer.mainConfigTab.timerboundaryevent"

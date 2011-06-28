@@ -16,6 +16,7 @@ import org.activiti.designer.features.AddScriptTaskFeature;
 import org.activiti.designer.features.AddSequenceFlowFeature;
 import org.activiti.designer.features.AddServiceTaskFeature;
 import org.activiti.designer.features.AddStartEventFeature;
+import org.activiti.designer.features.AddTimerStartEventFeature;
 import org.activiti.designer.features.AddUserTaskFeature;
 import org.activiti.designer.features.CopyFlowElementFeature;
 import org.activiti.designer.features.CreateBoundaryErrorFeature;
@@ -34,6 +35,7 @@ import org.activiti.designer.features.CreateScriptTaskFeature;
 import org.activiti.designer.features.CreateSequenceFlowFeature;
 import org.activiti.designer.features.CreateServiceTaskFeature;
 import org.activiti.designer.features.CreateStartEventFeature;
+import org.activiti.designer.features.CreateTimerStartEventFeature;
 import org.activiti.designer.features.CreateUserTaskFeature;
 import org.activiti.designer.features.DeleteFlowElementFeature;
 import org.activiti.designer.features.DeleteSequenceFlowFeature;
@@ -115,7 +117,11 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 		  if(context.getNewObject() instanceof AlfrescoStartEvent) {
 		    return new AddAlfrescoStartEventFeature(this);
 		  } else {
-		    return new AddStartEventFeature(this);
+		  	if(((StartEvent) context.getNewObject()).getEventDefinitions().size() > 0) {
+		  		return new AddTimerStartEventFeature(this);
+		  	} else {
+		  		return new AddStartEventFeature(this);
+		  	}
 		  }
 		} else if (context.getNewObject() instanceof EndEvent) {
 		  if(((EndEvent) context.getNewObject()).getEventDefinitions().size() > 0) {
@@ -172,7 +178,8 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 
 	@Override
 	public ICreateFeature[] getCreateFeatures() {
-		return new ICreateFeature[] { new CreateStartEventFeature(this), 
+		return new ICreateFeature[] { new CreateStartEventFeature(this),
+						new CreateTimerStartEventFeature(this),
 		        new CreateAlfrescoStartEventFeature(this),
 		        new CreateEndEventFeature(this),
 		        new CreateErrorEndEventFeature(this),
