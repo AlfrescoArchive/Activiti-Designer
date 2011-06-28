@@ -243,13 +243,22 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
       if(sequenceFlow.getSourceRef() instanceof Gateway && getAmountOfOutgoingConnections(
               sequenceFlow.getSourceRef().getId()) > 1) {
         
-        int y = 0;
-        if(sourceConnection.getY() > targetConnection.getY()) {
-          y = sourceConnection.getY();
-        } else {
-          y = sourceConnection.getY() + sourceConnection.getHeight();
-        }
-        lastWayPoint = createWayPoint(sourceConnection.getX() + (sourceConnection.getWidth() / 2) + subProcessX, y + subProcessY, xtw);
+      	if((bendPointList == null || bendPointList.size() == 0) && 
+      			(sourceConnection.getY() - 15) < targetConnection.getY() &&
+      					(sourceConnection.getY() + 15) > targetConnection.getY()) {
+      		
+      		lastWayPoint = createWayPoint(sourceConnection.getX() + sourceConnection.getWidth() + subProcessX, 
+      			sourceConnection.getY() + (sourceConnection.getHeight() / 2) + subProcessY, xtw);
+      		
+      	} else {
+	        int y = 0;
+	        if(sourceConnection.getY() > targetConnection.getY()) {
+	          y = sourceConnection.getY();
+	        } else {
+	          y = sourceConnection.getY() + sourceConnection.getHeight();
+	        }
+	        lastWayPoint = createWayPoint(sourceConnection.getX() + (sourceConnection.getWidth() / 2) + subProcessX, y + subProcessY, xtw);
+      	}
       
       } else if (sequenceFlow.getSourceRef() instanceof BoundaryEvent) {
         
@@ -257,8 +266,15 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
                 sourceConnection.getY() + sourceConnection.getHeight() + subProcessY, xtw);
         
       } else {
-        lastWayPoint = createWayPoint(sourceConnection.getX() + sourceConnection.getWidth() + subProcessX,
-                sourceConnection.getY() + (sourceConnection.getHeight() / 2) + subProcessY, xtw);
+      	
+      	if(sourceConnection.getX() > targetConnection.getX()) {
+      		lastWayPoint = createWayPoint(sourceConnection.getX() + subProcessX,
+              sourceConnection.getY() + (sourceConnection.getHeight() / 2) + subProcessY, xtw);
+      		
+      	} else {
+	        lastWayPoint = createWayPoint(sourceConnection.getX() + sourceConnection.getWidth() + subProcessX,
+	                sourceConnection.getY() + (sourceConnection.getHeight() / 2) + subProcessY, xtw);
+      	}
       }
       
       if(bendPointList != null && bendPointList.size() > 0) {
@@ -280,6 +296,7 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
         
       } else {
         if(lastWayPoint != null) {
+        	
           if(lastWayPoint.getX() == targetMiddleX) {
             
             if(lastWayPoint.getY() > targetMiddleY) {
@@ -290,7 +307,7 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
             	if(sequenceFlow.getTargetRef() instanceof Event) {
               	targetHeight = 0;
               }
-              createWayPoint(targetMiddleX, targetY - targetHeight, xtw);
+              createWayPoint(targetMiddleX, targetY, xtw);
             }
             
           } else if(lastWayPoint.getY() == targetMiddleY) {
