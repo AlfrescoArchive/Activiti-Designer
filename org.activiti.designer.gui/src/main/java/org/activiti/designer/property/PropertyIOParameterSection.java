@@ -65,7 +65,7 @@ public class PropertyIOParameterSection extends ActivitiPropertySection implemen
     outParameterEditor = new IOParameterEditor("outputParameterEditor", outParametersComposite);
     outParameterEditor.getLabelControl(outParametersComposite).setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
     
-    CLabel outParametersLabel = factory.createCLabel(composite, "Outpput parameters:"); //$NON-NLS-1$
+    CLabel outParametersLabel = factory.createCLabel(composite, "Output parameters:"); //$NON-NLS-1$
     data = new FormData();
     data.left = new FormAttachment(0, 0);
     data.right = new FormAttachment(outParametersComposite, -HSPACE);

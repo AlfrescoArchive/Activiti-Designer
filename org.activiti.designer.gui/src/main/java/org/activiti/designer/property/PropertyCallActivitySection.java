@@ -33,7 +33,7 @@ public class PropertyCallActivitySection extends ActivitiPropertySection impleme
 
 		callElementText = factory.createText(composite, ""); //$NON-NLS-1$
 		data = new FormData();
-		data.left = new FormAttachment(0, 120);
+		data.left = new FormAttachment(0, 150);
 		data.right = new FormAttachment(100, 0);
 		data.top = new FormAttachment(0, VSPACE);
 		callElementText.setLayoutData(data);
