@@ -17,6 +17,7 @@ package org.activiti.designer.property;
 
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.bpmn2.Bpmn2Factory;
 import org.eclipse.bpmn2.Documentation;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
@@ -28,6 +29,7 @@ import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
@@ -37,6 +39,7 @@ public class PropertyDiagramSection extends ActivitiPropertySection implements I
 
 	private Text idText;
 	private Text nameText;
+	private Text namespaceText;
 	private Text documentationText;
 
 	@Override
@@ -47,56 +50,31 @@ public class PropertyDiagramSection extends ActivitiPropertySection implements I
 		Composite composite = factory.createFlatFormComposite(parent);
 		FormData data;
 
-		idText = factory.createText(composite, ""); //$NON-NLS-1$
-    data = new FormData();
-    data.left = new FormAttachment(0, 120);
-    data.right = new FormAttachment(100, -HSPACE);
-    data.top = new FormAttachment(0, VSPACE);
-    idText.setLayoutData(data);
-    idText.addFocusListener(listener);
-
-		CLabel idLabel = factory.createCLabel(composite, "Id:"); //$NON-NLS-1$
-		data = new FormData();
-		data.left = new FormAttachment(0, 0);
-		data.right = new FormAttachment(idText, -HSPACE);
-		data.top = new FormAttachment(idText, 0, SWT.CENTER);
-		idLabel.setLayoutData(data);
-
-		nameText = factory.createText(composite, ""); //$NON-NLS-1$
-		data = new FormData();
-		data.left = new FormAttachment(0, 120);
-		data.right = new FormAttachment(100, 0);
-		data.top = new FormAttachment(idText, VSPACE);
-		nameText.setLayoutData(data);
-		nameText.addFocusListener(listener);
-
-		CLabel valueLabel = factory.createCLabel(composite, "Name:"); //$NON-NLS-1$
-		data = new FormData();
-		data.left = new FormAttachment(0, 0);
-		data.right = new FormAttachment(nameText, -HSPACE);
-		data.top = new FormAttachment(nameText, 0, SWT.CENTER);
-		valueLabel.setLayoutData(data);
+		idText = createText(composite, factory, null);
+		createLabel(composite, "Id:", idText, factory); //$NON-NLS-1$
+		
+		nameText = createText(composite, factory, idText);
+		createLabel(composite, "Name:", nameText, factory); //$NON-NLS-1$
+		
+		namespaceText = createText(composite, factory, nameText);
+		createLabel(composite, "Namespace:", namespaceText, factory); //$NON-NLS-1$
 		
 		documentationText = factory.createText(composite, "", SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL); //$NON-NLS-1$
 		data = new FormData(SWT.DEFAULT, 100);
-		data.left = new FormAttachment(0, 120);
+		data.left = new FormAttachment(0, 160);
 		data.right = new FormAttachment(100, 0);
-		data.top = new FormAttachment(nameText, VSPACE);
+		data.top = new FormAttachment(namespaceText, VSPACE);
 		documentationText.setLayoutData(data);
 		documentationText.addFocusListener(listener);
 
-		CLabel documentationLabel = factory.createCLabel(composite, "Documentation:"); //$NON-NLS-1$
-		data = new FormData();
-		data.left = new FormAttachment(0, 0);
-		data.right = new FormAttachment(documentationText, -HSPACE);
-		data.top = new FormAttachment(documentationText, 0, SWT.CENTER);
-		documentationLabel.setLayoutData(data);
+		createLabel(composite, "Documentation:", documentationText, factory); //$NON-NLS-1$
 	}
 
 	@Override
 	public void refresh() {
 	  idText.removeFocusListener(listener);
 		nameText.removeFocusListener(listener);
+		namespaceText.removeFocusListener(listener);
 		org.eclipse.bpmn2.Process process = ActivitiUiUtil.getProcessObject(getDiagram());
 		if(process == null) {
 			DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
@@ -106,6 +84,7 @@ public class PropertyDiagramSection extends ActivitiPropertySection implements I
 					org.eclipse.bpmn2.Process process = Bpmn2Factory.eINSTANCE.createProcess();
 					process.setId("helloworld");
 					process.setName("helloworld");
+					process.setNamespace("http://www.activiti.org/test");
 					Documentation documentation = Bpmn2Factory.eINSTANCE.createDocumentation();
 					documentation.setId("documentation_process");
 					documentation.setText("");
@@ -114,16 +93,23 @@ public class PropertyDiagramSection extends ActivitiPropertySection implements I
 					getDiagram().eResource().getContents().add(process);
 					idText.setText(process.getId());
 					nameText.setText(process.getName());
+					namespaceText.setText(process.getNamespace());
 					documentationText.setText(documentation.getText());
 				}
 			}, editingDomain, "Model Update");
 		} else {
 			idText.setText(process.getId());
-			idText.addFocusListener(listener);
 			nameText.setText(process.getName());
-			nameText.addFocusListener(listener);
+			if(StringUtils.isNotEmpty(process.getNamespace())) {
+				namespaceText.setText(process.getNamespace());
+			} else {
+				namespaceText.setText("http://www.activiti.org/test");
+			}
 			documentationText.setText(process.getDocumentation().get(0).getText());
 		}
+		idText.addFocusListener(listener);
+		nameText.addFocusListener(listener);
+		namespaceText.addFocusListener(listener);
 	}
 
 	private FocusListener listener = new FocusListener() {
@@ -144,19 +130,58 @@ public class PropertyDiagramSection extends ActivitiPropertySection implements I
 					String id = idText.getText();
 					if (id != null) {
 					  process.setId(id);
+					} else {
+						process.setId("");
 					}
 					
 					String name = nameText.getText();
 					if (name != null) {
 						process.setName(name);
+					} else {
+						process.setName("");
 					}
+					
+					String namespace = namespaceText.getText();
+					if (namespace != null) {
+						process.setNamespace(namespace);
+					} else {
+						process.setNamespace("");
+					}
+					
 					String documentation = documentationText.getText();
 					if (documentation != null) {
 						process.getDocumentation().get(0).setText(documentation);
+					} else {
+						process.getDocumentation().get(0).setText("");
 					}
 				}
 			}, editingDomain, "Model Update");
 		}
 	};
+	
+	private Text createText(Composite parent, TabbedPropertySheetWidgetFactory factory, Control top) {
+    Text text = factory.createText(parent, ""); //$NON-NLS-1$
+    FormData data = new FormData();
+    data.left = new FormAttachment(0, 160);
+    data.right = new FormAttachment(100, -HSPACE);
+    if(top == null) {
+      data.top = new FormAttachment(0, VSPACE);
+    } else {
+      data.top = new FormAttachment(top, VSPACE);
+    }
+    text.setLayoutData(data);
+    text.addFocusListener(listener);
+    return text;
+  }
+  
+  private CLabel createLabel(Composite parent, String text, Control control, TabbedPropertySheetWidgetFactory factory) {
+    CLabel label = factory.createCLabel(parent, text); //$NON-NLS-1$
+    FormData data = new FormData();
+    data.left = new FormAttachment(0, 0);
+    data.right = new FormAttachment(control, -HSPACE);
+    data.top = new FormAttachment(control, 0, SWT.TOP);
+    label.setLayoutData(data);
+    return label;
+  }
 
 }

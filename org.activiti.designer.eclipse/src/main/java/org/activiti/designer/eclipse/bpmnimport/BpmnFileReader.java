@@ -29,6 +29,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.activiti.designer.eclipse.bpmn.BpmnParser;
 import org.activiti.designer.eclipse.bpmn.GraphicInfo;
 import org.activiti.designer.eclipse.bpmn.SequenceFlowModel;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.bpmn2.Activity;
 import org.eclipse.bpmn2.BoundaryEvent;
 import org.eclipse.bpmn2.Bpmn2Factory;
@@ -137,7 +138,14 @@ public class BpmnFileReader {
       
       org.eclipse.bpmn2.Process process = Bpmn2Factory.eINSTANCE.createProcess();
       process.setId(processName);
-      process.setName(processName);
+      if(bpmnParser.process != null && StringUtils.isNotEmpty(bpmnParser.process.getName())) {
+      	process.setName(bpmnParser.process.getName());
+      } else {
+      	process.setName(processName);
+      }
+      if(bpmnParser.process != null && StringUtils.isNotEmpty(bpmnParser.process.getNamespace())) {
+      	process.setNamespace(bpmnParser.process.getNamespace());
+      }
       Documentation documentation = Bpmn2Factory.eINSTANCE.createDocumentation();
       documentation.setId("documentation_process");
       documentation.setText("");

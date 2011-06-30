@@ -16,6 +16,7 @@ import org.activiti.designer.eclipse.extension.export.AbstractExportMarshaller;
 import org.activiti.designer.eclipse.extension.export.ExportMarshaller;
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.util.preferences.Preferences;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.bpmn2.AlfrescoScriptTask;
 import org.eclipse.bpmn2.BoundaryEvent;
 import org.eclipse.bpmn2.BusinessRuleTask;
@@ -157,7 +158,11 @@ public class BPMN20ExportMarshaller extends AbstractExportMarshaller implements 
       xtw.writeNamespace(OMGDI_PREFIX, OMGDI_NAMESPACE);
       xtw.writeAttribute("typeLanguage", SCHEMA_NAMESPACE);
       xtw.writeAttribute("expressionLanguage", XPATH_NAMESPACE);
-      xtw.writeAttribute("targetNamespace", PROCESS_NAMESPACE);
+      if(process != null && StringUtils.isNotEmpty(process.getNamespace())) {
+      	xtw.writeAttribute("targetNamespace", process.getNamespace());
+      } else {
+      	xtw.writeAttribute("targetNamespace", PROCESS_NAMESPACE);
+      }
 
       // start process element
       xtw.writeStartElement("process");

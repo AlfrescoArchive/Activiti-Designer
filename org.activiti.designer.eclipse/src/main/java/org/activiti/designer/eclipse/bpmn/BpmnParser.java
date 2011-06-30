@@ -88,12 +88,21 @@ public class BpmnParser {
         if(xtr.isStartElement() == false) continue;
         
         if(xtr.isStartElement() && "definitions".equalsIgnoreCase(xtr.getLocalName())) {
+        	
+        	if(xtr.getAttributeValue(null, "targetNamespace") != null) {
+          	createProcessElement();
+          	process.setNamespace(xtr.getAttributeValue(null, "targetNamespace"));
+          }
           
         } else if(xtr.isStartElement() && "process".equalsIgnoreCase(xtr.getLocalName())) {
           processExtensionAvailable = true;
+          if(xtr.getAttributeValue(null, "name") != null) {
+          	createProcessElement();
+          	process.setName(xtr.getAttributeValue(null, "name"));
+          }
         
         } else if(processExtensionAvailable == true && xtr.isStartElement() && "extensionElements".equalsIgnoreCase(xtr.getLocalName())) {
-          process = Bpmn2Factory.eINSTANCE.createProcess();
+        	createProcessElement();
           process.getExecutionListeners().addAll(parseListeners(xtr));
           processExtensionAvailable = false;
         
@@ -259,6 +268,12 @@ public class BpmnParser {
     } catch(Exception e) {
       e.printStackTrace();
     }
+  }
+  
+  private void createProcessElement() {
+  	if(process == null) {
+  		process = Bpmn2Factory.eINSTANCE.createProcess();
+  	}
   }
   
   private StartEvent parseStartEvent(XMLStreamReader xtr) {

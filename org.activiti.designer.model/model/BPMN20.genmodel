@@ -661,6 +661,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute BPMN20.ecore#//Process/processType"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute BPMN20.ecore#//Process/filename"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference BPMN20.ecore#//Process/executionListeners"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute BPMN20.ecore#//Process/namespace"/>
     </genClasses>
     <genClasses ecoreClass="BPMN20.ecore#//Property">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute BPMN20.ecore#//Property/name"/>
