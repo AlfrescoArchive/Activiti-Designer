@@ -1,7 +1,6 @@
 package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
-import org.activiti.designer.util.features.AbstractCreateBPMNFeature;
 import org.eclipse.bpmn2.Bpmn2Factory;
 import org.eclipse.bpmn2.ExclusiveGateway;
 import org.eclipse.bpmn2.SubProcess;
@@ -9,7 +8,7 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 
-public class CreateExclusiveGatewayFeature extends AbstractCreateBPMNFeature {
+public class CreateExclusiveGatewayFeature extends AbstractCreateFastBPMNFeature {
 
 	public static final String FEATURE_ID_KEY = "exclusivegateway";
 
@@ -35,7 +34,8 @@ public class CreateExclusiveGatewayFeature extends AbstractCreateBPMNFeature {
       getDiagram().eResource().getContents().add(exclusiveGateway);
     }
 
-		addGraphicalRepresentation(context, exclusiveGateway);
+    addGraphicalContent(exclusiveGateway, context);
+		
 		return new Object[] { exclusiveGateway };
 	}
 

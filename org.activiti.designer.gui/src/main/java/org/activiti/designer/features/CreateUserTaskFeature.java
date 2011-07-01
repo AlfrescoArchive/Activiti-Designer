@@ -1,7 +1,6 @@
 package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
-import org.activiti.designer.util.features.AbstractCreateBPMNFeature;
 import org.eclipse.bpmn2.Bpmn2Factory;
 import org.eclipse.bpmn2.SubProcess;
 import org.eclipse.bpmn2.UserTask;
@@ -9,7 +8,7 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 
-public class CreateUserTaskFeature extends AbstractCreateBPMNFeature {
+public class CreateUserTaskFeature extends AbstractCreateFastBPMNFeature {
 
 	public static final String FEATURE_ID_KEY = "usertask";
 
@@ -37,7 +36,7 @@ public class CreateUserTaskFeature extends AbstractCreateBPMNFeature {
       getDiagram().eResource().getContents().add(newUserTask);
     }
 
-		addGraphicalRepresentation(context, newUserTask);
+    addGraphicalContent(newUserTask, context);
 
 		// activate direct editing after object creation
 		getFeatureProvider().getDirectEditingInfo().setActive(true);

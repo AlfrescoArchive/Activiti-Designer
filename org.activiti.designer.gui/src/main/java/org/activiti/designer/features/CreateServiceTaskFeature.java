@@ -7,7 +7,6 @@ import org.activiti.designer.eclipse.extension.ExtensionConstants;
 import org.activiti.designer.integration.servicetask.CustomServiceTask;
 import org.activiti.designer.property.extension.util.ExtensionUtil;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
-import org.activiti.designer.util.features.AbstractCreateBPMNFeature;
 import org.eclipse.bpmn2.Bpmn2Factory;
 import org.eclipse.bpmn2.CustomProperty;
 import org.eclipse.bpmn2.ServiceTask;
@@ -16,7 +15,7 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 
-public class CreateServiceTaskFeature extends AbstractCreateBPMNFeature {
+public class CreateServiceTaskFeature extends AbstractCreateFastBPMNFeature {
 
   public static final String FEATURE_ID_KEY = "servicetask";
 
@@ -83,8 +82,8 @@ public class CreateServiceTaskFeature extends AbstractCreateBPMNFeature {
       getDiagram().eResource().getContents().add(newServiceTask);
     }
 
-    // do the add
-    addGraphicalRepresentation(context, newServiceTask);
+    addGraphicalContent(newServiceTask, context);
+    
     return new Object[] { newServiceTask };
   }
 

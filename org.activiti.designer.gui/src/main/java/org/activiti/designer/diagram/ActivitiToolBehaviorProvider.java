@@ -38,12 +38,15 @@ import org.activiti.designer.integration.palette.PaletteEntry;
 import org.activiti.designer.property.extension.CustomServiceTaskContext;
 import org.activiti.designer.property.extension.util.ExtensionUtil;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
+import org.activiti.designer.util.features.AbstractCreateBPMNFeature;
 import org.activiti.designer.util.preferences.Preferences;
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.bpmn2.Gateway;
 import org.eclipse.bpmn2.SequenceFlow;
 import org.eclipse.bpmn2.ServiceTask;
 import org.eclipse.bpmn2.StartEvent;
 import org.eclipse.bpmn2.SubProcess;
+import org.eclipse.bpmn2.Task;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
@@ -63,7 +66,7 @@ import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.context.IDoubleClickContext;
 import org.eclipse.graphiti.features.context.IPictogramElementContext;
 import org.eclipse.graphiti.features.context.impl.CreateConnectionContext;
-import org.eclipse.graphiti.features.context.impl.CustomContext;
+import org.eclipse.graphiti.features.context.impl.CreateContext;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.mm.pictograms.Anchor;
 import org.eclipse.graphiti.mm.pictograms.AnchorContainer;
@@ -159,20 +162,53 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     }
 
     Object bo = getFeatureProvider().getBusinessObjectForPictogramElement(pe);
-    if (bo instanceof SubProcess) {
+    if (bo instanceof StartEvent || bo instanceof Task || bo instanceof Gateway) {
 
-      CustomContext newContext = new CustomContext(new PictogramElement[] { pe });
-      newContext.setInnerGraphicsAlgorithm(pe.getGraphicsAlgorithm());
-      newContext.setInnerPictogramElement(pe);
-
-      ExpandCollapseSubProcessFeature feature = new ExpandCollapseSubProcessFeature(getFeatureProvider());
-
-      ContextButtonEntry drillDownButton = new ContextButtonEntry(feature, newContext);
-      drillDownButton.setText("Expand subprocess"); //$NON-NLS-1$
-      drillDownButton.setDescription("Drill down into this subprocess and edit its diagram"); //$NON-NLS-1$
-      drillDownButton.setIconId(ActivitiImageProvider.IMG_ACTION_ZOOM);
-
-      data.getDomainSpecificContextButtons().add(drillDownButton);
+    	CreateConnectionContext connectionContext = new CreateConnectionContext();
+    	connectionContext.setSourcePictogramElement(pe);
+      Anchor connectionAnchor = null;
+      if (pe instanceof Anchor) {
+      	connectionAnchor = (Anchor) pe;
+      } else if (pe instanceof AnchorContainer) {
+      	connectionAnchor = Graphiti.getPeService().getChopboxAnchor((AnchorContainer) pe);
+      }
+      connectionContext.setSourceAnchor(connectionAnchor);
+    	
+    	CreateContext taskContext = new CreateContext();
+    	taskContext.setTargetContainer(Graphiti.getPeService().getDiagramForPictogramElement(pe));
+    	taskContext.putProperty("org.activiti.designer.connectionContext", connectionContext);
+    	
+    	CreateUserTaskFeature userTaskfeature = new CreateUserTaskFeature(getFeatureProvider());
+      ContextButtonEntry newUserTaskButton = new ContextButtonEntry(userTaskfeature, taskContext);
+      newUserTaskButton.setText("new user task"); //$NON-NLS-1$
+      newUserTaskButton.setDescription("Create a new task"); //$NON-NLS-1$
+      newUserTaskButton.setIconId(ActivitiImageProvider.IMG_USERTASK);
+      data.getDomainSpecificContextButtons().add(newUserTaskButton);
+      
+      CreateExclusiveGatewayFeature exclusiveGatewayFeature = new CreateExclusiveGatewayFeature(getFeatureProvider());
+      ContextButtonEntry newExclusiveGatewayButton = new ContextButtonEntry(exclusiveGatewayFeature, taskContext);
+      newExclusiveGatewayButton.setText("new exclusive gateway"); //$NON-NLS-1$
+      newExclusiveGatewayButton.setDescription("Create a new exclusive gateway"); //$NON-NLS-1$
+      newExclusiveGatewayButton.setIconId(ActivitiImageProvider.IMG_GATEWAY_EXCLUSIVE);
+      data.getDomainSpecificContextButtons().add(newExclusiveGatewayButton);
+      
+      CreateEndEventFeature endFeature = new CreateEndEventFeature(getFeatureProvider());
+      ContextButtonEntry newEndButton = new ContextButtonEntry(endFeature, taskContext);
+      newEndButton.setText("new end event"); //$NON-NLS-1$
+      newEndButton.setDescription("Create a new end event"); //$NON-NLS-1$
+      newEndButton.setIconId(ActivitiImageProvider.IMG_ENDEVENT_NONE);
+      data.getDomainSpecificContextButtons().add(newEndButton);
+      
+      ContextButtonEntry otherElementButton = new ContextButtonEntry(null, null);
+      otherElementButton.setText("other element"); //$NON-NLS-1$
+      otherElementButton.setDescription("Create a new element"); //$NON-NLS-1$
+      otherElementButton.setIconId(ActivitiImageProvider.IMG_CALLACTIVITY);
+      data.getDomainSpecificContextButtons().add(otherElementButton);
+      
+      addContextButton(otherElementButton, new CreateServiceTaskFeature(getFeatureProvider()), taskContext, 
+      		"Create service task", "Create a new service task", ActivitiImageProvider.IMG_SERVICETASK);
+      addContextButton(otherElementButton, new CreateScriptTaskFeature(getFeatureProvider()), taskContext, 
+      		"Create script task", "Create a new script task", ActivitiImageProvider.IMG_SCRIPTTASK);
     }
 
     if (button.getDragAndDropFeatures().size() > 0) {
@@ -180,6 +216,16 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     }
 
     return data;
+  }
+  
+  private void addContextButton(ContextButtonEntry button, AbstractCreateBPMNFeature feature, 
+  		CreateContext context, String text, String description, String image) {
+  	
+  	ContextButtonEntry newButton = new ContextButtonEntry(feature, context);
+  	newButton.setText(text); //$NON-NLS-1$
+  	newButton.setDescription(description); //$NON-NLS-1$
+  	newButton.setIconId(image);
+  	button.getContextButtonMenuEntries().add(newButton);
   }
 
   @Override

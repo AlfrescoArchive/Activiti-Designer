@@ -33,7 +33,11 @@ public class ImplementationValueExport implements ActivitiNamespaceConstants {
       } else {
         className = "org.alfresco.repo.workflow.activiti.tasklistener.ScriptTaskListener";
       }
-      xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "class", className);
+      if(namespace) {
+      	xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "class", className);
+      } else {
+      	xtw.writeAttribute("class", className);
+      }
       xtw.writeStartElement(ACTIVITI_EXTENSIONS_PREFIX, "field", ACTIVITI_EXTENSIONS_NAMESPACE);
       xtw.writeAttribute("name", "script");
       xtw.writeStartElement(ACTIVITI_EXTENSIONS_PREFIX, "string", ACTIVITI_EXTENSIONS_NAMESPACE);

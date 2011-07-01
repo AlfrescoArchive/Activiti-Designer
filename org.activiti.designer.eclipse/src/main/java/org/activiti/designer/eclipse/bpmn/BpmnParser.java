@@ -558,12 +558,32 @@ public class BpmnParser {
     
     boolean readyWithUserTask = false;
     try {
+    	String assignmentType = null;
       while(readyWithUserTask == false && xtr.hasNext()) {
         xtr.next();
-        if(xtr.isStartElement() && "formalExpression".equalsIgnoreCase(xtr.getLocalName())) {
-          CandidateGroup group = Bpmn2Factory.eINSTANCE.createCandidateGroup();
-          group.setGroup(xtr.getElementText());
-          userTask.getCandidateGroups().add(group);
+        if(xtr.isStartElement() && "humanPerformer".equalsIgnoreCase(xtr.getLocalName())) {
+        	assignmentType = "humanPerformer";
+        
+        } else if(xtr.isStartElement() && "potentialOwner".equalsIgnoreCase(xtr.getLocalName())) {
+        	assignmentType = "potentialOwner";
+        	
+        } else if(xtr.isStartElement() && "formalExpression".equalsIgnoreCase(xtr.getLocalName())) {
+        	if("potentialOwner".equals(assignmentType)) {
+        		String assignmentValue = xtr.getElementText();
+        		if(assignmentValue.trim().startsWith("user(")) {
+        			CandidateUser user = Bpmn2Factory.eINSTANCE.createCandidateUser();
+        			user.setUser(assignmentValue);
+		          userTask.getCandidateUsers().add(user);
+		          
+        		} else {
+	        		CandidateGroup group = Bpmn2Factory.eINSTANCE.createCandidateGroup();
+		          group.setGroup(assignmentValue);
+		          userTask.getCandidateGroups().add(group);
+        		}
+        		
+        	} else {
+	          userTask.setAssignee(xtr.getElementText());
+        	}
         
         } else if(xtr.isStartElement() && "extensionElements".equalsIgnoreCase(xtr.getLocalName())) {
           userTask.getActivitiListeners().addAll(parseListeners(xtr));

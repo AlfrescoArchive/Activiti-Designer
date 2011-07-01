@@ -1,7 +1,6 @@
 package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
-import org.activiti.designer.util.features.AbstractCreateBPMNFeature;
 import org.eclipse.bpmn2.Bpmn2Factory;
 import org.eclipse.bpmn2.EndEvent;
 import org.eclipse.bpmn2.SubProcess;
@@ -9,7 +8,7 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 
-public class CreateEndEventFeature extends AbstractCreateBPMNFeature {
+public class CreateEndEventFeature extends AbstractCreateFastBPMNFeature {
 	
 	public static final String FEATURE_ID_KEY = "endevent";
 
@@ -36,8 +35,7 @@ public class CreateEndEventFeature extends AbstractCreateBPMNFeature {
       getDiagram().eResource().getContents().add(endEvent);
     }
 
-		// do the add
-		addGraphicalRepresentation(context, endEvent);
+    addGraphicalContent(endEvent, context);
 		
 		// return newly created business object(s)
 		return new Object[] { endEvent };
