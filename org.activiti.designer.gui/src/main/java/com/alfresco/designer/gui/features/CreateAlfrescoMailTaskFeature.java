@@ -1,19 +1,19 @@
-package org.activiti.designer.features;
+package com.alfresco.designer.gui.features;
 
-import org.activiti.designer.ActivitiImageProvider;
+import org.activiti.designer.features.AbstractCreateFastBPMNFeature;
+import org.eclipse.bpmn2.AlfrescoMailTask;
 import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.MailTask;
 import org.eclipse.bpmn2.SubProcess;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 
-public class CreateMailTaskFeature extends AbstractCreateFastBPMNFeature {
-	
-	public static final String FEATURE_ID_KEY = "mailtask";
+public class CreateAlfrescoMailTaskFeature extends AbstractCreateFastBPMNFeature {
 
-	public CreateMailTaskFeature(IFeatureProvider fp) {
-		super(fp, "MailTask", "Add mail task");
+	public static final String FEATURE_ID_KEY = "alfrescoMailtask";
+
+	public CreateAlfrescoMailTaskFeature(IFeatureProvider fp) {
+		super(fp, "AlfrescoMailTask", "Add Alfresco mail task");
 	}
 
 	@Override
@@ -24,24 +24,29 @@ public class CreateMailTaskFeature extends AbstractCreateFastBPMNFeature {
 
 	@Override
 	public Object[] create(ICreateContext context) {
-		MailTask newMailTask = Bpmn2Factory.eINSTANCE.createMailTask();
+		AlfrescoMailTask newMailTask = Bpmn2Factory.eINSTANCE.createAlfrescoMailTask();
+
 		newMailTask.setId(getNextId());
-		newMailTask.setName("Mail Task");
-		
+		newMailTask.setName("Alfresco Mail Task");
+
 		Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
     if (parentObject instanceof SubProcess) {
       ((SubProcess) parentObject).getFlowElements().add(newMailTask);
     } else {
       getDiagram().eResource().getContents().add(newMailTask);
     }
-		
+
     addGraphicalContent(newMailTask, context);
+
+		// activate direct editing after object creation
+		getFeatureProvider().getDirectEditingInfo().setActive(true);
+
 		return new Object[] { newMailTask };
 	}
-	
+
 	@Override
 	public String getCreateImageId() {
-		return ActivitiImageProvider.IMG_MAILTASK;
+		return "org.activiti.designer.mail";
 	}
 
 	@Override
@@ -52,7 +57,7 @@ public class CreateMailTaskFeature extends AbstractCreateFastBPMNFeature {
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected Class getFeatureClass() {
-		return Bpmn2Factory.eINSTANCE.createMailTask().getClass();
+		return Bpmn2Factory.eINSTANCE.createAlfrescoMailTask().getClass();
 	}
 
 }

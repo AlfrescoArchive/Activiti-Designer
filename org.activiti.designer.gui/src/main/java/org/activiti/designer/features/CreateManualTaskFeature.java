@@ -1,7 +1,6 @@
 package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
-import org.activiti.designer.util.features.AbstractCreateBPMNFeature;
 import org.eclipse.bpmn2.Bpmn2Factory;
 import org.eclipse.bpmn2.ManualTask;
 import org.eclipse.bpmn2.SubProcess;
@@ -9,7 +8,7 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 
-public class CreateManualTaskFeature extends AbstractCreateBPMNFeature {
+public class CreateManualTaskFeature extends AbstractCreateFastBPMNFeature {
 	
 	public static final String FEATURE_ID_KEY = "manualtask";
 
@@ -36,7 +35,7 @@ public class CreateManualTaskFeature extends AbstractCreateBPMNFeature {
       getDiagram().eResource().getContents().add(newManualTask);
     }
 		
-		addGraphicalRepresentation(context, newManualTask);
+    addGraphicalContent(newManualTask, context);
 		return new Object[] { newManualTask };
 	}
 	

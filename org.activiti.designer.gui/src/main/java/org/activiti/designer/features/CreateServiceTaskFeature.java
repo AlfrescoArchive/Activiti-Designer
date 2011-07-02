@@ -36,6 +36,7 @@ public class CreateServiceTaskFeature extends AbstractCreateFastBPMNFeature {
     return (context.getTargetContainer() instanceof Diagram || parentObject instanceof SubProcess);
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public Object[] create(ICreateContext context) {
     ServiceTask newServiceTask = Bpmn2Factory.eINSTANCE.createServiceTask();

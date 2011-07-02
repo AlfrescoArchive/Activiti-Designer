@@ -18,6 +18,7 @@ import org.activiti.designer.features.AddServiceTaskFeature;
 import org.activiti.designer.features.AddStartEventFeature;
 import org.activiti.designer.features.AddTimerStartEventFeature;
 import org.activiti.designer.features.AddUserTaskFeature;
+import org.activiti.designer.features.ChangeElementTypeFeature;
 import org.activiti.designer.features.CopyFlowElementFeature;
 import org.activiti.designer.features.CreateBoundaryErrorFeature;
 import org.activiti.designer.features.CreateBoundaryTimerFeature;
@@ -272,7 +273,8 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 
   @Override
 	public ICustomFeature[] getCustomFeatures(ICustomContext context) {
-		return new ICustomFeature[] { new SaveBpmnModelFeature(this), new DeleteSequenceFlowFeature(this) };
+		return new ICustomFeature[] { new SaveBpmnModelFeature(this), 
+				new DeleteSequenceFlowFeature(this), new ChangeElementTypeFeature(this) };
 	}
 
 }

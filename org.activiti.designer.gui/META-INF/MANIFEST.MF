@@ -24,7 +24,6 @@ Require-Bundle: org.eclipse.ui,
  org.activiti.designer.model,
  org.activiti.designer.integration,
  org.eclipse.ui.ide,
- com.alfresco.designer.gui,
  org.activiti.designer.util
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6

@@ -1,7 +1,6 @@
 package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
-import org.activiti.designer.util.features.AbstractCreateBPMNFeature;
 import org.eclipse.bpmn2.Bpmn2Factory;
 import org.eclipse.bpmn2.BusinessRuleTask;
 import org.eclipse.bpmn2.SubProcess;
@@ -9,7 +8,7 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 
-public class CreateBusinessRuleTaskFeature extends AbstractCreateBPMNFeature {
+public class CreateBusinessRuleTaskFeature extends AbstractCreateFastBPMNFeature {
 	
 	public static final String FEATURE_ID_KEY = "businessruletask";
 
@@ -36,7 +35,8 @@ public class CreateBusinessRuleTaskFeature extends AbstractCreateBPMNFeature {
       getDiagram().eResource().getContents().add(newBusinessRuleTask);
     }
 		
-		addGraphicalRepresentation(context, newBusinessRuleTask);
+    addGraphicalContent(newBusinessRuleTask, context);
+    
 		return new Object[] { newBusinessRuleTask };
 	}
 	

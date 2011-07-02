@@ -1,20 +1,20 @@
-package org.activiti.designer.features;
+package com.alfresco.designer.gui.features;
 
-import org.activiti.designer.ActivitiImageProvider;
+import org.activiti.designer.util.features.AbstractCreateBPMNFeature;
 import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.ParallelGateway;
+import org.eclipse.bpmn2.StartEvent;
 import org.eclipse.bpmn2.SubProcess;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 
-public class CreateParallelGatewayFeature extends AbstractCreateFastBPMNFeature {
+public class CreateAlfrescoStartEventFeature extends AbstractCreateBPMNFeature {
 	
-	public static final String FEATURE_ID_KEY = "parallelgateway";
+	public static final String FEATURE_ID_KEY = "alfrescoStartevent";
 
-	public CreateParallelGatewayFeature(IFeatureProvider fp) {
+	public CreateAlfrescoStartEventFeature(IFeatureProvider fp) {
 		// set name and description of the creation feature
-		super(fp, "ParallelGateway", "Add parallel gateway");
+		super(fp, "AlfrescoStartEvent", "Add Alfresco start event");
 	}
 
 	public boolean canCreate(ICreateContext context) {
@@ -23,26 +23,29 @@ public class CreateParallelGatewayFeature extends AbstractCreateFastBPMNFeature 
 	}
 
 	public Object[] create(ICreateContext context) {
-		ParallelGateway parallelGateway = Bpmn2Factory.eINSTANCE.createParallelGateway();
-		parallelGateway.setId(getNextId());
-		parallelGateway.setName("Parallel Gateway");
+		StartEvent startEvent = Bpmn2Factory.eINSTANCE.createAlfrescoStartEvent();
+		
+		startEvent.setId(getNextId());
+		startEvent.setName("Alfresco start");
 		
 		Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
     if (parentObject instanceof SubProcess) {
-      ((SubProcess) parentObject).getFlowElements().add(parallelGateway);
+      ((SubProcess) parentObject).getFlowElements().add(startEvent);
     } else {
-      getDiagram().eResource().getContents().add(parallelGateway);
+      getDiagram().eResource().getContents().add(startEvent);
     }
+    
+		addGraphicalRepresentation(context, startEvent);
 		
-    addGraphicalContent(parallelGateway, context);
-		return new Object[] { parallelGateway };
+		// return newly created business object(s)
+		return new Object[] { startEvent };
 	}
 	
 	@Override
 	public String getCreateImageId() {
-		return ActivitiImageProvider.IMG_GATEWAY_PARALLEL;
+		return "org.activiti.designer.startevent.none";
 	}
-
+	
 	@Override
 	protected String getFeatureIdKey() {
 		return FEATURE_ID_KEY;
@@ -51,7 +54,7 @@ public class CreateParallelGatewayFeature extends AbstractCreateFastBPMNFeature 
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected Class getFeatureClass() {
-		return Bpmn2Factory.eINSTANCE.createParallelGateway().getClass();
+		return Bpmn2Factory.eINSTANCE.createAlfrescoStartEvent().getClass();
 	}
-	
+
 }

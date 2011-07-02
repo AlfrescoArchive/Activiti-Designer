@@ -79,17 +79,19 @@ public class SequenceFlowSynchronizer {
 		  
 		  if(this.graphicalRepresentation.getStart().getParent() == null) return;
 		  
-			final EObject startPE = this.graphicalRepresentation.getStart().getParent().getLink().getBusinessObjects()
-					.get(0);
+		  if(this.graphicalRepresentation.getStart().getParent().getLink().getBusinessObjects().size() == 0) return;
+		  
+			final EObject startPE = this.graphicalRepresentation.getStart().getParent().getLink().getBusinessObjects().get(0);
 			targetStartObject = (FlowElement) startPE;
 			graphicalStartId = targetStartObject.getId();
       
       if(this.graphicalRepresentation.getEnd() == null) return;
       
       if(this.graphicalRepresentation.getEnd().getParent() == null) return;
-			
-			final EObject endPE = this.graphicalRepresentation.getEnd().getParent().getLink().getBusinessObjects()
-					.get(0);
+      
+      if(this.graphicalRepresentation.getEnd().getParent().getLink().getBusinessObjects().size() == 0) return;
+      
+			final EObject endPE = this.graphicalRepresentation.getEnd().getParent().getLink().getBusinessObjects().get(0);
 			targetEndObject = (FlowElement) endPE;
 			graphicalEndId = targetEndObject.getId();
 

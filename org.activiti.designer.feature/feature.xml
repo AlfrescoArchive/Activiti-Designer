@@ -165,13 +165,6 @@
          unpack="false"/>
 
    <plugin
-         id="com.alfresco.designer.gui"
-         download-size="0"
-         install-size="0"
-         version="5.7"
-         unpack="false"/>
-
-   <plugin
          id="org.eclipse.wst.sse.ui"
          download-size="0"
          install-size="0"

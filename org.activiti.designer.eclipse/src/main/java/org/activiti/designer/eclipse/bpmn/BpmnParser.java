@@ -14,6 +14,7 @@
 package org.activiti.designer.eclipse.bpmn;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -569,17 +570,30 @@ public class BpmnParser {
         	
         } else if(xtr.isStartElement() && "formalExpression".equalsIgnoreCase(xtr.getLocalName())) {
         	if("potentialOwner".equals(assignmentType)) {
-        		String assignmentValue = xtr.getElementText();
-        		if(assignmentValue.trim().startsWith("user(")) {
-        			CandidateUser user = Bpmn2Factory.eINSTANCE.createCandidateUser();
-        			user.setUser(assignmentValue);
-		          userTask.getCandidateUsers().add(user);
-		          
+        		List<String> assignmentList = new ArrayList<String>();
+        		String assignmentText = xtr.getElementText();
+        		if(assignmentText.contains(",")) {
+        			String[] assignmentArray = assignmentText.split(",");
+        			assignmentList = Arrays.asList(assignmentArray);
         		} else {
-	        		CandidateGroup group = Bpmn2Factory.eINSTANCE.createCandidateGroup();
-		          group.setGroup(assignmentValue);
-		          userTask.getCandidateGroups().add(group);
+        			assignmentList.add(assignmentText);
         		}
+        		for (String assignmentValue : assignmentList) {
+        			if(assignmentValue == null) continue;
+        			assignmentValue = assignmentValue.trim();
+        			if(assignmentValue.length() == 0) continue;
+        			
+        			if(assignmentValue.trim().startsWith("user(")) {
+          			CandidateUser user = Bpmn2Factory.eINSTANCE.createCandidateUser();
+          			user.setUser(assignmentValue);
+  		          userTask.getCandidateUsers().add(user);
+  		          
+          		} else {
+  	        		CandidateGroup group = Bpmn2Factory.eINSTANCE.createCandidateGroup();
+  		          group.setGroup(assignmentValue);
+  		          userTask.getCandidateGroups().add(group);
+          		}
+            }
         		
         	} else {
 	          userTask.setAssignee(xtr.getElementText());

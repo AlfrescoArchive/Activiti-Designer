@@ -54,6 +54,9 @@ public class ActivitiImageProvider extends AbstractImageProvider {
   public static final String IMG_BOUNDARY_ERROR = PREFIX + "boundary.error"; //$NON-NLS-1$
   
   public static final String IMG_ALFRESCO_LOGO = PREFIX + "alfresco.logo"; //$NON-NLS-1$
+  
+  public static final String EDIT_ICON = PREFIX + "edit.icon"; //$NON-NLS-1$
+  public static final String NEW_ICON = PREFIX + "new.icon"; //$NON-NLS-1$
 
   @Override
   protected void addAvailableImages() {
@@ -78,6 +81,8 @@ public class ActivitiImageProvider extends AbstractImageProvider {
     addImageFilePath(IMG_BOUNDARY_TIMER, "icons/timer.png"); //$NON-NLS-1$
     addImageFilePath(IMG_BOUNDARY_ERROR, "icons/error.png"); //$NON-NLS-1$
     addImageFilePath(IMG_ALFRESCO_LOGO, "icons/alfresco.png"); //$NON-NLS-1$
+    addImageFilePath(EDIT_ICON, "icons/edit.png"); //$NON-NLS-1$
+    addImageFilePath(NEW_ICON, "icons/new.png"); //$NON-NLS-1$
   }
 
 }
