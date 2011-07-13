@@ -250,6 +250,26 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
       		lastWayPoint = createWayPoint(sourceConnection.getX() + sourceConnection.getWidth() + subProcessX, 
       			sourceConnection.getY() + (sourceConnection.getHeight() / 2) + subProcessY, xtw);
       		
+      	} else if(bendPointList != null && bendPointList.size() > 0) {
+      			
+    			Point bendPoint = bendPointList.get(0);
+    			if(sourceConnection.getY() + 50 < bendPoint.getY()) {
+    				lastWayPoint = createWayPoint(sourceConnection.getX() + (sourceConnection.getWidth() / 2) + subProcessX,
+	              sourceConnection.getY() + sourceConnection.getHeight() + subProcessY, xtw);
+    			
+    			} else if(sourceConnection.getY() - 50 > bendPoint.getY()) {
+    				lastWayPoint = createWayPoint(sourceConnection.getX() + (sourceConnection.getWidth() / 2) + subProcessX,
+	              sourceConnection.getY() + subProcessY, xtw);
+    			
+    			} else if(sourceConnection.getX() > bendPoint.getX()) {
+    				lastWayPoint = createWayPoint(sourceConnection.getX() + subProcessX,
+	              sourceConnection.getY() + (sourceConnection.getHeight() / 2) + subProcessY, xtw);
+    				
+    			} else {
+    				lastWayPoint = createWayPoint(sourceConnection.getX() + sourceConnection.getWidth() + subProcessX,
+	              sourceConnection.getY() + (sourceConnection.getHeight() / 2) + subProcessY, xtw);
+    			}
+      	
       	} else {
 	        int y = 0;
 	        if(sourceConnection.getY() > targetConnection.getY()) {
@@ -268,8 +288,32 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
       } else {
       	
       	if(sourceConnection.getY() + 50 < targetConnection.getY()) {
-      		lastWayPoint = createWayPoint(sourceConnection.getX() + (sourceConnection.getWidth() / 2) + subProcessX,
-              sourceConnection.getY() + sourceConnection.getHeight() + subProcessY, xtw);
+      		
+      		if(bendPointList != null && bendPointList.size() > 0) {
+      			
+      			Point bendPoint = bendPointList.get(0);
+      			if(sourceConnection.getY() + 50 < bendPoint.getY()) {
+      				lastWayPoint = createWayPoint(sourceConnection.getX() + (sourceConnection.getWidth() / 2) + subProcessX,
+  	              sourceConnection.getY() + sourceConnection.getHeight() + subProcessY, xtw);
+      			
+      			} else if(sourceConnection.getY() - 50 > bendPoint.getY()) {
+      				lastWayPoint = createWayPoint(sourceConnection.getX() + (sourceConnection.getWidth() / 2) + subProcessX,
+  	              sourceConnection.getY() + subProcessY, xtw);
+      			
+      			} else if(sourceConnection.getX() > bendPoint.getX()) {
+      				lastWayPoint = createWayPoint(sourceConnection.getX() + subProcessX,
+  	              sourceConnection.getY() + (sourceConnection.getHeight() / 2) + subProcessY, xtw);
+      				
+      			} else {
+      				lastWayPoint = createWayPoint(sourceConnection.getX() + sourceConnection.getWidth() + subProcessX,
+  	              sourceConnection.getY() + (sourceConnection.getHeight() / 2) + subProcessY, xtw);
+      			}
+      			
+      		} else {
+      		
+	      		lastWayPoint = createWayPoint(sourceConnection.getX() + (sourceConnection.getWidth() / 2) + subProcessX,
+	              sourceConnection.getY() + sourceConnection.getHeight() + subProcessY, xtw);
+      		}
       	
       	} else {
       	
