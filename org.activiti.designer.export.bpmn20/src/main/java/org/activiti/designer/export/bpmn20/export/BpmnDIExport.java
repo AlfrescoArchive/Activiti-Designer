@@ -371,8 +371,22 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
             }
             
           } else {
-            createWayPoint(targetConnection.getX() + subProcessX,
-                    targetConnection.getY() + (targetConnection.getHeight() / 2) + subProcessY, xtw);
+          	if(lastWayPoint.getY() + 50 < targetConnection.getY()) {
+          		createWayPoint(targetConnection.getX() + (targetConnection.getWidth() / 2) + subProcessX,
+                  targetConnection.getY() + subProcessY, xtw);
+          	
+          	} else if(lastWayPoint.getY() - 20 > targetConnection.getY()) {
+          		createWayPoint(targetConnection.getX() + (targetConnection.getWidth() / 2) + subProcessX,
+                  targetConnection.getY() + targetConnection.getHeight() + subProcessY, xtw);
+          	
+          	} else if(lastWayPoint.getX() > targetConnection.getX()) {
+          		createWayPoint(targetConnection.getX() + targetConnection.getWidth() + subProcessX,
+                  targetConnection.getY() + (targetConnection.getHeight() / 2) + subProcessY, xtw);
+          	
+          	} else {
+	            createWayPoint(targetConnection.getX() + subProcessX,
+	                    targetConnection.getY() + (targetConnection.getHeight() / 2) + subProcessY, xtw);
+          	}
           }
         } else {
           createWayPoint(targetConnection.getX() + subProcessX,
