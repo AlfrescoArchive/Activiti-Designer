@@ -17,6 +17,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.activiti.designer.eclipse.extension.ExtensionConstants;
 import org.eclipse.bpmn2.CustomProperty;
+import org.eclipse.bpmn2.FieldExtension;
 import org.eclipse.bpmn2.ServiceTask;
 import org.eclipse.emf.ecore.EObject;
 
@@ -41,8 +42,35 @@ public class ServiceTaskExport implements ActivitiNamespaceConstants {
       xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "resultVariableName", serviceTask.getResultVariableName());
     }
 
-    ExtensionListenerExport.createExtensionListenerXML(serviceTask.getActivitiListeners(), true, EXECUTION_LISTENER, xtw);
-    FieldExtensionsExport.writeFieldExtensions(xtw, serviceTask.getFieldExtensions(), true);
+    boolean executionListenersAvailable = false;
+    if (serviceTask.getActivitiListeners() != null && serviceTask.getActivitiListeners().size() > 0) {
+    	executionListenersAvailable = true;
+    }
+    
+    boolean fieldExtensionsAvailable = false;
+    if(serviceTask.getFieldExtensions() != null && serviceTask.getFieldExtensions().size() > 0) {
+    	
+    	for (FieldExtension fieldExtension : serviceTask.getFieldExtensions()) {
+        if(fieldExtension.getFieldname() != null && fieldExtension.getFieldname().length() > 0 &&
+                fieldExtension.getExpression() != null && fieldExtension.getExpression().length() > 0) {
+        	
+        	fieldExtensionsAvailable = true;
+        	break;
+        }
+    	}
+    }
+    
+    if(executionListenersAvailable == true || fieldExtensionsAvailable == true) {
+    	xtw.writeStartElement("extensionElements");
+    }
+    
+    ExtensionListenerExport.createExtensionListenerXML(serviceTask.getActivitiListeners(), false, EXECUTION_LISTENER, xtw);
+    
+    FieldExtensionsExport.writeFieldExtensions(xtw, serviceTask.getFieldExtensions(), false);
+    
+    if(executionListenersAvailable == true || fieldExtensionsAvailable == true) {
+    	xtw.writeEndElement();
+    }
 
     if (serviceTask.getCustomProperties() != null && serviceTask.getCustomProperties().size() > 0) {
       boolean firstCustomProperty = true;
