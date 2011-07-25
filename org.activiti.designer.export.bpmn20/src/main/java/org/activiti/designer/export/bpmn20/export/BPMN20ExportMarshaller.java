@@ -25,6 +25,7 @@ import org.eclipse.bpmn2.EndEvent;
 import org.eclipse.bpmn2.ErrorEventDefinition;
 import org.eclipse.bpmn2.ExclusiveGateway;
 import org.eclipse.bpmn2.FlowElement;
+import org.eclipse.bpmn2.FlowNode;
 import org.eclipse.bpmn2.FormalExpression;
 import org.eclipse.bpmn2.MailTask;
 import org.eclipse.bpmn2.ManualTask;
@@ -178,6 +179,12 @@ public class BPMN20ExportMarshaller extends AbstractExportMarshaller implements 
       }
 
       for (EObject object : contents) {
+      	if(object instanceof FlowNode) {
+      		FlowNode node = (FlowNode) object;
+      		if(node.getIncoming().size() == 0 && node.getOutgoing().size() == 0) {
+      			continue;
+      		}
+      	}
         createXML(object, "");
       }
 

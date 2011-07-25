@@ -27,6 +27,7 @@ public class CallActivityExport implements ActivitiNamespaceConstants {
 
   public static void createCallActivity(EObject object, String subProcessId, XMLStreamWriter xtw) throws Exception {
     CallActivity callActivity = (CallActivity) object;
+    
     // start CallActivity element
     xtw.writeStartElement("callActivity");
     xtw.writeAttribute("id", subProcessId + callActivity.getId());

@@ -67,23 +67,27 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
     for (EObject bpmnObject : contents) {
 
       if (bpmnObject instanceof FlowNode) {
-        writeBpmnElement((FlowNode) bpmnObject, diagram, "");
+      	FlowNode node = (FlowNode) bpmnObject;
+    		if(node.getIncoming().size() == 0 && node.getOutgoing().size() == 0) {
+    			continue;
+    		}
+        writeBpmnElement(node, diagram, "");
         if(bpmnObject instanceof SubProcess) {
-          for (FlowElement subFlowElement : ((SubProcess) bpmnObject).getFlowElements()) {
+          for (FlowElement subFlowElement : ((SubProcess) node).getFlowElements()) {
             if (subFlowElement instanceof FlowNode) {
-              List<PictogramElement> pictoList = linkService.getPictogramElements(diagram, bpmnObject);
+              List<PictogramElement> pictoList = linkService.getPictogramElements(diagram, node);
               if(pictoList != null && pictoList.size() > 0) {
                 ContainerShape parent = (ContainerShape) pictoList.get(0);
-                writeBpmnElement((FlowNode) subFlowElement, parent, ((SubProcess) bpmnObject).getId());
+                writeBpmnElement((FlowNode) subFlowElement, parent, ((SubProcess) node).getId());
               }
             }
           }
-          for (FlowElement subFlowElement : ((SubProcess) bpmnObject).getFlowElements()) {
+          for (FlowElement subFlowElement : ((SubProcess) node).getFlowElements()) {
             if (subFlowElement instanceof SequenceFlow) {
-              List<PictogramElement> pictoList = linkService.getPictogramElements(diagram, bpmnObject);
+              List<PictogramElement> pictoList = linkService.getPictogramElements(diagram, node);
               if(pictoList != null && pictoList.size() > 0) {
                 ContainerShape parent = (ContainerShape) pictoList.get(0);
-                writeBpmnEdge((SequenceFlow) subFlowElement, parent, ((SubProcess) bpmnObject).getId());
+                writeBpmnEdge((SequenceFlow) subFlowElement, parent, ((SubProcess) node).getId());
               }
             }
           }
@@ -136,7 +140,7 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
         }
         
       } else {
-        
+      	
         if (shapeBO instanceof FlowNode) {
           FlowNode shapeFlowNode = (FlowNode) shapeBO;
           if (shapeFlowNode.getId().equals(flowNode.getId())) {
