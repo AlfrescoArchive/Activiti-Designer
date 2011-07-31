@@ -18,11 +18,11 @@ package org.activiti.designer;
  * 
  * @author Tiese Barrell
  * @since 0.6.1
- * @version 1
+ * @version 2
  */
 public enum PluginImage {
 
-  ACTION_UP("action.up.png"), ACTION_DOWN("action.down.png");//$NON-NLS-1$ //$NON-NLS-2$
+  ACTION_UP("action.up.png"), ACTION_DOWN("action.down.png"), ACTION_GO("bullet_go.png");//$NON-NLS-1$ //$NON-NLS-2$
 
   private static final String KEY_PREFIX = Activator.PLUGIN_ID;
   private static final String DEFAULT_IMAGE_DIR = "icons/";

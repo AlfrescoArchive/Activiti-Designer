@@ -24,5 +24,6 @@ Export-Package: org.activiti.designer.util.eclipse,
  org.activiti.designer.util.platform,
  org.activiti.designer.util.preferences,
  org.activiti.designer.util.property,
- org.activiti.designer.util.style
+ org.activiti.designer.util.style,
+ org.activiti.designer.util.workspace
 Bundle-ClassPath: .
