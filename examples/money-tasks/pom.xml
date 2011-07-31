@@ -14,8 +14,8 @@
 
 	<dependencies>
 		<dependency>
-			<groupId>org.activiti.designer</groupId>
-			<artifactId>org.activiti.designer.integration</artifactId>
+			<groupId>org.activiti</groupId>
+			<artifactId>activiti-designer-integration</artifactId>
 			<version>${activiti.designer.version}</version>
 			<scope>compile</scope>
 		</dependency>
