@@ -37,8 +37,6 @@ Export-Package:
  org.activiti.designer.eclipse.navigator.nodes.base,
  org.activiti.designer.eclipse.outline,
  org.activiti.designer.eclipse.outline.tree,
- org.activiti.designer.eclipse.pattern.compartment,
- org.activiti.designer.eclipse.pattern.grid,
  org.activiti.designer.eclipse.perspective,
  org.activiti.designer.eclipse.preferences,
  org.activiti.designer.eclipse.property,

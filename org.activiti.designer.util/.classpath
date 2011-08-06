@@ -43,9 +43,9 @@
   <classpathentry kind="lib" path="/Users/trademakers/.m2/repository/p2/osgi/bundle/org.eclipse.equinox.registry/3.5.0.v20100503/org.eclipse.equinox.registry-3.5.0.v20100503.jar"/>
   <classpathentry kind="lib" path="/Users/trademakers/.m2/repository/p2/osgi/bundle/org.eclipse.equinox.servletbridge.extensionbundle/1.2.0.v20100503/org.eclipse.equinox.servletbridge.extensionbundle-1.2.0.v20100503.jar"/>
   <classpathentry kind="lib" path="/Users/trademakers/.m2/repository/p2/osgi/bundle/org.eclipse.gef/3.6.2.v20110110-2020/org.eclipse.gef-3.6.2.v20110110-2020.jar"/>
-  <classpathentry kind="lib" path="/Users/trademakers/.m2/repository/p2/osgi/bundle/org.eclipse.graphiti/0.7.1.v20110110-1225/org.eclipse.graphiti-0.7.1.v20110110-1225.jar"/>
-  <classpathentry kind="lib" path="/Users/trademakers/.m2/repository/p2/osgi/bundle/org.eclipse.graphiti.mm/0.7.1.v20110110-1225/org.eclipse.graphiti.mm-0.7.1.v20110110-1225.jar"/>
-  <classpathentry kind="lib" path="/Users/trademakers/.m2/repository/p2/osgi/bundle/org.eclipse.graphiti.ui/0.7.1.v20110111-0756/org.eclipse.graphiti.ui-0.7.1.v20110111-0756.jar"/>
+  <classpathentry kind="lib" path="/Users/trademakers/.m2/repository/p2/osgi/bundle/org.eclipse.graphiti/0.8.0.v20110601-0826/org.eclipse.graphiti-0.8.0.v20110601-0826.jar"/>
+  <classpathentry kind="lib" path="/Users/trademakers/.m2/repository/p2/osgi/bundle/org.eclipse.graphiti.mm/0.8.0.v20110603-1048/org.eclipse.graphiti.mm-0.8.0.v20110603-1048.jar"/>
+  <classpathentry kind="lib" path="/Users/trademakers/.m2/repository/p2/osgi/bundle/org.eclipse.graphiti.ui/0.8.0.v20110606-1453/org.eclipse.graphiti.ui-0.8.0.v20110606-1453.jar"/>
   <classpathentry kind="lib" path="/Users/trademakers/.m2/repository/p2/osgi/bundle/org.eclipse.help/3.5.0.v20100524/org.eclipse.help-3.5.0.v20100524.jar"/>
   <classpathentry kind="lib" path="/Users/trademakers/.m2/repository/p2/osgi/bundle/org.eclipse.help.base/3.5.3.v201102101200/org.eclipse.help.base-3.5.3.v201102101200.jar"/>
   <classpathentry kind="lib" path="/Users/trademakers/.m2/repository/p2/osgi/bundle/org.eclipse.help.ui/3.5.3.r36_20101116/org.eclipse.help.ui-3.5.3.r36_20101116.jar"/>

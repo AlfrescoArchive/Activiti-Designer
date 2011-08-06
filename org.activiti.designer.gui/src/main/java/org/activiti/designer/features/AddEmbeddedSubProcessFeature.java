@@ -78,7 +78,7 @@ public class AddEmbeddedSubProcessFeature extends AbstractAddShapeFeature {
 			final Shape shape = peCreateService.createShape(containerShape, false);
 
 			// create and set text graphics algorithm
-			final Text text = gaService.createDefaultText(shape, addedSubProcess.getName());
+			final Text text = gaService.createDefaultText(getDiagram(), shape, addedSubProcess.getName());
 			text.setStyle(StyleUtil.getStyleForEvent(getDiagram()));
 			text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
 			text.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);

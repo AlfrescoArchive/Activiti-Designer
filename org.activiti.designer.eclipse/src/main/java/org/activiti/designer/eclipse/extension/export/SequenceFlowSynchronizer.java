@@ -20,7 +20,6 @@ import org.eclipse.graphiti.ui.editor.DiagramEditor;
  * @version 1
  * 
  */
-@Deprecated
 public class SequenceFlowSynchronizer {
 
 	private SequenceFlowSynchronizer() {

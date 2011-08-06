@@ -92,7 +92,7 @@ public abstract class AddAlfrescoTaskFeature extends AbstractAddShapeFeature {
       final Shape shape = peCreateService.createShape(containerShape, false);
 
       // create and set text graphics algorithm
-      final Text text = gaService.createDefaultText(shape, addedTask.getName());
+      final Text text = gaService.createDefaultText(getDiagram(), shape, addedTask.getName());
       text.setStyle(StyleUtil.getStyleForTask(getDiagram()));
       text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
       text.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);

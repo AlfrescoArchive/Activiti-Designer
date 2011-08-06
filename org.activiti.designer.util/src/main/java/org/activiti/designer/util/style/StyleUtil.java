@@ -20,7 +20,6 @@ import java.util.Collection;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.graphiti.mm.StyleContainer;
 import org.eclipse.graphiti.mm.algorithms.styles.AdaptedGradientColoredAreas;
-import org.eclipse.graphiti.mm.algorithms.styles.Color;
 import org.eclipse.graphiti.mm.algorithms.styles.GradientColoredArea;
 import org.eclipse.graphiti.mm.algorithms.styles.GradientColoredAreas;
 import org.eclipse.graphiti.mm.algorithms.styles.LocationType;
@@ -38,12 +37,6 @@ import org.eclipse.graphiti.util.IPredefinedRenderingStyle;
 public class StyleUtil {
 
 	private static final IColorConstant BPMN_CLASS_FOREGROUND = new ColorConstant(0, 0, 0);
-	
-	private static final IColorConstant BOUNDARY_EVENT_FOREGROUND = new ColorConstant(0, 0, 0);
-	
-	private static final IColorConstant EMBEDDED_PROCESS_FOREGROUND = new ColorConstant(0, 0, 0);
-	
-	private static Color blackColor = null;
 	
 	public static Style getStyleForTask(Diagram diagram) {
     final String styleId = "TASK"; //$NON-NLS-1$
@@ -166,21 +159,21 @@ public class StyleUtil {
 	
 	protected static void addGradientColoredArea(EList<GradientColoredArea> gcas, String colorStart, int locationValueStart,
 	        LocationType locationTypeStart, String colorEnd, int locationValueEnd, LocationType locationTypeEnd) {
-	      final GradientColoredArea gca = StylesFactory.eINSTANCE.createGradientColoredArea();
-	      gcas.add(gca);
-	      gca.setStart(StylesFactory.eINSTANCE.createGradientColoredLocation());
-	      gca.getStart().setColor(StylesFactory.eINSTANCE.createColor());
-	      gca.getStart().getColor().setBlue(ColorUtil.getBlueFromHex(colorStart));
-	      gca.getStart().getColor().setGreen(ColorUtil.getGreenFromHex(colorStart));
-	      gca.getStart().getColor().setRed(ColorUtil.getRedFromHex(colorStart));
-	      gca.getStart().setLocationType(locationTypeStart);
-	      gca.getStart().setLocationValue(locationValueStart);
-	      gca.setEnd(StylesFactory.eINSTANCE.createGradientColoredLocation());
-	      gca.getEnd().setColor(StylesFactory.eINSTANCE.createColor());
-	      gca.getEnd().getColor().setBlue(ColorUtil.getBlueFromHex(colorEnd));
-	      gca.getEnd().getColor().setGreen(ColorUtil.getGreenFromHex(colorEnd));
-	      gca.getEnd().getColor().setRed(ColorUtil.getRedFromHex(colorEnd));
-	      gca.getEnd().setLocationType(locationTypeEnd);
-	      gca.getEnd().setLocationValue(locationValueEnd);
-	    }
+    final GradientColoredArea gca = StylesFactory.eINSTANCE.createGradientColoredArea();
+    gcas.add(gca);
+    gca.setStart(StylesFactory.eINSTANCE.createGradientColoredLocation());
+    gca.getStart().setColor(StylesFactory.eINSTANCE.createColor());
+    gca.getStart().getColor().setBlue(ColorUtil.getBlueFromHex(colorStart));
+    gca.getStart().getColor().setGreen(ColorUtil.getGreenFromHex(colorStart));
+    gca.getStart().getColor().setRed(ColorUtil.getRedFromHex(colorStart));
+    gca.getStart().setLocationType(locationTypeStart);
+    gca.getStart().setLocationValue(locationValueStart);
+    gca.setEnd(StylesFactory.eINSTANCE.createGradientColoredLocation());
+    gca.getEnd().setColor(StylesFactory.eINSTANCE.createColor());
+    gca.getEnd().getColor().setBlue(ColorUtil.getBlueFromHex(colorEnd));
+    gca.getEnd().getColor().setGreen(ColorUtil.getGreenFromHex(colorEnd));
+    gca.getEnd().getColor().setRed(ColorUtil.getRedFromHex(colorEnd));
+    gca.getEnd().setLocationType(locationTypeEnd);
+    gca.getEnd().setLocationValue(locationValueEnd);
+  }
 }

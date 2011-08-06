@@ -86,7 +86,7 @@ public class AddCallActivityFeature extends AbstractAddShapeFeature {
 			final Shape shape = peCreateService.createShape(containerShape, false);
 
 			// create and set text graphics algorithm
-			final Text text = gaService.createDefaultText(shape, addedCallActivity.getName());
+			final Text text = gaService.createDefaultText(getDiagram(), shape, addedCallActivity.getName());
 			text.setStyle(StyleUtil.getStyleForTask(getDiagram()));
 			text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
 			text.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);

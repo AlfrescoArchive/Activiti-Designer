@@ -1,6 +1,7 @@
 package org.activiti.designer.eclipse.editor;
 
 import java.util.Collection;
+import java.util.List;
 
 import org.activiti.designer.eclipse.Logger;
 import org.activiti.designer.eclipse.extension.export.ExportMarshaller;
@@ -8,6 +9,7 @@ import org.activiti.designer.eclipse.extension.export.SequenceFlowSynchronizer;
 import org.activiti.designer.eclipse.ui.ActivitiEditorContextMenuProvider;
 import org.activiti.designer.eclipse.ui.ExportMarshallerRunnable;
 import org.activiti.designer.eclipse.util.ExtensionPointUtil;
+import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.gef.ContextMenuProvider;
@@ -15,7 +17,11 @@ import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.LayerConstants;
 import org.eclipse.gef.editparts.LayerManager;
 import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
+import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
+import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
+import org.eclipse.graphiti.mm.pictograms.Shape;
+import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 import org.eclipse.swt.widgets.Composite;
@@ -97,6 +103,42 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 				Logger.logError("Exception while performing save", e);
 			}
 		}
+	}
+
+	@Override
+  protected void setInput(final IEditorInput input) {
+		super.setInput(input);
+	  if(input instanceof DiagramEditorInput) {
+	  	final Diagram diagram = ((DiagramEditorInput) input).getDiagram();
+	  	boolean shouldMigrate = Graphiti.getMigrationService().shouldMigrate070To080(diagram);
+	  	if(shouldMigrate) {
+	  		ActivitiUiUtil.runModelChange(new Runnable() {
+					public void run() {
+						setTransparencyAndLineWidth(diagram);
+						Graphiti.getMigrationService().migrate070To080(diagram);
+					}
+				}, getEditingDomain(), "Mirgation from Graphiti 0.7 to 0.8");
+	  	}
+	  }
+  }
+	
+	private void setTransparencyAndLineWidth(ContainerShape parent) {
+		List<Shape> shapes = parent.getChildren();
+		for (Shape shape : shapes) {
+      if(shape instanceof ContainerShape) {
+      	GraphicsAlgorithm graphics = ((ContainerShape) shape).getGraphicsAlgorithm();
+      	graphics.setLineWidth(1);
+      	graphics.setTransparency(0.0);
+      	List<GraphicsAlgorithm> graphicsChildren = graphics.getGraphicsAlgorithmChildren();
+      	for (GraphicsAlgorithm graphicsAlgorithm : graphicsChildren) {
+          if(graphicsAlgorithm.getLineWidth() == null ||  graphicsAlgorithm.getLineWidth() <= 1) {
+          	graphicsAlgorithm.setLineWidth(1);
+          }
+          graphicsAlgorithm.setTransparency(0.0);
+        }
+      	setTransparencyAndLineWidth((ContainerShape) shape);
+      }
+    }
 	}
 
 	@Override

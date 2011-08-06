@@ -79,11 +79,11 @@
   <classpathentry kind="lib" path="/Users/trademakers/.m2/repository/p2/osgi/bundle/org.eclipse.emf.workspace.ui/1.3.0.v200901271819/org.eclipse.emf.workspace.ui-1.3.0.v200901271819.jar"/>
   <classpathentry kind="lib" path="/Users/trademakers/.m2/repository/p2/org/eclipse/update/feature/org.eclipse.gef/3.6.0.v20100519-2050-777B-81A2Bz-69793A8B83447/org.eclipse.gef-3.6.0.v20100519-2050-777B-81A2Bz-69793A8B83447.jar"/>
   <classpathentry kind="lib" path="/Users/trademakers/.m2/repository/p2/osgi/bundle/org.eclipse.gef/3.6.0.v20100525-1225/org.eclipse.gef-3.6.0.v20100525-1225.jar"/>
-  <classpathentry kind="lib" path="/Users/trademakers/.m2/repository/p2/osgi/bundle/org.eclipse.graphiti/0.7.1.v20110110-1225/org.eclipse.graphiti-0.7.1.v20110110-1225.jar"/>
-  <classpathentry kind="lib" path="/Users/trademakers/.m2/repository/p2/org/eclipse/update/feature/org.eclipse.graphiti.feature/0.7.1.v20110111-0756/org.eclipse.graphiti.feature-0.7.1.v20110111-0756.jar"/>
-  <classpathentry kind="lib" path="/Users/trademakers/.m2/repository/p2/osgi/bundle/org.eclipse.graphiti.mm/0.7.1.v20110110-1225/org.eclipse.graphiti.mm-0.7.1.v20110110-1225.jar"/>
-  <classpathentry kind="lib" path="/Users/trademakers/.m2/repository/p2/osgi/bundle/org.eclipse.graphiti.pattern/0.7.1.v20110110-1225/org.eclipse.graphiti.pattern-0.7.1.v20110110-1225.jar"/>
-  <classpathentry kind="lib" path="/Users/trademakers/.m2/repository/p2/osgi/bundle/org.eclipse.graphiti.ui/0.7.1.v20110111-0756/org.eclipse.graphiti.ui-0.7.1.v20110111-0756.jar"/>
+  <classpathentry kind="lib" path="/Users/trademakers/.m2/repository/p2/osgi/bundle/org.eclipse.graphiti/0.8.0.v20110601-0826/org.eclipse.graphiti-0.8.0.v20110601-0826.jar"/>
+  <classpathentry kind="lib" path="/Users/trademakers/.m2/repository/p2/org/eclipse/update/feature/org.eclipse.graphiti.feature/0.8.0.v20110607-1252/org.eclipse.graphiti.feature-0.8.0.v20110607-1252.jar"/>
+  <classpathentry kind="lib" path="/Users/trademakers/.m2/repository/p2/osgi/bundle/org.eclipse.graphiti.mm/0.8.0.v20110603-1048/org.eclipse.graphiti.mm-0.8.0.v20110603-1048.jar"/>
+  <classpathentry kind="lib" path="/Users/trademakers/.m2/repository/p2/osgi/bundle/org.eclipse.graphiti.pattern/0.8.0.v20110516-1053/org.eclipse.graphiti.pattern-0.8.0.v20110516-1053.jar"/>
+  <classpathentry kind="lib" path="/Users/trademakers/.m2/repository/p2/osgi/bundle/org.eclipse.graphiti.ui/0.8.0.v20110606-1453/org.eclipse.graphiti.ui-0.8.0.v20110606-1453.jar"/>
   <classpathentry kind="lib" path="/Users/trademakers/.m2/repository/p2/osgi/bundle/org.eclipse.jem.util/2.1.0.v201005130500/org.eclipse.jem.util-2.1.0.v201005130500.jar"/>
   <classpathentry kind="lib" path="/Users/trademakers/.m2/repository/p2/osgi/bundle/org.eclipse.jface.text/3.6.0.v20100526-0800/org.eclipse.jface.text-3.6.0.v20100526-0800.jar"/>
   <classpathentry kind="lib" path="/Users/trademakers/.m2/repository/p2/osgi/bundle/org.eclipse.wst.common.core/1.2.0.v200908252030/org.eclipse.wst.common.core-1.2.0.v200908252030.jar"/>

@@ -113,7 +113,7 @@ public class AddSequenceFlowFeature extends AbstractAddFeature {
 		GraphicsAlgorithm targetGraphics = getPictogramElement(
 				addedSequenceFlow.getTargetRef()).getGraphicsAlgorithm();
 		
-		if (addedSequenceFlow.getSourceRef() instanceof Gateway) {
+		if (addedSequenceFlow.getSourceRef() instanceof Gateway && addedSequenceFlow.getTargetRef() instanceof Gateway == false) {
 			if (((sourceGraphics.getY() + 10) < targetGraphics.getY()
 					|| (sourceGraphics.getY() - 10) > targetGraphics.getY())  && 
 					(sourceGraphics.getX() + (sourceGraphics.getWidth() / 2)) < targetGraphics.getX()) {
@@ -166,7 +166,7 @@ public class AddSequenceFlowFeature extends AbstractAddFeature {
 
 		// add dynamic text decorator for the reference name
 		ConnectionDecorator textDecorator = peCreateService.createConnectionDecorator(connection, true, 0.5, true);
-		Text text = gaService.createDefaultText(textDecorator);
+		Text text = gaService.createDefaultText(getDiagram(), textDecorator);
 		text.setStyle(StyleUtil.getStyleForTask((getDiagram())));
 		gaService.setLocation(text, 10, 0);
 

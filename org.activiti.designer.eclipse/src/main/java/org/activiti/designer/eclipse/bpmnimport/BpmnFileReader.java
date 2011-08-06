@@ -188,6 +188,17 @@ public class BpmnFileReader {
     List<FlowElement> wrongOrderList = new ArrayList<FlowElement>();
     for (FlowElement flowElement : flowList) {
       
+    	if(flowElement instanceof Gateway) {
+    		try {
+        	getMaxX(flowElement.getId());
+        	if(isEndGateway(flowElement.getId(), bpmnParser.sequenceFlowList)) {
+        		getDivergingGateway(flowElement, bpmnParser.sequenceFlowList, flowElement.getClass().getName());
+        	}
+        } catch(FlowSourceNotFoundException e) {
+        	wrongOrderList.add(flowElement);
+          continue;
+        }
+    	} 
       FlowElement sourceElement = sourceRef(flowElement.getId(), yMap);
       if(flowElement instanceof StartEvent == false && flowElement instanceof BoundaryEvent == false) {
         if(sourceElement == null) {
@@ -288,7 +299,7 @@ public class BpmnFileReader {
         
         if(newFlowElement instanceof Gateway) {
           if(isEndGateway(newFlowElement.getId(), bpmnParser.sequenceFlowList)) {
-            y = START_Y - 3;
+            y = getDivergingGateway(newFlowElement, bpmnParser.sequenceFlowList, newFlowElement.getClass().getName());
             x = getMaxX(newFlowElement.getId());
           } else {
             if(sourceFlowElement instanceof Task) {
@@ -395,6 +406,8 @@ public class BpmnFileReader {
             maxX = sourceX;
             sourceRef = sequenceFlowModel.sourceRef;
           }
+        } else {
+        	throw new FlowSourceNotFoundException();
         }
       }
     }
@@ -445,6 +458,26 @@ public class BpmnFileReader {
       }
     }
     return y;
+  }
+  
+  private int getDivergingGateway(FlowElement element, List<SequenceFlowModel> sequenceFlowList, String type) {
+  	for (SequenceFlowModel sequenceFlowModel : sequenceFlowList) {
+  		
+      if(sequenceFlowModel.targetRef.equals(element.getId())) {
+        
+      	FlowElement sourceElement = sourceRef(sequenceFlowModel.targetRef, yMap);
+      	if(sourceElement == null) {
+      		throw new FlowSourceNotFoundException();
+      	}
+      	
+      	if(sourceElement.getClass().getName().equals(type)) {
+      		return yMap.get(sourceElement.getId()).y;
+      	}
+      	
+      	return getDivergingGateway(sourceElement, sequenceFlowList, type);
+      }
+    }
+  	throw new FlowSourceNotFoundException();
   }
   
   private boolean isEndGateway(String id, List<SequenceFlowModel> sequenceFlowList) {

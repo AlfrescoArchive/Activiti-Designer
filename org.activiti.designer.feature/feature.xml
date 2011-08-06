@@ -44,7 +44,7 @@
 
    <includes
          id="org.eclipse.graphiti.feature"
-         version="0.7.1"/>
+         version="0.8.0"/>
 
    <includes
          id="org.eclipse.wst.xml_ui.feature"
@@ -64,8 +64,8 @@
    <requires>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.core.runtime" version="3.6.0.v20100505" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.graphiti" version="0.7.1" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.graphiti.ui" version="0.7.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.graphiti" version="0.8.0" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.graphiti.ui" version="0.8.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.resources" version="3.6.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.views.properties.tabbed" version="3.5.100" match="greaterOrEqual"/>
       <import plugin="org.eclipse.emf" version="2.6.0" match="greaterOrEqual"/>
@@ -80,7 +80,7 @@
       <import plugin="org.eclipse.gef" version="3.6.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.jdt.launching" version="3.5.100" match="greaterOrEqual"/>
       <import plugin="org.eclipse.jdt.junit.core" version="3.6.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.graphiti.pattern" version="0.7.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.graphiti.pattern" version="0.8.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.navigator" version="3.5.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.ide" version="3.6.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.emf.ecore"/>

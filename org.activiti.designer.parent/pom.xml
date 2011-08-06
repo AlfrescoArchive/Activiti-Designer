@@ -8,7 +8,7 @@
 	<name>Activiti Designer - Parent project</name>
 
 	<properties>
-		<tycho-version>0.11.0</tycho-version>
+		<tycho-version>0.12.0</tycho-version>
 	</properties>
 
 	<modules>
@@ -34,7 +34,7 @@
 		<repository>
 			<id>Graphiti</id>
 			<layout>p2</layout>
-			<url>http://download.eclipse.org/graphiti/updates/0.7.1/</url>
+			<url>http://download.eclipse.org/graphiti/updates/0.8.0/</url>
 		</repository>
 		<repository>
 			<id>Oribit</id>
@@ -46,13 +46,13 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.sonatype.tycho</groupId>
+				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>tycho-maven-plugin</artifactId>
 				<version>${tycho-version}</version>
 				<extensions>true</extensions>
 			</plugin>
 			<plugin>
-				<groupId>org.sonatype.tycho</groupId>
+				<groupId>org.eclipse.tycho</groupId>
 				<artifactId>target-platform-configuration</artifactId>
 				<version>${tycho-version}</version>
 				<configuration>
