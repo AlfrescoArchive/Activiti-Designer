@@ -4,13 +4,11 @@
 	<parent>
 		<groupId>org.activiti.designer</groupId>
 		<artifactId>org.activiti.designer.parent</artifactId>
-		<version>5.7</version>
+		<version>5.7.1</version>
 		<relativePath>../org.activiti.designer.parent/pom.xml</relativePath>
 	</parent>
 
-	<groupId>org.activiti.designer</groupId>
 	<artifactId>org.activiti.designer.eclipse</artifactId>
-	<version>5.7</version>
 	<packaging>eclipse-plugin</packaging>
 	<name>Activiti Designer - Eclipse</name>
 
