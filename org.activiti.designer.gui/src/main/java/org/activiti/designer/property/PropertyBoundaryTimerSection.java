@@ -1,5 +1,8 @@
 package org.activiti.designer.property;
 
+import java.util.Arrays;
+import java.util.List;
+
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.eclipse.bpmn2.BoundaryEvent;
@@ -11,6 +14,7 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -28,6 +32,8 @@ public class PropertyBoundaryTimerSection extends ActivitiPropertySection implem
 	private Text timeDurationText;
 	private Text timeDateText;
 	private Text timeCycleText;
+	private CCombo cancelActivityCombo;
+	private List<String> cancelFormats = Arrays.asList("true", "false");
 
 	@Override
 	public void createControls(Composite parent, TabbedPropertySheetPage tabbedPropertySheetPage) {
@@ -35,8 +41,19 @@ public class PropertyBoundaryTimerSection extends ActivitiPropertySection implem
 
 		TabbedPropertySheetWidgetFactory factory = getWidgetFactory();
 		Composite composite = factory.createFlatFormComposite(parent);
+		
+		cancelActivityCombo = factory.createCCombo(composite, SWT.NONE);
+		cancelActivityCombo.setItems((String[]) cancelFormats.toArray());
+		FormData data = new FormData();
+		data.left = new FormAttachment(0, 160);
+		data.right = new FormAttachment(100, 0);
+		data.top = new FormAttachment(0, VSPACE);
+		cancelActivityCombo.setLayoutData(data);
+		cancelActivityCombo.addFocusListener(listener);
+		
+		createLabel(composite, "Cancel activity", cancelActivityCombo, factory); //$NON-NLS-1$
 
-		timeDurationText = createText(composite, factory, null);
+		timeDurationText = createText(composite, factory, cancelActivityCombo);
 		createLabel(composite, "Time duration", timeDurationText, factory); //$NON-NLS-1$
 		
 		timeDateText = createText(composite, factory, timeDurationText);
@@ -48,6 +65,7 @@ public class PropertyBoundaryTimerSection extends ActivitiPropertySection implem
 
 	@Override
 	public void refresh() {
+		cancelActivityCombo.removeFocusListener(listener);
 	  timeDurationText.removeFocusListener(listener);
 	  timeDateText.removeFocusListener(listener);
 	  timeCycleText.removeFocusListener(listener);
@@ -60,6 +78,14 @@ public class PropertyBoundaryTimerSection extends ActivitiPropertySection implem
 				return;
 			
 			BoundaryEvent boundaryEvent = (BoundaryEvent) bo;
+			
+			boolean cancelActivity = ((BoundaryEvent) bo).isCancelActivity();
+			if(cancelActivity == false) {
+				cancelActivityCombo.select(1);
+			} else {
+				cancelActivityCombo.select(0);
+			}
+			
 			if(boundaryEvent.getEventDefinitions().get(0) != null) {
 			  TimerEventDefinition timerDefinition = (TimerEventDefinition) boundaryEvent.getEventDefinitions().get(0);
         if(timerDefinition.getTimeDuration() != null && ((FormalExpression) timerDefinition.getTimeDuration()).getBody() != null &&
@@ -79,6 +105,7 @@ public class PropertyBoundaryTimerSection extends ActivitiPropertySection implem
         }
 			}
 		}
+		cancelActivityCombo.addFocusListener(listener);
 		timeDurationText.addFocusListener(listener);
 		timeDateText.addFocusListener(listener);
 		timeCycleText.addFocusListener(listener);
@@ -104,6 +131,14 @@ public class PropertyBoundaryTimerSection extends ActivitiPropertySection implem
 							}
 							
 							BoundaryEvent boundaryEvent = (BoundaryEvent) bo;
+							
+							int selection = cancelActivityCombo.getSelectionIndex();
+							if(selection == 0) {
+								boundaryEvent.setCancelActivity(true);
+							} else {
+								boundaryEvent.setCancelActivity(false);
+							}
+							
               TimerEventDefinition timerDefinition = (TimerEventDefinition) boundaryEvent.getEventDefinitions().get(0);
               
 							String timeDuration = timeDurationText.getText();

@@ -36,6 +36,7 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
   private String currentType = "Assignee";
   private Text expressionText;
   private Text formKeyText;
+  private Text dueDateText;
   private Text priorityText;
   private Text documentationText;
 
@@ -56,7 +57,10 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
     formKeyText = createText(composite, factory, expressionText);
     createLabel("Form key:", composite, factory, formKeyText);
     
-    priorityText = createText(composite, factory, formKeyText);
+    dueDateText = createText(composite, factory, formKeyText);
+    createLabel("Due date (variable):", composite, factory, dueDateText);
+    
+    priorityText = createText(composite, factory, dueDateText);
     createLabel("Priority:", composite, factory, priorityText);
 
     documentationText = factory.createText(composite, "", SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL); //$NON-NLS-1$
@@ -75,6 +79,7 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
     performerTypeCombo.removeFocusListener(listener);
     expressionText.removeFocusListener(listener);
     formKeyText.removeFocusListener(listener);
+    dueDateText.removeFocusListener(listener);
     priorityText.removeFocusListener(listener);
     documentationText.removeFocusListener(listener);
     PictogramElement pe = getSelectedPictogramElement();
@@ -122,6 +127,11 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
         }
       }
       
+      dueDateText.setText("");
+      if(userTask.getDueDate() != null) {
+      	dueDateText.setText(userTask.getDueDate());
+      }
+      
       priorityText.setText("");
       if(userTask.getPriority() != null) {
         priorityText.setText(userTask.getPriority().toString());
@@ -136,6 +146,7 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
       performerTypeCombo.addFocusListener(listener);
       expressionText.addFocusListener(listener);
       formKeyText.addFocusListener(listener);
+      dueDateText.addFocusListener(listener);
       priorityText.addFocusListener(listener);
       documentationText.addFocusListener(listener);
     }
@@ -216,6 +227,14 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
               } else {
                 userTask.setFormKey("");
               }
+              
+              String dueDate = dueDateText.getText();
+              if (dueDate != null) {
+                userTask.setDueDate(dueDate);
+              } else {
+                userTask.setDueDate("");
+              }
+              
               if(priorityText.getText() != null && priorityText.getText().length() > 0) {
                 Integer priorityValue = null;
                 try {

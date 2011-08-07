@@ -10,14 +10,19 @@ import org.activiti.designer.eclipse.ui.ActivitiEditorContextMenuProvider;
 import org.activiti.designer.eclipse.ui.ExportMarshallerRunnable;
 import org.activiti.designer.eclipse.util.ExtensionPointUtil;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
+import org.eclipse.bpmn2.Task;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.draw2d.IFigure;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.gef.ContextMenuProvider;
 import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.LayerConstants;
 import org.eclipse.gef.editparts.LayerManager;
 import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
+import org.eclipse.graphiti.mm.algorithms.MultiText;
+import org.eclipse.graphiti.mm.algorithms.Text;
+import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.Shape;
@@ -114,7 +119,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 	  	if(shouldMigrate) {
 	  		ActivitiUiUtil.runModelChange(new Runnable() {
 					public void run() {
-						setTransparencyAndLineWidth(diagram);
+						setTransparencyAndLineWidth(diagram, diagram);
 						Graphiti.getMigrationService().migrate070To080(diagram);
 					}
 				}, getEditingDomain(), "Mirgation from Graphiti 0.7 to 0.8");
@@ -122,7 +127,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 	  }
   }
 	
-	private void setTransparencyAndLineWidth(ContainerShape parent) {
+	private void setTransparencyAndLineWidth(ContainerShape parent, Diagram diagram) {
 		List<Shape> shapes = parent.getChildren();
 		for (Shape shape : shapes) {
       if(shape instanceof ContainerShape) {
@@ -136,7 +141,25 @@ public class ActivitiDiagramEditor extends DiagramEditor {
           }
           graphicsAlgorithm.setTransparency(0.0);
         }
-      	setTransparencyAndLineWidth((ContainerShape) shape);
+      	setTransparencyAndLineWidth((ContainerShape) shape, diagram);
+      
+      } else if(shape.getGraphicsAlgorithm() != null && shape.getGraphicsAlgorithm() instanceof Text) {
+      	if(parent.getLink().getBusinessObjects() != null && parent.getLink().getBusinessObjects().size() > 0) {
+      		EObject object = parent.getLink().getBusinessObjects().get(0);
+      		if(object instanceof Task) {
+      			Text text = (Text) shape.getGraphicsAlgorithm();
+          	MultiText multiText = Graphiti.getGaService().createDefaultMultiText(diagram, shape, text.getValue());
+          	multiText.setStyle(text.getStyle());
+          	multiText.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
+          	multiText.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);
+          	multiText.setFont(text.getFont());
+          	multiText.setX(text.getX());
+          	multiText.setY(text.getY());
+          	multiText.setHeight(30);
+          	multiText.setWidth(text.getWidth());
+          	shape.setGraphicsAlgorithm(multiText);
+      		}
+      	}
       }
     }
 	}

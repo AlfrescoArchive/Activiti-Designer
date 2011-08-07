@@ -212,7 +212,8 @@ public class BPMN20ExportMarshaller extends AbstractExportMarshaller implements 
       for (EObject object : contents) {
         if (object instanceof FlowNode) {
           FlowNode node = (FlowNode) object;
-          if (node.getIncoming().size() == 0 && node.getOutgoing().size() == 0) {
+          if (node.getIncoming().size() == 0 && node.getOutgoing().size() == 0 && node instanceof BoundaryEvent == false &&
+      				node instanceof EndEvent == false) {
             continue;
           }
         }

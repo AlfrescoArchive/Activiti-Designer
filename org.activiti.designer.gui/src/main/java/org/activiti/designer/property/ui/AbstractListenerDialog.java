@@ -494,15 +494,15 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
   private void setVisibleAlfrescoType(boolean visible) {
     if(PreferencesUtil.getBooleanPreference(Preferences.ALFRESCO_ENABLE)) {
       alfrescoTypeButton.setSelection(visible);
-      scriptText.setVisible(visible);
-      scriptLabel.setVisible(visible);
-      runAsText.setVisible(visible);
-      runAsLabel.setVisible(visible);
-      scriptProcessorText.setVisible(visible);
-      scriptProcessorLabel.setVisible(visible);
-      extensionLabel.setVisible(!visible);
-      fieldEditor.setVisible(!visible);
     }
+    scriptText.setVisible(visible);
+    scriptLabel.setVisible(visible);
+    runAsText.setVisible(visible);
+    runAsLabel.setVisible(visible);
+    scriptProcessorText.setVisible(visible);
+    scriptProcessorLabel.setVisible(visible);
+    extensionLabel.setVisible(!visible);
+    fieldEditor.setVisible(!visible);
   }
   
   private CLabel createLabel(Composite parent, String text, Control control) {

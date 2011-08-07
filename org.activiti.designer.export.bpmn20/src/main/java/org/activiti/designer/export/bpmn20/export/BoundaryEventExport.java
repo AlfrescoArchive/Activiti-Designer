@@ -52,7 +52,12 @@ public class BoundaryEventExport implements ActivitiNamespaceConstants {
           if (boundaryEvent.getName() != null) {
             xtw.writeAttribute("name", boundaryEvent.getName());
           }
-          xtw.writeAttribute("cancelActivity", "true");
+          if (boundaryEvent.isCancelActivity()) {
+          	xtw.writeAttribute("cancelActivity", "true");
+          } else {
+          	xtw.writeAttribute("cancelActivity", "false");
+          }
+          
           if (boundaryEvent.getAttachedToRef() != null) {
             xtw.writeAttribute("attachedToRef", subProcessId + boundaryEvent.getAttachedToRef().getId());
           }

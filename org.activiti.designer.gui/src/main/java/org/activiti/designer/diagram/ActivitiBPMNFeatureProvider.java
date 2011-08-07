@@ -45,6 +45,7 @@ import org.activiti.designer.features.MoveBoundaryEventFeature;
 import org.activiti.designer.features.PasteFlowElementFeature;
 import org.activiti.designer.features.SaveBpmnModelFeature;
 import org.activiti.designer.features.SubProcessResizeFeature;
+import org.activiti.designer.features.TaskResizeFeature;
 import org.activiti.designer.features.UpdateFlowElementFeature;
 import org.eclipse.bpmn2.AlfrescoMailTask;
 import org.eclipse.bpmn2.AlfrescoScriptTask;
@@ -67,6 +68,7 @@ import org.eclipse.bpmn2.SequenceFlow;
 import org.eclipse.bpmn2.ServiceTask;
 import org.eclipse.bpmn2.StartEvent;
 import org.eclipse.bpmn2.SubProcess;
+import org.eclipse.bpmn2.Task;
 import org.eclipse.bpmn2.UserTask;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.IAddFeature;
@@ -256,7 +258,9 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 	  Shape shape = context.getShape();
     Object bo = getBusinessObjectForPictogramElement(shape);
     if (bo instanceof SubProcess) {
-        return new SubProcessResizeFeature(this);
+    	return new SubProcessResizeFeature(this);
+    } else if (bo instanceof Task) {
+    	return new TaskResizeFeature(this);
     }
     return super.getResizeShapeFeature(context);
   }

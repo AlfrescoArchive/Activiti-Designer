@@ -66,7 +66,7 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 		Composite radioTypeComposite = new Composite(composite, SWT.NULL);
 		radioTypeComposite.setBackground(composite.getBackground());
 		data = new FormData();
-		data.left = new FormAttachment(0, 120);
+		data.left = new FormAttachment(0, 160);
 		data.right = new FormAttachment(100, 0);
 		radioTypeComposite.setLayoutData(data);
 		radioTypeComposite.setLayout(new RowLayout());
@@ -137,7 +137,7 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 
 		classNameText = factory.createText(composite, ""); //$NON-NLS-1$
 		data = new FormData();
-		data.left = new FormAttachment(0, 120);
+		data.left = new FormAttachment(0, 160);
 		data.right = new FormAttachment(70, 0);
 		data.top = new FormAttachment(radioTypeComposite, VSPACE);
 		classNameText.setEnabled(false);
@@ -204,7 +204,7 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 		
 		expressionText = factory.createText(composite, ""); //$NON-NLS-1$
 		data = new FormData();
-		data.left = new FormAttachment(0, 120);
+		data.left = new FormAttachment(0, 160);
 		data.right = new FormAttachment(100, 0);
 		data.top = new FormAttachment(radioTypeComposite, VSPACE);
 		expressionText.setVisible(false);
@@ -221,7 +221,7 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 		
 		delegateExpressionText = factory.createText(composite, ""); //$NON-NLS-1$
 		data = new FormData();
-		data.left = new FormAttachment(0, 120);
+		data.left = new FormAttachment(0, 160);
 		data.right = new FormAttachment(100, 0);
 		data.top = new FormAttachment(radioTypeComposite, VSPACE);
 		delegateExpressionText.setVisible(false);
@@ -238,7 +238,7 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 		
 		resultVariableText = factory.createText(composite, ""); //$NON-NLS-1$
     data = new FormData();
-    data.left = new FormAttachment(0, 120);
+    data.left = new FormAttachment(0, 160);
     data.right = new FormAttachment(100, 0);
     data.top = new FormAttachment(expressionText, VSPACE);
     resultVariableText.setLayoutData(data);
@@ -253,7 +253,7 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 		
 		Composite extensionsComposite = factory.createComposite(composite, SWT.WRAP);
 		data = new FormData();
-		data.left = new FormAttachment(0, 120);
+		data.left = new FormAttachment(0, 160);
 		data.right = new FormAttachment(100, 0);
 		data.top = new FormAttachment(resultVariableText, VSPACE);
 		extensionsComposite.setLayoutData(data);

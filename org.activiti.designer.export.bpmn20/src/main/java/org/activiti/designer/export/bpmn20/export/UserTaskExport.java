@@ -41,6 +41,11 @@ public class UserTaskExport implements ActivitiNamespaceConstants {
       if (userTask.getName() != null) {
         xtw.writeAttribute("name", userTask.getName());
       }
+      
+      if (userTask.getDueDate() != null) {
+        xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "dueDate", userTask.getDueDate());
+      }
+      
       DefaultFlowExport.createDefaultFlow(object, subProcessId, xtw);
 
       // TODO revisit once the designer supports mixing these
