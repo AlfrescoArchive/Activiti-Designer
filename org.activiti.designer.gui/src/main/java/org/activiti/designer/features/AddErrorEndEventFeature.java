@@ -12,6 +12,7 @@ import org.eclipse.graphiti.mm.algorithms.Ellipse;
 import org.eclipse.graphiti.mm.algorithms.Image;
 import org.eclipse.graphiti.mm.pictograms.BoxRelativeAnchor;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
+import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
@@ -55,11 +56,13 @@ public class AddErrorEndEventFeature extends AddEventFeature {
       gaService.setLocationAndSize(circle, 0, 0, width, height);
 
       if (addedEvent.eResource() == null) {
-        Object parentObject = getBusinessObjectForPictogramElement(parent);
-        if (parentObject instanceof SubProcess) {
-          ((SubProcess) parentObject).getFlowElements().add(addedEvent);
-        }
-      }
+				Object parentObject = getBusinessObjectForPictogramElement(parent);
+	      if (parentObject instanceof SubProcess) {
+	        ((SubProcess) parentObject).getFlowElements().add(addedEvent);
+	      } else {
+	        getDiagram().eResource().getContents().add(addedEvent);
+	      }
+			}
 
       // create link and wire it
       link(containerShape, addedEvent);
@@ -93,9 +96,9 @@ public class AddErrorEndEventFeature extends AddEventFeature {
   public boolean canAdd(IAddContext context) {
     if (context.getNewObject() instanceof Event) {
       
-      Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
+    	Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
       
-      if (parentObject instanceof SubProcess) {
+      if (context.getTargetContainer() instanceof Diagram || parentObject instanceof SubProcess) {
         return true;
       }
     }

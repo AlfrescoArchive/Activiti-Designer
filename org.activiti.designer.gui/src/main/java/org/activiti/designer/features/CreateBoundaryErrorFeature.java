@@ -5,10 +5,12 @@ import org.activiti.designer.util.features.AbstractCreateBPMNFeature;
 import org.eclipse.bpmn2.Activity;
 import org.eclipse.bpmn2.BoundaryEvent;
 import org.eclipse.bpmn2.Bpmn2Factory;
+import org.eclipse.bpmn2.CallActivity;
 import org.eclipse.bpmn2.ErrorEventDefinition;
 import org.eclipse.bpmn2.SubProcess;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
+import org.eclipse.graphiti.mm.pictograms.Diagram;
 
 public class CreateBoundaryErrorFeature extends AbstractCreateBPMNFeature {
 	
@@ -21,7 +23,8 @@ public class CreateBoundaryErrorFeature extends AbstractCreateBPMNFeature {
 
 	public boolean canCreate(ICreateContext context) {
 	  Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-    if (parentObject instanceof SubProcess == true) {
+    if (parentObject instanceof SubProcess == true ||
+        parentObject instanceof CallActivity == true) {
       return true;
     }
     return false;
@@ -35,7 +38,17 @@ public class CreateBoundaryErrorFeature extends AbstractCreateBPMNFeature {
 		boundaryEvent.setId(getNextId());
 		
 		Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-    if (parentObject instanceof SubProcess) {
+		if (parentObject instanceof SubProcess) {
+      getDiagram().eResource().getContents().add(boundaryEvent);
+    } else if(context.getTargetContainer().getContainer() != null && 
+            context.getTargetContainer().getContainer() instanceof Diagram == false) {
+      
+      Object containerObject = getBusinessObjectForPictogramElement(context.getTargetContainer().getContainer());
+      if (containerObject instanceof SubProcess) {
+        ((SubProcess) containerObject).getFlowElements().add(boundaryEvent);
+      }
+      
+    } else {
       getDiagram().eResource().getContents().add(boundaryEvent);
     }
     

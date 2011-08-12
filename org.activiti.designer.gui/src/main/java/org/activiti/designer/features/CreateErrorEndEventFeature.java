@@ -7,6 +7,7 @@ import org.eclipse.bpmn2.ErrorEventDefinition;
 import org.eclipse.bpmn2.SubProcess;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
+import org.eclipse.graphiti.mm.pictograms.Diagram;
 
 public class CreateErrorEndEventFeature extends AbstractCreateFastBPMNFeature {
 	
@@ -19,7 +20,7 @@ public class CreateErrorEndEventFeature extends AbstractCreateFastBPMNFeature {
 
 	public boolean canCreate(ICreateContext context) {
 	  Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-    return (parentObject instanceof SubProcess);
+    return (context.getTargetContainer() instanceof Diagram || parentObject instanceof SubProcess);
 	}
 
 	public Object[] create(ICreateContext context) {
@@ -31,8 +32,10 @@ public class CreateErrorEndEventFeature extends AbstractCreateFastBPMNFeature {
 		endEvent.setName("ErrorEnd");
 		
 		Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-    if (parentObject instanceof SubProcess) {
+		if (parentObject instanceof SubProcess) {
       ((SubProcess) parentObject).getFlowElements().add(endEvent);
+    } else {
+      getDiagram().eResource().getContents().add(endEvent);
     }
 
     addGraphicalContent(endEvent, context);

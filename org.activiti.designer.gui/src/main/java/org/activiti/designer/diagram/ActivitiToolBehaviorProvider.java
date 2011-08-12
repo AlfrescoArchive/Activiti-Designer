@@ -240,7 +240,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
       addContextButton(otherElementButton, new CreateParallelGatewayFeature(getFeatureProvider()), taskContext, 
       		"Create parallel gateway", "Create a new parallel gateway", ActivitiImageProvider.IMG_GATEWAY_PARALLEL);
       addContextButton(otherElementButton, new CreateEndEventFeature(getFeatureProvider()), taskContext, 
-      		"Create error end event", "Create a new end event", ActivitiImageProvider.IMG_ENDEVENT_NONE);
+      		"Create end event", "Create a new end event", ActivitiImageProvider.IMG_ENDEVENT_NONE);
       addContextButton(otherElementButton, new CreateErrorEndEventFeature(getFeatureProvider()), taskContext, 
       		"Create error end event", "Create a new error end event", ActivitiImageProvider.IMG_ENDEVENT_ERROR);
       addContextButton(otherElementButton, new CreateAlfrescoScriptTaskFeature(getFeatureProvider()), taskContext, 

@@ -42,7 +42,7 @@ public class UserTaskExport implements ActivitiNamespaceConstants {
         xtw.writeAttribute("name", userTask.getName());
       }
       
-      if (userTask.getDueDate() != null) {
+      if (userTask.getDueDate() != null && userTask.getDueDate().length() > 0) {
         xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "dueDate", userTask.getDueDate());
       }
       

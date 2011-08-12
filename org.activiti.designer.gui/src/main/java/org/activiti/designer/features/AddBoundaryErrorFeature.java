@@ -3,6 +3,7 @@ package org.activiti.designer.features;
 import org.activiti.designer.ActivitiImageProvider;
 import org.activiti.designer.util.style.StyleUtil;
 import org.eclipse.bpmn2.BoundaryEvent;
+import org.eclipse.bpmn2.CallActivity;
 import org.eclipse.bpmn2.SubProcess;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddContext;
@@ -10,6 +11,7 @@ import org.eclipse.graphiti.features.impl.AbstractAddShapeFeature;
 import org.eclipse.graphiti.mm.algorithms.Ellipse;
 import org.eclipse.graphiti.mm.algorithms.Image;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
+import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
@@ -41,6 +43,32 @@ public class AddBoundaryErrorFeature extends AbstractAddShapeFeature {
       y += parent.getGraphicsAlgorithm().getY();
       
       parent = getDiagram();
+      
+    } else if(parent.getContainer() != null && 
+            parent.getContainer() instanceof Diagram == false) {
+      
+      x += parent.getGraphicsAlgorithm().getX();
+      y += parent.getGraphicsAlgorithm().getY();
+      
+      Object containerObject = getBusinessObjectForPictogramElement(parent.getContainer());
+      if (containerObject instanceof SubProcess) {
+        parent = parent.getContainer();
+      }
+      
+      if (addedEvent.eResource() == null) {
+        ((SubProcess) parentObject).getFlowElements().add(addedEvent);
+      }
+      
+    } else {
+      
+      x += parent.getGraphicsAlgorithm().getX();
+      y += parent.getGraphicsAlgorithm().getY();
+      
+      parent = getDiagram();
+      
+      if (addedEvent.eResource() == null) {
+        getDiagram().eResource().getContents().add(addedEvent);
+      }
     } 
 
     // CONTAINER SHAPE WITH CIRCLE
@@ -95,7 +123,7 @@ public class AddBoundaryErrorFeature extends AbstractAddShapeFeature {
   @Override
   public boolean canAdd(IAddContext context) {
     Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-    if (parentObject instanceof SubProcess == false) {
+    if (parentObject instanceof SubProcess == false && parentObject instanceof CallActivity == false) {
       return false;
     }
     if (context.getNewObject() instanceof BoundaryEvent == false) {
