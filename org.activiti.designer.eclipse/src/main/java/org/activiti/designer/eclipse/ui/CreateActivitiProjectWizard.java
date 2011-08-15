@@ -152,7 +152,7 @@ public class CreateActivitiProjectWizard extends BasicNewProjectResourceWizard {
 		buffer.append("  <packaging>jar</packaging>\n");
 		buffer.append("  <name>BPMN 2.0 with Activiti - Examples</name>\n");
 		buffer.append("  <properties>\n");
-		buffer.append("    <activiti-version>5.4</activiti-version>\n");
+		buffer.append("    <activiti-version>5.7</activiti-version>\n");
 		buffer.append("  </properties>\n");
 		buffer.append("  <dependencies>\n");
 		addDependency(buffer, "org.activiti", "activiti-engine", "${activiti-version}");

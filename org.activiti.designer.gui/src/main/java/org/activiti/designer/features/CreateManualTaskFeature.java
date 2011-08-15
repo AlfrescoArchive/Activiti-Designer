@@ -26,7 +26,7 @@ public class CreateManualTaskFeature extends AbstractCreateFastBPMNFeature {
 	public Object[] create(ICreateContext context) {
 		ManualTask newManualTask = Bpmn2Factory.eINSTANCE.createManualTask();
 		newManualTask.setId(getNextId());
-		newManualTask.setName("Manual Task");
+		setName("Manual Task", newManualTask, context);
 		
 		Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
     if (parentObject instanceof SubProcess) {

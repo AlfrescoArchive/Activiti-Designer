@@ -26,7 +26,7 @@ public class CreateBusinessRuleTaskFeature extends AbstractCreateFastBPMNFeature
 	public Object[] create(ICreateContext context) {
 		BusinessRuleTask newBusinessRuleTask = Bpmn2Factory.eINSTANCE.createBusinessRuleTask();
 		newBusinessRuleTask.setId(getNextId());
-		newBusinessRuleTask.setName("Business rule task");
+		setName("Business rule task", newBusinessRuleTask, context);
 		
 		Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
     if (parentObject instanceof SubProcess) {

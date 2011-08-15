@@ -27,7 +27,7 @@ public class CreateUserTaskFeature extends AbstractCreateFastBPMNFeature {
 		UserTask newUserTask = Bpmn2Factory.eINSTANCE.createUserTask();
 
 		newUserTask.setId(getNextId());
-		newUserTask.setName("User Task");
+		setName("User Task", newUserTask, context);
 
 		Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
     if (parentObject instanceof SubProcess) {

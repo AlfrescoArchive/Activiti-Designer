@@ -26,7 +26,7 @@ public class CreateCallActivityFeature extends AbstractCreateFastBPMNFeature {
 	public Object[] create(ICreateContext context) {
 		CallActivity callActivity = Bpmn2Factory.eINSTANCE.createCallActivity();
 		callActivity.setId(getNextId());
-		callActivity.setName("Call activity");
+		setName("Call activity", callActivity, context);
 
 		Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
     if (parentObject instanceof SubProcess) {

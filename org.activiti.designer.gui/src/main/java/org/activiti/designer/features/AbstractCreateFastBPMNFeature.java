@@ -9,6 +9,7 @@ import org.activiti.designer.util.features.AbstractCreateBPMNFeature;
 import org.eclipse.bpmn2.BaseElement;
 import org.eclipse.bpmn2.CallActivity;
 import org.eclipse.bpmn2.Event;
+import org.eclipse.bpmn2.FlowElement;
 import org.eclipse.bpmn2.FlowNode;
 import org.eclipse.bpmn2.Gateway;
 import org.eclipse.bpmn2.SequenceFlow;
@@ -78,6 +79,14 @@ public abstract class AbstractCreateFastBPMNFeature extends AbstractCreateBPMNFe
       	elementAnchor.getIncomingConnections().add(connection);
       }
 		}
+  }
+  
+  protected void setName(String defaultName, FlowElement targetElement, ICreateContext context) {
+  	if(context.getProperty("org.activiti.designer.changetype.name") != null) {
+  		targetElement.setName(context.getProperty("org.activiti.designer.changetype.name").toString());
+  	} else {
+  		targetElement.setName(defaultName);
+  	}
   }
   
   private void setLocation(BaseElement targetElement, CreateContext context) {

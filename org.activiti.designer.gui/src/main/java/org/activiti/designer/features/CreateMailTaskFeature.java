@@ -26,7 +26,7 @@ public class CreateMailTaskFeature extends AbstractCreateFastBPMNFeature {
 	public Object[] create(ICreateContext context) {
 		MailTask newMailTask = Bpmn2Factory.eINSTANCE.createMailTask();
 		newMailTask.setId(getNextId());
-		newMailTask.setName("Mail Task");
+		setName("Mail Task", newMailTask, context);
 		
 		Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
     if (parentObject instanceof SubProcess) {

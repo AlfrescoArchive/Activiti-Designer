@@ -26,7 +26,7 @@ public class CreateScriptTaskFeature extends AbstractCreateFastBPMNFeature {
 	public Object[] create(ICreateContext context) {
 		ScriptTask newScriptTask = Bpmn2Factory.eINSTANCE.createScriptTask();
 		newScriptTask.setId(getNextId());
-		newScriptTask.setName("Script Task");
+		setName("Script Task", newScriptTask, context);
 		
 		Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
     if (parentObject instanceof SubProcess) {

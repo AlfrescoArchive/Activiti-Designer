@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.bpmn2.BaseElement;
+import org.eclipse.bpmn2.FlowElement;
 import org.eclipse.bpmn2.FlowNode;
 import org.eclipse.bpmn2.SequenceFlow;
 import org.eclipse.emf.common.util.EList;
@@ -52,7 +53,7 @@ public class ChangeElementTypeFeature extends AbstractCustomFeature {
   	taskContext.setTargetContainer(targetContainer);
   	taskContext.setLocation(x, y);
   	
-	  BaseElement oldObject = (BaseElement) element.getLink().getBusinessObjects().get(0);
+  	FlowElement oldObject = (FlowElement) element.getLink().getBusinessObjects().get(0);
 	  String objectId = oldObject.getId();
 	  
 	  List<SequenceFlow> sourceList = new ArrayList<SequenceFlow>();
@@ -70,6 +71,7 @@ public class ChangeElementTypeFeature extends AbstractCustomFeature {
 	  }
 	  taskContext.putProperty("org.activiti.designer.changetype.sourceflows", sourceList);
 	  taskContext.putProperty("org.activiti.designer.changetype.targetflows", targetList);
+	  taskContext.putProperty("org.activiti.designer.changetype.name", oldObject.getName());
 	  
 	  Anchor elementAnchor = null;
 	  for (Shape shape : targetContainer.getChildren()) {

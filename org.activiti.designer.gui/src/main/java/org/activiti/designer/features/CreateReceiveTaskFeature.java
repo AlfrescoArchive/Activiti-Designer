@@ -26,7 +26,7 @@ public class CreateReceiveTaskFeature extends AbstractCreateFastBPMNFeature {
 	public Object[] create(ICreateContext context) {
 		ReceiveTask newReceiveTask = Bpmn2Factory.eINSTANCE.createReceiveTask();
 		newReceiveTask.setId(getNextId());
-		newReceiveTask.setName("Receive Task");
+		setName("Receive Task", newReceiveTask, context);
 		
 		Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
     if (parentObject instanceof SubProcess) {
