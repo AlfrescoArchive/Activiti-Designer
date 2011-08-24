@@ -24,6 +24,7 @@ import org.activiti.designer.features.CreateEmbeddedSubProcessFeature;
 import org.activiti.designer.features.CreateEndEventFeature;
 import org.activiti.designer.features.CreateErrorEndEventFeature;
 import org.activiti.designer.features.CreateExclusiveGatewayFeature;
+import org.activiti.designer.features.CreateInclusiveGatewayFeature;
 import org.activiti.designer.features.CreateMailTaskFeature;
 import org.activiti.designer.features.CreateManualTaskFeature;
 import org.activiti.designer.features.CreateParallelGatewayFeature;
@@ -48,6 +49,7 @@ import org.eclipse.bpmn2.BusinessRuleTask;
 import org.eclipse.bpmn2.CallActivity;
 import org.eclipse.bpmn2.ExclusiveGateway;
 import org.eclipse.bpmn2.Gateway;
+import org.eclipse.bpmn2.InclusiveGateway;
 import org.eclipse.bpmn2.MailTask;
 import org.eclipse.bpmn2.ManualTask;
 import org.eclipse.bpmn2.ParallelGateway;
@@ -124,6 +126,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     toolMapping.put(CreateEndEventFeature.class, PaletteEntry.END_EVENT);
     toolMapping.put(CreateErrorEndEventFeature.class, PaletteEntry.ERROR_END_EVENT);
     toolMapping.put(CreateExclusiveGatewayFeature.class, PaletteEntry.EXCLUSIVE_GATEWAY);
+    toolMapping.put(CreateInclusiveGatewayFeature.class, PaletteEntry.INCLUSIVE_GATEWAY);
     toolMapping.put(CreateMailTaskFeature.class, PaletteEntry.MAIL_TASK);
     toolMapping.put(CreateManualTaskFeature.class, PaletteEntry.MANUAL_TASK);
     toolMapping.put(CreateReceiveTaskFeature.class, PaletteEntry.RECEIVE_TASK);
@@ -247,6 +250,8 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
       		"Create call activity", "Create a new call activiti", ActivitiImageProvider.IMG_CALLACTIVITY);
       addContextButton(otherElementButton, new CreateExclusiveGatewayFeature(getFeatureProvider()), taskContext, 
       		"Create exclusive gateway", "Create a new exclusive gateway", ActivitiImageProvider.IMG_GATEWAY_EXCLUSIVE);
+      addContextButton(otherElementButton, new CreateInclusiveGatewayFeature(getFeatureProvider()), taskContext, 
+          "Create inclusive gateway", "Create a new inclusive gateway", ActivitiImageProvider.IMG_GATEWAY_INCLUSIVE);
       addContextButton(otherElementButton, new CreateParallelGatewayFeature(getFeatureProvider()), taskContext, 
       		"Create parallel gateway", "Create a new parallel gateway", ActivitiImageProvider.IMG_GATEWAY_PARALLEL);
       addContextButton(otherElementButton, new CreateEndEventFeature(getFeatureProvider()), taskContext, 
@@ -282,11 +287,15 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
   }
   
   private void addGatewayButtons(ContextButtonEntry otherElementButton, Gateway notGateway, CustomContext customContext) {
-  	if(notGateway == null || notGateway instanceof ExclusiveGateway == false) {
+  	if(notGateway == null || !(notGateway instanceof ExclusiveGateway)) {
 	  	addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "exclusivegateway"), customContext, 
-	    		"Change to exclusive gateway", "Change to a exclusive gateway", ActivitiImageProvider.IMG_GATEWAY_EXCLUSIVE);
+	    		"Change to exclusive gateway", "Change to an exclusive gateway", ActivitiImageProvider.IMG_GATEWAY_EXCLUSIVE);
   	}
-  	if(notGateway == null || notGateway instanceof ParallelGateway == false) {
+    if(notGateway == null || !(notGateway instanceof InclusiveGateway)) {
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "inclusivegateway"), customContext, 
+      		"Change to inclusive gateway", "Change to an inclusive gateway", ActivitiImageProvider.IMG_GATEWAY_INCLUSIVE);
+    }
+  	if(notGateway == null || !(notGateway instanceof ParallelGateway)) {
 	    addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "parallelgateway"), customContext, 
 	    		"Change to parallel gateway", "Change to a parallel gateway", ActivitiImageProvider.IMG_GATEWAY_PARALLEL);
   	}
@@ -440,6 +449,8 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
         } else if ("parallelgateway".equalsIgnoreCase(toolEntry.getLabel())) {
           gatewayCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("exclusivegateway".equalsIgnoreCase(toolEntry.getLabel())) {
+          gatewayCompartmentEntry.getToolEntries().add(toolEntry);
+        } else if ("inclusivegateway".equalsIgnoreCase(toolEntry.getLabel())) {
           gatewayCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("subprocess".equalsIgnoreCase(toolEntry.getLabel())) {
           taskCompartmentEntry.getToolEntries().add(toolEntry);

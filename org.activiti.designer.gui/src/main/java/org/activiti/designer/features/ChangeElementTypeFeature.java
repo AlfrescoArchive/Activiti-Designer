@@ -148,7 +148,10 @@ public class ChangeElementTypeFeature extends AbstractCustomFeature {
 	  } else if("exclusivegateway".equals(newType)) {
 	  	new CreateExclusiveGatewayFeature(getFeatureProvider()).create(taskContext);
 	 
-	  } else if("parallelgateway".equals(newType)) {
+	  } else if("inclusivegateway".equals(newType)) {
+        new CreateInclusiveGatewayFeature(getFeatureProvider()).create(taskContext);
+     
+      } else if("parallelgateway".equals(newType)) {
 	  	new CreateParallelGatewayFeature(getFeatureProvider()).create(taskContext);
 	  }
   }

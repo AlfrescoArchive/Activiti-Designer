@@ -5,6 +5,7 @@ package org.activiti.designer.util;
 
 import org.activiti.designer.features.CreateEndEventFeature;
 import org.activiti.designer.features.CreateExclusiveGatewayFeature;
+import org.activiti.designer.features.CreateInclusiveGatewayFeature;
 import org.activiti.designer.features.CreateMailTaskFeature;
 import org.activiti.designer.features.CreateParallelGatewayFeature;
 import org.activiti.designer.features.CreateScriptTaskFeature;
@@ -22,6 +23,7 @@ import org.eclipse.bpmn2.DataGridRow;
 import org.eclipse.bpmn2.EndEvent;
 import org.eclipse.bpmn2.ExclusiveGateway;
 import org.eclipse.bpmn2.FlowElement;
+import org.eclipse.bpmn2.InclusiveGateway;
 import org.eclipse.bpmn2.MailTask;
 import org.eclipse.bpmn2.ManualTask;
 import org.eclipse.bpmn2.ParallelGateway;
@@ -57,6 +59,8 @@ public final class CloneUtil {
       return clone((EndEvent) element, diagram);
     } else if (element instanceof ExclusiveGateway) {
       return clone((ExclusiveGateway) element, diagram);
+    } else if (element instanceof InclusiveGateway) {
+      return clone((InclusiveGateway) element, diagram);
     } else if (element instanceof MailTask) {
       return clone((MailTask) element, diagram);
     } else if (element instanceof ManualTask) {
@@ -125,6 +129,27 @@ public final class CloneUtil {
     ExclusiveGateway result = Bpmn2Factory.eINSTANCE.createExclusiveGateway();
 
     result.setId(ActivitiUiUtil.getNextId(result.getClass(), CreateExclusiveGatewayFeature.FEATURE_ID_KEY, diagram));
+    result.setName(original.getName());
+    result.setGatewayDirection(original.getGatewayDirection());
+
+    diagram.eResource().getContents().add(result);
+
+    return result;
+
+  }
+
+  /**
+   * Clones an {@link InclusiveGateway}.
+   * 
+   * @param original
+   *          the object to clone
+   * @return a clone of the original object
+   */
+  private static final InclusiveGateway clone(final InclusiveGateway original, final Diagram diagram) {
+
+    InclusiveGateway result = Bpmn2Factory.eINSTANCE.createInclusiveGateway();
+
+    result.setId(ActivitiUiUtil.getNextId(result.getClass(), CreateInclusiveGatewayFeature.FEATURE_ID_KEY, diagram));
     result.setName(original.getName());
     result.setGatewayDirection(original.getGatewayDirection());
 

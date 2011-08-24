@@ -16,6 +16,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.eclipse.bpmn2.Activity;
 import org.eclipse.bpmn2.ExclusiveGateway;
+import org.eclipse.bpmn2.InclusiveGateway;
 import org.eclipse.bpmn2.SequenceFlow;
 import org.eclipse.emf.ecore.EObject;
 
@@ -29,8 +30,14 @@ public class DefaultFlowExport {
     SequenceFlow defaultFlow = null;
     if(object instanceof Activity) {
       defaultFlow = ((Activity) object).getDefault();
-    } else {
+    } else if(object instanceof ExclusiveGateway) {
       defaultFlow = ((ExclusiveGateway) object).getDefault();
+    } else if(object instanceof InclusiveGateway) {
+      defaultFlow = ((InclusiveGateway) object).getDefault();
+    }
+    else {
+        throw new Exception("Invalid default flow chosen.  Expected 'Activity', " +
+        		"'ExclusiveGateway', 'InclusiveGateway', but got: '" + defaultFlow);
     }
     if(defaultFlow != null) {
       xtw.writeAttribute("default", subProcessId + defaultFlow.getId());

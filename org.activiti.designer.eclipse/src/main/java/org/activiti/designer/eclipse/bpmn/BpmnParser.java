@@ -43,6 +43,7 @@ import org.eclipse.bpmn2.FlowNode;
 import org.eclipse.bpmn2.FormProperty;
 import org.eclipse.bpmn2.FormalExpression;
 import org.eclipse.bpmn2.IOParameter;
+import org.eclipse.bpmn2.InclusiveGateway;
 import org.eclipse.bpmn2.IntermediateCatchEvent;
 import org.eclipse.bpmn2.MailTask;
 import org.eclipse.bpmn2.ManualTask;
@@ -258,6 +259,15 @@ public class BpmnParser {
 						bpmnList.add(exclusiveGateway);
 
 					} else if (xtr.isStartElement()
+              && "inclusiveGateway".equalsIgnoreCase(xtr.getLocalName())) {
+            String elementid = xtr.getAttributeValue(null, "id");
+            InclusiveGateway inclusiveGateway = parseInclusiveGateway(xtr);
+            inclusiveGateway.setId(elementid);
+            if (activeSubProcess != null)
+                activeSubProcess.getFlowElements().add(inclusiveGateway);
+            bpmnList.add(inclusiveGateway);
+
+          } else if (xtr.isStartElement()
 					    && "parallelGateway".equalsIgnoreCase(xtr.getLocalName())) {
 						String elementid = xtr.getAttributeValue(null, "id");
 						ParallelGateway parallelGateway = parseParallelGateway(xtr);
@@ -537,6 +547,22 @@ public class BpmnParser {
 		}
 		return exclusiveGateway;
 	}
+	
+	private InclusiveGateway parseInclusiveGateway(XMLStreamReader xtr) {
+        InclusiveGateway inclusiveGateway = Bpmn2Factory.eINSTANCE
+            .createInclusiveGateway();
+        String name = xtr.getAttributeValue(null, "name");
+        if (name != null) {
+            inclusiveGateway.setName(name);
+        } else {
+            inclusiveGateway.setName(xtr.getAttributeValue(null, "id"));
+        }
+        if (xtr.getAttributeValue(null, "default") != null) {
+            defaultFlowMap.put(inclusiveGateway,
+                xtr.getAttributeValue(null, "default"));
+        }
+        return inclusiveGateway;
+    }
 
 	private ParallelGateway parseParallelGateway(XMLStreamReader xtr) {
 		ParallelGateway parallelGateway = Bpmn2Factory.eINSTANCE

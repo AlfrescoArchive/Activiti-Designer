@@ -8,6 +8,7 @@ import org.activiti.designer.features.AddEmbeddedSubProcessFeature;
 import org.activiti.designer.features.AddEndEventFeature;
 import org.activiti.designer.features.AddErrorEndEventFeature;
 import org.activiti.designer.features.AddExclusiveGatewayFeature;
+import org.activiti.designer.features.AddInclusiveGatewayFeature;
 import org.activiti.designer.features.AddMailTaskFeature;
 import org.activiti.designer.features.AddManualTaskFeature;
 import org.activiti.designer.features.AddParallelGatewayFeature;
@@ -29,6 +30,7 @@ import org.activiti.designer.features.CreateEmbeddedSubProcessFeature;
 import org.activiti.designer.features.CreateEndEventFeature;
 import org.activiti.designer.features.CreateErrorEndEventFeature;
 import org.activiti.designer.features.CreateExclusiveGatewayFeature;
+import org.activiti.designer.features.CreateInclusiveGatewayFeature;
 import org.activiti.designer.features.CreateMailTaskFeature;
 import org.activiti.designer.features.CreateManualTaskFeature;
 import org.activiti.designer.features.CreateParallelGatewayFeature;
@@ -61,6 +63,7 @@ import org.eclipse.bpmn2.ErrorEventDefinition;
 import org.eclipse.bpmn2.EventDefinition;
 import org.eclipse.bpmn2.ExclusiveGateway;
 import org.eclipse.bpmn2.FlowElement;
+import org.eclipse.bpmn2.InclusiveGateway;
 import org.eclipse.bpmn2.IntermediateCatchEvent;
 import org.eclipse.bpmn2.MailTask;
 import org.eclipse.bpmn2.ManualTask;
@@ -161,7 +164,9 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
       return new AddBusinessRuleTaskFeature(this);
 		} else if (context.getNewObject() instanceof ExclusiveGateway) {
 			return new AddExclusiveGatewayFeature(this);
-		} else if (context.getNewObject() instanceof ParallelGateway) {
+		} else if (context.getNewObject() instanceof InclusiveGateway) {
+      return new AddInclusiveGatewayFeature(this);
+    } else if (context.getNewObject() instanceof ParallelGateway) {
 			return new AddParallelGatewayFeature(this);
 		} else if (context.getNewObject() instanceof BoundaryEvent) {
 		  if(((BoundaryEvent) context.getNewObject()).getEventDefinitions().size() > 0) {
@@ -201,6 +206,7 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 		        new CreateBusinessRuleTaskFeature(this),
 		        new CreateParallelGatewayFeature(this), 
 		        new CreateExclusiveGatewayFeature(this), 
+		        new CreateInclusiveGatewayFeature(this), 
 		        new CreateBoundaryTimerFeature(this),
 		        new CreateBoundaryErrorFeature(this),
 		        new CreateTimerCatchingEventFeature(this),

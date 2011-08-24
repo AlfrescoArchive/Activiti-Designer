@@ -47,6 +47,7 @@ import org.eclipse.bpmn2.FieldExtension;
 import org.eclipse.bpmn2.FlowElement;
 import org.eclipse.bpmn2.FlowNode;
 import org.eclipse.bpmn2.Gateway;
+import org.eclipse.bpmn2.InclusiveGateway;
 import org.eclipse.bpmn2.MailTask;
 import org.eclipse.bpmn2.ManualTask;
 import org.eclipse.bpmn2.ParallelGateway;
@@ -537,6 +538,8 @@ public class BpmnFileReader {
         }
       } else if(flowElement instanceof ExclusiveGateway) {
         flowElement.setId(getNextId("exclusivegateway", idMap));
+      } else if(flowElement instanceof InclusiveGateway) {
+        flowElement.setId(getNextId("inclusivegateway", idMap));
       } else if(flowElement instanceof ParallelGateway) {
         flowElement.setId(getNextId("parallelgateway", idMap));
       } else if(flowElement instanceof UserTask) {
@@ -678,6 +681,8 @@ public class BpmnFileReader {
           if(defaultId.equalsIgnoreCase(sequenceFlowModel.id)) {
             if(flowNode instanceof ExclusiveGateway) {
               ((ExclusiveGateway) flowNode).setDefault(sequenceFlow);
+            } else if(flowNode instanceof InclusiveGateway) {
+              ((InclusiveGateway) flowNode).setDefault(sequenceFlow);
             } else {
               ((Activity) flowNode).setDefault(sequenceFlow);
             }
@@ -772,7 +777,8 @@ public class BpmnFileReader {
       } else {
         addContext.setY(graphicInfo.y);
       }
-    } else if(flowElement instanceof ExclusiveGateway || flowElement instanceof ParallelGateway) {
+    } else if(flowElement instanceof ExclusiveGateway || flowElement instanceof InclusiveGateway || 
+        flowElement instanceof ParallelGateway) {
       if(graphicInfo.height < GATEWAY_HEIGHT) {
         addContext.setY(graphicInfo.y - 20);
       } else {

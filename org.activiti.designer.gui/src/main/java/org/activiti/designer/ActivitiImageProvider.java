@@ -33,6 +33,7 @@ public class ActivitiImageProvider extends AbstractImageProvider {
   // Gateway image icons
   public static final String IMG_GATEWAY_PARALLEL = PREFIX + "gateway.parallel"; //$NON-NLS-1$
   public static final String IMG_GATEWAY_EXCLUSIVE = PREFIX + "gateway.exclusive"; //$NON-NLS-1$
+  public static final String IMG_GATEWAY_INCLUSIVE = PREFIX + "gateway.inclusive"; //$NON-NLS-1$
 
   // Task image icons
   public static final String IMG_USERTASK = PREFIX + "usertask"; //$NON-NLS-1$
@@ -67,6 +68,7 @@ public class ActivitiImageProvider extends AbstractImageProvider {
     addImageFilePath(IMG_ENDEVENT_ERROR, "icons/error.png"); //$NON-NLS-1$
     addImageFilePath(IMG_GATEWAY_PARALLEL, "icons/type.gateway.parallel.png"); //$NON-NLS-1$
     addImageFilePath(IMG_GATEWAY_EXCLUSIVE, "icons/type.gateway.exclusive.png"); //$NON-NLS-1$
+    addImageFilePath(IMG_GATEWAY_INCLUSIVE, "icons/type.gateway.inclusive.png"); //$NON-NLS-1$
     addImageFilePath(IMG_USERTASK, "icons/type.user.png"); //$NON-NLS-1$
     addImageFilePath(IMG_SCRIPTTASK, "icons/type.script.png"); //$NON-NLS-1$
     addImageFilePath(IMG_SERVICETASK, "icons/type.service.png"); //$NON-NLS-1$
