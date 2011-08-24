@@ -158,41 +158,23 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
 
     setGenericContextButtons(data, pe, CONTEXT_BUTTON_DELETE);
 
-    CreateConnectionContext ccc = new CreateConnectionContext();
-    ccc.setSourcePictogramElement(pe);
-    Anchor anchor = null;
-    if (pe instanceof Anchor) {
-      anchor = (Anchor) pe;
-    } else if (pe instanceof AnchorContainer) {
-      anchor = Graphiti.getPeService().getChopboxAnchor((AnchorContainer) pe);
-    }
-    ccc.setSourceAnchor(anchor);
-
-    ContextButtonEntry button = new ContextButtonEntry(null, context);
-    button.setText("Create connection"); //$NON-NLS-1$
-    button.setIconId(ActivitiImageProvider.IMG_EREFERENCE);
-    ICreateConnectionFeature[] features = getFeatureProvider().getCreateConnectionFeatures();
-    for (ICreateConnectionFeature feature : features) {
-      if (feature.isAvailable(ccc) && feature.canStartConnection(ccc))
-        button.addDragAndDropFeature(feature);
-    }
-
     Object bo = getFeatureProvider().getBusinessObjectForPictogramElement(pe);
+    
+    CreateConnectionContext connectionContext = new CreateConnectionContext();
+  	connectionContext.setSourcePictogramElement(pe);
+    Anchor connectionAnchor = null;
+    if (pe instanceof Anchor) {
+    	connectionAnchor = (Anchor) pe;
+    } else if (pe instanceof AnchorContainer) {
+    	connectionAnchor = Graphiti.getPeService().getChopboxAnchor((AnchorContainer) pe);
+    }
+    connectionContext.setSourceAnchor(connectionAnchor);
+    
+    CreateContext taskContext = new CreateContext();
+  	taskContext.setTargetContainer((ContainerShape) pe.eContainer());
+  	taskContext.putProperty("org.activiti.designer.connectionContext", connectionContext);
+    
     if (bo instanceof StartEvent || bo instanceof Task || bo instanceof CallActivity || bo instanceof Gateway) {
-
-    	CreateConnectionContext connectionContext = new CreateConnectionContext();
-    	connectionContext.setSourcePictogramElement(pe);
-      Anchor connectionAnchor = null;
-      if (pe instanceof Anchor) {
-      	connectionAnchor = (Anchor) pe;
-      } else if (pe instanceof AnchorContainer) {
-      	connectionAnchor = Graphiti.getPeService().getChopboxAnchor((AnchorContainer) pe);
-      }
-      connectionContext.setSourceAnchor(connectionAnchor);
-    	
-    	CreateContext taskContext = new CreateContext();
-    	taskContext.setTargetContainer((ContainerShape) pe.eContainer());
-    	taskContext.putProperty("org.activiti.designer.connectionContext", connectionContext);
     	
     	CreateUserTaskFeature userTaskfeature = new CreateUserTaskFeature(getFeatureProvider());
       ContextButtonEntry newUserTaskButton = new ContextButtonEntry(userTaskfeature, taskContext);
@@ -214,6 +196,32 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
       newEndButton.setDescription("Create a new end event"); //$NON-NLS-1$
       newEndButton.setIconId(ActivitiImageProvider.IMG_ENDEVENT_NONE);
       data.getDomainSpecificContextButtons().add(newEndButton);
+    }
+    
+    CreateConnectionContext ccc = new CreateConnectionContext();
+    ccc.setSourcePictogramElement(pe);
+    Anchor anchor = null;
+    if (pe instanceof Anchor) {
+      anchor = (Anchor) pe;
+    } else if (pe instanceof AnchorContainer) {
+      anchor = Graphiti.getPeService().getChopboxAnchor((AnchorContainer) pe);
+    }
+    ccc.setSourceAnchor(anchor);
+
+    ContextButtonEntry button = new ContextButtonEntry(null, context);
+    button.setText("Create connection"); //$NON-NLS-1$
+    button.setIconId(ActivitiImageProvider.IMG_EREFERENCE);
+    ICreateConnectionFeature[] features = getFeatureProvider().getCreateConnectionFeatures();
+    for (ICreateConnectionFeature feature : features) {
+      if (feature.isAvailable(ccc) && feature.canStartConnection(ccc))
+        button.addDragAndDropFeature(feature);
+    }
+
+    if (button.getDragAndDropFeatures().size() > 0) {
+      data.getDomainSpecificContextButtons().add(button);
+    }
+    
+    if (bo instanceof StartEvent || bo instanceof Task || bo instanceof CallActivity || bo instanceof Gateway) {
       
       ContextButtonEntry otherElementButton = new ContextButtonEntry(null, null);
       otherElementButton.setText("new element"); //$NON-NLS-1$
@@ -268,10 +276,6 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
       	addGatewayButtons(editElementButton, (Gateway) bo, customContext);
       }
       
-    }
-
-    if (button.getDragAndDropFeatures().size() > 0) {
-      data.getDomainSpecificContextButtons().add(button);
     }
 
     return data;
