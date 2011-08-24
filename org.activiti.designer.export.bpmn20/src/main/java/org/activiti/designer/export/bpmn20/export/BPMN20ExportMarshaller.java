@@ -29,6 +29,7 @@ import org.eclipse.bpmn2.ExclusiveGateway;
 import org.eclipse.bpmn2.FlowElement;
 import org.eclipse.bpmn2.FlowNode;
 import org.eclipse.bpmn2.FormalExpression;
+import org.eclipse.bpmn2.IntermediateCatchEvent;
 import org.eclipse.bpmn2.MailTask;
 import org.eclipse.bpmn2.ManualTask;
 import org.eclipse.bpmn2.ParallelGateway;
@@ -380,6 +381,9 @@ public class BPMN20ExportMarshaller extends AbstractExportMarshaller implements 
 
     } else if (object instanceof BoundaryEvent) {
       BoundaryEventExport.createBoundaryEvent(object, subProcessId, xtw);
+    
+    } else if (object instanceof IntermediateCatchEvent) {
+    	IntermediateCatchEventExport.createIntermediateEvent(object, subProcessId, xtw);
 
     } else if (object instanceof SubProcess) {
       SubProcess subProcess = (SubProcess) object;

@@ -147,7 +147,7 @@
          <propertySection
                class="org.activiti.designer.property.PropertyTimerStartEventSection"
                filter="org.activiti.designer.property.PropertyTimerStartEventFilter"
-               id="org.activiti.designer.mainConfigTab.startevent"
+               id="org.activiti.designer.mainConfigTab.timerstartevent"
                tab="org.activiti.designer.mainConfigTab">
          </propertySection>
          <propertySection
@@ -192,6 +192,12 @@
                filter="org.activiti.designer.property.PropertyMultiInstanceFilter"
                id="org.activiti.designer.multiInstanceTab.multiInstance"
                tab="org.activiti.designer.multiInstanceTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyIntermediateCatchTimerSection"
+               filter="org.activiti.designer.property.PropertyIntermediateCatchTimerFilter"
+               id="org.activiti.designer.mainConfigTab.timerintermediatecatchevent"
+               tab="org.activiti.designer.mainConfigTab">
          </propertySection>
          <propertySection
                class="com.alfresco.designer.gui.property.PropertyAlfrescoUserTaskSection"

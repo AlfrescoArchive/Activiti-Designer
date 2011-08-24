@@ -159,15 +159,19 @@ public class BpmnFileReader {
         drawDiagramWithBPMNDI(diagram, featureProvider, bpmnParser.bpmnList, bpmnParser.sequenceFlowList,
                 bpmnParser.locationMap);
       } else {*/
-       
+       	
         List<FlowElement> wrongOrderList = createDiagramElements(bpmnParser.bpmnList);
         if(wrongOrderList.size() > 0) {
-          boolean elementCreated = true;
-          while(elementCreated == true) {
+        	
+        	int counter = 0;
+          while(wrongOrderList.size() > 0 && counter < 10) {
             int sizeBefore = wrongOrderList.size();
             wrongOrderList = createDiagramElements(wrongOrderList);
+           	
             if(sizeBefore <= wrongOrderList.size()) {
-              elementCreated = false;
+              counter++;
+            } else {
+            	counter = 0;
             }
           }
         }
@@ -191,7 +195,7 @@ public class BpmnFileReader {
     	if(flowElement instanceof Gateway) {
     		try {
         	getMaxX(flowElement.getId());
-        	if(isEndGateway(flowElement.getId(), bpmnParser.sequenceFlowList)) {
+        	if(isEndGateway(flowElement, bpmnParser.sequenceFlowList)) {
         		getDivergingGateway(flowElement, bpmnParser.sequenceFlowList, flowElement.getClass().getName());
         	}
         } catch(FlowSourceNotFoundException e) {
@@ -239,22 +243,11 @@ public class BpmnFileReader {
     
     GraphicInfo graphicInfo = new GraphicInfo();
     GraphicInfo sourceInfo = null;
-    if(sourceFlowElement != null) {
-      int initX = 0;
-      int initY = 0;
-      if(sourceFlowElement instanceof BoundaryEvent) {
-        BoundaryEvent boundaryEvent = (BoundaryEvent) sourceFlowElement;
-        if(yMap.containsKey(boundaryEvent.getAttachedToRef().getId())) {
-          sourceInfo = yMap.get(boundaryEvent.getAttachedToRef().getId());
-          initX = sourceInfo.x;
-          initY = sourceInfo.y;
-        }
-      }
-      if(yMap.containsKey(sourceFlowElement.getId())) {
-        sourceInfo = yMap.get(sourceFlowElement.getId());
-        sourceInfo.x += initX;
-        sourceInfo.y += initY;
-      }
+    if(sourceFlowElement != null && yMap.containsKey(sourceFlowElement.getId())) {
+    	sourceInfo = yMap.get(sourceFlowElement.getId());
+    	if(sourceFlowElement instanceof BoundaryEvent && newFlowElement instanceof Task) {
+    		sourceInfo.x -= 38;
+    	}
     }
     
     int x = 0;
@@ -275,7 +268,7 @@ public class BpmnFileReader {
           }
         } else if(sourceFlowElement instanceof Gateway) {
           x += GATEWAY_WIDTH;
-          if(isEndGateway(sourceFlowElement.getId(), bpmnParser.sequenceFlowList) == false) {
+          if(isEndGateway(sourceFlowElement, bpmnParser.sequenceFlowList) == false) {
             y = calculateDirectGatewayChildY(sourceFlowElement.getId(), newFlowElement.getId(), sourceInfo.y, bpmnParser.sequenceFlowList);
           } else {
           
@@ -298,7 +291,7 @@ public class BpmnFileReader {
         }
         
         if(newFlowElement instanceof Gateway) {
-          if(isEndGateway(newFlowElement.getId(), bpmnParser.sequenceFlowList)) {
+          if(isEndGateway(newFlowElement, bpmnParser.sequenceFlowList)) {
             y = getDivergingGateway(newFlowElement, bpmnParser.sequenceFlowList, newFlowElement.getClass().getName());
             x = getMaxX(newFlowElement.getId());
           } else {
@@ -325,8 +318,12 @@ public class BpmnFileReader {
         BoundaryEvent boundaryEvent = (BoundaryEvent) newFlowElement;
         if(boundaryEvent.getAttachedToRef() instanceof SubProcess && yMap.containsKey(boundaryEvent.getAttachedToRef().getId())) {
           GraphicInfo attachGraphInfo = yMap.get(boundaryEvent.getAttachedToRef().getId());
-          graphicInfo.x = attachGraphInfo.width / 2;
-          graphicInfo.y = attachGraphInfo.height - 15;
+          graphicInfo.x = attachGraphInfo.x + attachGraphInfo.width / 2;
+          graphicInfo.y = attachGraphInfo.y + attachGraphInfo.height - 15;
+        } else if(yMap.containsKey(boundaryEvent.getAttachedToRef().getId())) {
+        	GraphicInfo attachGraphInfo = yMap.get(boundaryEvent.getAttachedToRef().getId());
+        	graphicInfo.x = attachGraphInfo.x + TASK_WIDTH - 25;
+        	graphicInfo.y = attachGraphInfo.y + TASK_HEIGHT - 25;
         }
       }
     } else if(newFlowElement instanceof Gateway) {
@@ -356,8 +353,14 @@ public class BpmnFileReader {
         if(subGraphicInfo.y > height)
           height = subGraphicInfo.y;
       }
+      
       graphicInfo.width = width + TASK_WIDTH + 40;
       graphicInfo.height = height + 40 + TASK_HEIGHT;
+      
+      if(yMap.containsKey(sourceFlowElement.getId())) {
+      	GraphicInfo subSourceInfo = yMap.get(sourceFlowElement.getId());
+      	graphicInfo.y = subSourceInfo.y + (graphicInfo.height / 2);
+      }
       
       addBpmnElementToDiagram(newFlowElement, graphicInfo, diagram); 
       
@@ -480,11 +483,27 @@ public class BpmnFileReader {
   	throw new FlowSourceNotFoundException();
   }
   
-  private boolean isEndGateway(String id, List<SequenceFlowModel> sequenceFlowList) {
+  private boolean isEndGateway(FlowElement gateway, List<SequenceFlowModel> sequenceFlowList) {
     boolean isEnd = false;
+    
+    boolean foundOtherGateway = false;
+    for (FlowElement element : bpmnParser.bpmnList) {
+    	if(element instanceof Gateway) {
+    		if(gateway.getId().equals(element.getId()) == false && 
+    				gateway.getClass().getName().equals(element.getClass().getName())) {
+    			
+    			foundOtherGateway = true;
+    		}
+    	}
+    }
+    
+    if(foundOtherGateway == false) {
+    	return false;
+    }
+    
     int counter = 0;
     for (SequenceFlowModel sequenceFlowModel : sequenceFlowList) {
-      if(sequenceFlowModel.targetRef.equals(id)) {
+      if(sequenceFlowModel.targetRef.equals(gateway.getId())) {
         counter++;
       }
     }

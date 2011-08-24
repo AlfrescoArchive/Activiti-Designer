@@ -16,6 +16,7 @@ import org.activiti.designer.features.AddScriptTaskFeature;
 import org.activiti.designer.features.AddSequenceFlowFeature;
 import org.activiti.designer.features.AddServiceTaskFeature;
 import org.activiti.designer.features.AddStartEventFeature;
+import org.activiti.designer.features.AddTimerCatchingEventFeature;
 import org.activiti.designer.features.AddTimerStartEventFeature;
 import org.activiti.designer.features.AddUserTaskFeature;
 import org.activiti.designer.features.ChangeElementTypeFeature;
@@ -36,6 +37,7 @@ import org.activiti.designer.features.CreateScriptTaskFeature;
 import org.activiti.designer.features.CreateSequenceFlowFeature;
 import org.activiti.designer.features.CreateServiceTaskFeature;
 import org.activiti.designer.features.CreateStartEventFeature;
+import org.activiti.designer.features.CreateTimerCatchingEventFeature;
 import org.activiti.designer.features.CreateTimerStartEventFeature;
 import org.activiti.designer.features.CreateUserTaskFeature;
 import org.activiti.designer.features.DeleteFlowElementFeature;
@@ -59,6 +61,7 @@ import org.eclipse.bpmn2.ErrorEventDefinition;
 import org.eclipse.bpmn2.EventDefinition;
 import org.eclipse.bpmn2.ExclusiveGateway;
 import org.eclipse.bpmn2.FlowElement;
+import org.eclipse.bpmn2.IntermediateCatchEvent;
 import org.eclipse.bpmn2.MailTask;
 import org.eclipse.bpmn2.ManualTask;
 import org.eclipse.bpmn2.ParallelGateway;
@@ -169,6 +172,8 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 		      return new AddBoundaryTimerFeature(this);
 		    }
 		  }
+		} else if (context.getNewObject() instanceof IntermediateCatchEvent) {
+			return new AddTimerCatchingEventFeature(this);
 		} else if (context.getNewObject() instanceof SubProcess) {
       return new AddEmbeddedSubProcessFeature(this);
 		} else if (context.getNewObject() instanceof CallActivity) {
@@ -198,6 +203,7 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 		        new CreateExclusiveGatewayFeature(this), 
 		        new CreateBoundaryTimerFeature(this),
 		        new CreateBoundaryErrorFeature(this),
+		        new CreateTimerCatchingEventFeature(this),
 		        new CreateEmbeddedSubProcessFeature(this), 
 		        new CreateCallActivityFeature(this),
 		        new CreateAlfrescoScriptTaskFeature(this),

@@ -43,6 +43,7 @@ import org.eclipse.bpmn2.FlowNode;
 import org.eclipse.bpmn2.FormProperty;
 import org.eclipse.bpmn2.FormalExpression;
 import org.eclipse.bpmn2.IOParameter;
+import org.eclipse.bpmn2.IntermediateCatchEvent;
 import org.eclipse.bpmn2.MailTask;
 import org.eclipse.bpmn2.ManualTask;
 import org.eclipse.bpmn2.MultiInstanceLoopCharacteristics;
@@ -237,6 +238,15 @@ public class BpmnParser {
 						if (activeSubProcess != null)
 							activeSubProcess.getFlowElements().add(endEvent);
 						bpmnList.add(endEvent);
+					
+					} else if (xtr.isStartElement()
+					    && "intermediateCatchEvent".equalsIgnoreCase(xtr.getLocalName())) {
+						String elementid = xtr.getAttributeValue(null, "id");
+						IntermediateCatchEvent catchEvent = parseIntermediateCatchEvent(xtr);
+						catchEvent.setId(elementid);
+						if (activeSubProcess != null)
+							activeSubProcess.getFlowElements().add(catchEvent);
+						bpmnList.add(catchEvent);
 
 					} else if (xtr.isStartElement()
 					    && "exclusiveGateway".equalsIgnoreCase(xtr.getLocalName())) {
@@ -1518,7 +1528,7 @@ public class BpmnParser {
 			while (readyWithEvent == false && xtr.hasNext()) {
 				xtr.next();
 				if (xtr.isStartElement()
-				    && "timeEventDefinition".equalsIgnoreCase(xtr.getLocalName())) {
+				    && "timerEventDefinition".equalsIgnoreCase(xtr.getLocalName())) {
 					model.type = BoundaryEventModel.TIMEEVENT;
 				} else if (xtr.isStartElement()
 				    && "errorEventDefinition".equalsIgnoreCase(xtr.getLocalName())) {
@@ -1573,5 +1583,57 @@ public class BpmnParser {
 			e.printStackTrace();
 		}
 		return model;
+	}
+	
+	private IntermediateCatchEvent parseIntermediateCatchEvent(XMLStreamReader xtr) {
+		IntermediateCatchEvent catchEvent = Bpmn2Factory.eINSTANCE.createIntermediateCatchEvent();
+		catchEvent.setName(xtr.getAttributeValue(null, "name"));
+		
+		boolean readyWithEvent = false;
+		try {
+			while (readyWithEvent == false && xtr.hasNext()) {
+				xtr.next();
+				if (xtr.isStartElement()
+				    && "timeDuration".equalsIgnoreCase(xtr.getLocalName())) {
+					TimerEventDefinition eventDef = Bpmn2Factory.eINSTANCE
+					    .createTimerEventDefinition();
+					FormalExpression expression = Bpmn2Factory.eINSTANCE
+					    .createFormalExpression();
+					expression.setBody(xtr.getElementText());
+					eventDef.setTimeDuration(expression);
+					catchEvent.getEventDefinitions().add(eventDef);
+					readyWithEvent = true;
+
+				} else if (xtr.isStartElement()
+				    && "timeDate".equalsIgnoreCase(xtr.getLocalName())) {
+					TimerEventDefinition eventDef = Bpmn2Factory.eINSTANCE
+					    .createTimerEventDefinition();
+					FormalExpression expression = Bpmn2Factory.eINSTANCE
+					    .createFormalExpression();
+					expression.setBody(xtr.getElementText());
+					eventDef.setTimeDate(expression);
+					catchEvent.getEventDefinitions().add(eventDef);
+					readyWithEvent = true;
+
+				} else if (xtr.isStartElement()
+				    && "timeCycle".equalsIgnoreCase(xtr.getLocalName())) {
+					TimerEventDefinition eventDef = Bpmn2Factory.eINSTANCE
+					    .createTimerEventDefinition();
+					FormalExpression expression = Bpmn2Factory.eINSTANCE
+					    .createFormalExpression();
+					expression.setBody(xtr.getElementText());
+					eventDef.setTimeCycle(expression);
+					catchEvent.getEventDefinitions().add(eventDef);
+					readyWithEvent = true;
+
+				} else if (xtr.isEndElement()
+				    && "intermediateCatchEvent".equalsIgnoreCase(xtr.getLocalName())) {
+					readyWithEvent = true;
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return catchEvent;
 	}
 }
