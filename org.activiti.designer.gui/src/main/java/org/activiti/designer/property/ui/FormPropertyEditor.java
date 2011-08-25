@@ -6,6 +6,7 @@ import java.util.List;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.eclipse.bpmn2.Bpmn2Factory;
 import org.eclipse.bpmn2.FormProperty;
+import org.eclipse.bpmn2.FormValue;
 import org.eclipse.bpmn2.StartEvent;
 import org.eclipse.bpmn2.UserTask;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
@@ -27,8 +28,8 @@ public class FormPropertyEditor extends TableFieldEditor {
 	
   public FormPropertyEditor(String key, Composite parent) {
     
-    super(key, "", new String[] {"Id", "Name", "Type", "Value", "Required", "Readable", "Writeable"},
-        new int[] {100, 100, 100, 200, 100, 100, 100}, parent);
+    super(key, "", new String[] {"Id", "Name", "Type", "Value/Expression", "Required", "Readable", "Writeable", "Form values"},
+        new int[] {100, 100, 100, 200, 100, 100, 100, 200}, parent);
     this.parent = parent;
   }
 
@@ -55,12 +56,48 @@ public class FormPropertyEditor extends TableFieldEditor {
     if(table != null) {
       TableItem tableItem = new TableItem(table, SWT.NONE);
       tableItem.setText(0, formProperty.getId());
-      tableItem.setText(1, formProperty.getName());
-      tableItem.setText(2, formProperty.getType());
-      tableItem.setText(3, formProperty.getValue());
-      tableItem.setText(4, "" + formProperty.isRequired());
-      tableItem.setText(5, "" + formProperty.isReadable());
-      tableItem.setText(6, "" + formProperty.isWriteable());
+      if(formProperty.getName() != null) {
+      	tableItem.setText(1, formProperty.getName());
+      } else {
+      	tableItem.setText(1, "");
+      }
+      
+      if(formProperty.getType() != null) {
+      	tableItem.setText(2, formProperty.getType());
+	    } else {
+	    	tableItem.setText(2, "");
+	    }
+      
+      if(formProperty.getValue() != null) {
+      	tableItem.setText(3, formProperty.getValue());
+      } else {
+	    	tableItem.setText(3, "");
+	    }
+      
+      if(formProperty.getRequired() != null) {
+      	tableItem.setText(4, "" + formProperty.getRequired().toString().toLowerCase());
+      } else {
+      	tableItem.setText(4, "");
+      }
+      if(formProperty.getReadable() != null) {
+      	tableItem.setText(5, "" + formProperty.getReadable().toString().toLowerCase());
+      } else {
+      	tableItem.setText(5, "");
+      }
+      if(formProperty.getWriteable() != null) {
+      	tableItem.setText(6, "" + formProperty.getWriteable().toString().toLowerCase());
+      } else {
+      	tableItem.setText(6, "");
+      }
+      String formValuesString = "";
+      for(int i = 0; i < formProperty.getFormValues().size(); i++) {
+      	FormValue formValue = formProperty.getFormValues().get(i);
+      	if(i > 0) {
+      		formValuesString += ";";
+      	}
+      	formValuesString += formValue.getValueId() + ":" + formValue.getValueName();
+      }
+      tableItem.setText(7, formValuesString);
     }
   }
 
@@ -70,7 +107,8 @@ public class FormPropertyEditor extends TableFieldEditor {
     dialog.open();
     if(dialog.id != null && dialog.id.length() > 0) {
       return new String[] { dialog.id, dialog.name, dialog.type, dialog.value,
-              dialog.required, dialog.readable, dialog.writeable};
+              dialog.required.toLowerCase(), dialog.readable.toLowerCase(), 
+              dialog.writeable.toLowerCase(), dialog.formValues};
     } else {
       return null;
     }
@@ -80,11 +118,12 @@ public class FormPropertyEditor extends TableFieldEditor {
   protected String[] getChangedInputObject(TableItem item) {
     FormPropertyDialog dialog = new FormPropertyDialog(parent.getShell(), getItems(), 
             item.getText(1), item.getText(0), item.getText(2), item.getText(3), item.getText(4),
-            item.getText(5), item.getText(6));
+            item.getText(5), item.getText(6), item.getText(7));
     dialog.open();
     if(dialog.id != null && dialog.id.length() > 0) {      
-      return new String[] { dialog.id, dialog.name, dialog.type, dialog.value, 
-              dialog.required, dialog.readable, dialog.writeable };
+      return new String[] {dialog.id, dialog.name, dialog.type, dialog.value, 
+              dialog.required.toLowerCase(), dialog.readable.toLowerCase(), 
+              dialog.writeable.toLowerCase(), dialog.formValues};
     } else {
       return null;
     }
@@ -111,6 +150,16 @@ public class FormPropertyEditor extends TableFieldEditor {
     return formPropertyList;
   }
   
+  private void setFormProperties(Object bo, List<FormProperty> formPropertyList) {
+    if(bo instanceof UserTask) {
+      ((UserTask) bo).getFormProperties().clear();
+      ((UserTask) bo).getFormProperties().addAll(formPropertyList);
+    } else if(bo instanceof StartEvent) {
+    	((StartEvent) bo).getFormProperties().clear();
+      ((StartEvent) bo).getFormProperties().addAll(formPropertyList);
+    }
+  }
+  
   private void saveFormProperties() {
     if (pictogramElement != null) {
       final Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pictogramElement);
@@ -127,6 +176,7 @@ public class FormPropertyEditor extends TableFieldEditor {
       TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
       ActivitiUiUtil.runModelChange(new Runnable() {
         public void run() {
+        	List<FormProperty> newFormList = new ArrayList<FormProperty>();
           for (TableItem item : getItems()) {
             String id = item.getText(0);
             String name = item.getText(1);
@@ -135,42 +185,48 @@ public class FormPropertyEditor extends TableFieldEditor {
             String required = item.getText(4);
             String readable = item.getText(5);
             String writeable = item.getText(6);
+            String formValues = item.getText(7);
             if(id != null && id.length() > 0) {
               
-              FormProperty formProperty = formPropertyExists(formPropertyList, id);
-              if(formProperty != null) {
-                formProperty.setName(name);
-                formProperty.setType(type);
-                formProperty.setValue(value);
-                if(required != null && required.length() > 0) {
-                  formProperty.setRequired(Boolean.valueOf(required.toLowerCase()));
-                }
-                if(readable != null && readable.length() > 0) {
-                  formProperty.setReadable(Boolean.valueOf(readable.toLowerCase()));
-                }
-                if(writeable != null && writeable.length() > 0) {
-                  formProperty.setWriteable(Boolean.valueOf(writeable.toLowerCase()));
-                }
+              FormProperty newFormProperty = Bpmn2Factory.eINSTANCE.createFormProperty();
+              newFormProperty.setId(id);
+              newFormProperty.setName(name);
+              newFormProperty.setType(type);
+              newFormProperty.setValue(value);
+              if(required != null && required.length() > 0) {
+                newFormProperty.setRequired(Boolean.valueOf(required.toLowerCase()));
               } else {
-                FormProperty newFormProperty = Bpmn2Factory.eINSTANCE.createFormProperty();
-                newFormProperty.setId(id);
-                newFormProperty.setName(name);
-                newFormProperty.setType(type);
-                newFormProperty.setValue(value);
-                if(required != null && required.length() > 0) {
-                  newFormProperty.setRequired(Boolean.valueOf(required.toLowerCase()));
-                }
-                if(readable != null && readable.length() > 0) {
-                  newFormProperty.setReadable(Boolean.valueOf(readable.toLowerCase()));
-                }
-                if(writeable != null && writeable.length() > 0) {
-                  newFormProperty.setWriteable(Boolean.valueOf(writeable.toLowerCase()));
-                }
-                getFormProperties(bo).add(newFormProperty);
+              	newFormProperty.setRequired(null);
               }
+              if(readable != null && readable.length() > 0) {
+                newFormProperty.setReadable(Boolean.valueOf(readable.toLowerCase()));
+              } else {
+              	newFormProperty.setReadable(null);
+              }
+              if(writeable != null && writeable.length() > 0) {
+                newFormProperty.setWriteable(Boolean.valueOf(writeable.toLowerCase()));
+              } else {
+              	newFormProperty.setWriteable(null);
+              }
+              
+              List<FormValue> formValueList = new ArrayList<FormValue>();
+              if(formValues != null && formValues.length() > 0) {
+              	String[] formValueArray = formValues.split(";");
+              	if(formValueArray != null) {
+              		for(String formValue : formValueArray) {
+              			FormValue formValueObj = Bpmn2Factory.eINSTANCE.createFormValue();
+              			formValueObj.setValueId(formValue.substring(0, formValue.lastIndexOf(":")));
+              			formValueObj.setValueName(formValue.substring(formValue.lastIndexOf(":") + 1));
+              			formValueList.add(formValueObj);
+              		}
+              	}
+              }
+              newFormProperty.getFormValues().addAll(formValueList);
+              
+              newFormList.add(newFormProperty);
             }
           }
-          removeFormPropertiesNotInList(getItems(), bo);
+          setFormProperties(bo, newFormList);
         }
       }, editingDomain, "Model Update");
     }
@@ -189,16 +245,18 @@ public class FormPropertyEditor extends TableFieldEditor {
       return false;
     } else if(noPropertySaved == false && nothingInTable == false) {
       
-      for(FormProperty formProperty : formPropertyList) {
+      for(int i = 0; i < formPropertyList.size(); i++) {
+      	FormProperty formProperty = formPropertyList.get(i);
         boolean found = false;
-        for (TableItem item : items) {
+        if(items.length > i) {
+        	TableItem item = items[i];
           if(item.getText(0).equalsIgnoreCase(formProperty.getId()) &&
                   item.getText(1).equalsIgnoreCase(formProperty.getName()) &&
                   item.getText(2).equalsIgnoreCase(formProperty.getType()) &&
                   item.getText(3).equalsIgnoreCase(formProperty.getValue()) &&
-                  item.getText(4).equalsIgnoreCase("" + formProperty.isRequired()) &&
-                  item.getText(5).equalsIgnoreCase("" + formProperty.isReadable()) &&
-                  item.getText(6).equalsIgnoreCase("" + formProperty.isWriteable())) {
+                  item.getText(4).equalsIgnoreCase("" + formProperty.getRequired()) &&
+                  item.getText(5).equalsIgnoreCase("" + formProperty.getReadable()) &&
+                  item.getText(6).equalsIgnoreCase("" + formProperty.getWriteable())) {
             
             found = true;
           }
@@ -208,19 +266,22 @@ public class FormPropertyEditor extends TableFieldEditor {
         }
       }
       
-      for (TableItem item : items) {
+      for (int i = 0; i < items.length; i++) {
+      	TableItem item = items[i];
         boolean found = false;
-        for(FormProperty formProperty : formPropertyList) {
-          if(item.getText(0).equalsIgnoreCase(formProperty.getId()) &&
-                  item.getText(1).equalsIgnoreCase(formProperty.getName()) &&
-                  item.getText(2).equalsIgnoreCase(formProperty.getType()) &&
-                  item.getText(3).equalsIgnoreCase(formProperty.getValue()) &&
-                  item.getText(4).equalsIgnoreCase("" + formProperty.isRequired()) &&
-                  item.getText(5).equalsIgnoreCase("" + formProperty.isReadable()) &&
-                  item.getText(6).equalsIgnoreCase("" + formProperty.isWriteable())) {
-            
-            found = true;
-          }
+        if(formPropertyList.size() > i) {
+        	FormProperty formProperty = formPropertyList.get(i);
+        
+	        if(item.getText(0).equalsIgnoreCase(formProperty.getId()) &&
+			        item.getText(1).equalsIgnoreCase(formProperty.getName()) &&
+			        item.getText(2).equalsIgnoreCase(formProperty.getType()) &&
+			        item.getText(3).equalsIgnoreCase(formProperty.getValue()) &&
+			        item.getText(4).equalsIgnoreCase("" + formProperty.getRequired()) &&
+			        item.getText(5).equalsIgnoreCase("" + formProperty.getReadable()) &&
+			        item.getText(6).equalsIgnoreCase("" + formProperty.getWriteable())) {
+	            
+	          found = true;
+	        }
         }
         if(found == false) {
           return true;
@@ -243,25 +304,4 @@ public class FormPropertyEditor extends TableFieldEditor {
     }
     return null;
   }
-  
-  private void removeFormPropertiesNotInList(TableItem[] items, Object bo) {
-    List<FormProperty> formPropertyList = getFormProperties(bo);
-    List<FormProperty> toDeleteList = new ArrayList<FormProperty>();
-    for (FormProperty formProperty : formPropertyList) {
-      boolean found = false;
-      for (TableItem item : items) {
-        if(item.getText(0).equals(formProperty.getId())) {
-          found = true;
-          break;
-        }
-      }
-      if(found == false) {
-        toDeleteList.add(formProperty);
-      }
-    }
-    for (FormProperty formProperty : toDeleteList) {
-     getFormProperties(bo).remove(formProperty);
-    }
-  }
-	
 }

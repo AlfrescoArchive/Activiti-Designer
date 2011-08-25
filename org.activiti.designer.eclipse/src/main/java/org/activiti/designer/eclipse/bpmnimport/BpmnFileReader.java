@@ -87,8 +87,8 @@ public class BpmnFileReader {
   private static final int TASK_HEIGHT = 55;
   private static final int GATEWAY_WIDTH = 40;
   private static final int GATEWAY_HEIGHT = 40;
-  private static final int SEQUENCEFLOW_WIDTH = 60;
-  private static final int GATEWAY_CHILD_HEIGHT = 100;
+  private static final int SEQUENCEFLOW_WIDTH = 40;
+  private static final int GATEWAY_CHILD_HEIGHT = 60;
   
   private Diagram diagram;
   private IFeatureProvider featureProvider;
@@ -282,6 +282,15 @@ public class BpmnFileReader {
           
         } else if(sourceFlowElement instanceof SubProcess) {
           x += sourceInfo.width;
+          int height = 0;
+          if(newFlowElement instanceof Task) {
+          	height = TASK_HEIGHT;
+          } else if(newFlowElement instanceof Gateway) {
+          	height = GATEWAY_HEIGHT;
+          } else if(newFlowElement instanceof Event) {
+          	height = EVENT_HEIGHT;
+          }
+          y += ((sourceInfo.height / 2) - (height / 2));
         } else {
           x += TASK_WIDTH;
         }
@@ -344,6 +353,7 @@ public class BpmnFileReader {
           }
         } else {
           subGraphicInfo = new GraphicInfo();
+          subGraphicInfo.height = EVENT_HEIGHT;
           subGraphicInfo.x = 20;
           subGraphicInfo.y = 50;
         }
@@ -355,21 +365,25 @@ public class BpmnFileReader {
           height = subGraphicInfo.y;
       }
       
-      graphicInfo.width = width + TASK_WIDTH + 40;
+      graphicInfo.width = width + 80;
       graphicInfo.height = height + 40 + TASK_HEIGHT;
       
       if(yMap.containsKey(sourceFlowElement.getId())) {
       	GraphicInfo subSourceInfo = yMap.get(sourceFlowElement.getId());
-      	graphicInfo.y = subSourceInfo.y + (graphicInfo.height / 2);
+      	graphicInfo.y = subSourceInfo.y + (subSourceInfo.height / 2) - (graphicInfo.height / 2);
       }
       
-      addBpmnElementToDiagram(newFlowElement, graphicInfo, diagram); 
+      addBpmnElementToDiagram(newFlowElement, graphicInfo, diagram);
+      
+      int differenceInitialStartEventAndSubProcessHeight = (graphicInfo.height / 2) - 50 - (EVENT_HEIGHT / 2);
       
       ILinkService linkService = Graphiti.getLinkService();
       List<PictogramElement> pictoList = linkService.getPictogramElements(diagram, (SubProcess) newFlowElement);
       if(pictoList != null && pictoList.size() > 0) {
         ContainerShape parent = (ContainerShape) pictoList.get(0);
         for (FlowElement subFlowElement : subFlowElementList) {
+        	GraphicInfo subInfoElem = subYMap.get(subFlowElement.getId());
+        	subInfoElem.y += differenceInitialStartEventAndSubProcessHeight;
           addBpmnElementToDiagram(subFlowElement, subYMap.get(subFlowElement.getId()), parent);
         }
       }

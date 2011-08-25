@@ -838,6 +838,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute BPMN20.ecore#//FormProperty/readable"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute BPMN20.ecore#//FormProperty/writeable"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute BPMN20.ecore#//FormProperty/required"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference BPMN20.ecore#//FormProperty/formValues"/>
     </genClasses>
     <genClasses ecoreClass="BPMN20.ecore#//IOParameter">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute BPMN20.ecore#//IOParameter/source"/>
@@ -856,6 +857,10 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute BPMN20.ecore#//AlfrescoMailTask/toMany"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute BPMN20.ecore#//AlfrescoMailTask/template"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute BPMN20.ecore#//AlfrescoMailTask/templateModel"/>
+    </genClasses>
+    <genClasses ecoreClass="BPMN20.ecore#//FormValue">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute BPMN20.ecore#//FormValue/valueId"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute BPMN20.ecore#//FormValue/valueName"/>
     </genClasses>
   </genPackages>
   <genPackages prefix="BpmnDi" basePackage="org.eclipse.bpmn2" resource="XML" multipleEditorPages="false"

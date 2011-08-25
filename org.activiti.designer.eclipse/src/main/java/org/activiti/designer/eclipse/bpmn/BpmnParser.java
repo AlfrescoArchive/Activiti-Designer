@@ -41,6 +41,7 @@ import org.eclipse.bpmn2.FieldExtension;
 import org.eclipse.bpmn2.FlowElement;
 import org.eclipse.bpmn2.FlowNode;
 import org.eclipse.bpmn2.FormProperty;
+import org.eclipse.bpmn2.FormValue;
 import org.eclipse.bpmn2.FormalExpression;
 import org.eclipse.bpmn2.IOParameter;
 import org.eclipse.bpmn2.InclusiveGateway;
@@ -443,6 +444,25 @@ public class BpmnParser {
 		if (xtr.getAttributeValue(null, "writable") != null) {
 			property.setWriteable(Boolean.valueOf(xtr.getAttributeValue(null,
 			    "writable")));
+		}
+		
+		boolean readyWithFormProperty = false;
+		try {
+			while (readyWithFormProperty == false && xtr.hasNext()) {
+				xtr.next();
+				if (xtr.isStartElement()
+				    && "value".equalsIgnoreCase(xtr.getLocalName())) {
+					FormValue value = Bpmn2Factory.eINSTANCE.createFormValue();
+					value.setValueId(xtr.getAttributeValue(null, "id"));
+					value.setValueName(xtr.getAttributeValue(null, "name"));
+					property.getFormValues().add(value);
+
+				} else if (xtr.isEndElement()
+				    && "formProperty".equalsIgnoreCase(xtr.getLocalName())) {
+					readyWithFormProperty = true;
+				}
+			}
+		} catch (Exception e) {
 		}
 	}
 

@@ -18,6 +18,7 @@ import java.util.List;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.eclipse.bpmn2.FormProperty;
+import org.eclipse.bpmn2.FormValue;
 
 /**
  * @author Tijs Rademakers
@@ -42,9 +43,25 @@ public class FormPropertiesExport implements ActivitiNamespaceConstants {
           xtw.writeAttribute("variable", formProperty.getValue());
         }
       }
-      xtw.writeAttribute("required", "" + formProperty.isRequired());
-      xtw.writeAttribute("readable", "" + formProperty.isReadable());
-      xtw.writeAttribute("writable", "" + formProperty.isWriteable());
+      if(formProperty.getRequired() != null) {
+      	xtw.writeAttribute("required", "" + formProperty.getRequired().toString().toLowerCase());
+      }
+      if(formProperty.getReadable() != null) {
+      	xtw.writeAttribute("readable", "" + formProperty.getReadable().toString().toLowerCase());
+      }
+      if(formProperty.getWriteable() != null) {
+      	xtw.writeAttribute("writable", "" + formProperty.getWriteable().toString().toLowerCase());
+      }
+      
+      if(formProperty.getFormValues().size() > 0) {
+      	for (FormValue formValue : formProperty.getFormValues()) {
+      		xtw.writeStartElement(ACTIVITI_EXTENSIONS_PREFIX, "value", ACTIVITI_EXTENSIONS_NAMESPACE);
+        	xtw.writeAttribute("id", formValue.getValueId());
+        	xtw.writeAttribute("name", formValue.getValueName());
+        	xtw.writeEndElement();
+        }
+      }
+      
       xtw.writeEndElement();
     }
   }

@@ -113,6 +113,8 @@ public class IOParameterEditor extends TableFieldEditor {
       TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
       ActivitiUiUtil.runModelChange(new Runnable() {
         public void run() {
+        	List<IOParameter> newParameterList = new ArrayList<IOParameter>();
+        	
           List<IOParameter> parameterList = null;
           if(isInputParameters == true) {
             parameterList = ((CallActivity) bo).getInParameters();
@@ -129,15 +131,22 @@ public class IOParameterEditor extends TableFieldEditor {
               if(parameter != null) {
                 parameter.setSource(source);
                 parameter.setTarget(target);
+                newParameterList.add(parameter);
               } else {
                 IOParameter newParameter = Bpmn2Factory.eINSTANCE.createIOParameter();
                 newParameter.setSource(source);
                 newParameter.setTarget(target);
-                parameterList.add(newParameter);
+                newParameterList.add(newParameter);
               }
             }
           }
-          removeParametersNotInList(getItems(), (CallActivity) bo, isInputParameters);
+          if(isInputParameters == true) {
+            ((CallActivity) bo).getInParameters().clear();
+            ((CallActivity) bo).getInParameters().addAll(newParameterList);
+          } else {
+            ((CallActivity) bo).getOutParameters().clear();
+            ((CallActivity) bo).getOutParameters().addAll(newParameterList);
+          }
         }
       }, editingDomain, "Model Update");
     }
@@ -156,9 +165,12 @@ public class IOParameterEditor extends TableFieldEditor {
       return false;
     } else if(noPropertySaved == false && nothingInTable == false) {
       
-      for(IOParameter parameter : parameterList) {
+    	for(int i = 0; i < parameterList.size(); i++) {
+    		IOParameter parameter = parameterList.get(i);
+      
         boolean found = false;
-        for (TableItem item : items) {
+        if(items.length > i) {
+        	TableItem item = items[i];
           if(item.getText(0).equalsIgnoreCase(parameter.getSource()) &&
                   item.getText(1).equalsIgnoreCase(parameter.getTarget())) {
             
@@ -170,9 +182,12 @@ public class IOParameterEditor extends TableFieldEditor {
         }
       }
       
-      for (TableItem item : items) {
+    	for (int i = 0; i < items.length; i++) {
+      	TableItem item = items[i];
         boolean found = false;
-        for(IOParameter parameter : parameterList) {
+        if(parameterList.size() > i) {
+        	IOParameter parameter = parameterList.get(i);
+      
           if(item.getText(0).equalsIgnoreCase(parameter.getSource()) &&
                   item.getText(1).equalsIgnoreCase(parameter.getTarget())) {
             
@@ -201,35 +216,4 @@ public class IOParameterEditor extends TableFieldEditor {
     }
     return null;
   }
-  
-  private void removeParametersNotInList(TableItem[] items, CallActivity callActivity, boolean isInput) {
-    List<IOParameter> toDeleteList = new ArrayList<IOParameter>();
-    List<IOParameter> parameterList = null;
-    if(isInput == true) {
-      parameterList = callActivity.getInParameters();
-    } else {
-      parameterList = callActivity.getOutParameters();
-    }
-    for (IOParameter parameter : parameterList) {
-      boolean found = false;
-      for (TableItem item : items) {
-        if(item.getText(0).equals(parameter.getSource()) &&
-                item.getText(1).equals(parameter.getTarget())) {
-          found = true;
-          break;
-        }
-      }
-      if(found == false) {
-        toDeleteList.add(parameter);
-      }
-    }
-    for (IOParameter parameter : toDeleteList) {
-      if(isInput == true) {
-        callActivity.getInParameters().remove(parameter);
-      } else {
-        callActivity.getOutParameters().remove(parameter);;
-      }
-    }
-  }
-	
 }

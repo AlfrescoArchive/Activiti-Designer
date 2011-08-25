@@ -22,6 +22,23 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.TableItem;
 import org.eclipse.swt.widgets.Widget;
 
+/**
+ * An abstract field editor that manages a table of input values. The editor
+ * displays a table containing the rows of values, buttons for adding,
+ * duplicating and removing rows and buttons to adjust the order of rows in the
+ * table. The table also allows in-place editing of values.
+ *
+ * <p>
+ * Subclasses must implement the <code>parseString</code>,
+ * <code>createList</code>, and <code>getNewInputObject</code> framework
+ * methods.
+ * </p>
+ *
+ * @author Sandip V. Chitale
+ * @author Tijs Rademakers
+ *
+ */
+
 public abstract class TableFieldEditor extends FieldEditor {
 
 	/**
@@ -50,6 +67,16 @@ public abstract class TableFieldEditor extends FieldEditor {
 	 * The Remove button.
 	 */
 	private Button removeButton;
+	
+	/**
+   * The Up button.
+   */
+  private Button upButton;
+
+  /**
+   * The Down button.
+   */
+  private Button downButton;
 
 	/**
 	 * The selection listener.
@@ -143,6 +170,8 @@ public abstract class TableFieldEditor extends FieldEditor {
 		addButton = createPushButton(box, "New");
 		editButton = createPushButton(box, "Edit");
 		removeButton = createPushButton(box, "Remove");
+		upButton = createPushButton(box, "Up");
+    downButton = createPushButton(box, "Down");
 	}
 
 	/**
@@ -171,6 +200,25 @@ public abstract class TableFieldEditor extends FieldEditor {
 	protected Button getRemoveButton() {
 		return removeButton;
 	}
+	
+	/**
+   * Return the Up button.
+   *
+   * @return the button
+   */
+  protected Button getUpButton() {
+          return upButton;
+  }
+
+  /**
+   * Return the Down button.
+   *
+   * @return the button
+   */
+  protected Button getDownButton() {
+          return downButton;
+  }
+
 
 	/**
 	 * Helper method to create a push button.
@@ -217,6 +265,10 @@ public abstract class TableFieldEditor extends FieldEditor {
           editPressed();
 				} else if (widget == removeButton) {
 					removePressed();
+				} else if (widget == upButton) {
+          upPressed();
+			  } else if (widget == downButton) {
+			  	downPressed();
 				} else if (widget == table) {
 					selectionChanged();
 				}
@@ -238,7 +290,7 @@ public abstract class TableFieldEditor extends FieldEditor {
 		GridData gridData = new GridData(SWT.FILL, SWT.BEGINNING, true, false);
 		gridData.horizontalSpan = 2;
 		gridData.widthHint = 550;
-		gridData.heightHint = 150;
+		gridData.heightHint = 200;
 		composite.setLayoutData(gridData);
 		composite.setLayout(new GridLayout(2, false));
 
@@ -319,6 +371,8 @@ public abstract class TableFieldEditor extends FieldEditor {
 					addButton = null;
 					editButton = null;
 					removeButton = null;
+					upButton = null;
+          downButton = null;
 					buttonBox = null;
 				}
 			});
@@ -452,6 +506,20 @@ public abstract class TableFieldEditor extends FieldEditor {
 		}
 	}
 	
+	/**
+   * Notifies that the Up button has been pressed.
+   */
+  private void upPressed() {
+  	swap(true);
+  }
+
+  /**
+   * Notifies that the Down button has been pressed.
+   */
+  private void downPressed() {
+  	swap(false);
+  }
+	
 	protected abstract void removedItem(int index);
 
 	/**
@@ -474,6 +542,8 @@ public abstract class TableFieldEditor extends FieldEditor {
 
 		editButton.setEnabled(index >= 0);
 		removeButton.setEnabled(index >= 0);
+		upButton.setEnabled(size > 1 && index > 0);
+    downButton.setEnabled(size > 1 && index >= 0 && index < size - 1);
 	}
 
 	/*
@@ -484,6 +554,35 @@ public abstract class TableFieldEditor extends FieldEditor {
 			table.setFocus();
 		}
 	}
+	
+	/**
+   * Moves the currently selected item up or down.
+   *
+   * @param up
+   *            <code>true</code> if the item should move up, and
+   *            <code>false</code> if it should move down
+   */
+  private void swap(boolean up) {
+    setPresentsDefaultValue(false);
+    int index = table.getSelectionIndex();
+    int target = up ? index - 1 : index + 1;
+
+    if (index >= 0) {
+      TableItem[] selection = table.getSelection();
+      if(selection.length == 1) {
+	      String[] values = new String[columnNames.length];
+	      for (int j = 0; j < columnNames.length; j++) {
+	              values[j] = selection[0].getText(j);
+	      }
+	      table.remove(index);
+	      TableItem tableItem = new TableItem(table, SWT.NONE, target);
+	      tableItem.setText(values);
+	      table.setSelection(target);
+      }
+    }
+    selectionChanged();
+  }
+
 
 	/*
 	 * @see FieldEditor.setEnabled(boolean,Composite).
@@ -494,6 +593,8 @@ public abstract class TableFieldEditor extends FieldEditor {
 		addButton.setEnabled(enabled);
 		editButton.setEnabled(enabled);
 		removeButton.setEnabled(enabled);
+		upButton.setEnabled(enabled);
+    downButton.setEnabled(enabled);
 	}
 	
 	public void setVisible(boolean visible) {
@@ -501,6 +602,9 @@ public abstract class TableFieldEditor extends FieldEditor {
 	  addButton.setVisible(visible);
 	  editButton.setVisible(visible);
 	  removeButton.setVisible(visible);
+	  upButton.setVisible(visible);
+    downButton.setVisible(visible);
+
 	}
 
 }

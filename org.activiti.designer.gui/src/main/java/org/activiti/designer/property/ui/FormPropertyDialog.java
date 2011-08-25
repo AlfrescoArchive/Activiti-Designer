@@ -9,8 +9,10 @@ import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Dialog;
 import org.eclipse.swt.widgets.Display;
@@ -28,6 +30,7 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
 	public String required;
 	public String readable;
 	public String writeable;
+	public String formValues;
 	
 	protected String savedId;
 	protected String savedName;
@@ -36,6 +39,7 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
 	protected String savedRequired;
 	protected String savedReadable;
 	protected String savedWriteable;
+	protected String savedFormValues;
 
 	public FormPropertyDialog(Shell parent, TableItem[] fieldList) {
 		// Pass the default styles here
@@ -44,7 +48,7 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
 	
 	public FormPropertyDialog(Shell parent, TableItem[] fieldList, String savedId, 
 	        String savedName, String savedType, String savedValue, String savedRequired,
-	        String savedReadable, String savedWriteable) {
+	        String savedReadable, String savedWriteable, String savedFormValues) {
     // Pass the default styles here
     this(parent, fieldList, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
     this.savedId = savedId;
@@ -54,6 +58,7 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
     this.savedRequired = savedRequired;
     this.savedReadable = savedReadable;
     this.savedWriteable = savedWriteable;
+    this.savedFormValues = savedFormValues;
   }
 
 	public FormPropertyDialog(Shell parent, TableItem[] fieldList, int style) {
@@ -72,7 +77,7 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
 		Shell shell = new Shell(getParent(), getStyle());
 		shell.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
 		shell.setText(getText());
-		shell.setSize(700, 400);
+		shell.setSize(700, 550);
 		Point location = getParent().getShell().getLocation();
 		Point size = getParent().getShell().getSize();
 		shell.setLocation((location.x + size.x - 300) / 2, (location.y + size.y - 150) / 2);
@@ -149,6 +154,7 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
     createLabel("Value", shell, valueText);
     
     final Combo readableDropDown = new Combo(shell, SWT.DROP_DOWN | SWT.BORDER);
+    readableDropDown.add("");
     readableDropDown.add("True");
     readableDropDown.add("False");
     data = new FormData();
@@ -157,14 +163,17 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
     data.top = new FormAttachment(valueText, VSPACE);
     readableDropDown.setLayoutData(data);
     if("true".equalsIgnoreCase(savedReadable)) {
-      readableDropDown.select(0);
-    } else if("false".equalsIgnoreCase(savedReadable)) {
       readableDropDown.select(1);
+    } else if("false".equalsIgnoreCase(savedReadable)) {
+      readableDropDown.select(2);
+    } else {
+    	readableDropDown.select(0);
     }
     
     createLabel("Readable", shell, readableDropDown);
     
     final Combo writeableDropDown = new Combo(shell, SWT.DROP_DOWN | SWT.BORDER);
+    writeableDropDown.add("");
     writeableDropDown.add("True");
     writeableDropDown.add("False");
     data = new FormData();
@@ -173,14 +182,17 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
     data.top = new FormAttachment(readableDropDown, VSPACE);
     writeableDropDown.setLayoutData(data);
     if("true".equalsIgnoreCase(savedWriteable)) {
-      writeableDropDown.select(0);
-    } else if("false".equalsIgnoreCase(savedWriteable)) {
       writeableDropDown.select(1);
+    } else if("false".equalsIgnoreCase(savedWriteable)) {
+      writeableDropDown.select(2);
+    } else {
+    	writeableDropDown.select(0);
     }
     
     createLabel("Writeable", shell, writeableDropDown);
     
     final Combo requiredDropDown = new Combo(shell, SWT.DROP_DOWN | SWT.BORDER);
+    requiredDropDown.add("");
     requiredDropDown.add("True");
     requiredDropDown.add("False");
     data = new FormData();
@@ -189,12 +201,31 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
     data.top = new FormAttachment(writeableDropDown, VSPACE);
     requiredDropDown.setLayoutData(data);
     if("true".equalsIgnoreCase(savedRequired)) {
-      requiredDropDown.select(0);
-    } else if("false".equalsIgnoreCase(savedRequired)) {
       requiredDropDown.select(1);
+    } else if("false".equalsIgnoreCase(savedRequired)) {
+      requiredDropDown.select(2);
+    } else {
+    	requiredDropDown.select(0);
     }
     
     createLabel("Required", shell, requiredDropDown);
+    
+    Composite valuesComposite = new Composite(shell, SWT.WRAP);
+		data = new FormData();
+		data.left = new FormAttachment(0, 120);
+		data.right = new FormAttachment(100, 0);
+		data.top = new FormAttachment(requiredDropDown, VSPACE);
+		valuesComposite.setLayoutData(data);
+		GridLayout valuesLayout = new GridLayout();
+		valuesLayout.marginTop = 0;
+		valuesLayout.numColumns = 1;
+		valuesComposite.setLayout(valuesLayout);
+		final FormValueEditor formValueEditor = new FormValueEditor("formValueEditor", valuesComposite);
+		formValueEditor.getLabelControl(valuesComposite).setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
+		
+		formValueEditor.initialize(savedFormValues);
+		
+		createLabel("Form values", shell, valuesComposite);
     
     // Create the cancel button and add a handler
     // so that pressing it will set input to null
@@ -203,7 +234,7 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
     data = new FormData();
     data.left = new FormAttachment(0, 120);
     data.right = new FormAttachment(50, 0);
-    data.top = new FormAttachment(requiredDropDown, 20);
+    data.top = new FormAttachment(valuesComposite, 20);
     cancel.setLayoutData(data);
     cancel.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent event) {
@@ -231,6 +262,17 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
 				readable = readableDropDown.getText();
 				writeable = writeableDropDown.getText();
 				required = requiredDropDown.getText();
+				formValues = "";
+				TableItem[] formValueItems = formValueEditor.getItems();
+				if(formValueItems != null) {
+					for(int i = 0; i < formValueItems.length; i++) {
+						TableItem formValueItem = formValueItems[i];
+						if(i > 0) {
+							formValues += ";"; 
+						}
+						formValues += formValueItem.getText(0) + ":" + formValueItem.getText(1);
+					}
+				}
 				shell.close();
 			}
 		});
