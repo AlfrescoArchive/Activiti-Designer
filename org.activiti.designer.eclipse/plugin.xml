@@ -193,23 +193,23 @@
           priority="normal">
     </content-type>
  </extension>
- 	<extension id="activitiMarker" point="org.eclipse.core.resources.markers">
+ 	<extension id="activitiMarker" point="org.eclipse.core.resources.markers" name="Activiti Marker">
 	   <super type="org.eclipse.core.resources.problemmarker"/>
 	   <persistent value="true"/>
 	</extension>
-	<extension id="activitiGeneralMarker" point="org.eclipse.core.resources.markers">
+	<extension id="activitiGeneralMarker" point="org.eclipse.core.resources.markers" name="Activiti General Marker">
 	   <super type="org.eclipse.core.resources.problemmarker"/>
 	   <super type="org.activiti.designer.eclipse.activitiMarker"/>
 	   <persistent value="true"/>
 	</extension>
-	<extension id="activitiMarshallerMarker" point="org.eclipse.core.resources.markers">
+	<extension id="activitiMarshallerMarker" point="org.eclipse.core.resources.markers" name="Activiti Marshaller Marker">
 	   <super type="org.eclipse.core.resources.problemmarker"/>
 	   <super type="org.activiti.designer.eclipse.activitiMarker"/>
 	   <super type="org.activiti.designer.eclipse.activitiGeneralMarker"/>
 	   <attribute name="nodeId"/>
 	   <persistent value="true"/>
 	</extension>
-	<extension id="activitiValidatorMarker" point="org.eclipse.core.resources.markers">
+	<extension id="activitiValidatorMarker" point="org.eclipse.core.resources.markers" name="Activiti Validator Marker">
 		<super type="org.eclipse.core.resources.problemmarker"/>
 	   <super type="org.activiti.designer.eclipse.activitiMarker"/>
 	   <super type="org.activiti.designer.eclipse.activitiGeneralMarker"/>
