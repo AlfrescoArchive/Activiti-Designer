@@ -207,7 +207,9 @@ public class BpmnFileReader {
       FlowElement sourceElement = sourceRef(flowElement.getId(), yMap);
       if(flowElement instanceof StartEvent == false && flowElement instanceof BoundaryEvent == false) {
         if(sourceElement == null) {
-          wrongOrderList.add(flowElement);
+        	if(activeSubProcess == null || containsFlowElementId(activeSubProcess.getFlowElements(), flowElement.getId()) == false) {
+        		wrongOrderList.add(flowElement);
+          }
           continue;
         }
       }
@@ -221,16 +223,12 @@ public class BpmnFileReader {
         continue;
       }
       
-      if(activeSubProcess != null && containsFlowElementId(activeSubProcess.getFlowElements(), flowElement.getId()) == true) {
-        continue;
-      }
-      
       addBpmnElementToDiagram(flowElement, graphicInfo, diagram); 
     }
     return wrongOrderList;
   }
   
-  private boolean containsFlowElementId(List<FlowElement> flowElementList, String id) {
+ 	private boolean containsFlowElementId(List<FlowElement> flowElementList, String id) {
     for (FlowElement flowElement : flowElementList) {
       if(id.equals(flowElement.getId())) {
         return true;
@@ -343,26 +341,40 @@ public class BpmnFileReader {
       int height = 0;
       Map<String, GraphicInfo> subYMap = new HashMap<String, GraphicInfo>();
       List<FlowElement> subFlowElementList = new ArrayList<FlowElement>();
+      
+      GraphicInfo subGraphicInfo = null;
+      
+      // first go for start event
       for(FlowElement subFlowElement : ((SubProcess) newFlowElement).getFlowElements()) {
-        GraphicInfo subGraphicInfo = null;
+        if(subFlowElement instanceof StartEvent) {
+        	subGraphicInfo = new GraphicInfo();
+          subGraphicInfo.height = EVENT_HEIGHT;
+          subGraphicInfo.x = 20;
+          subGraphicInfo.y = 50;
+          subYMap.put(subFlowElement.getId(), subGraphicInfo);
+          subFlowElementList.add(subFlowElement);
+          if(subGraphicInfo.x > width)
+            width = subGraphicInfo.x;
+          if(subGraphicInfo.y > height)
+            height = subGraphicInfo.y;
+        }
+      }
+      
+      // the other elements
+      for(FlowElement subFlowElement : ((SubProcess) newFlowElement).getFlowElements()) {
         if(subFlowElement instanceof StartEvent == false) {
           FlowElement subSourceElement = sourceRef(subFlowElement.getId(), subYMap);
           subGraphicInfo = getNextGraphicInfo(subSourceElement, subFlowElement, subYMap);
           if(subGraphicInfo.y < 0) {
             subGraphicInfo.y = 0;
           }
-        } else {
-          subGraphicInfo = new GraphicInfo();
-          subGraphicInfo.height = EVENT_HEIGHT;
-          subGraphicInfo.x = 20;
-          subGraphicInfo.y = 50;
+          subYMap.put(subFlowElement.getId(), subGraphicInfo);
+          subFlowElementList.add(subFlowElement);
+          if(subGraphicInfo.x > width)
+            width = subGraphicInfo.x;
+          if(subGraphicInfo.y > height)
+            height = subGraphicInfo.y;
         }
-        subYMap.put(subFlowElement.getId(), subGraphicInfo);
-        subFlowElementList.add(subFlowElement);
-        if(subGraphicInfo.x > width)
-          width = subGraphicInfo.x;
-        if(subGraphicInfo.y > height)
-          height = subGraphicInfo.y;
       }
       
       graphicInfo.width = width + 80;

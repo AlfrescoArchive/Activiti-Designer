@@ -257,21 +257,17 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
       	} else if(bendPointList != null && bendPointList.size() > 0) {
       			
     			Point bendPoint = bendPointList.get(0);
-    			if(sourceConnection.getY() + 50 < bendPoint.getY()) {
-    				lastWayPoint = createWayPoint(sourceConnection.getX() + (sourceConnection.getWidth() / 2) + subProcessX,
-	              sourceConnection.getY() + sourceConnection.getHeight() + subProcessY, xtw);
+    			if((sourceY + 20) < bendPoint.getY()) {
+    				lastWayPoint = createWayPoint(sourceMiddleX, sourceY + sourceHeight, xtw);
     			
-    			} else if(sourceConnection.getY() - 50 > bendPoint.getY()) {
-    				lastWayPoint = createWayPoint(sourceConnection.getX() + (sourceConnection.getWidth() / 2) + subProcessX,
-	              sourceConnection.getY() + subProcessY, xtw);
+    			} else if((sourceY - 20) > bendPoint.getY()) {
+    				lastWayPoint = createWayPoint(sourceMiddleX, sourceY, xtw);
     			
     			} else if(sourceConnection.getX() > bendPoint.getX()) {
-    				lastWayPoint = createWayPoint(sourceConnection.getX() + subProcessX,
-	              sourceConnection.getY() + (sourceConnection.getHeight() / 2) + subProcessY, xtw);
+    				lastWayPoint = createWayPoint(sourceX, sourceMiddleY, xtw);
     				
     			} else {
-    				lastWayPoint = createWayPoint(sourceConnection.getX() + sourceConnection.getWidth() + subProcessX,
-	              sourceConnection.getY() + (sourceConnection.getHeight() / 2) + subProcessY, xtw);
+    				lastWayPoint = createWayPoint(sourceX + sourceWidth, sourceMiddleY, xtw);
     			}
       	
       	} else {
@@ -288,7 +284,23 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
         
         lastWayPoint = createWayPoint(sourceConnection.getX() + (sourceConnection.getWidth() / 2) + subProcessX,
                 sourceConnection.getY() + sourceConnection.getHeight() + subProcessY, xtw);
-        
+      
+      } else if (sequenceFlow.getSourceRef() instanceof SubProcess) {
+      	
+      	// subprocess drawn before target element
+      	if((sourceX + sourceWidth) < targetX) {
+      		lastWayPoint = createWayPoint(sourceX + sourceWidth + subProcessX,
+              sourceY + (sourceHeight / 2) + subProcessY, xtw);
+      	
+      	} else if(sourceY < targetY) {
+      		lastWayPoint = createWayPoint(sourceX + (sourceWidth / 2) + subProcessX,
+              sourceY + subProcessY, xtw);
+      	
+      	} else {
+      		lastWayPoint = createWayPoint(sourceX + (sourceWidth / 2) + subProcessX,
+              sourceY + sourceHeight + subProcessY, xtw);
+      	}
+      
       } else {
       	
       	if(sourceConnection.getY() + 50 < targetConnection.getY()) {
@@ -342,12 +354,21 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
               sequenceFlow.getTargetRef().getId()) > 1) {
         
         int y = 0;
-        if(targetConnection.getY() > sourceConnection.getY()) {
+        int x = 0;
+        if((sourceConnection.getY() + 5) > targetConnection.getY() &&
+        		sourceConnection.getY() - 5 < targetConnection.getY()) {
+        	
+        	x = targetConnection.getX();
+        	y = targetConnection.getY() + (targetConnection.getHeight() / 2);
+        	
+        } else if(targetConnection.getY() > sourceConnection.getY()) {
+        	x = targetConnection.getX() + (targetConnection.getWidth() / 2);
           y = targetConnection.getY();
         } else {
+        	x = targetConnection.getX() + (targetConnection.getWidth() / 2);
           y = targetConnection.getY() + targetConnection.getHeight();
         }
-        createWayPoint(targetConnection.getX() + (targetConnection.getWidth() / 2) + subProcessX, y + subProcessY, xtw);
+        createWayPoint(x + subProcessX, y + subProcessY, xtw);
         
       } else {
         if(lastWayPoint != null) {
