@@ -173,6 +173,8 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     }
     connectionContext.setSourceAnchor(connectionAnchor);
     
+    if(pe.eContainer() instanceof ContainerShape == false) return data;
+    
     CreateContext taskContext = new CreateContext();
   	taskContext.setTargetContainer((ContainerShape) pe.eContainer());
   	taskContext.putProperty("org.activiti.designer.connectionContext", connectionContext);

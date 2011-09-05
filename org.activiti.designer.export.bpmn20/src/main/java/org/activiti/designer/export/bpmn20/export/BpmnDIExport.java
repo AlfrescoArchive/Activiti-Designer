@@ -106,13 +106,9 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
   
   private static void writeBpmnElement(FlowNode flowNode, ContainerShape parent, String subprocessId) throws Exception {
     ILinkService linkService = Graphiti.getLinkService();
-    xtw.writeStartElement(BPMNDI_PREFIX, "BPMNShape", BPMNDI_NAMESPACE);
-    xtw.writeAttribute("bpmnElement", subprocessId + flowNode.getId());
-    xtw.writeAttribute("id", "BPMNShape_" + flowNode.getId());
     
     if(flowNode instanceof BoundaryEvent) {
       if(((BoundaryEvent) flowNode).getAttachedToRef() == null || ((BoundaryEvent) flowNode).getAttachedToRef().getId() == null) {
-        xtw.writeEndElement();
         return;
       }
     }
@@ -126,6 +122,9 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
         diFlowNodeMap.put(flowNode.getId(), shape.getGraphicsAlgorithm());
         java.awt.Point attachedPoint = findAttachedShape(shapeBoundaryEvent.getAttachedToRef().getId(), parent.getChildren());
         if(attachedPoint != null) {
+        	xtw.writeStartElement(BPMNDI_PREFIX, "BPMNShape", BPMNDI_NAMESPACE);
+          xtw.writeAttribute("bpmnElement", subprocessId + flowNode.getId());
+          xtw.writeAttribute("id", "BPMNShape_" + flowNode.getId());
           xtw.writeStartElement(OMGDC_PREFIX, "Bounds", OMGDC_NAMESPACE);
           xtw.writeAttribute("height", "" + shape.getGraphicsAlgorithm().getHeight());
           xtw.writeAttribute("width", "" + shape.getGraphicsAlgorithm().getWidth());
@@ -137,6 +136,7 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
             xtw.writeAttribute("y", "" + shape.getGraphicsAlgorithm().getY());
           }
           xtw.writeEndElement();
+          xtw.writeEndElement();
         }
         
       } else {
@@ -144,6 +144,9 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
         if (shapeBO instanceof FlowNode) {
           FlowNode shapeFlowNode = (FlowNode) shapeBO;
           if (shapeFlowNode.getId().equals(flowNode.getId())) {
+          	xtw.writeStartElement(BPMNDI_PREFIX, "BPMNShape", BPMNDI_NAMESPACE);
+            xtw.writeAttribute("bpmnElement", subprocessId + flowNode.getId());
+            xtw.writeAttribute("id", "BPMNShape_" + flowNode.getId());
             diFlowNodeMap.put(flowNode.getId(), shape.getGraphicsAlgorithm());
             xtw.writeStartElement(OMGDC_PREFIX, "Bounds", OMGDC_NAMESPACE);
             xtw.writeAttribute("height", "" + shape.getGraphicsAlgorithm().getHeight());
@@ -156,11 +159,11 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
               xtw.writeAttribute("y", "" + shape.getGraphicsAlgorithm().getY());
             }
             xtw.writeEndElement();
+            xtw.writeEndElement();
           }
         }
       }
     }
-    xtw.writeEndElement();
   }
   
   private static java.awt.Point findAttachedShape(String shapeid, EList<Shape> shapeList) {
