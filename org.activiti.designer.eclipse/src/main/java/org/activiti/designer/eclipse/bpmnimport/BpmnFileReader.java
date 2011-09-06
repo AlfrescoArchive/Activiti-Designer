@@ -191,41 +191,77 @@ public class BpmnFileReader {
   private List<FlowElement> createDiagramElements(List<FlowElement> flowList) {
     SubProcess activeSubProcess = null;
     List<FlowElement> wrongOrderList = new ArrayList<FlowElement>();
-    for (FlowElement flowElement : flowList) {
-      
-    	if(flowElement instanceof Gateway) {
-    		try {
-        	getMaxX(flowElement.getId());
-        	if(isEndGateway(flowElement, bpmnParser.sequenceFlowList)) {
-        		getDivergingGateway(flowElement, bpmnParser.sequenceFlowList, flowElement.getClass().getName());
-        	}
-        } catch(FlowSourceNotFoundException e) {
-        	wrongOrderList.add(flowElement);
-          continue;
-        }
-    	} 
-      FlowElement sourceElement = sourceRef(flowElement.getId(), yMap);
-      if(flowElement instanceof StartEvent == false && flowElement instanceof BoundaryEvent == false) {
-        if(sourceElement == null) {
-        	if(activeSubProcess == null || containsFlowElementId(activeSubProcess.getFlowElements(), flowElement.getId()) == false) {
-        		wrongOrderList.add(flowElement);
-          }
-          continue;
-        }
-      }
-      GraphicInfo graphicInfo = getNextGraphicInfo(sourceElement, flowElement, yMap);
     
-      yMap.put(flowElement.getId(), graphicInfo);
-      
-      if(flowElement instanceof SubProcess) {
-        activeSubProcess = (SubProcess) flowElement;
+    // first look for start event
+    for (FlowElement startElement : flowList) {
+    	
+    	if(startElement instanceof SubProcess) {
+        activeSubProcess = (SubProcess) startElement;
         subProcessList.add(activeSubProcess);
         continue;
       }
-      
-      addBpmnElementToDiagram(flowElement, graphicInfo, diagram); 
+    	
+    	if(startElement instanceof StartEvent) {
+    		if(activeSubProcess == null || containsFlowElementId(activeSubProcess.getFlowElements(), startElement.getId()) == false) {
+    			GraphicInfo graphicInfo = getNextGraphicInfo(null, startElement, yMap);
+          yMap.put(startElement.getId(), graphicInfo);
+          addBpmnElementToDiagram(startElement, graphicInfo, diagram);
+          
+          processDiagramInSequence(startElement, flowList, activeSubProcess, wrongOrderList);
+          
+          break;
+          
+    		}
+    	}
     }
     return wrongOrderList;
+  }
+  
+  private void processDiagramInSequence(FlowElement previousElement, List<FlowElement> flowList, 
+  		SubProcess activeSubProcess, List<FlowElement> wrongOrderList) {
+  	
+  	for(SequenceFlowModel sequence : bpmnParser.sequenceFlowList) {
+    	if(sequence.sourceRef != null && sequence.sourceRef.equals(previousElement.getId()) &&
+    			sequence.targetRef != null && yMap.containsKey(sequence.targetRef) == false) {
+    
+    		for (FlowElement flowElement : flowList) {
+    			if(sequence.targetRef.equals(flowElement.getId())) {
+    				
+			    	if(flowElement instanceof Gateway) {
+			    		try {
+			        	getMaxX(flowElement.getId());
+			        	if(isEndGateway(flowElement, bpmnParser.sequenceFlowList)) {
+			        		getDivergingGateway(flowElement, bpmnParser.sequenceFlowList, flowElement.getClass().getName());
+			        	}
+			        } catch(FlowSourceNotFoundException e) {
+			        	if(activeSubProcess == null || containsFlowElementId(activeSubProcess.getFlowElements(), flowElement.getId()) == false) {
+			        		wrongOrderList.add(flowElement);
+			          }
+			          continue;
+			        }
+			    	} 
+			      
+			      GraphicInfo graphicInfo = getNextGraphicInfo(previousElement, flowElement, yMap);
+			    
+			      yMap.put(flowElement.getId(), graphicInfo);
+			      
+			      if(flowElement instanceof SubProcess) {
+			        activeSubProcess = (SubProcess) flowElement;
+			        subProcessList.add(activeSubProcess);
+			        
+			      } else if(activeSubProcess == null || containsFlowElementId(activeSubProcess.getFlowElements(), 
+			      		flowElement.getId()) == false) {
+			      	
+			      	addBpmnElementToDiagram(flowElement, graphicInfo, diagram); 
+			      }
+			      
+			      processDiagramInSequence(flowElement, flowList, activeSubProcess, wrongOrderList);
+			      
+			      break;
+    			}
+    		}
+    	}
+    }
   }
   
  	private boolean containsFlowElementId(List<FlowElement> flowElementList, String id) {
@@ -342,40 +378,35 @@ public class BpmnFileReader {
       Map<String, GraphicInfo> subYMap = new HashMap<String, GraphicInfo>();
       List<FlowElement> subFlowElementList = new ArrayList<FlowElement>();
       
-      GraphicInfo subGraphicInfo = null;
-      
       // first go for start event
-      for(FlowElement subFlowElement : ((SubProcess) newFlowElement).getFlowElements()) {
-        if(subFlowElement instanceof StartEvent) {
-        	subGraphicInfo = new GraphicInfo();
+      for(FlowElement startElement : ((SubProcess) newFlowElement).getFlowElements()) {
+        if(startElement instanceof StartEvent) {
+        	GraphicInfo subGraphicInfo = new GraphicInfo();
           subGraphicInfo.height = EVENT_HEIGHT;
           subGraphicInfo.x = 20;
           subGraphicInfo.y = 50;
-          subYMap.put(subFlowElement.getId(), subGraphicInfo);
-          subFlowElementList.add(subFlowElement);
+          subYMap.put(startElement.getId(), subGraphicInfo);
+          subFlowElementList.add(startElement);
           if(subGraphicInfo.x > width)
             width = subGraphicInfo.x;
           if(subGraphicInfo.y > height)
             height = subGraphicInfo.y;
+          
+          processSubDiagramInSequence(startElement, (SubProcess) newFlowElement, 
+          		subFlowElementList, subYMap);
+          
+          break;
         }
       }
       
-      // the other elements
-      for(FlowElement subFlowElement : ((SubProcess) newFlowElement).getFlowElements()) {
-        if(subFlowElement instanceof StartEvent == false) {
-          FlowElement subSourceElement = sourceRef(subFlowElement.getId(), subYMap);
-          subGraphicInfo = getNextGraphicInfo(subSourceElement, subFlowElement, subYMap);
-          if(subGraphicInfo.y < 0) {
-            subGraphicInfo.y = 0;
-          }
-          subYMap.put(subFlowElement.getId(), subGraphicInfo);
-          subFlowElementList.add(subFlowElement);
-          if(subGraphicInfo.x > width)
-            width = subGraphicInfo.x;
-          if(subGraphicInfo.y > height)
-            height = subGraphicInfo.y;
-        }
+      for(String subElementId : subYMap.keySet()) {
+      	GraphicInfo subGraphicInfo = subYMap.get(subElementId);
+      	if(subGraphicInfo.x > width)
+          width = subGraphicInfo.x;
+        if(subGraphicInfo.y > height)
+          height = subGraphicInfo.y;
       }
+      
       
       graphicInfo.width = width + 80;
       graphicInfo.height = height + 40 + TASK_HEIGHT;
@@ -405,6 +436,32 @@ public class BpmnFileReader {
     }
     
     return graphicInfo;
+  }
+  
+  private void processSubDiagramInSequence(FlowElement previousElement, SubProcess subProcess, 
+  		List<FlowElement> subFlowElementList, Map<String, GraphicInfo> subYMap) {
+  	
+  	for(SequenceFlowModel sequence : bpmnParser.sequenceFlowList) {
+    	if(sequence.sourceRef != null && sequence.sourceRef.equals(previousElement.getId()) &&
+    			sequence.targetRef != null && subYMap.containsKey(sequence.targetRef) == false) {
+    		
+    		for(FlowElement subFlowElement : subProcess.getFlowElements()) {
+    			if(sequence.targetRef.equals(subFlowElement.getId())) {
+    				FlowElement subSourceElement = sourceRef(subFlowElement.getId(), subYMap);
+            GraphicInfo subGraphicInfo = getNextGraphicInfo(subSourceElement, subFlowElement, subYMap);
+            if(subGraphicInfo.y < 0) {
+              subGraphicInfo.y = 0;
+            }
+            
+            subYMap.put(subFlowElement.getId(), subGraphicInfo);
+            subFlowElementList.add(subFlowElement);
+            processSubDiagramInSequence(subFlowElement, subProcess, subFlowElementList, subYMap);
+            
+    				break;
+    			}
+    		}
+    	}
+    }
   }
   
   private FlowElement sourceRef(String id, Map<String, GraphicInfo> graphInfoMap) {
