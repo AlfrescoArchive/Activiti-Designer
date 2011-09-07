@@ -34,6 +34,7 @@ import org.eclipse.bpmn2.BusinessRuleTask;
 import org.eclipse.bpmn2.CallActivity;
 import org.eclipse.bpmn2.CandidateGroup;
 import org.eclipse.bpmn2.CandidateUser;
+import org.eclipse.bpmn2.Documentation;
 import org.eclipse.bpmn2.EndEvent;
 import org.eclipse.bpmn2.ErrorEventDefinition;
 import org.eclipse.bpmn2.ExclusiveGateway;
@@ -85,33 +86,44 @@ public class BpmnParser {
 			while (xtr.hasNext()) {
 				xtr.next();
 
-				if (xtr.isEndElement()
-				    && "subProcess".equalsIgnoreCase(xtr.getLocalName())) {
+				if (xtr.isEndElement()  && "subProcess".equalsIgnoreCase(xtr.getLocalName())) {
 					activeSubProcess = null;
 				}
 
 				if (xtr.isStartElement() == false)
 					continue;
 
-				if (xtr.isStartElement()
-				    && "definitions".equalsIgnoreCase(xtr.getLocalName())) {
+				if (xtr.isStartElement() && "definitions".equalsIgnoreCase(xtr.getLocalName())) {
 
 					if (xtr.getAttributeValue(null, "targetNamespace") != null) {
 						createProcessElement();
-						process
-						    .setNamespace(xtr.getAttributeValue(null, "targetNamespace"));
+						process.setNamespace(xtr.getAttributeValue(null, "targetNamespace"));
 					}
 
-				} else if (xtr.isStartElement()
-				    && "process".equalsIgnoreCase(xtr.getLocalName())) {
+				} else if (xtr.isStartElement() && "process".equalsIgnoreCase(xtr.getLocalName())) {
+					
 					processExtensionAvailable = true;
 					if (xtr.getAttributeValue(null, "name") != null) {
 						createProcessElement();
 						process.setName(xtr.getAttributeValue(null, "name"));
 					}
+				} else if (xtr.isStartElement()
+				    && "documentation".equalsIgnoreCase(xtr.getLocalName())) {
+					
+					String docText = xtr.getElementText();
+					if(process != null && StringUtils.isEmpty(docText) == false) {
+						Documentation documentation = Bpmn2Factory.eINSTANCE.createDocumentation();
+						documentation.setText(docText);
+						if(activeSubProcess != null) {
+							activeSubProcess.getDocumentation().add(documentation);
+						} else {
+							process.getDocumentation().add(documentation);
+						}
+					}					
 
 				} else if (processExtensionAvailable == true && xtr.isStartElement()
 				    && "extensionElements".equalsIgnoreCase(xtr.getLocalName())) {
+					
 					createProcessElement();
 					process.getExecutionListeners().addAll(parseListeners(xtr));
 					processExtensionAvailable = false;
@@ -120,8 +132,7 @@ public class BpmnParser {
 
 					processExtensionAvailable = false;
 
-					if (xtr.isStartElement()
-					    && "startEvent".equalsIgnoreCase(xtr.getLocalName())) {
+					if (xtr.isStartElement() && "startEvent".equalsIgnoreCase(xtr.getLocalName())) {
 						String elementid = xtr.getAttributeValue(null, "id");
 						StartEvent startEvent = parseStartEvent(xtr);
 						startEvent.setId(elementid);
@@ -129,29 +140,25 @@ public class BpmnParser {
 							activeSubProcess.getFlowElements().add(startEvent);
 						bpmnList.add(startEvent);
 
-					} else if (xtr.isStartElement()
-					    && "subProcess".equalsIgnoreCase(xtr.getLocalName())) {
+					} else if (xtr.isStartElement() && "subProcess".equalsIgnoreCase(xtr.getLocalName())) {
 						String elementid = xtr.getAttributeValue(null, "id");
 						SubProcess subProcess = parseSubProcess(xtr);
 						subProcess.setId(elementid);
 						activeSubProcess = subProcess;
 						bpmnList.add(subProcess);
 
-					} else if (activeSubProcess != null && xtr.isStartElement()
-					    && "extensionElements".equalsIgnoreCase(xtr.getLocalName())) {
+					} else if (activeSubProcess != null && xtr.isStartElement() && "extensionElements".equalsIgnoreCase(xtr.getLocalName())) {
 						activeSubProcess.getActivitiListeners().addAll(parseListeners(xtr));
 
-					} else if (activeSubProcess != null
-					    && xtr.isStartElement()
-					    && "multiInstanceLoopCharacteristics".equalsIgnoreCase(xtr
-					        .getLocalName())) {
+					} else if (activeSubProcess != null && xtr.isStartElement()
+					    && "multiInstanceLoopCharacteristics".equalsIgnoreCase(xtr.getLocalName())) {
+						
 						MultiInstanceLoopCharacteristics multiInstanceDef = Bpmn2Factory.eINSTANCE
 						    .createMultiInstanceLoopCharacteristics();
 						activeSubProcess.setLoopCharacteristics(multiInstanceDef);
 						parseMultiInstanceDef(multiInstanceDef, xtr);
 
-					} else if (xtr.isStartElement()
-					    && "userTask".equalsIgnoreCase(xtr.getLocalName())) {
+					} else if (xtr.isStartElement() && "userTask".equalsIgnoreCase(xtr.getLocalName())) {
 						String elementid = xtr.getAttributeValue(null, "id");
 						UserTask userTask = parseUserTask(xtr);
 						userTask.setId(elementid);
@@ -159,8 +166,8 @@ public class BpmnParser {
 							activeSubProcess.getFlowElements().add(userTask);
 						bpmnList.add(userTask);
 
-					} else if (xtr.isStartElement()
-					    && "serviceTask".equalsIgnoreCase(xtr.getLocalName())) {
+					} else if (xtr.isStartElement() && "serviceTask".equalsIgnoreCase(xtr.getLocalName())) {
+						
 						String elementid = xtr.getAttributeValue(null, "id");
 						Task task = null;
 						if ("mail".equalsIgnoreCase(xtr.getAttributeValue(
@@ -178,8 +185,8 @@ public class BpmnParser {
 							activeSubProcess.getFlowElements().add(task);
 						bpmnList.add(task);
 
-					} else if (xtr.isStartElement()
-					    && "task".equalsIgnoreCase(xtr.getLocalName())) {
+					} else if (xtr.isStartElement() && "task".equalsIgnoreCase(xtr.getLocalName())) {
+						
 						String elementid = xtr.getAttributeValue(null, "id");
 						ServiceTask task = parseTask(xtr);
 						task.setId(elementid);
@@ -187,8 +194,8 @@ public class BpmnParser {
 							activeSubProcess.getFlowElements().add(task);
 						bpmnList.add(task);
 
-					} else if (xtr.isStartElement()
-					    && "scriptTask".equalsIgnoreCase(xtr.getLocalName())) {
+					} else if (xtr.isStartElement() && "scriptTask".equalsIgnoreCase(xtr.getLocalName())) {
+						
 						String elementid = xtr.getAttributeValue(null, "id");
 						ScriptTask scriptTask = parseScriptTask(xtr);
 						scriptTask.setId(elementid);
@@ -196,8 +203,8 @@ public class BpmnParser {
 							activeSubProcess.getFlowElements().add(scriptTask);
 						bpmnList.add(scriptTask);
 
-					} else if (xtr.isStartElement()
-					    && "manualTask".equalsIgnoreCase(xtr.getLocalName())) {
+					} else if (xtr.isStartElement() && "manualTask".equalsIgnoreCase(xtr.getLocalName())) {
+						
 						String elementid = xtr.getAttributeValue(null, "id");
 						ManualTask manualTask = parseManualTask(xtr);
 						manualTask.setId(elementid);
@@ -205,8 +212,8 @@ public class BpmnParser {
 							activeSubProcess.getFlowElements().add(manualTask);
 						bpmnList.add(manualTask);
 
-					} else if (xtr.isStartElement()
-					    && "receiveTask".equalsIgnoreCase(xtr.getLocalName())) {
+					} else if (xtr.isStartElement() && "receiveTask".equalsIgnoreCase(xtr.getLocalName())) {
+						
 						String elementid = xtr.getAttributeValue(null, "id");
 						ReceiveTask receiveTask = parseReceiveTask(xtr);
 						receiveTask.setId(elementid);
@@ -214,8 +221,8 @@ public class BpmnParser {
 							activeSubProcess.getFlowElements().add(receiveTask);
 						bpmnList.add(receiveTask);
 
-					} else if (xtr.isStartElement()
-					    && "businessRuleTask".equalsIgnoreCase(xtr.getLocalName())) {
+					} else if (xtr.isStartElement() && "businessRuleTask".equalsIgnoreCase(xtr.getLocalName())) {
+						
 						String elementid = xtr.getAttributeValue(null, "id");
 						BusinessRuleTask businessRuleTask = parseBusinessRuleTask(xtr);
 						businessRuleTask.setId(elementid);
@@ -223,8 +230,8 @@ public class BpmnParser {
 							activeSubProcess.getFlowElements().add(businessRuleTask);
 						bpmnList.add(businessRuleTask);
 
-					} else if (xtr.isStartElement()
-					    && "callActivity".equalsIgnoreCase(xtr.getLocalName())) {
+					} else if (xtr.isStartElement() && "callActivity".equalsIgnoreCase(xtr.getLocalName())) {
+						
 						String elementid = xtr.getAttributeValue(null, "id");
 						CallActivity callActivity = parseCallActivity(xtr);
 						callActivity.setId(elementid);
@@ -232,8 +239,8 @@ public class BpmnParser {
 							activeSubProcess.getFlowElements().add(callActivity);
 						bpmnList.add(callActivity);
 
-					} else if (xtr.isStartElement()
-					    && "endEvent".equalsIgnoreCase(xtr.getLocalName())) {
+					} else if (xtr.isStartElement() && "endEvent".equalsIgnoreCase(xtr.getLocalName())) {
+						
 						String elementid = xtr.getAttributeValue(null, "id");
 						EndEvent endEvent = parseEndEvent(xtr);
 						endEvent.setId(elementid);
@@ -241,8 +248,7 @@ public class BpmnParser {
 							activeSubProcess.getFlowElements().add(endEvent);
 						bpmnList.add(endEvent);
 					
-					} else if (xtr.isStartElement()
-					    && "intermediateCatchEvent".equalsIgnoreCase(xtr.getLocalName())) {
+					} else if (xtr.isStartElement() && "intermediateCatchEvent".equalsIgnoreCase(xtr.getLocalName())) {
 						String elementid = xtr.getAttributeValue(null, "id");
 						IntermediateCatchEvent catchEvent = parseIntermediateCatchEvent(xtr);
 						catchEvent.setId(elementid);
@@ -250,8 +256,7 @@ public class BpmnParser {
 							activeSubProcess.getFlowElements().add(catchEvent);
 						bpmnList.add(catchEvent);
 
-					} else if (xtr.isStartElement()
-					    && "exclusiveGateway".equalsIgnoreCase(xtr.getLocalName())) {
+					} else if (xtr.isStartElement() && "exclusiveGateway".equalsIgnoreCase(xtr.getLocalName())) {
 						String elementid = xtr.getAttributeValue(null, "id");
 						ExclusiveGateway exclusiveGateway = parseExclusiveGateway(xtr);
 						exclusiveGateway.setId(elementid);
@@ -259,8 +264,7 @@ public class BpmnParser {
 							activeSubProcess.getFlowElements().add(exclusiveGateway);
 						bpmnList.add(exclusiveGateway);
 
-					} else if (xtr.isStartElement()
-              && "inclusiveGateway".equalsIgnoreCase(xtr.getLocalName())) {
+					} else if (xtr.isStartElement() && "inclusiveGateway".equalsIgnoreCase(xtr.getLocalName())) {
             String elementid = xtr.getAttributeValue(null, "id");
             InclusiveGateway inclusiveGateway = parseInclusiveGateway(xtr);
             inclusiveGateway.setId(elementid);
@@ -268,8 +272,7 @@ public class BpmnParser {
                 activeSubProcess.getFlowElements().add(inclusiveGateway);
             bpmnList.add(inclusiveGateway);
 
-          } else if (xtr.isStartElement()
-					    && "parallelGateway".equalsIgnoreCase(xtr.getLocalName())) {
+          } else if (xtr.isStartElement() && "parallelGateway".equalsIgnoreCase(xtr.getLocalName())) {
 						String elementid = xtr.getAttributeValue(null, "id");
 						ParallelGateway parallelGateway = parseParallelGateway(xtr);
 						parallelGateway.setId(elementid);
@@ -277,8 +280,7 @@ public class BpmnParser {
 							activeSubProcess.getFlowElements().add(parallelGateway);
 						bpmnList.add(parallelGateway);
 
-					} else if (xtr.isStartElement()
-					    && "boundaryEvent".equalsIgnoreCase(xtr.getLocalName())) {
+					} else if (xtr.isStartElement() && "boundaryEvent".equalsIgnoreCase(xtr.getLocalName())) {
 						String elementid = xtr.getAttributeValue(null, "id");
 						BoundaryEventModel event = parseBoundaryEvent(xtr);
 						event.boundaryEvent.setId(elementid);
@@ -287,20 +289,17 @@ public class BpmnParser {
 							activeSubProcess.getFlowElements().add(event.boundaryEvent);
 						bpmnList.add(event.boundaryEvent);
 
-					} else if (xtr.isStartElement()
-					    && "sequenceFlow".equalsIgnoreCase(xtr.getLocalName())) {
+					} else if (xtr.isStartElement() && "sequenceFlow".equalsIgnoreCase(xtr.getLocalName())) {
 						SequenceFlowModel sequenceFlow = parseSequenceFlow(xtr);
 						sequenceFlowList.add(sequenceFlow);
 
-					} else if (xtr.isStartElement()
-					    && "BPMNShape".equalsIgnoreCase(xtr.getLocalName())) {
+					} else if (xtr.isStartElement() && "BPMNShape".equalsIgnoreCase(xtr.getLocalName())) {
 						bpmdiInfoFound = true;
 						String id = xtr.getAttributeValue(null, "bpmnElement");
 						boolean readyWithBPMNShape = false;
 						while (readyWithBPMNShape == false && xtr.hasNext()) {
 							xtr.next();
-							if (xtr.isStartElement()
-							    && "Bounds".equalsIgnoreCase(xtr.getLocalName())) {
+							if (xtr.isStartElement() && "Bounds".equalsIgnoreCase(xtr.getLocalName())) {
 								GraphicInfo graphicInfo = new GraphicInfo();
 								graphicInfo.x = Double
 								    .valueOf(xtr.getAttributeValue(null, "x")).intValue();
@@ -803,6 +802,16 @@ public class BpmnParser {
 					FormProperty property = Bpmn2Factory.eINSTANCE.createFormProperty();
 					userTask.getFormProperties().add(property);
 					parseFormProperty(property, xtr);
+				
+				} else if (xtr.isStartElement()
+				    && "documentation".equalsIgnoreCase(xtr.getLocalName())) {
+					
+					String docText = xtr.getElementText();
+					if(StringUtils.isEmpty(docText) == false) {
+						Documentation documentation = Bpmn2Factory.eINSTANCE.createDocumentation();
+						documentation.setText(docText);
+						userTask.getDocumentation().add(documentation);
+					}
 
 				} else if (xtr.isStartElement()
 				    && "multiInstanceLoopCharacteristics".equalsIgnoreCase(xtr
@@ -1124,6 +1133,16 @@ public class BpmnParser {
 					    .createMultiInstanceLoopCharacteristics();
 					serviceTask.setLoopCharacteristics(multiInstanceDef);
 					parseMultiInstanceDef(multiInstanceDef, xtr);
+			
+				} else if (xtr.isStartElement()
+					    && "documentation".equalsIgnoreCase(xtr.getLocalName())) {
+						
+					String docText = xtr.getElementText();
+					if(StringUtils.isEmpty(docText) == false) {
+						Documentation documentation = Bpmn2Factory.eINSTANCE.createDocumentation();
+						documentation.setText(docText);
+						serviceTask.getDocumentation().add(documentation);
+					}
 
 				} else if (xtr.isEndElement()
 				    && "serviceTask".equalsIgnoreCase(xtr.getLocalName())) {

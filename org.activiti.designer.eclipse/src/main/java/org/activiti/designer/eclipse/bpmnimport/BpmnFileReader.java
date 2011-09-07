@@ -148,10 +148,18 @@ public class BpmnFileReader {
       if(bpmnParser.process != null && StringUtils.isNotEmpty(bpmnParser.process.getNamespace())) {
       	process.setNamespace(bpmnParser.process.getNamespace());
       }
-      Documentation documentation = Bpmn2Factory.eINSTANCE.createDocumentation();
-      documentation.setId("documentation_process");
-      documentation.setText("");
+      
+      Documentation documentation = null;
+      if(bpmnParser.process == null || bpmnParser.process.getDocumentation().size() == 0) {
+      	documentation = Bpmn2Factory.eINSTANCE.createDocumentation();
+	      documentation.setId("documentation_process");
+	      documentation.setText("");
+      } else {
+      	documentation = bpmnParser.process.getDocumentation().get(0);
+      }
+      
       process.getDocumentation().add(documentation);
+      
       if(bpmnParser.process != null && bpmnParser.process.getExecutionListeners().size() > 0) {
         process.getExecutionListeners().addAll(bpmnParser.process.getExecutionListeners());
       }

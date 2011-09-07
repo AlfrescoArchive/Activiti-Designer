@@ -75,6 +75,7 @@ public class PropertyDiagramSection extends ActivitiPropertySection implements I
 	  idText.removeFocusListener(listener);
 		nameText.removeFocusListener(listener);
 		namespaceText.removeFocusListener(listener);
+		documentationText.removeFocusListener(listener);
 		org.eclipse.bpmn2.Process process = ActivitiUiUtil.getProcessObject(getDiagram());
 		if(process == null) {
 			DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
@@ -110,6 +111,7 @@ public class PropertyDiagramSection extends ActivitiPropertySection implements I
 		idText.addFocusListener(listener);
 		nameText.addFocusListener(listener);
 		namespaceText.addFocusListener(listener);
+		documentationText.addFocusListener(listener);
 	}
 
 	private FocusListener listener = new FocusListener() {
