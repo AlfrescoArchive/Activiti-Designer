@@ -166,8 +166,12 @@ public class AddSequenceFlowFeature extends AbstractAddFeature {
 			}
 		} else if (addedSequenceFlow.getTargetRef() instanceof EndEvent) {
 			int middleSub = sourceGraphics.getY() + (sourceGraphics.getHeight() / 2);
-			if ((middleSub + 10) < targetGraphics.getY() && 
-					(sourceGraphics.getX() + sourceGraphics.getWidth()) < targetGraphics.getX()) {
+			if (((middleSub + 10) < targetGraphics.getY() && 
+					(sourceGraphics.getX() + sourceGraphics.getWidth()) < targetGraphics.getX()) ||
+					
+					((middleSub - 10) > targetGraphics.getY() && 
+					(sourceGraphics.getX() + sourceGraphics.getWidth()) < targetGraphics.getX())) {
+				
 				Point bendPoint = StylesFactory.eINSTANCE.createPoint();
 				if(inSubProcess == true) {
   				bendPoint.setX(parentShape.getGraphicsAlgorithm().getX() + targetGraphics.getX() + (targetGraphics.getWidth() / 2));

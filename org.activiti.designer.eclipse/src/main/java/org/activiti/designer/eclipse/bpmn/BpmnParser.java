@@ -718,6 +718,7 @@ public class BpmnParser {
 		boolean readyWithUserTask = false;
 		try {
 			String assignmentType = null;
+			ActivitiListener listener = null;
 			while (readyWithUserTask == false && xtr.hasNext()) {
 				xtr.next();
 				if (xtr.isStartElement()
@@ -764,10 +765,39 @@ public class BpmnParser {
 						userTask.setAssignee(xtr.getElementText());
 					}
 
-				} else if (xtr.isStartElement()
-				    && "extensionElements".equalsIgnoreCase(xtr.getLocalName())) {
-					userTask.getActivitiListeners().addAll(parseListeners(xtr));
+				} else if (xtr.isStartElement() && ("taskListener".equalsIgnoreCase(xtr.getLocalName()))) {
 
+					if (xtr.getAttributeValue(null, "class") != null
+					    && "org.alfresco.repo.workflow.activiti.listener.ScriptExecutionListener"
+					        .equals(xtr.getAttributeValue(null, "class"))
+					    || "org.alfresco.repo.workflow.activiti.tasklistener.ScriptTaskListener"
+					        .equals(xtr.getAttributeValue(null, "class"))) {
+
+						listener = Bpmn2Factory.eINSTANCE.createActivitiListener();
+						listener.setEvent(xtr.getAttributeValue(null, "event"));
+						listener.setImplementationType(ALFRESCO_TYPE);
+						boolean readyWithAlfrescoType = false;
+						while (readyWithAlfrescoType == false && xtr.hasNext()) {
+							xtr.next();
+							if (xtr.isStartElement() && "field".equalsIgnoreCase(xtr.getLocalName())) {
+								String script = getFieldExtensionValue(xtr);
+								if (script != null && script.length() > 0) {
+									listener.setImplementation(script);
+								}
+								readyWithAlfrescoType = true;
+							} else if (xtr.isEndElement() && "extensionElements".equalsIgnoreCase(xtr.getLocalName())) {
+								readyWithAlfrescoType = true;
+								readyWithUserTask = true;
+							}
+						}
+					} else {
+						listener = parseListener(xtr);
+					}
+					userTask.getActivitiListeners().add(listener);
+
+				} else if (xtr.isStartElement() && "field".equalsIgnoreCase(xtr.getLocalName())) {
+					listener.getFieldExtensions().add(parseFieldExtension(xtr));
+				
 				} else if (xtr.isStartElement()
 				    && "formProperty".equalsIgnoreCase(xtr.getLocalName())) {
 					FormProperty property = Bpmn2Factory.eINSTANCE.createFormProperty();
