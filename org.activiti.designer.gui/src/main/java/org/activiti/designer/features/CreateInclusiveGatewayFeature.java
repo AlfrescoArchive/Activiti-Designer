@@ -26,7 +26,6 @@ public class CreateInclusiveGatewayFeature extends AbstractCreateFastBPMNFeature
 		InclusiveGateway inclusiveGateway = Bpmn2Factory.eINSTANCE.createInclusiveGateway();
 		inclusiveGateway.setId(getNextId());
 		inclusiveGateway.setName("Inclusive Gateway");
-		System.out.println("adding inclusive gateway " + inclusiveGateway);
 		Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
     if (parentObject instanceof SubProcess) {
       ((SubProcess) parentObject).getFlowElements().add(inclusiveGateway);

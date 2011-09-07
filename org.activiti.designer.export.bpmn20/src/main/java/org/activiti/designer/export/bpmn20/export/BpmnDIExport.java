@@ -20,10 +20,8 @@ import java.util.Map;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.eclipse.bpmn2.BoundaryEvent;
-import org.eclipse.bpmn2.Event;
 import org.eclipse.bpmn2.FlowElement;
 import org.eclipse.bpmn2.FlowNode;
-import org.eclipse.bpmn2.Gateway;
 import org.eclipse.bpmn2.Process;
 import org.eclipse.bpmn2.SequenceFlow;
 import org.eclipse.bpmn2.SubProcess;
@@ -71,14 +69,14 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
     		if(node.getIncoming().size() == 0 && node.getOutgoing().size() == 0) {
     			continue;
     		}
-        writeBpmnElement(node, diagram, "");
+        writeBpmnElement(node, diagram, null);
         if(bpmnObject instanceof SubProcess) {
           for (FlowElement subFlowElement : ((SubProcess) node).getFlowElements()) {
             if (subFlowElement instanceof FlowNode) {
               List<PictogramElement> pictoList = linkService.getPictogramElements(diagram, node);
               if(pictoList != null && pictoList.size() > 0) {
                 ContainerShape parent = (ContainerShape) pictoList.get(0);
-                writeBpmnElement((FlowNode) subFlowElement, parent, ((SubProcess) node).getId());
+                writeBpmnElement((FlowNode) subFlowElement, parent, (SubProcess) node);
               }
             }
           }
@@ -87,7 +85,7 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
               List<PictogramElement> pictoList = linkService.getPictogramElements(diagram, node);
               if(pictoList != null && pictoList.size() > 0) {
                 ContainerShape parent = (ContainerShape) pictoList.get(0);
-                writeBpmnEdge((SequenceFlow) subFlowElement, parent, ((SubProcess) node).getId());
+                writeBpmnEdge((SequenceFlow) subFlowElement, parent, (SubProcess) node);
               }
             }
           }
@@ -97,14 +95,14 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
 
     for (EObject bpmnObject : contents) {
       if (bpmnObject instanceof SequenceFlow) {
-        writeBpmnEdge((SequenceFlow) bpmnObject, diagram, "");
+        writeBpmnEdge((SequenceFlow) bpmnObject, diagram, null);
       } 
     }
     xtw.writeEndElement();
     xtw.writeEndElement();
   }
   
-  private static void writeBpmnElement(FlowNode flowNode, ContainerShape parent, String subprocessId) throws Exception {
+  private static void writeBpmnElement(FlowNode flowNode, ContainerShape parent, SubProcess subProcess) throws Exception {
     ILinkService linkService = Graphiti.getLinkService();
     
     if(flowNode instanceof BoundaryEvent) {
@@ -123,12 +121,12 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
         java.awt.Point attachedPoint = findAttachedShape(shapeBoundaryEvent.getAttachedToRef().getId(), parent.getChildren());
         if(attachedPoint != null) {
         	xtw.writeStartElement(BPMNDI_PREFIX, "BPMNShape", BPMNDI_NAMESPACE);
-          xtw.writeAttribute("bpmnElement", subprocessId + flowNode.getId());
+          xtw.writeAttribute("bpmnElement", flowNode.getId());
           xtw.writeAttribute("id", "BPMNShape_" + flowNode.getId());
           xtw.writeStartElement(OMGDC_PREFIX, "Bounds", OMGDC_NAMESPACE);
           xtw.writeAttribute("height", "" + shape.getGraphicsAlgorithm().getHeight());
           xtw.writeAttribute("width", "" + shape.getGraphicsAlgorithm().getWidth());
-          if(subprocessId.length() > 0) {
+          if(subProcess != null) {
             xtw.writeAttribute("x", "" + (shape.getGraphicsAlgorithm().getX() + attachedPoint.getX()));
             xtw.writeAttribute("y", "" + (shape.getGraphicsAlgorithm().getY() + attachedPoint.getY()));
           } else {
@@ -145,13 +143,13 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
           FlowNode shapeFlowNode = (FlowNode) shapeBO;
           if (shapeFlowNode.getId().equals(flowNode.getId())) {
           	xtw.writeStartElement(BPMNDI_PREFIX, "BPMNShape", BPMNDI_NAMESPACE);
-            xtw.writeAttribute("bpmnElement", subprocessId + flowNode.getId());
+            xtw.writeAttribute("bpmnElement", flowNode.getId());
             xtw.writeAttribute("id", "BPMNShape_" + flowNode.getId());
             diFlowNodeMap.put(flowNode.getId(), shape.getGraphicsAlgorithm());
             xtw.writeStartElement(OMGDC_PREFIX, "Bounds", OMGDC_NAMESPACE);
             xtw.writeAttribute("height", "" + shape.getGraphicsAlgorithm().getHeight());
             xtw.writeAttribute("width", "" + shape.getGraphicsAlgorithm().getWidth());
-            if(subprocessId.length() > 0) {
+            if(subProcess != null) {
               xtw.writeAttribute("x", "" + (shape.getGraphicsAlgorithm().getX() + shape.getContainer().getGraphicsAlgorithm().getX()));
               xtw.writeAttribute("y", "" + (shape.getGraphicsAlgorithm().getY() + shape.getContainer().getGraphicsAlgorithm().getY()));
             } else {
@@ -191,7 +189,7 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
     return null;
   }
   
-  private static void writeBpmnEdge(SequenceFlow sequenceFlow, ContainerShape parent, String subprocessId) throws Exception {
+  private static void writeBpmnEdge(SequenceFlow sequenceFlow, ContainerShape parent, SubProcess subProcess) throws Exception {
     if (diFlowNodeMap.containsKey(sequenceFlow.getSourceRef().getId()) && diFlowNodeMap.containsKey(sequenceFlow.getTargetRef().getId())) {
       
       ILinkService linkService = Graphiti.getLinkService();
@@ -213,7 +211,7 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
       if(freeFormConnection == null) return;
       
       xtw.writeStartElement(BPMNDI_PREFIX, "BPMNEdge", BPMNDI_NAMESPACE);
-      xtw.writeAttribute("bpmnElement", subprocessId + sequenceFlow.getId());
+      xtw.writeAttribute("bpmnElement", sequenceFlow.getId());
       xtw.writeAttribute("id", "BPMNEdge_" + sequenceFlow.getId());
       
       GraphicsAlgorithm sourceConnection = diFlowNodeMap.get(sequenceFlow.getSourceRef().getId());
@@ -221,8 +219,8 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
       
       int subProcessX = 0;
       int subProcessY = 0;
-      if(subprocessId.length() > 0) {
-        GraphicsAlgorithm subProcessGraphics = diFlowNodeMap.get(subprocessId);
+      if(subProcess != null) {
+        GraphicsAlgorithm subProcessGraphics = diFlowNodeMap.get(subProcess.getId());
         if(subProcessGraphics != null) {
           subProcessX = subProcessGraphics.getX();
           subProcessY = subProcessGraphics.getY();
@@ -235,7 +233,7 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
       int sourceHeight = sourceConnection.getHeight();
       int sourceMiddleX = sourceX + (sourceWidth / 2);
       int sourceMiddleY = sourceY + (sourceHeight / 2);
-      java.awt.Point sourcePoint = new java.awt.Point(sourceMiddleX, sourceMiddleY);
+      int sourceBottomY = sourceY + sourceHeight;
       
       int targetX = subProcessX + targetConnection.getX();
       int targetY = subProcessY + targetConnection.getY();
@@ -243,109 +241,49 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
       int targetHeight = targetConnection.getHeight();
       int targetMiddleX = targetX + (targetWidth / 2);
       int targetMiddleY = targetY + (targetHeight / 2);
-      java.awt.Point targetPoint = new java.awt.Point(targetMiddleX, targetMiddleY);
+      int targetBottomY = targetY + targetHeight;
       
       java.awt.Point lastWayPoint = null;
       
-      if(sequenceFlow.getSourceRef() instanceof Gateway && getAmountOfOutgoingConnections(
-              sequenceFlow.getSourceRef().getId()) > 1) {
+      if (sequenceFlow.getSourceRef() instanceof BoundaryEvent) {
         
-      	if((bendPointList == null || bendPointList.size() == 0) && 
-      			(sourceConnection.getY() - 15) < targetConnection.getY() &&
-      					(sourceConnection.getY() + 15) > targetConnection.getY()) {
+        lastWayPoint = createWayPoint(sourceConnection.getX() + (sourceConnection.getWidth() / 2) + subProcessX,
+                sourceConnection.getY() + sourceConnection.getHeight() + subProcessY, xtw);
+      
+      } else {
+        
+      	if((bendPointList == null || bendPointList.size() == 0)) {
       		
-      		lastWayPoint = createWayPoint(sourceConnection.getX() + sourceConnection.getWidth() + subProcessX, 
-      			sourceConnection.getY() + (sourceConnection.getHeight() / 2) + subProcessY, xtw);
-      		
-      	} else if(bendPointList != null && bendPointList.size() > 0) {
-      			
-    			Point bendPoint = bendPointList.get(0);
-    			if((sourceY + 20) < bendPoint.getY()) {
+      		if((sourceBottomY + 11) < targetY) {
     				lastWayPoint = createWayPoint(sourceMiddleX, sourceY + sourceHeight, xtw);
     			
-    			} else if((sourceY - 20) > bendPoint.getY()) {
+    			} else if((sourceY - 11) > (targetY + targetHeight)) {
     				lastWayPoint = createWayPoint(sourceMiddleX, sourceY, xtw);
     			
-    			} else if(sourceConnection.getX() > bendPoint.getX()) {
+    			} else if(sourceX > targetX) {
     				lastWayPoint = createWayPoint(sourceX, sourceMiddleY, xtw);
     				
     			} else {
     				lastWayPoint = createWayPoint(sourceX + sourceWidth, sourceMiddleY, xtw);
     			}
-      	
-      	} else {
-	        int y = 0;
-	        if(sourceConnection.getY() > targetConnection.getY()) {
-	          y = sourceConnection.getY();
-	        } else {
-	          y = sourceConnection.getY() + sourceConnection.getHeight();
-	        }
-	        lastWayPoint = createWayPoint(sourceConnection.getX() + (sourceConnection.getWidth() / 2) + subProcessX, y + subProcessY, xtw);
-      	}
-      
-      } else if (sequenceFlow.getSourceRef() instanceof BoundaryEvent) {
-        
-        lastWayPoint = createWayPoint(sourceConnection.getX() + (sourceConnection.getWidth() / 2) + subProcessX,
-                sourceConnection.getY() + sourceConnection.getHeight() + subProcessY, xtw);
-      
-      } else if (sequenceFlow.getSourceRef() instanceof SubProcess) {
-      	
-      	// subprocess drawn before target element
-      	if((sourceX + sourceWidth) < targetX) {
-      		lastWayPoint = createWayPoint(sourceX + sourceWidth + subProcessX,
-              sourceY + (sourceHeight / 2) + subProcessY, xtw);
-      	
-      	} else if(sourceY < targetY) {
-      		lastWayPoint = createWayPoint(sourceX + (sourceWidth / 2) + subProcessX,
-              sourceY + subProcessY, xtw);
-      	
-      	} else {
-      		lastWayPoint = createWayPoint(sourceX + (sourceWidth / 2) + subProcessX,
-              sourceY + sourceHeight + subProcessY, xtw);
-      	}
-      
-      } else {
-      	
-      	if(sourceConnection.getY() + 50 < targetConnection.getY()) {
       		
-      		if(bendPointList != null && bendPointList.size() > 0) {
-      			
-      			Point bendPoint = bendPointList.get(0);
-      			if(sourceConnection.getY() + 50 < bendPoint.getY()) {
-      				lastWayPoint = createWayPoint(sourceConnection.getX() + (sourceConnection.getWidth() / 2) + subProcessX,
-  	              sourceConnection.getY() + sourceConnection.getHeight() + subProcessY, xtw);
-      			
-      			} else if(sourceConnection.getY() - 50 > bendPoint.getY()) {
-      				lastWayPoint = createWayPoint(sourceConnection.getX() + (sourceConnection.getWidth() / 2) + subProcessX,
-  	              sourceConnection.getY() + subProcessY, xtw);
-      			
-      			} else if(sourceConnection.getX() > bendPoint.getX()) {
-      				lastWayPoint = createWayPoint(sourceConnection.getX() + subProcessX,
-  	              sourceConnection.getY() + (sourceConnection.getHeight() / 2) + subProcessY, xtw);
-      				
-      			} else {
-      				lastWayPoint = createWayPoint(sourceConnection.getX() + sourceConnection.getWidth() + subProcessX,
-  	              sourceConnection.getY() + (sourceConnection.getHeight() / 2) + subProcessY, xtw);
-      			}
-      			
-      		} else {
-      		
-	      		lastWayPoint = createWayPoint(sourceConnection.getX() + (sourceConnection.getWidth() / 2) + subProcessX,
-	              sourceConnection.getY() + sourceConnection.getHeight() + subProcessY, xtw);
-      		}
-      	
       	} else {
-      	
-	      	if(sourceConnection.getX() > targetConnection.getX()) {
-	      		lastWayPoint = createWayPoint(sourceConnection.getX() + subProcessX,
-	              sourceConnection.getY() + (sourceConnection.getHeight() / 2) + subProcessY, xtw);
-	      		
-	      	} else {
-		        lastWayPoint = createWayPoint(sourceConnection.getX() + sourceConnection.getWidth() + subProcessX,
-		                sourceConnection.getY() + (sourceConnection.getHeight() / 2) + subProcessY, xtw);
-	      	}
+      			
+    			Point bendPoint = bendPointList.get(0);
+    			if((sourceBottomY + 5) < bendPoint.getY()) {
+    				lastWayPoint = createWayPoint(sourceMiddleX, sourceY + sourceHeight, xtw);
+    			
+    			} else if((sourceY - 5) > bendPoint.getY()) {
+    				lastWayPoint = createWayPoint(sourceMiddleX, sourceY, xtw);
+    			
+    			} else if(sourceX > bendPoint.getX()) {
+    				lastWayPoint = createWayPoint(sourceX, sourceMiddleY, xtw);
+    				
+    			} else {
+    				lastWayPoint = createWayPoint(sourceX + sourceWidth, sourceMiddleY, xtw);
+    			}
       	}
-      }
+      } 
       
       if(bendPointList != null && bendPointList.size() > 0) {
         for (Point point : bendPointList) {
@@ -353,108 +291,27 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
         }
       }
       
-      if(sequenceFlow.getTargetRef() instanceof Gateway && getAmountOfIncomingConnections(
-              sequenceFlow.getTargetRef().getId()) > 1) {
-        
-        int y = 0;
-        int x = 0;
-        if((sourceConnection.getY() + 5) > targetConnection.getY() &&
-        		sourceConnection.getY() - 5 < targetConnection.getY()) {
-        	
-        	x = targetConnection.getX();
-        	y = targetConnection.getY() + (targetConnection.getHeight() / 2);
-        	
-        } else if(targetConnection.getY() > sourceConnection.getY()) {
-        	x = targetConnection.getX() + (targetConnection.getWidth() / 2);
-          y = targetConnection.getY();
-        } else {
-        	x = targetConnection.getX() + (targetConnection.getWidth() / 2);
-          y = targetConnection.getY() + targetConnection.getHeight();
-        }
-        createWayPoint(x + subProcessX, y + subProcessY, xtw);
-        
-      } else {
-        if(lastWayPoint != null) {
-        	
-          if(lastWayPoint.getX() == targetMiddleX) {
-            
-            if(lastWayPoint.getY() > targetMiddleY) {
-            	
-              createWayPoint(targetMiddleX, targetY + targetHeight, xtw);
-              
-            } else {
-            	if(sequenceFlow.getTargetRef() instanceof Event) {
-              	targetHeight = 0;
-              }
-              createWayPoint(targetMiddleX, targetY, xtw);
-            }
-            
-          } else if(lastWayPoint.getY() == targetMiddleY) {
-            
-            if(lastWayPoint.getX() > targetMiddleX) {
-              createWayPoint(targetX + targetWidth, targetMiddleY, xtw);
-              
-            } else {
-              createWayPoint(targetX, targetMiddleY, xtw);
-            }
-            
-          } else {
-          	if(lastWayPoint.getY() + 50 < targetConnection.getY()) {
-          		createWayPoint(targetConnection.getX() + (targetConnection.getWidth() / 2) + subProcessX,
-                  targetConnection.getY() + subProcessY, xtw);
-          	
-          	} else if(lastWayPoint.getY() - 20 > targetConnection.getY()) {
-          		createWayPoint(targetConnection.getX() + (targetConnection.getWidth() / 2) + subProcessX,
-                  targetConnection.getY() + targetConnection.getHeight() + subProcessY, xtw);
-          	
-          	} else if(lastWayPoint.getX() > targetConnection.getX()) {
-          		createWayPoint(targetConnection.getX() + targetConnection.getWidth() + subProcessX,
-                  targetConnection.getY() + (targetConnection.getHeight() / 2) + subProcessY, xtw);
-          	
-          	} else {
-	            createWayPoint(targetConnection.getX() + subProcessX,
-	                    targetConnection.getY() + (targetConnection.getHeight() / 2) + subProcessY, xtw);
-          	}
-          }
-        } else {
-          createWayPoint(targetConnection.getX() + subProcessX,
-                  targetConnection.getY() + (targetConnection.getHeight() / 2) + subProcessY, xtw);
-        }
-      }
+      int difference = 5;
+    	
+    	if((bendPointList == null || bendPointList.size() == 0)) {
+    		difference = 11;
+    	}
+    	
+      if((targetBottomY + difference) < lastWayPoint.getY()) {
+				lastWayPoint = createWayPoint(targetMiddleX, targetY + targetHeight, xtw);
+			
+			} else if((targetY - difference) > lastWayPoint.getY()) {
+				lastWayPoint = createWayPoint(targetMiddleX, targetY, xtw);
+			
+			} else if(targetX > lastWayPoint.getX()) {
+				lastWayPoint = createWayPoint(targetX, targetMiddleY, xtw);
+				
+			} else {
+				lastWayPoint = createWayPoint(targetX + targetWidth, targetMiddleY, xtw);
+			}
+      
       xtw.writeEndElement();
     }
-  }
-  
-  private static int getAmountOfIncomingConnections(String id) {
-    int amount = 0;
-    ILinkService linkService = Graphiti.getLinkService();
-    for(Connection connection : diagram.getConnections()) {
-      EObject linkedSequenceFlowObj = linkService.getBusinessObjectForLinkedPictogramElement(
-              connection.getGraphicsAlgorithm().getPictogramElement());
-      if(linkedSequenceFlowObj instanceof SequenceFlow == false) continue;
-      
-      SequenceFlow linkedSequenceFlow = (SequenceFlow) linkedSequenceFlowObj;
-      if(linkedSequenceFlow.getTargetRef().getId().equals(id)) {
-        amount++;
-      }
-    }
-    return amount;
-  }
-  
-  private static int getAmountOfOutgoingConnections(String id) {
-    int amount = 0;
-    ILinkService linkService = Graphiti.getLinkService();
-    for(Connection connection : diagram.getConnections()) {
-      EObject linkedSequenceFlowObj = linkService.getBusinessObjectForLinkedPictogramElement(
-              connection.getGraphicsAlgorithm().getPictogramElement());
-      if(linkedSequenceFlowObj instanceof SequenceFlow == false) continue;
-      
-      SequenceFlow linkedSequenceFlow = (SequenceFlow) linkedSequenceFlowObj;
-      if(linkedSequenceFlow.getSourceRef().getId().equals(id)) {
-        amount++;
-      }
-    }
-    return amount;
   }
   
   private static java.awt.Point createWayPoint(int x, int y, XMLStreamWriter xtw) throws Exception {

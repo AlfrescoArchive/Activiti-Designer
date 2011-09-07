@@ -26,7 +26,7 @@ import org.eclipse.emf.ecore.EObject;
  */
 public class DefaultFlowExport {
 
-  public static void createDefaultFlow(EObject object, String subProcessId, XMLStreamWriter xtw) throws Exception {
+  public static void createDefaultFlow(EObject object, XMLStreamWriter xtw) throws Exception {
     SequenceFlow defaultFlow = null;
     if(object instanceof Activity) {
       defaultFlow = ((Activity) object).getDefault();
@@ -40,7 +40,7 @@ public class DefaultFlowExport {
         		"'ExclusiveGateway', 'InclusiveGateway', but got: '" + defaultFlow);
     }
     if(defaultFlow != null) {
-      xtw.writeAttribute("default", subProcessId + defaultFlow.getId());
+      xtw.writeAttribute("default", defaultFlow.getId());
     }
   }
 }

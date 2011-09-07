@@ -26,7 +26,7 @@ import org.eclipse.emf.ecore.EObject;
  */
 public class MultiInstanceExport implements ActivitiNamespaceConstants {
 
-  public static void createMultiInstance(EObject object, String subProcessId, XMLStreamWriter xtw) throws Exception {
+  public static void createMultiInstance(EObject object, XMLStreamWriter xtw) throws Exception {
     Activity activity = (Activity) object;
     if(activity.getLoopCharacteristics() == null) return;
     

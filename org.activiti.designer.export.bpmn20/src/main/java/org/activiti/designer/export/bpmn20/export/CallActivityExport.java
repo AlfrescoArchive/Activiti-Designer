@@ -25,17 +25,17 @@ import org.eclipse.emf.ecore.EObject;
  */
 public class CallActivityExport implements ActivitiNamespaceConstants {
 
-  public static void createCallActivity(EObject object, String subProcessId, XMLStreamWriter xtw) throws Exception {
+  public static void createCallActivity(EObject object, XMLStreamWriter xtw) throws Exception {
     CallActivity callActivity = (CallActivity) object;
     
     // start CallActivity element
     xtw.writeStartElement("callActivity");
-    xtw.writeAttribute("id", subProcessId + callActivity.getId());
+    xtw.writeAttribute("id", callActivity.getId());
     if (callActivity.getName() != null) {
       xtw.writeAttribute("name", callActivity.getName());
     }
     
-    DefaultFlowExport.createDefaultFlow(object, subProcessId, xtw);
+    DefaultFlowExport.createDefaultFlow(object, xtw);
 
     if(callActivity.getCalledElement() != null && callActivity.getCalledElement().length() > 0) {
       xtw.writeAttribute("calledElement", callActivity.getCalledElement());
@@ -68,7 +68,7 @@ public class CallActivityExport implements ActivitiNamespaceConstants {
       xtw.writeEndElement();
     }
     
-    MultiInstanceExport.createMultiInstance(object, subProcessId, xtw);
+    MultiInstanceExport.createMultiInstance(object, xtw);
 
     // end CallActivity element
     xtw.writeEndElement();

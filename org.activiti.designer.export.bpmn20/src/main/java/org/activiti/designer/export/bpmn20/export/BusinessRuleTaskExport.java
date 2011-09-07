@@ -24,15 +24,15 @@ import org.eclipse.emf.ecore.EObject;
  */
 public class BusinessRuleTaskExport implements ActivitiNamespaceConstants {
 
-  public static void createBusinessRuleTask(EObject object, String subProcessId, XMLStreamWriter xtw) throws Exception {
+  public static void createBusinessRuleTask(EObject object, XMLStreamWriter xtw) throws Exception {
     BusinessRuleTask businessRuleTask = (BusinessRuleTask) object;
     // start BusinessRuleTask element
     xtw.writeStartElement("businessRuleTask");
-    xtw.writeAttribute("id", subProcessId + businessRuleTask.getId());
+    xtw.writeAttribute("id", businessRuleTask.getId());
     if (businessRuleTask.getName() != null) {
       xtw.writeAttribute("name", businessRuleTask.getName());
     }
-    DefaultFlowExport.createDefaultFlow(object, subProcessId, xtw);
+    DefaultFlowExport.createDefaultFlow(object, xtw);
     if(businessRuleTask.getRuleNames().size() > 0) {
       StringBuilder ruleNameBuilder = new StringBuilder();
       for (String ruleName: businessRuleTask.getRuleNames()) {
@@ -67,7 +67,7 @@ public class BusinessRuleTaskExport implements ActivitiNamespaceConstants {
               "resultVariableName", businessRuleTask.getResultVariableName());
     }
     
-    MultiInstanceExport.createMultiInstance(object, subProcessId, xtw);
+    MultiInstanceExport.createMultiInstance(object, xtw);
 
     // end BusinessRuleTask element
     xtw.writeEndElement();

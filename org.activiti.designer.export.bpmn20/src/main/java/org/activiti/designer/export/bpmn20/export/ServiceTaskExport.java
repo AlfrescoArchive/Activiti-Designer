@@ -27,15 +27,15 @@ import org.eclipse.emf.ecore.EObject;
  */
 public class ServiceTaskExport implements ActivitiNamespaceConstants {
 
-  public static void createServiceTask(EObject object, String subProcessId, XMLStreamWriter xtw) throws Exception {
+  public static void createServiceTask(EObject object, XMLStreamWriter xtw) throws Exception {
     ServiceTask serviceTask = (ServiceTask) object;
     // start ServiceTask element
     xtw.writeStartElement("serviceTask");
-    xtw.writeAttribute("id", subProcessId + serviceTask.getId());
+    xtw.writeAttribute("id", serviceTask.getId());
     if (serviceTask.getName() != null) {
       xtw.writeAttribute("name", serviceTask.getName());
     }
-    DefaultFlowExport.createDefaultFlow(object, subProcessId, xtw);
+    DefaultFlowExport.createDefaultFlow(object, xtw);
     ImplementationValueExport.writeImplementationValue(xtw, EXECUTION_LISTENER, serviceTask.getImplementationType(), serviceTask.getImplementation(), true);
 
     if (serviceTask.getResultVariableName() != null && serviceTask.getResultVariableName().length() > 0) {
@@ -97,7 +97,7 @@ public class ServiceTaskExport implements ActivitiNamespaceConstants {
       }
     }
     
-    MultiInstanceExport.createMultiInstance(object, subProcessId, xtw);
+    MultiInstanceExport.createMultiInstance(object, xtw);
     
     // end ServiceTask element
     xtw.writeEndElement();

@@ -26,25 +26,25 @@ import org.eclipse.emf.ecore.EObject;
  */
 public class MailTaskExport implements ActivitiNamespaceConstants {
 
-  public static void createMailTask(EObject object, String subProcessId, XMLStreamWriter xtw) throws Exception {
+  public static void createMailTask(EObject object, XMLStreamWriter xtw) throws Exception {
   	if(object instanceof AlfrescoMailTask) {
-  		writeAlfrescoScriptMailTask((AlfrescoMailTask) object, subProcessId, xtw);
+  		writeAlfrescoScriptMailTask((AlfrescoMailTask) object, xtw);
   	} else {
-  		writeServiceMailTask((MailTask) object, subProcessId, xtw);
+  		writeServiceMailTask((MailTask) object, xtw);
   	}
   }
   
-  private static void writeAlfrescoScriptMailTask(AlfrescoMailTask mailTask, String subProcessId, XMLStreamWriter xtw) throws Exception {
+  private static void writeAlfrescoScriptMailTask(AlfrescoMailTask mailTask, XMLStreamWriter xtw) throws Exception {
   	
   	// start AlfrescoMailTask element
   	xtw.writeStartElement("serviceTask");
-    xtw.writeAttribute("id", subProcessId + mailTask.getId());
+    xtw.writeAttribute("id", mailTask.getId());
     if (mailTask.getName() != null) {
       xtw.writeAttribute("name", mailTask.getName());
     }
     xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE,
             "class", "org.alfresco.repo.workflow.activiti.script.AlfrescoScriptDelegate");
-    DefaultFlowExport.createDefaultFlow(mailTask, subProcessId, xtw);
+    DefaultFlowExport.createDefaultFlow(mailTask, xtw);
     
     xtw.writeStartElement("extensionElements");
     
@@ -59,7 +59,7 @@ public class MailTaskExport implements ActivitiNamespaceConstants {
     
     xtw.writeEndElement();
     
-    MultiInstanceExport.createMultiInstance(mailTask, subProcessId, xtw);
+    MultiInstanceExport.createMultiInstance(mailTask, xtw);
 
     // end AlfrescoMailTask element
     xtw.writeEndElement();
@@ -112,15 +112,15 @@ public class MailTaskExport implements ActivitiNamespaceConstants {
   	return mailBuilder.toString();
   }
    
-  private static void writeServiceMailTask(MailTask mailTask, String subProcessId, XMLStreamWriter xtw) throws Exception {
+  private static void writeServiceMailTask(MailTask mailTask, XMLStreamWriter xtw) throws Exception {
   	
     // start MailTask element
     xtw.writeStartElement("serviceTask");
-    xtw.writeAttribute("id", subProcessId + mailTask.getId());
+    xtw.writeAttribute("id", mailTask.getId());
     if (mailTask.getName() != null) {
       xtw.writeAttribute("name", mailTask.getName());
     }
-    DefaultFlowExport.createDefaultFlow(mailTask, subProcessId, xtw);
+    DefaultFlowExport.createDefaultFlow(mailTask, xtw);
     xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "type", "mail");
 
     xtw.writeStartElement("extensionElements");
@@ -149,7 +149,7 @@ public class MailTaskExport implements ActivitiNamespaceConstants {
     }
     xtw.writeEndElement();
     
-    MultiInstanceExport.createMultiInstance(mailTask, subProcessId, xtw);
+    MultiInstanceExport.createMultiInstance(mailTask, xtw);
 
     // end MailTask element
     xtw.writeEndElement();

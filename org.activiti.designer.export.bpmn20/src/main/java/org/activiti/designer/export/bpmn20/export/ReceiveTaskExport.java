@@ -24,18 +24,18 @@ import org.eclipse.emf.ecore.EObject;
  */
 public class ReceiveTaskExport implements ActivitiNamespaceConstants {
 
-  public static void createReceiveTask(EObject object, String subProcessId, XMLStreamWriter xtw) throws Exception {
+  public static void createReceiveTask(EObject object, XMLStreamWriter xtw) throws Exception {
     ReceiveTask receiveTask = (ReceiveTask) object;
     // start ReceiveTask element
     xtw.writeStartElement("receiveTask");
-    xtw.writeAttribute("id", subProcessId + receiveTask.getId());
+    xtw.writeAttribute("id", receiveTask.getId());
     if (receiveTask.getName() != null) {
       xtw.writeAttribute("name", receiveTask.getName());
     }
-    DefaultFlowExport.createDefaultFlow(object, subProcessId, xtw);
+    DefaultFlowExport.createDefaultFlow(object, xtw);
     ExtensionListenerExport.createExtensionListenerXML(receiveTask.getActivitiListeners(), true, EXECUTION_LISTENER, xtw);
     
-    MultiInstanceExport.createMultiInstance(object, subProcessId, xtw);
+    MultiInstanceExport.createMultiInstance(object, xtw);
 
     // end ReceiveTask element
     xtw.writeEndElement();

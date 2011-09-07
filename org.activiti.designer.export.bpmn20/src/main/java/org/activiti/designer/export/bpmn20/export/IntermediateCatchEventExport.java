@@ -29,7 +29,7 @@ import org.eclipse.emf.ecore.EObject;
  */
 public class IntermediateCatchEventExport implements ActivitiNamespaceConstants {
 
-  public static void createIntermediateEvent(EObject object, String subProcessId, XMLStreamWriter xtw) throws Exception {
+  public static void createIntermediateEvent(EObject object, XMLStreamWriter xtw) throws Exception {
   	IntermediateCatchEvent catchEvent = (IntermediateCatchEvent) object;
     List<EventDefinition> eventDefinitionList = catchEvent.getEventDefinitions();
     if(eventDefinitionList.size() == 1) {
@@ -47,7 +47,7 @@ public class IntermediateCatchEventExport implements ActivitiNamespaceConstants 
           
           // start TimerBoundaryEvent element
           xtw.writeStartElement("intermediateCatchEvent");
-          xtw.writeAttribute("id", subProcessId + catchEvent.getId());
+          xtw.writeAttribute("id", catchEvent.getId());
           if (catchEvent.getName() != null) {
             xtw.writeAttribute("name", catchEvent.getName());
           }

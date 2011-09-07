@@ -30,7 +30,7 @@ import org.eclipse.emf.ecore.EObject;
  */
 public class BoundaryEventExport implements ActivitiNamespaceConstants {
 
-  public static void createBoundaryEvent(EObject object, String subProcessId, XMLStreamWriter xtw) throws Exception {
+  public static void createBoundaryEvent(EObject object, XMLStreamWriter xtw) throws Exception {
     BoundaryEvent boundaryEvent = (BoundaryEvent) object;
     List<EventDefinition> eventDefinitionList = boundaryEvent.getEventDefinitions();
     if(eventDefinitionList.size() == 1) {
@@ -48,7 +48,7 @@ public class BoundaryEventExport implements ActivitiNamespaceConstants {
           
           // start TimerBoundaryEvent element
           xtw.writeStartElement("boundaryEvent");
-          xtw.writeAttribute("id", subProcessId + boundaryEvent.getId());
+          xtw.writeAttribute("id", boundaryEvent.getId());
           if (boundaryEvent.getName() != null) {
             xtw.writeAttribute("name", boundaryEvent.getName());
           }
@@ -59,7 +59,7 @@ public class BoundaryEventExport implements ActivitiNamespaceConstants {
           }
           
           if (boundaryEvent.getAttachedToRef() != null) {
-            xtw.writeAttribute("attachedToRef", subProcessId + boundaryEvent.getAttachedToRef().getId());
+            xtw.writeAttribute("attachedToRef", boundaryEvent.getAttachedToRef().getId());
           }
           
           xtw.writeStartElement("timerEventDefinition");
@@ -95,12 +95,12 @@ public class BoundaryEventExport implements ActivitiNamespaceConstants {
         
         // start ErrorBoundaryEvent element
         xtw.writeStartElement("boundaryEvent");
-        xtw.writeAttribute("id", subProcessId + boundaryEvent.getId());
+        xtw.writeAttribute("id", boundaryEvent.getId());
         if (boundaryEvent.getName() != null) {
           xtw.writeAttribute("name", boundaryEvent.getName());
         }
         if (boundaryEvent.getAttachedToRef() != null) {
-          xtw.writeAttribute("attachedToRef", subProcessId + boundaryEvent.getAttachedToRef().getId());
+          xtw.writeAttribute("attachedToRef", boundaryEvent.getAttachedToRef().getId());
         }
         
         xtw.writeStartElement("errorEventDefinition");

@@ -219,7 +219,7 @@ public class BPMN20ExportMarshaller extends AbstractExportMarshaller implements 
             continue;
           }
         }
-        createXML(object, "");
+        createXML(object);
       }
 
       // end process element
@@ -244,12 +244,12 @@ public class BPMN20ExportMarshaller extends AbstractExportMarshaller implements 
     }
   }
 
-  private void createXML(EObject object, String subProcessId) throws Exception {
+  private void createXML(EObject object) throws Exception {
     if (object instanceof StartEvent) {
       StartEvent startEvent = (StartEvent) object;
       // start StartEvent element
       xtw.writeStartElement("startEvent");
-      xtw.writeAttribute("id", subProcessId + startEvent.getId());
+      xtw.writeAttribute("id", startEvent.getId());
       xtw.writeAttribute("name", startEvent.getName());
 
       if (startEvent.getFormKey() != null && startEvent.getFormKey().length() > 0) {
@@ -310,7 +310,7 @@ public class BPMN20ExportMarshaller extends AbstractExportMarshaller implements 
       EndEvent endEvent = (EndEvent) object;
       // start EndEvent element
       xtw.writeStartElement("endEvent");
-      xtw.writeAttribute("id", subProcessId + endEvent.getId());
+      xtw.writeAttribute("id", endEvent.getId());
       xtw.writeAttribute("name", endEvent.getName());
 
       if (endEvent.getEventDefinitions().size() > 0) {
@@ -326,40 +326,40 @@ public class BPMN20ExportMarshaller extends AbstractExportMarshaller implements 
       xtw.writeEndElement();
 
     } else if (object instanceof SequenceFlow) {
-      SequenceFlowExport.createSequenceFlow(object, subProcessId, xtw);
+      SequenceFlowExport.createSequenceFlow(object, xtw);
 
     } else if (object instanceof UserTask) {
-      UserTaskExport.createUserTask(object, subProcessId, xtw);
+      UserTaskExport.createUserTask(object, xtw);
 
     } else if (object instanceof ScriptTask) {
-      ScriptTaskExport.createScriptTask(object, subProcessId, xtw);
+      ScriptTaskExport.createScriptTask(object, xtw);
 
     } else if (object instanceof ServiceTask) {
-      ServiceTaskExport.createServiceTask(object, subProcessId, xtw);
+      ServiceTaskExport.createServiceTask(object, xtw);
 
     } else if (object instanceof MailTask) {
-      MailTaskExport.createMailTask(object, subProcessId, xtw);
+      MailTaskExport.createMailTask(object, xtw);
 
     } else if (object instanceof ManualTask) {
-      ManualTaskExport.createManualTask(object, subProcessId, xtw);
+      ManualTaskExport.createManualTask(object, xtw);
 
     } else if (object instanceof ReceiveTask) {
-      ReceiveTaskExport.createReceiveTask(object, subProcessId, xtw);
+      ReceiveTaskExport.createReceiveTask(object, xtw);
 
     } else if (object instanceof BusinessRuleTask) {
-      BusinessRuleTaskExport.createBusinessRuleTask(object, subProcessId, xtw);
+      BusinessRuleTaskExport.createBusinessRuleTask(object, xtw);
 
     } else if (object instanceof AlfrescoScriptTask) {
-      AlfrescoScriptTaskExport.createScriptTask(object, subProcessId, xtw);
+      AlfrescoScriptTaskExport.createScriptTask(object, xtw);
 
     } else if (object instanceof CallActivity) {
-      CallActivityExport.createCallActivity(object, subProcessId, xtw);
+      CallActivityExport.createCallActivity(object, xtw);
 
     } else if (object instanceof ParallelGateway) {
       ParallelGateway parallelGateway = (ParallelGateway) object;
       // start ParallelGateway element
       xtw.writeStartElement("parallelGateway");
-      xtw.writeAttribute("id", subProcessId + parallelGateway.getId());
+      xtw.writeAttribute("id", parallelGateway.getId());
       if (parallelGateway.getName() != null) {
         xtw.writeAttribute("name", parallelGateway.getName());
       }
@@ -371,11 +371,11 @@ public class BPMN20ExportMarshaller extends AbstractExportMarshaller implements 
       ExclusiveGateway exclusiveGateway = (ExclusiveGateway) object;
       // start ExclusiveGateway element
       xtw.writeStartElement("exclusiveGateway");
-      xtw.writeAttribute("id", subProcessId + exclusiveGateway.getId());
+      xtw.writeAttribute("id", exclusiveGateway.getId());
       if (exclusiveGateway.getName() != null) {
         xtw.writeAttribute("name", exclusiveGateway.getName());
       }
-      DefaultFlowExport.createDefaultFlow(object, subProcessId, xtw);
+      DefaultFlowExport.createDefaultFlow(object, xtw);
 
       // end ExclusiveGateway element
       xtw.writeEndElement();
@@ -384,20 +384,20 @@ public class BPMN20ExportMarshaller extends AbstractExportMarshaller implements 
       InclusiveGateway inclusiveGateway = (InclusiveGateway) object;
       // start InclusiveGateway element
       xtw.writeStartElement("inclusiveGateway");
-      xtw.writeAttribute("id", subProcessId + inclusiveGateway.getId());
+      xtw.writeAttribute("id", inclusiveGateway.getId());
       if (inclusiveGateway.getName() != null) {
         xtw.writeAttribute("name", inclusiveGateway.getName());
       }
-      DefaultFlowExport.createDefaultFlow(object, subProcessId, xtw);
+      DefaultFlowExport.createDefaultFlow(object, xtw);
 
       // end InclusiveGateway element
       xtw.writeEndElement();
 
     } else if (object instanceof BoundaryEvent) {
-      BoundaryEventExport.createBoundaryEvent(object, subProcessId, xtw);
+      BoundaryEventExport.createBoundaryEvent(object, xtw);
     
     } else if (object instanceof IntermediateCatchEvent) {
-    	IntermediateCatchEventExport.createIntermediateEvent(object, subProcessId, xtw);
+    	IntermediateCatchEventExport.createIntermediateEvent(object, xtw);
 
     } else if (object instanceof SubProcess) {
       SubProcess subProcess = (SubProcess) object;
@@ -411,10 +411,10 @@ public class BPMN20ExportMarshaller extends AbstractExportMarshaller implements 
         }
 
         ExtensionListenerExport.createExtensionListenerXML(subProcess.getActivitiListeners(), true, EXECUTION_LISTENER, xtw);
-        MultiInstanceExport.createMultiInstance(object, subProcessId, xtw);
+        MultiInstanceExport.createMultiInstance(object, xtw);
 
         for (FlowElement flowElement : flowElementList) {
-          createXML(flowElement, subProcess.getId());
+          createXML(flowElement);
         }
 
         // end SubProcess element

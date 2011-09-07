@@ -24,17 +24,17 @@ import org.eclipse.emf.ecore.EObject;
  */
 public class AlfrescoScriptTaskExport implements ActivitiNamespaceConstants {
 
-  public static void createScriptTask(EObject object, String subProcessId, XMLStreamWriter xtw) throws Exception {
+  public static void createScriptTask(EObject object, XMLStreamWriter xtw) throws Exception {
     AlfrescoScriptTask scriptTask = (AlfrescoScriptTask) object;
     // start AlfrescoScriptTask element
     xtw.writeStartElement("serviceTask");
-    xtw.writeAttribute("id", subProcessId + scriptTask.getId());
+    xtw.writeAttribute("id", scriptTask.getId());
     if (scriptTask.getName() != null) {
       xtw.writeAttribute("name", scriptTask.getName());
     }
     xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE,
             "class", "org.alfresco.repo.workflow.activiti.script.AlfrescoScriptDelegate");
-    DefaultFlowExport.createDefaultFlow(object, subProcessId, xtw);
+    DefaultFlowExport.createDefaultFlow(object, xtw);
     
     xtw.writeStartElement("extensionElements");
     
@@ -63,7 +63,7 @@ public class AlfrescoScriptTaskExport implements ActivitiNamespaceConstants {
     
     xtw.writeEndElement();
     
-    MultiInstanceExport.createMultiInstance(object, subProcessId, xtw);
+    MultiInstanceExport.createMultiInstance(object, xtw);
 
     // end AlfrescoScriptTask element
     xtw.writeEndElement();

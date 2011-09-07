@@ -24,15 +24,15 @@ import org.eclipse.emf.ecore.EObject;
  */
 public class ScriptTaskExport implements ActivitiNamespaceConstants {
 
-  public static void createScriptTask(EObject object, String subProcessId, XMLStreamWriter xtw) throws Exception {
+  public static void createScriptTask(EObject object, XMLStreamWriter xtw) throws Exception {
     ScriptTask scriptTask = (ScriptTask) object;
     // start ScriptTask element
     xtw.writeStartElement("scriptTask");
-    xtw.writeAttribute("id", subProcessId + scriptTask.getId());
+    xtw.writeAttribute("id", scriptTask.getId());
     if (scriptTask.getName() != null) {
       xtw.writeAttribute("name", scriptTask.getName());
     }
-    DefaultFlowExport.createDefaultFlow(object, subProcessId, xtw);
+    DefaultFlowExport.createDefaultFlow(object, xtw);
     xtw.writeAttribute("scriptFormat", scriptTask.getScriptFormat());
 
     ExtensionListenerExport.createExtensionListenerXML(scriptTask.getActivitiListeners(), true, EXECUTION_LISTENER, xtw);
@@ -41,7 +41,7 @@ public class ScriptTaskExport implements ActivitiNamespaceConstants {
     xtw.writeCData(scriptTask.getScript());
     xtw.writeEndElement();
     
-    MultiInstanceExport.createMultiInstance(object, subProcessId, xtw);
+    MultiInstanceExport.createMultiInstance(object, xtw);
 
     // end ScriptTask element
     xtw.writeEndElement();

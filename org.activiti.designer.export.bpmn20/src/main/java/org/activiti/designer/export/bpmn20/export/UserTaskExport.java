@@ -29,7 +29,7 @@ import org.eclipse.emf.ecore.EObject;
  */
 public class UserTaskExport implements ActivitiNamespaceConstants {
 
-  public static void createUserTask(EObject object, String subProcessId, XMLStreamWriter xtw) throws Exception {
+  public static void createUserTask(EObject object, XMLStreamWriter xtw) throws Exception {
     UserTask userTask = (UserTask) object;
     if ((userTask.getAssignee() != null && userTask.getAssignee().length() > 0)
             || (userTask.getCandidateUsers() != null && userTask.getCandidateUsers().size() > 0)
@@ -37,7 +37,7 @@ public class UserTaskExport implements ActivitiNamespaceConstants {
 
       // start UserTask element
       xtw.writeStartElement("userTask");
-      xtw.writeAttribute("id", subProcessId + userTask.getId());
+      xtw.writeAttribute("id", userTask.getId());
       if (userTask.getName() != null) {
         xtw.writeAttribute("name", userTask.getName());
       }
@@ -46,7 +46,7 @@ public class UserTaskExport implements ActivitiNamespaceConstants {
         xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "dueDate", userTask.getDueDate());
       }
       
-      DefaultFlowExport.createDefaultFlow(object, subProcessId, xtw);
+      DefaultFlowExport.createDefaultFlow(object, xtw);
 
       // TODO revisit once the designer supports mixing these
       // configurations as they are now exclusive
@@ -109,7 +109,7 @@ public class UserTaskExport implements ActivitiNamespaceConstants {
         xtw.writeEndElement();
       }
       
-      MultiInstanceExport.createMultiInstance(object, subProcessId, xtw);
+      MultiInstanceExport.createMultiInstance(object, xtw);
 
       // end UserTask element
       xtw.writeEndElement();

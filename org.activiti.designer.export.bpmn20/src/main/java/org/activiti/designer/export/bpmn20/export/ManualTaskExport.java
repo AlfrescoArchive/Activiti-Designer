@@ -24,18 +24,18 @@ import org.eclipse.emf.ecore.EObject;
  */
 public class ManualTaskExport implements ActivitiNamespaceConstants {
 
-  public static void createManualTask(EObject object, String subProcessId, XMLStreamWriter xtw) throws Exception {
+  public static void createManualTask(EObject object, XMLStreamWriter xtw) throws Exception {
     ManualTask manualTask = (ManualTask) object;
     // start ManualTask element
     xtw.writeStartElement("manualTask");
-    xtw.writeAttribute("id", subProcessId + manualTask.getId());
+    xtw.writeAttribute("id", manualTask.getId());
     if (manualTask.getName() != null) {
       xtw.writeAttribute("name", manualTask.getName());
     }
-    DefaultFlowExport.createDefaultFlow(object, subProcessId, xtw);
+    DefaultFlowExport.createDefaultFlow(object, xtw);
     ExtensionListenerExport.createExtensionListenerXML(manualTask.getActivitiListeners(), true, EXECUTION_LISTENER, xtw);
     
-    MultiInstanceExport.createMultiInstance(object, subProcessId, xtw);
+    MultiInstanceExport.createMultiInstance(object, xtw);
 
     // end ManualTask element
     xtw.writeEndElement();

@@ -24,18 +24,18 @@ import org.eclipse.emf.ecore.EObject;
  */
 public class SequenceFlowExport implements ActivitiNamespaceConstants {
 
-  public static void createSequenceFlow(EObject object, String subProcessId, XMLStreamWriter xtw) throws Exception {
+  public static void createSequenceFlow(EObject object, XMLStreamWriter xtw) throws Exception {
     SequenceFlow sequenceFlow = (SequenceFlow) object;
     // start SequenceFlow element
     xtw.writeStartElement("sequenceFlow");
-    xtw.writeAttribute("id", subProcessId + sequenceFlow.getId());
+    xtw.writeAttribute("id", sequenceFlow.getId());
     if (sequenceFlow.getName() == null) {
       xtw.writeAttribute("name", "");
     } else {
       xtw.writeAttribute("name", sequenceFlow.getName());
     }
-    xtw.writeAttribute("sourceRef", subProcessId + sequenceFlow.getSourceRef().getId());
-    xtw.writeAttribute("targetRef", subProcessId + sequenceFlow.getTargetRef().getId());
+    xtw.writeAttribute("sourceRef", sequenceFlow.getSourceRef().getId());
+    xtw.writeAttribute("targetRef", sequenceFlow.getTargetRef().getId());
 
     ExtensionListenerExport.createExtensionListenerXML(sequenceFlow.getExecutionListeners(), true, EXECUTION_LISTENER, xtw);
 

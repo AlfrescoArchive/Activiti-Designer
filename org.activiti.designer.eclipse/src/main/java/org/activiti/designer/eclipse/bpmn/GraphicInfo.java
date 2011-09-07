@@ -13,6 +13,8 @@
 
 package org.activiti.designer.eclipse.bpmn;
 
+import org.eclipse.bpmn2.FlowElement;
+
 
 /**
  * @author Tijs Rademakers
@@ -23,5 +25,6 @@ public class GraphicInfo {
   public int y;
   public int height;
   public int width;
+  public FlowElement element;
 
 }
