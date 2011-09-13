@@ -45,7 +45,7 @@ public class SequenceFlowExport implements ActivitiNamespaceConstants {
       String condition = sequenceFlow.getConditionExpression().getBody();
       // start conditionExpression element
       xtw.writeStartElement("conditionExpression");
-      xtw.writeAttribute("xsi", SCHEMA_NAMESPACE, "type", "tFormalExpression");
+      xtw.writeAttribute("xsi", XSI_NAMESPACE, "type", "tFormalExpression");
       xtw.writeCData(condition);
 
       // end conditionExpression element

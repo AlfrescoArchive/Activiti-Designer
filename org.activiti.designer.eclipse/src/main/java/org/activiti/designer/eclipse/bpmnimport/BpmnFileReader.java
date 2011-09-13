@@ -584,7 +584,20 @@ public class BpmnFileReader {
     int counter = 0;
     for (SequenceFlowModel sequenceFlowModel : sequenceFlowList) {
       if(sequenceFlowModel.targetRef.equals(element.getId())) {
-        counter++;
+      	String source = sequenceFlowModel.sourceRef;
+      	int sourceCounter = 0;
+      	for (SequenceFlowModel sourceFlowModel : sequenceFlowList) {
+      		if(sourceFlowModel.sourceRef.equals(source)) {
+      			for(FlowElement flowElement : bpmnParser.bpmnList) {
+      				if(flowElement.getId().equals(source) && flowElement instanceof BoundaryEvent == false) {
+      					sourceCounter++;
+      				}
+      			}
+      		}
+      	}
+      	if(sourceCounter == 1) {
+      		counter++;
+      	}
       }
     }
     return counter;
