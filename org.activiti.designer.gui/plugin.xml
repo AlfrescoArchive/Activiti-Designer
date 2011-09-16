@@ -246,6 +246,12 @@
       </page>
       <page
             category="org.activiti.designer.preferences"
+            class="org.activiti.designer.preferences.ActivitiImportPreferencesPage"
+            id="org.activiti.designer.gui.preferences.Import"
+            name="Import">
+      </page>
+      <page
+            category="org.activiti.designer.preferences"
             class="org.activiti.designer.preferences.AlfrescoPreferencesPage"
             id="org.activiti.designer.gui.preferences.alfresco"
             name="Alfresco settings">

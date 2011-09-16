@@ -52,6 +52,8 @@ public class ChangeElementTypeFeature extends AbstractCustomFeature {
 	  ContainerShape targetContainer = (ContainerShape) element.eContainer();
   	taskContext.setTargetContainer(targetContainer);
   	taskContext.setLocation(x, y);
+  	taskContext.setHeight(elementGraphics.getHeight());
+  	taskContext.setWidth(elementGraphics.getWidth());
   	
   	FlowElement oldObject = (FlowElement) element.getLink().getBusinessObjects().get(0);
 	  String objectId = oldObject.getId();

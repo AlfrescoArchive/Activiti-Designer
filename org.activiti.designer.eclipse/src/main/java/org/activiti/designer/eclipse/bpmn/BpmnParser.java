@@ -76,6 +76,7 @@ public class BpmnParser {
 	public List<SequenceFlowModel> sequenceFlowList = new ArrayList<SequenceFlowModel>();
 	private List<BoundaryEventModel> boundaryList = new ArrayList<BoundaryEventModel>();
 	public Map<String, GraphicInfo> locationMap = new HashMap<String, GraphicInfo>();
+	public Map<String, List<GraphicInfo>> flowLocationMap = new HashMap<String, List<GraphicInfo>>();
 	public Map<FlowNode, String> defaultFlowMap = new HashMap<FlowNode, String>();
 	public org.eclipse.bpmn2.Process process;
 
@@ -307,10 +308,31 @@ public class BpmnParser {
 								    .valueOf(xtr.getAttributeValue(null, "y")).intValue();
 								graphicInfo.height = Double.valueOf(
 								    xtr.getAttributeValue(null, "height")).intValue();
+								graphicInfo.width = Double.valueOf(
+								    xtr.getAttributeValue(null, "width")).intValue();
 								locationMap.put(id, graphicInfo);
 								readyWithBPMNShape = true;
 							}
 						}
+						
+					} else if(xtr.isStartElement() && "BPMNEdge".equalsIgnoreCase(xtr.getLocalName())) {
+						String id = xtr.getAttributeValue(null, "bpmnElement");
+						List<GraphicInfo> wayPointList = new ArrayList<GraphicInfo>();
+						boolean readyWithBPMNEdge = false;
+						while (readyWithBPMNEdge == false && xtr.hasNext()) {
+							xtr.next();
+							if (xtr.isStartElement() && "waypoint".equalsIgnoreCase(xtr.getLocalName())) {
+								GraphicInfo graphicInfo = new GraphicInfo();
+								graphicInfo.x = Double
+								    .valueOf(xtr.getAttributeValue(null, "x")).intValue();
+								graphicInfo.y = Double
+								    .valueOf(xtr.getAttributeValue(null, "y")).intValue();
+								wayPointList.add(graphicInfo);
+							} else if(xtr.isEndElement() && "BPMNEdge".equalsIgnoreCase(xtr.getLocalName())) {
+								readyWithBPMNEdge = true;
+							}
+						}
+						flowLocationMap.put(id, wayPointList);
 					}
 				}
 			}

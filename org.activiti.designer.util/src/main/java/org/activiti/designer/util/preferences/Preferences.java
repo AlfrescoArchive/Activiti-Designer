@@ -21,7 +21,8 @@ public enum Preferences {
   EDITOR_ADD_DEFAULT_CONTENT_TO_DIAGRAMS("org.activiti.designer.preferences.editor.addDefaultContentToDiagrams"), 
   SAVE_TO_FORMAT("org.activiti.designer.preferences.save.saveToFormat"), 
   VALIDATE_ACTIVITI_BPMN_FORMAT("org.activiti.designer.preferences.validation.validateActivitiBPMNFormat"),
-  SKIP_BPMN_MARSHALLER_ON_VALIDATION_FAILURE("org.activiti.designer.preferences.validation.skipBPMNMarshallerOnValidationFailure");
+  SKIP_BPMN_MARSHALLER_ON_VALIDATION_FAILURE("org.activiti.designer.preferences.validation.skipBPMNMarshallerOnValidationFailure"),
+  IMPORT_USE_BPMNDI("org.activiti.designer.preferences.import.useBPMNDI");
 
   private String preferenceId;
 

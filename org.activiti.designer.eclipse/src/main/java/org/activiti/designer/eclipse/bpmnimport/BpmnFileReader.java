@@ -31,6 +31,8 @@ import javax.xml.stream.XMLStreamReader;
 import org.activiti.designer.eclipse.bpmn.BpmnParser;
 import org.activiti.designer.eclipse.bpmn.GraphicInfo;
 import org.activiti.designer.eclipse.bpmn.SequenceFlowModel;
+import org.activiti.designer.eclipse.preferences.PreferencesUtil;
+import org.activiti.designer.util.preferences.Preferences;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.bpmn2.Activity;
 import org.eclipse.bpmn2.BoundaryEvent;
@@ -101,6 +103,8 @@ public class BpmnFileReader {
   private Map<String, GraphicInfo> yMap = new HashMap<String, GraphicInfo>();
   private List<SubProcess> subProcessList = new ArrayList<SubProcess>();
   
+  private boolean useBPMNDI = false;
+  
   public BpmnFileReader(String filename, Diagram diagram, IFeatureProvider featureProvider) {
     this.filename = filename;
     this.diagram = diagram;
@@ -139,7 +143,8 @@ public class BpmnFileReader {
       if(bpmnParser.bpmnList.size() == 0) return;
       
       org.eclipse.bpmn2.Process process = Bpmn2Factory.eINSTANCE.createProcess();
-      process.setId(processName);
+      String processId = processName.replace(" ", "");
+      process.setId(processId);
       if(bpmnParser.process != null && StringUtils.isNotEmpty(bpmnParser.process.getName())) {
       	process.setName(bpmnParser.process.getName());
       } else {
@@ -165,10 +170,11 @@ public class BpmnFileReader {
       }
       diagram.eResource().getContents().add(process);
       
-      /*if(bpmnParser.bpmdiInfoFound == true) {
+      if(PreferencesUtil.getBooleanPreference(Preferences.IMPORT_USE_BPMNDI) && bpmnParser.bpmdiInfoFound == true) {
+      	useBPMNDI = true;
         drawDiagramWithBPMNDI(diagram, featureProvider, bpmnParser.bpmnList, bpmnParser.sequenceFlowList,
                 bpmnParser.locationMap);
-      } else {*/
+      } else {
       
         List<FlowElement> wrongOrderList = createDiagramElements(bpmnParser.bpmnList);
         if(wrongOrderList.size() > 0) {
@@ -186,7 +192,7 @@ public class BpmnFileReader {
           }
         }
         drawSequenceFlows();
-      //}
+      }
       setFriendlyIds();
       xtr.close();
       in.close();
@@ -920,6 +926,23 @@ public class BpmnFileReader {
       }
       
       AddConnectionContext addContext = new AddConnectionContext(sourceAnchor, targetAnchor);
+      
+      if(useBPMNDI) {
+	      List<GraphicInfo> bendpointList = new ArrayList<GraphicInfo>();
+	      for (String sequenceGraphElement : bpmnParser.flowLocationMap.keySet()) {
+		      if(sequenceFlowModel.id.equalsIgnoreCase(sequenceGraphElement)) {
+		      	List<GraphicInfo> pointList = bpmnParser.flowLocationMap.get(sequenceGraphElement);
+		      	if(pointList.size() > 2) {
+		      		for(int i = 1; i < pointList.size() - 1; i++) {
+		      			bendpointList.add(pointList.get(i));
+		      		}
+		      	}
+		      }
+	      }
+      
+	      addContext.putProperty("org.activiti.designer.bendpoints", bendpointList);
+      }
+      
       addContext.setNewObject(sequenceFlow);
       featureProvider.addIfPossible(addContext);
       
@@ -1022,15 +1045,22 @@ public class BpmnFileReader {
     addContext.setNewObject(flowElement);
     addContext.setTargetContainer(parent);
     addContext.setX(graphicInfo.x);
+    
+    if(useBPMNDI) {
+    	addContext.setHeight(graphicInfo.height);
+    	addContext.setWidth(graphicInfo.width);
+    }
+    
+    
     if(flowElement instanceof StartEvent || flowElement instanceof EndEvent) {
-      if(graphicInfo.height < EVENT_HEIGHT) {
+      if(useBPMNDI == false && graphicInfo.height < EVENT_HEIGHT) {
         addContext.setY(graphicInfo.y - 25);
       } else {
         addContext.setY(graphicInfo.y);
       }
     } else if(flowElement instanceof ExclusiveGateway || flowElement instanceof InclusiveGateway || 
         flowElement instanceof ParallelGateway) {
-      if(graphicInfo.height < GATEWAY_HEIGHT) {
+      if(useBPMNDI == false && graphicInfo.height < GATEWAY_HEIGHT) {
         addContext.setY(graphicInfo.y - 20);
       } else {
         addContext.setY(graphicInfo.y);
