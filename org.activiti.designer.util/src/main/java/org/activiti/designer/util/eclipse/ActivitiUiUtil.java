@@ -157,6 +157,12 @@ public class ActivitiUiUtil {
       if (fileResource != null) {
         currentProject = fileResource.getProject();
       }
+    } else {
+    	IResource fileResource = ResourcesPlugin.getWorkspace().getRoot().findMember(uriTrimmed.toString());
+    	
+    	if (fileResource != null) {
+        currentProject = fileResource.getProject();
+      }
     }
     return currentProject;
   }
