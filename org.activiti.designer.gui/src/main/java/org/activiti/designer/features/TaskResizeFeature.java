@@ -15,6 +15,7 @@ package org.activiti.designer.features;
 
 import java.util.List;
 
+import org.eclipse.bpmn2.CallActivity;
 import org.eclipse.bpmn2.Task;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IResizeShapeContext;
@@ -22,6 +23,7 @@ import org.eclipse.graphiti.features.impl.DefaultResizeShapeFeature;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.algorithms.Image;
 import org.eclipse.graphiti.mm.algorithms.MultiText;
+import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 
@@ -44,7 +46,7 @@ public class TaskResizeFeature extends DefaultResizeShapeFeature {
       // don't allow resize if the class name has the length of 1
       Shape shape = context.getShape();
       Object bo = getBusinessObjectForPictogramElement(shape);
-      if (bo instanceof Task) {
+      if (bo instanceof Task || bo instanceof CallActivity) {
         canResize = true;
       } else {
         canResize = false;
@@ -56,6 +58,10 @@ public class TaskResizeFeature extends DefaultResizeShapeFeature {
   @Override
   public void resizeShape(IResizeShapeContext context) {
     super.resizeShape(context);
+    
+    Shape boShape = context.getShape();
+    Object bo = getBusinessObjectForPictogramElement(boShape);
+    
     int height = context.getHeight();
     int width = context.getWidth();
     if(height < 55) {
@@ -80,10 +86,28 @@ public class TaskResizeFeature extends DefaultResizeShapeFeature {
 	      	text.setWidth(width);
       	} else if(shape.getGraphicsAlgorithm() instanceof Image) {
       		Image image = (Image) shape.getGraphicsAlgorithm();
-      		int imageX = image.getX();
-      		if(imageX > 20) {
-      			image.setX(width - 20);
+      		
+      		if(bo instanceof CallActivity) {
+      			
+      			// calculate position for icon
+      			final int iconWidthAndHeight = 10;
+      			final int padding = 5;
+      			final int xPos = (context.getShape().getGraphicsAlgorithm().getWidth() / 2) - (iconWidthAndHeight / 2);
+      			final int yPos = context.getShape().getGraphicsAlgorithm().getHeight() - padding - iconWidthAndHeight;
+
+      			image.setX(xPos);
+      			image.setY(yPos);
+      			
+      		} else {
+	      		int imageX = image.getX();
+	      		if(imageX > 20) {
+	      			image.setX(width - 20);
+	      		}
       		}
+      	} else if(shape.getGraphicsAlgorithm() instanceof Text) {
+      		Text text = (Text) shape.getGraphicsAlgorithm();
+	      	text.setHeight(height - 25);
+	      	text.setWidth(width);
       	}
       }
     }

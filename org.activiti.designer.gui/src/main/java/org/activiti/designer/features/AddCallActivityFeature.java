@@ -13,9 +13,9 @@ import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.impl.AbstractAddShapeFeature;
 import org.eclipse.graphiti.mm.algorithms.Ellipse;
 import org.eclipse.graphiti.mm.algorithms.Image;
+import org.eclipse.graphiti.mm.algorithms.MultiText;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.RoundedRectangle;
-import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
 import org.eclipse.graphiti.mm.pictograms.BoxRelativeAnchor;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
@@ -86,7 +86,7 @@ public class AddCallActivityFeature extends AbstractAddShapeFeature {
 			final Shape shape = peCreateService.createShape(containerShape, false);
 
 			// create and set text graphics algorithm
-			final Text text = gaService.createDefaultText(getDiagram(), shape, addedCallActivity.getName());
+			final MultiText text = gaService.createDefaultMultiText(getDiagram(), shape, addedCallActivity.getName());
 			text.setStyle(StyleUtil.getStyleForTask(getDiagram()));
 			text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
 			text.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);
@@ -94,7 +94,7 @@ public class AddCallActivityFeature extends AbstractAddShapeFeature {
       if (OSUtil.getOperatingSystem() == OSEnum.Mac) {
         text.getFont().setSize(11);
       }
-			gaService.setLocationAndSize(text, 0, 20, width, 20);
+			gaService.setLocationAndSize(text, 0, 20, width, 30);
 
 			// create link and wire it
 			link(shape, addedCallActivity);

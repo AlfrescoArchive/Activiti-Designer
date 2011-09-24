@@ -271,7 +271,7 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
     Object bo = getBusinessObjectForPictogramElement(shape);
     if (bo instanceof SubProcess) {
     	return new SubProcessResizeFeature(this);
-    } else if (bo instanceof Task) {
+    } else if (bo instanceof Task || bo instanceof CallActivity) {
     	return new TaskResizeFeature(this);
     }
     return super.getResizeShapeFeature(context);
