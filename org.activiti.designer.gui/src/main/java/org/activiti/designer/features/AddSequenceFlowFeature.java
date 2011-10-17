@@ -188,11 +188,12 @@ public class AddSequenceFlowFeature extends AbstractAddFeature {
 					}
 				}
 			} else if (addedSequenceFlow.getTargetRef() instanceof EndEvent) {
-				int middleSub = sourceGraphics.getY() + (sourceGraphics.getHeight() / 2);
-				if (((middleSub + 10) < targetGraphics.getY() && 
+				int middleSource = sourceGraphics.getY() + (sourceGraphics.getHeight() / 2);
+				int middleTarget = targetGraphics.getY() + (targetGraphics.getHeight() / 2);
+				if (((middleSource + 10) < middleTarget && 
 						(sourceGraphics.getX() + sourceGraphics.getWidth()) < targetGraphics.getX()) ||
 						
-						((middleSub - 10) > targetGraphics.getY() && 
+						((middleSource - 10) > middleTarget && 
 						(sourceGraphics.getX() + sourceGraphics.getWidth()) < targetGraphics.getX())) {
 					
 					Point bendPoint = StylesFactory.eINSTANCE.createPoint();

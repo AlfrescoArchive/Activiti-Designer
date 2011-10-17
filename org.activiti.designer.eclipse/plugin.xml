@@ -153,10 +153,11 @@
    <editor
          class="org.activiti.designer.eclipse.editor.ActivitiDiagramEditor"
          contributorClass="org.eclipse.graphiti.ui.editor.DiagramEditorActionBarContributor"
-         default="false"
+         default="true"
          extensions="activiti"
          icon="community_icon.png"
          id="org.activiti.designer.editor.multiPageEditor"
+         matchingStrategy="org.eclipse.graphiti.ui.editor.DiagramEditorFactory$DiagramEditorMatchingStrategy"
          name="Activiti Diagram Editor">
       <contentTypeBinding
             contentTypeId="org.activiti.designer.editor.diagram.contenttype">
