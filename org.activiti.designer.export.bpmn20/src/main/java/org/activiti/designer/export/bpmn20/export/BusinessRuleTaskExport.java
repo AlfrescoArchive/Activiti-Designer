@@ -33,6 +33,7 @@ public class BusinessRuleTaskExport implements ActivitiNamespaceConstants {
       xtw.writeAttribute("name", businessRuleTask.getName());
     }
     DefaultFlowExport.createDefaultFlow(object, xtw);
+    AsyncActivityExport.createDefaultFlow(object, xtw);
     if(businessRuleTask.getRuleNames().size() > 0) {
       StringBuilder ruleNameBuilder = new StringBuilder();
       for (String ruleName: businessRuleTask.getRuleNames()) {

@@ -237,6 +237,7 @@ public class DiagramUpdater extends RecordingCommand {
         	Task parsedTask = (Task) bpmnFlowElement;
         	
         	targetTask.setLoopCharacteristics(parsedTask.getLoopCharacteristics());
+        	targetTask.setAsynchronous(parsedTask.isAsynchronous());
         	
         	targetTask.getActivitiListeners().clear();
           if (parsedTask.getActivitiListeners() != null) {

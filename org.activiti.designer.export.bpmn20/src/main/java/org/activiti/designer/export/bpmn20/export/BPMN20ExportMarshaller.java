@@ -409,6 +409,9 @@ public class BPMN20ExportMarshaller extends AbstractExportMarshaller implements 
         if (subProcess.getName() != null) {
           xtw.writeAttribute("name", subProcess.getName());
         }
+        
+        DefaultFlowExport.createDefaultFlow(object, xtw);
+        AsyncActivityExport.createDefaultFlow(object, xtw);
 
         ExtensionListenerExport.createExtensionListenerXML(subProcess.getActivitiListeners(), true, EXECUTION_LISTENER, xtw);
         MultiInstanceExport.createMultiInstance(object, xtw);

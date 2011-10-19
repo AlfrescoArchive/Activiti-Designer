@@ -33,6 +33,7 @@ public class ReceiveTaskExport implements ActivitiNamespaceConstants {
       xtw.writeAttribute("name", receiveTask.getName());
     }
     DefaultFlowExport.createDefaultFlow(object, xtw);
+    AsyncActivityExport.createDefaultFlow(object, xtw);
     ExtensionListenerExport.createExtensionListenerXML(receiveTask.getActivitiListeners(), true, EXECUTION_LISTENER, xtw);
     
     MultiInstanceExport.createMultiInstance(object, xtw);

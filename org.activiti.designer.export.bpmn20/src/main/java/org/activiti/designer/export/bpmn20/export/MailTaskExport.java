@@ -45,6 +45,7 @@ public class MailTaskExport implements ActivitiNamespaceConstants {
     xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE,
             "class", "org.alfresco.repo.workflow.activiti.script.AlfrescoScriptDelegate");
     DefaultFlowExport.createDefaultFlow(mailTask, xtw);
+    AsyncActivityExport.createDefaultFlow(mailTask, xtw);
     
     xtw.writeStartElement("extensionElements");
     
@@ -121,6 +122,7 @@ public class MailTaskExport implements ActivitiNamespaceConstants {
       xtw.writeAttribute("name", mailTask.getName());
     }
     DefaultFlowExport.createDefaultFlow(mailTask, xtw);
+    AsyncActivityExport.createDefaultFlow(mailTask, xtw);
     xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "type", "mail");
 
     xtw.writeStartElement("extensionElements");

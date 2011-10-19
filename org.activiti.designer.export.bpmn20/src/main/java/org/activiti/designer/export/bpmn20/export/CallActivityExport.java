@@ -36,6 +36,7 @@ public class CallActivityExport implements ActivitiNamespaceConstants {
     }
     
     DefaultFlowExport.createDefaultFlow(object, xtw);
+    AsyncActivityExport.createDefaultFlow(object, xtw);
 
     if(callActivity.getCalledElement() != null && callActivity.getCalledElement().length() > 0) {
       xtw.writeAttribute("calledElement", callActivity.getCalledElement());

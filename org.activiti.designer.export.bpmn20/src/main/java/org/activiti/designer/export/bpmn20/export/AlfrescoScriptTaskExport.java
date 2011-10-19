@@ -35,6 +35,7 @@ public class AlfrescoScriptTaskExport implements ActivitiNamespaceConstants {
     xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE,
             "class", "org.alfresco.repo.workflow.activiti.script.AlfrescoScriptDelegate");
     DefaultFlowExport.createDefaultFlow(object, xtw);
+    AsyncActivityExport.createDefaultFlow(object, xtw);
     
     xtw.writeStartElement("extensionElements");
     

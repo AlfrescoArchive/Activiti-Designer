@@ -570,6 +570,7 @@ public class BpmnParser {
 		} else {
 			subProcess.setName(xtr.getAttributeValue(null, "id"));
 		}
+		subProcess.setAsynchronous(parseAsync(xtr));
 		return subProcess;
 	}
 
@@ -672,6 +673,7 @@ public class BpmnParser {
 		}
 
 		userTask.setName(xtr.getAttributeValue(null, "name"));
+		userTask.setAsynchronous(parseAsync(xtr));
 		
 		if (xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "dueDate") != null) {
 			userTask.setDueDate(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "dueDate"));
@@ -860,6 +862,7 @@ public class BpmnParser {
 		if (xtr.getAttributeValue(null, "default") != null) {
 			defaultFlowMap.put(scriptTask, xtr.getAttributeValue(null, "default"));
 		}
+		scriptTask.setAsynchronous(parseAsync(xtr));
 		boolean readyWithScriptTask = false;
 		try {
 			while (readyWithScriptTask == false && xtr.hasNext()) {
@@ -897,6 +900,7 @@ public class BpmnParser {
 		if (xtr.getAttributeValue(null, "default") != null) {
 			defaultFlowMap.put(mailTask, xtr.getAttributeValue(null, "default"));
 		}
+		mailTask.setAsynchronous(parseAsync(xtr));
 		boolean readyWithServiceTask = false;
 		try {
 			while (readyWithServiceTask == false && xtr.hasNext()) {
@@ -927,6 +931,7 @@ public class BpmnParser {
 	private Task parseAlfrescoScriptTask(XMLStreamReader xtr) {
 		String name = xtr.getAttributeValue(null, "name");
 		String defaultValue = xtr.getAttributeValue(null, "default");
+		boolean async = parseAsync(xtr);
 		List<FieldModel> fieldList = new ArrayList<FieldModel>();
 		boolean readyWithExtensions = false;
 		ActivitiListener listener = null;
@@ -985,6 +990,7 @@ public class BpmnParser {
 		}
 
 		task.setName(name);
+		task.setAsynchronous(async);
 
 		if (defaultValue != null) {
 			defaultFlowMap.put(task, xtr.getAttributeValue(null, "default"));
@@ -1114,6 +1120,7 @@ public class BpmnParser {
 	private ServiceTask parseServiceTask(XMLStreamReader xtr) {
 		ServiceTask serviceTask = Bpmn2Factory.eINSTANCE.createServiceTask();
 		serviceTask.setName(xtr.getAttributeValue(null, "name"));
+		serviceTask.setAsynchronous(parseAsync(xtr));
 		if (xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "class") != null) {
 			serviceTask.setImplementationType(CLASS_TYPE);
 			serviceTask.setImplementation(xtr.getAttributeValue(
@@ -1180,6 +1187,7 @@ public class BpmnParser {
 	private ServiceTask parseTask(XMLStreamReader xtr) {
 		ServiceTask serviceTask = Bpmn2Factory.eINSTANCE.createServiceTask();
 		serviceTask.setName(xtr.getAttributeValue(null, "name"));
+		serviceTask.setAsynchronous(parseAsync(xtr));
 		return serviceTask;
 	}
 
@@ -1445,6 +1453,7 @@ public class BpmnParser {
 	private ManualTask parseManualTask(XMLStreamReader xtr) {
 		ManualTask manualTask = Bpmn2Factory.eINSTANCE.createManualTask();
 		manualTask.setName(xtr.getAttributeValue(null, "name"));
+		manualTask.setAsynchronous(parseAsync(xtr));
 		if (xtr.getAttributeValue(null, "default") != null) {
 			defaultFlowMap.put(manualTask, xtr.getAttributeValue(null, "default"));
 		}
@@ -1478,6 +1487,7 @@ public class BpmnParser {
 	private CallActivity parseCallActivity(XMLStreamReader xtr) {
 		CallActivity callActivity = Bpmn2Factory.eINSTANCE.createCallActivity();
 		callActivity.setName(xtr.getAttributeValue(null, "name"));
+		callActivity.setAsynchronous(parseAsync(xtr));
 		if (xtr.getAttributeValue(null, "calledElement") != null
 		    && xtr.getAttributeValue(null, "calledElement").length() > 0) {
 			callActivity.setCalledElement(xtr
@@ -1517,6 +1527,7 @@ public class BpmnParser {
 	private ReceiveTask parseReceiveTask(XMLStreamReader xtr) {
 		ReceiveTask receiveTask = Bpmn2Factory.eINSTANCE.createReceiveTask();
 		receiveTask.setName(xtr.getAttributeValue(null, "name"));
+		receiveTask.setAsynchronous(parseAsync(xtr));
 		if (xtr.getAttributeValue(null, "default") != null) {
 			defaultFlowMap.put(receiveTask, xtr.getAttributeValue(null, "default"));
 		}
@@ -1551,6 +1562,7 @@ public class BpmnParser {
 		BusinessRuleTask businessRuleTask = Bpmn2Factory.eINSTANCE
 		    .createBusinessRuleTask();
 		businessRuleTask.setName(xtr.getAttributeValue(null, "name"));
+		businessRuleTask.setAsynchronous(parseAsync(xtr));
 		if (xtr.getAttributeValue(null, "default") != null) {
 			defaultFlowMap.put(businessRuleTask,
 			    xtr.getAttributeValue(null, "default"));
@@ -1700,6 +1712,15 @@ public class BpmnParser {
 			e.printStackTrace();
 		}
 		return model;
+	}
+	
+	private boolean parseAsync(XMLStreamReader xtr) {
+		boolean async = false;
+		String asyncString = xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "async");
+		if ("true".equalsIgnoreCase(asyncString)) {
+			async = true;
+		}
+		return async;
 	}
 	
 	private IntermediateCatchEvent parseIntermediateCatchEvent(XMLStreamReader xtr) {

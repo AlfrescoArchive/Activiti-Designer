@@ -33,6 +33,7 @@ public class ManualTaskExport implements ActivitiNamespaceConstants {
       xtw.writeAttribute("name", manualTask.getName());
     }
     DefaultFlowExport.createDefaultFlow(object, xtw);
+    AsyncActivityExport.createDefaultFlow(object, xtw);
     ExtensionListenerExport.createExtensionListenerXML(manualTask.getActivitiListeners(), true, EXECUTION_LISTENER, xtw);
     
     MultiInstanceExport.createMultiInstance(object, xtw);

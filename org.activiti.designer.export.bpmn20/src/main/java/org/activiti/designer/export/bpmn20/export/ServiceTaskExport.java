@@ -36,6 +36,7 @@ public class ServiceTaskExport implements ActivitiNamespaceConstants {
       xtw.writeAttribute("name", serviceTask.getName());
     }
     DefaultFlowExport.createDefaultFlow(object, xtw);
+    AsyncActivityExport.createDefaultFlow(object, xtw);
     ImplementationValueExport.writeImplementationValue(xtw, EXECUTION_LISTENER, serviceTask.getImplementationType(), serviceTask.getImplementation(), true);
 
     if (serviceTask.getResultVariableName() != null && serviceTask.getResultVariableName().length() > 0) {

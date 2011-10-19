@@ -33,6 +33,7 @@ public class ScriptTaskExport implements ActivitiNamespaceConstants {
       xtw.writeAttribute("name", scriptTask.getName());
     }
     DefaultFlowExport.createDefaultFlow(object, xtw);
+    AsyncActivityExport.createDefaultFlow(object, xtw);
     xtw.writeAttribute("scriptFormat", scriptTask.getScriptFormat());
 
     ExtensionListenerExport.createExtensionListenerXML(scriptTask.getActivitiListeners(), true, EXECUTION_LISTENER, xtw);

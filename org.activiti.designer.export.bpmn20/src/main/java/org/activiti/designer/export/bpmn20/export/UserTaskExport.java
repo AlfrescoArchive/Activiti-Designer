@@ -47,6 +47,7 @@ public class UserTaskExport implements ActivitiNamespaceConstants {
       }
       
       DefaultFlowExport.createDefaultFlow(object, xtw);
+      AsyncActivityExport.createDefaultFlow(object, xtw);
 
       // TODO revisit once the designer supports mixing these
       // configurations as they are now exclusive
