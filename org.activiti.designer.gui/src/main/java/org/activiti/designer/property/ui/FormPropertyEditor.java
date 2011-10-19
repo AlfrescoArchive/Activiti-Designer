@@ -117,7 +117,7 @@ public class FormPropertyEditor extends TableFieldEditor {
   @Override
   protected String[] getChangedInputObject(TableItem item) {
     FormPropertyDialog dialog = new FormPropertyDialog(parent.getShell(), getItems(), 
-            item.getText(1), item.getText(0), item.getText(2), item.getText(3), item.getText(4),
+    				item.getText(0), item.getText(1), item.getText(2), item.getText(3), item.getText(4),
             item.getText(5), item.getText(6), item.getText(7));
     dialog.open();
     if(dialog.id != null && dialog.id.length() > 0) {      
@@ -293,15 +293,5 @@ public class FormPropertyEditor extends TableFieldEditor {
     } else {
       return true;
     }
-  }
- 
-  private FormProperty formPropertyExists(List<FormProperty> formPropertyList, String id) {
-    if(formPropertyList == null) return null;
-    for(FormProperty formProperty : formPropertyList) {
-      if(id.equalsIgnoreCase(formProperty.getId())) {
-        return formProperty;
-      }
-    }
-    return null;
   }
 }
