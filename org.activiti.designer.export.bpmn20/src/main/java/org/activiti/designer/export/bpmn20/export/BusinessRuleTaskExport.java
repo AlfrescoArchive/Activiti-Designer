@@ -15,6 +15,7 @@ package org.activiti.designer.export.bpmn20.export;
 
 import javax.xml.stream.XMLStreamWriter;
 
+import org.eclipse.bpmn2.BoundaryEvent;
 import org.eclipse.bpmn2.BusinessRuleTask;
 import org.eclipse.emf.ecore.EObject;
 
@@ -72,5 +73,11 @@ public class BusinessRuleTaskExport implements ActivitiNamespaceConstants {
 
     // end BusinessRuleTask element
     xtw.writeEndElement();
+    
+    if(businessRuleTask.getBoundaryEventRefs().size() > 0) {
+    	for(BoundaryEvent event : businessRuleTask.getBoundaryEventRefs()) {
+    		BoundaryEventExport.createBoundaryEvent(event, xtw);
+    	}
+    }
   }
 }

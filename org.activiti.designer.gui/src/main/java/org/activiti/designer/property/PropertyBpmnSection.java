@@ -218,7 +218,7 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
       	asyncCombo.setVisible(true);
       	asyncLabel.setVisible(true);
       
-      } else {
+      } else if(asyncCombo != null) {
       	asyncCombo.setVisible(false);
       	asyncLabel.setVisible(false);
       }

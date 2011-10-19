@@ -15,6 +15,7 @@ package org.activiti.designer.export.bpmn20.export;
 
 import javax.xml.stream.XMLStreamWriter;
 
+import org.eclipse.bpmn2.BoundaryEvent;
 import org.eclipse.bpmn2.ManualTask;
 import org.eclipse.emf.ecore.EObject;
 
@@ -40,5 +41,11 @@ public class ManualTaskExport implements ActivitiNamespaceConstants {
 
     // end ManualTask element
     xtw.writeEndElement();
+    
+    if(manualTask.getBoundaryEventRefs().size() > 0) {
+    	for(BoundaryEvent event : manualTask.getBoundaryEventRefs()) {
+    		BoundaryEventExport.createBoundaryEvent(event, xtw);
+    	}
+    }
   }
 }

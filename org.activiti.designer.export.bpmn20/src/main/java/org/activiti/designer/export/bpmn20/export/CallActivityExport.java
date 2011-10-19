@@ -15,6 +15,7 @@ package org.activiti.designer.export.bpmn20.export;
 
 import javax.xml.stream.XMLStreamWriter;
 
+import org.eclipse.bpmn2.BoundaryEvent;
 import org.eclipse.bpmn2.CallActivity;
 import org.eclipse.bpmn2.IOParameter;
 import org.eclipse.emf.ecore.EObject;
@@ -73,6 +74,12 @@ public class CallActivityExport implements ActivitiNamespaceConstants {
 
     // end CallActivity element
     xtw.writeEndElement();
+    
+    if(callActivity.getBoundaryEventRefs().size() > 0) {
+    	for(BoundaryEvent event : callActivity.getBoundaryEventRefs()) {
+    		BoundaryEventExport.createBoundaryEvent(event, xtw);
+    	}
+    }
   }
   
   private static void writeParameter(IOParameter parameter, String name, XMLStreamWriter xtw) throws Exception {

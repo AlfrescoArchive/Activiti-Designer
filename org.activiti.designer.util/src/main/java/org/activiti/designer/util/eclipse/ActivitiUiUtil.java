@@ -218,7 +218,7 @@ public class ActivitiUiUtil {
 	            List<EventDefinition> definitionList = boundaryEvent.getEventDefinitions();
 	            for (EventDefinition eventDefinition : definitionList) {
 	              if(eventDefinition.getClass() == featureClass) {
-	              	String contentObjectId = eventDefinition.getId().replace(featureIdKey, "");
+	              	String contentObjectId = boundaryEvent.getId().replace(featureIdKey, "");
 	                determinedId = getId(contentObjectId, determinedId);
 	              }
               }

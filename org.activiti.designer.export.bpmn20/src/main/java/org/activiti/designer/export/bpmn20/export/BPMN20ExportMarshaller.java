@@ -392,9 +392,6 @@ public class BPMN20ExportMarshaller extends AbstractExportMarshaller implements 
 
       // end InclusiveGateway element
       xtw.writeEndElement();
-
-    } else if (object instanceof BoundaryEvent) {
-      BoundaryEventExport.createBoundaryEvent(object, xtw);
     
     } else if (object instanceof IntermediateCatchEvent) {
     	IntermediateCatchEventExport.createIntermediateEvent(object, xtw);
@@ -422,6 +419,12 @@ public class BPMN20ExportMarshaller extends AbstractExportMarshaller implements 
 
         // end SubProcess element
         xtw.writeEndElement();
+        
+        if(subProcess.getBoundaryEventRefs().size() > 0) {
+        	for(BoundaryEvent event : subProcess.getBoundaryEventRefs()) {
+        		BoundaryEventExport.createBoundaryEvent(event, xtw);
+        	}
+        }
       }
     }
   }

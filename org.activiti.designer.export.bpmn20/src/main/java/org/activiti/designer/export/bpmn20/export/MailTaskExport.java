@@ -17,6 +17,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.bpmn2.AlfrescoMailTask;
+import org.eclipse.bpmn2.BoundaryEvent;
 import org.eclipse.bpmn2.MailTask;
 import org.eclipse.emf.ecore.EObject;
 
@@ -64,6 +65,12 @@ public class MailTaskExport implements ActivitiNamespaceConstants {
 
     // end AlfrescoMailTask element
     xtw.writeEndElement();
+    
+    if(mailTask.getBoundaryEventRefs().size() > 0) {
+    	for(BoundaryEvent event : mailTask.getBoundaryEventRefs()) {
+    		BoundaryEventExport.createBoundaryEvent(event, xtw);
+    	}
+    }
   }
   
   private static String createMailScript(AlfrescoMailTask mailTask) {
@@ -155,6 +162,12 @@ public class MailTaskExport implements ActivitiNamespaceConstants {
 
     // end MailTask element
     xtw.writeEndElement();
+    
+    if(mailTask.getBoundaryEventRefs().size() > 0) {
+    	for(BoundaryEvent event : mailTask.getBoundaryEventRefs()) {
+    		BoundaryEventExport.createBoundaryEvent(event, xtw);
+    	}
+    }
   }
   
   private static void writeField(String name, String expression, XMLStreamWriter xtw) throws Exception {

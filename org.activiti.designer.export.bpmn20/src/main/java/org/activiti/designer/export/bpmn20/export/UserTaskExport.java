@@ -17,6 +17,7 @@ import java.util.Iterator;
 
 import javax.xml.stream.XMLStreamWriter;
 
+import org.eclipse.bpmn2.BoundaryEvent;
 import org.eclipse.bpmn2.CandidateGroup;
 import org.eclipse.bpmn2.CandidateUser;
 import org.eclipse.bpmn2.Documentation;
@@ -114,6 +115,11 @@ public class UserTaskExport implements ActivitiNamespaceConstants {
 
       // end UserTask element
       xtw.writeEndElement();
+    }
+    if(userTask.getBoundaryEventRefs().size() > 0) {
+    	for(BoundaryEvent event : userTask.getBoundaryEventRefs()) {
+    		BoundaryEventExport.createBoundaryEvent(event, xtw);
+    	}
     }
   }
 }
