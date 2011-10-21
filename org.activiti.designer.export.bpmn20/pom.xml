@@ -1,0 +1,15 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>org.activiti.designer</groupId>
+		<artifactId>org.activiti.designer.parent</artifactId>
+		<version>5.8.0</version>
+		<relativePath>../org.activiti.designer.parent/pom.xml</relativePath>
+	</parent>
+
+	<artifactId>org.activiti.designer.export.bpmn20</artifactId>
+	<packaging>eclipse-plugin</packaging>
+	<name>Activiti Designer - Export BPMN 2.0</name>
+
+</project>

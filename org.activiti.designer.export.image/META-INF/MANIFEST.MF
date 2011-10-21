@@ -1,0 +1,21 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Activiti Designer - Export Image
+Bundle-SymbolicName: org.activiti.designer.export.image;singleton:=true
+Bundle-Version: 5.8.0
+Bundle-Activator: org.activiti.designer.export.image.bundle.Activator
+Bundle-Vendor: Activiti
+Require-Bundle: org.eclipse.core.runtime,
+ org.activiti.designer.eclipse,
+ org.activiti.designer.model,
+ org.eclipse.emf,
+ org.eclipse.graphiti.mm,
+ org.eclipse.graphiti.ui,
+ org.eclipse.core.resources,
+ org.eclipse.gef
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: .,
+ jdi.jar,
+ jdimodel.jar,
+ junit.jar
