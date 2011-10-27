@@ -715,7 +715,7 @@ public class BpmnFileReader {
       	}
       }
     }
-  	throw null;
+  	return null;
   }
   
   private int calculateDirectElementChildY(FlowElement element, String id, int elementY, List<SequenceFlowModel> sequenceFlowList) {
