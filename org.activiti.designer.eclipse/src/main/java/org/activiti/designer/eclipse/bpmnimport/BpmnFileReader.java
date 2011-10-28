@@ -176,21 +176,7 @@ public class BpmnFileReader {
                 bpmnParser.locationMap);
       } else {
       
-        List<FlowElement> wrongOrderList = createDiagramElements(bpmnParser.bpmnList);
-        if(wrongOrderList.size() > 0) {
-        	
-        	int counter = 0;
-          while(wrongOrderList.size() > 0 && counter < 10) {
-            int sizeBefore = wrongOrderList.size();
-            wrongOrderList = createDiagramElements(wrongOrderList);
-           	
-            if(sizeBefore <= wrongOrderList.size()) {
-              counter++;
-            } else {
-            	counter = 0;
-            }
-          }
-        }
+        createDiagramElements(bpmnParser.bpmnList);
         drawSequenceFlows();
       }
       setFriendlyIds();
@@ -203,9 +189,8 @@ public class BpmnFileReader {
     }
   }
   
-  private List<FlowElement> createDiagramElements(List<FlowElement> flowList) {
+  private void createDiagramElements(List<FlowElement> flowList) {
     SubProcess activeSubProcess = null;
-    List<FlowElement> wrongOrderList = new ArrayList<FlowElement>();
     Set<BoundaryEvent> boundaryEventList = new HashSet<BoundaryEvent>(); 
     
     // look for boundary events
@@ -224,41 +209,29 @@ public class BpmnFileReader {
           yMap.put(startElement.getId(), graphicInfo);
           addBpmnElementToDiagram(startElement, graphicInfo, diagram);
           
-          processDiagramInSequence(startElement, flowList, activeSubProcess, wrongOrderList, boundaryEventList);
+          processDiagramInSequence(startElement, flowList, activeSubProcess, boundaryEventList);
           
           break;
           
     		}
     	}
     }
-    return wrongOrderList;
   }
   
   private void processDiagramInSequence(FlowElement previousElement, List<FlowElement> flowList, 
-  		SubProcess activeSubProcess, List<FlowElement> wrongOrderList, Set<BoundaryEvent> boundaryEventList) {
+  		SubProcess activeSubProcess, Set<BoundaryEvent> boundaryEventList) {
   	
   	for(SequenceFlowModel sequence : bpmnParser.sequenceFlowList) {
+  		
     	if(sequence.sourceRef != null && sequence.sourceRef.equals(previousElement.getId()) &&
     			sequence.targetRef != null && yMap.containsKey(sequence.targetRef) == false) {
     
     		for (FlowElement flowElement : flowList) {
+    			
     			if(sequence.targetRef.equals(flowElement.getId())) {
-    				
-			    	if(multipleIncomingSequenceFlows(flowElement, bpmnParser.sequenceFlowList) > 1) {
-			    		try {
-			        	getMaxX(flowElement.getId());
-			        	calculateDivergingElementY(flowElement, bpmnParser.sequenceFlowList);
-			        	
-			        } catch(FlowSourceNotFoundException e) {
-			        	if(activeSubProcess == null || containsFlowElementId(activeSubProcess.getFlowElements(), flowElement.getId()) == false) {
-			        		wrongOrderList.add(flowElement);
-			          }
-			          continue;
-			        }
-			    	} 
 			      
 			      GraphicInfo graphicInfo = getNextGraphicInfo(previousElement, flowElement, yMap, boundaryEventList);
-			    
+			      
 			      yMap.put(flowElement.getId(), graphicInfo);
 			      
 			      if(flowElement instanceof SubProcess) {
@@ -271,7 +244,7 @@ public class BpmnFileReader {
 			      	addBpmnElementToDiagram(flowElement, graphicInfo, diagram); 
 			      }
 			      
-			      processDiagramInSequence(flowElement, flowList, activeSubProcess, wrongOrderList, boundaryEventList);
+			      processDiagramInSequence(flowElement, flowList, activeSubProcess, boundaryEventList);
 			      
 			      if(boundaryEventList.size() > 0 && 
 			      		(flowElement instanceof SubProcess || flowElement instanceof CallActivity 
@@ -287,7 +260,7 @@ public class BpmnFileReader {
 							      yMap.put(boundaryEvent.getId(), boundaryGraphicInfo);
 							      addBpmnElementToDiagram(boundaryEvent, boundaryGraphicInfo, diagram);
 							      
-							      processDiagramInSequence(boundaryEvent, flowList, activeSubProcess, wrongOrderList, boundaryEventList);
+							      processDiagramInSequence(boundaryEvent, flowList, activeSubProcess, boundaryEventList);
 				      		}
 	              }
 			      	}
@@ -380,8 +353,8 @@ public class BpmnFileReader {
         
         if(multipleIncomingSequenceFlows(newFlowElement, bpmnParser.sequenceFlowList) > 1) {
         	
-          y = calculateDivergingElementY(newFlowElement, bpmnParser.sequenceFlowList);
-          x = getMaxX(newFlowElement.getId());
+          y = calculateDivergingElementY(newFlowElement, bpmnParser.sequenceFlowList, y);
+          x = getMaxX(newFlowElement.getId(), x);
           
         } else if(newFlowElement instanceof Gateway){
           if(sourceFlowElement instanceof Task) {
@@ -543,7 +516,7 @@ public class BpmnFileReader {
     return sourceRef;
   }
   
-  private int getMaxX(String id) {
+  private int getMaxX(String id, int defaultX) {
     int maxX = 0;
     String sourceRef = null;
     for (SequenceFlowModel sequenceFlowModel : bpmnParser.sequenceFlowList) {
@@ -555,7 +528,7 @@ public class BpmnFileReader {
             sourceRef = sequenceFlowModel.sourceRef;
           }
         } else {
-        	throw new FlowSourceNotFoundException();
+        	maxX = defaultX;
         }
       }
     }
@@ -609,7 +582,7 @@ public class BpmnFileReader {
     return counter;
   }
   
-  private int calculateDivergingElementY(FlowElement element, List<SequenceFlowModel> sequenceFlowList) {
+  private int calculateDivergingElementY(FlowElement element, List<SequenceFlowModel> sequenceFlowList, int defaultY) {
   	
   	if(element instanceof Gateway) {
 	  	GraphicInfo previousGateway = getDivergingGateway(element, sequenceFlowList, element.getClass().getName());
@@ -647,7 +620,7 @@ public class BpmnFileReader {
       	}
       	
       } else {
-      	throw new FlowSourceNotFoundException();
+      	y = defaultY;
       }
     	
     } else {
@@ -689,7 +662,7 @@ public class BpmnFileReader {
       	}
       	
       } else {
-      	throw new FlowSourceNotFoundException();
+      	y = defaultY;
       }
     }
     return y;
@@ -702,7 +675,7 @@ public class BpmnFileReader {
         
       	FlowElement sourceElement = sourceRef(sequenceFlowModel.targetRef, yMap);
       	if(sourceElement == null) {
-      		throw new FlowSourceNotFoundException();
+      		throw null;
       	}
       	
       	if(sourceElement.getClass().getName().equals(type)) {
@@ -884,44 +857,50 @@ public class BpmnFileReader {
         
         if(sequenceFlow.getSourceRef() instanceof BoundaryEvent) {
           if(flowNode instanceof Task || flowNode instanceof SubProcess) {
-            for(Shape subShape : ((ContainerShape) shape).getChildren()) {
-              FlowNode subFlowNode = (FlowNode) linkService.getBusinessObjectForLinkedPictogramElement(
-                      subShape.getGraphicsAlgorithm().getPictogramElement());
-              if(subFlowNode == null || subFlowNode.getId() == null) continue;
-              
-              if(subFlowNode.getId().equals(sequenceFlow.getSourceRef().getId())) {
-                EList<Anchor> anchorList = ((ContainerShape) subShape).getAnchors();
-                for (Anchor anchor : anchorList) {
-                  if(anchor instanceof ChopboxAnchor) {
-                    sourceAnchor = anchor;
-                    break;
-                  }
-                }
-              }
-            }
+          	if(shape instanceof ContainerShape) {
+	            for(Shape subShape : ((ContainerShape) shape).getChildren()) {
+	              FlowNode subFlowNode = (FlowNode) linkService.getBusinessObjectForLinkedPictogramElement(
+	                      subShape.getGraphicsAlgorithm().getPictogramElement());
+	              if(subFlowNode == null || subFlowNode.getId() == null) continue;
+	              
+	              if(subFlowNode.getId().equals(sequenceFlow.getSourceRef().getId())) {
+	                EList<Anchor> anchorList = ((ContainerShape) subShape).getAnchors();
+	                for (Anchor anchor : anchorList) {
+	                  if(anchor instanceof ChopboxAnchor) {
+	                    sourceAnchor = anchor;
+	                    break;
+	                  }
+	                }
+	              }
+	            }
+          	}
           }
           
         } else {
         
           if(flowNode.getId().equals(sequenceFlow.getSourceRef().getId())) {
-            EList<Anchor> anchorList = ((ContainerShape) shape).getAnchors();
-            for (Anchor anchor : anchorList) {
-              if(anchor instanceof ChopboxAnchor) {
-                sourceAnchor = anchor;
-                break;
-              }
-            }
+          	if(shape instanceof ContainerShape) {
+	            EList<Anchor> anchorList = ((ContainerShape) shape).getAnchors();
+	            for (Anchor anchor : anchorList) {
+	              if(anchor instanceof ChopboxAnchor) {
+	                sourceAnchor = anchor;
+	                break;
+	              }
+	            }
+          	}
           }
         }
         
         if(flowNode.getId().equals(sequenceFlow.getTargetRef().getId())) {
-          EList<Anchor> anchorList = ((ContainerShape) shape).getAnchors();
-          for (Anchor anchor : anchorList) {
-            if(anchor instanceof ChopboxAnchor) {
-              targetAnchor = anchor;
-              break;
-            }
-          }
+        	if(shape instanceof ContainerShape) {
+	          EList<Anchor> anchorList = ((ContainerShape) shape).getAnchors();
+	          for (Anchor anchor : anchorList) {
+	            if(anchor instanceof ChopboxAnchor) {
+	              targetAnchor = anchor;
+	              break;
+	            }
+	          }
+        	}
         }
       }
       
