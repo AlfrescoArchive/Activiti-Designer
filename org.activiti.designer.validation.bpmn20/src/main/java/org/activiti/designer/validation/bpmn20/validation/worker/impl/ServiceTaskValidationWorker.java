@@ -2,14 +2,18 @@ package org.activiti.designer.validation.bpmn20.validation.worker.impl;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.activiti.designer.property.extension.util.ExtensionUtil;
 import org.activiti.designer.validation.bpmn20.validation.worker.ProcessValidationWorker;
 import org.activiti.designer.validation.bpmn20.validation.worker.ProcessValidationWorkerMarker;
+import org.eclipse.bpmn2.FlowElement;
 import org.eclipse.bpmn2.ServiceTask;
+import org.eclipse.bpmn2.SubProcess;
 import org.eclipse.bpmn2.impl.ServiceTaskImpl;
+import org.eclipse.bpmn2.impl.SubProcessImpl;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -46,6 +50,31 @@ public class ServiceTaskValidationWorker implements ProcessValidationWorker {
                     serviceTask.getId(), ValidationCode.VAL_004));
           }
         }
+      }
+    }
+    
+    final List<EObject> subProcesses = processNodes.get(SubProcessImpl.class.getCanonicalName());
+
+    if (subProcesses != null && !subProcesses.isEmpty()) {
+      for (final EObject object : subProcesses) {
+
+        final SubProcess subProcess = (SubProcess) object;
+        
+        final Map<String, List<EObject>> subElementsMap = new HashMap<String, List<EObject>>();
+
+        for (final FlowElement subElement : subProcess.getFlowElements()) {
+
+          String nodeType = subElement.getClass().getCanonicalName();
+
+          if (nodeType != null) {
+            if (!subElementsMap.containsKey(nodeType)) {
+            	subElementsMap.put(nodeType, new ArrayList<EObject>());
+            }
+            subElementsMap.get(nodeType).add(subElement);
+          }
+        }
+        
+        result.addAll(validate(diagram, subElementsMap));
       }
     }
 

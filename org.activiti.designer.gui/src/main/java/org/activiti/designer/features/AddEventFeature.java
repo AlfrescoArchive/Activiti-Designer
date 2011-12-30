@@ -40,8 +40,8 @@ public class AddEventFeature extends AbstractAddShapeFeature {
 
 		// check whether the context has a size (e.g. from a create feature)
 		// otherwise define a default size for the shape
-		final int width = context.getWidth() <= 0 ? 35 : context.getWidth();
-		final int height = context.getHeight() <= 0 ? 35 : context.getHeight();
+		final int width = context.getWidth() <= 35 ? 35 : context.getWidth();
+		final int height = context.getHeight() <= 35 ? 35 : context.getHeight();
 
 		final IGaService gaService = Graphiti.getGaService();
 

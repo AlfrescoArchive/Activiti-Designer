@@ -454,6 +454,9 @@ public class BpmnParser {
 		if (xtr.getAttributeValue(null, "variable") != null) {
 			property.setValue(xtr.getAttributeValue(null, "variable"));
 		}
+		if (xtr.getAttributeValue(null, "expression") != null) {
+			property.setValue(xtr.getAttributeValue(null, "expression"));
+		}
 		if (xtr.getAttributeValue(null, "required") != null) {
 			property.setRequired(Boolean.valueOf(xtr.getAttributeValue(null,
 			    "required")));

@@ -124,6 +124,7 @@ public class DeploymentMenu implements org.eclipse.ui.IObjectActionDelegate{
               IFolder classesFolder = project.getFolder("target/classes");
               memberList = new ArrayList<IFile>();
               getMembersWithFilter(classesFolder, ".class");
+              getMembersWithFilter(classesFolder, ".gif");
               if(memberList.size() > 0) {
                 for (IFile classResource : memberList) {
                   String classFilename = classResource.getName();

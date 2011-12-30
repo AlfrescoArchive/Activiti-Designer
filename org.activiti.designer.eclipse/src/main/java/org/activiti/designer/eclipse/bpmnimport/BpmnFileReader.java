@@ -675,7 +675,7 @@ public class BpmnFileReader {
         
       	FlowElement sourceElement = sourceRef(sequenceFlowModel.targetRef, yMap);
       	if(sourceElement == null) {
-      		throw null;
+      		return null;
       	}
       	
       	if(sourceElement.getClass().getName().equals(type)) {
@@ -737,10 +737,32 @@ public class BpmnFileReader {
   private void drawDiagramWithBPMNDI(Diagram diagram, IFeatureProvider featureProvider, List<FlowElement> bpmnList, 
           List<SequenceFlowModel> sequenceFlowList, Map<String, GraphicInfo> locationMap) {
     
+  	SubProcess activeSubProcess = null;
+  	ContainerShape processShape = null;
+  	
     for (FlowElement flowElement : bpmnList) {
       String elementid = flowElement.getId();
       GraphicInfo graphicInfo = locationMap.get(elementid);
-      addBpmnElementToDiagram(flowElement, graphicInfo, diagram);
+      
+      if(activeSubProcess != null && activeSubProcess.getFlowElements().contains(flowElement)) {
+      	addBpmnElementToDiagram(flowElement, graphicInfo, processShape);
+      
+      } else {
+      	activeSubProcess = null;
+      	processShape = null;
+      	addBpmnElementToDiagram(flowElement, graphicInfo, diagram);
+      }
+      
+      if(flowElement instanceof SubProcess) {
+      	activeSubProcess = (SubProcess) flowElement;
+      	subProcessList.add(activeSubProcess);
+      	
+      	ILinkService linkService = Graphiti.getLinkService();
+        List<PictogramElement> pictoList = linkService.getPictogramElements(diagram, activeSubProcess);
+        if(pictoList != null && pictoList.size() > 0) {
+        	processShape = (ContainerShape) pictoList.get(0);
+        }
+      }
     }
     drawSequenceFlows();
   }
@@ -913,6 +935,17 @@ public class BpmnFileReader {
 		      	List<GraphicInfo> pointList = bpmnParser.flowLocationMap.get(sequenceGraphElement);
 		      	if(pointList.size() > 2) {
 		      		for(int i = 1; i < pointList.size() - 1; i++) {
+		      			
+		      			if(parent instanceof Diagram == false) {
+		      				GraphicInfo pointInfo = pointList.get(i);
+		      				if(pointInfo.x > parent.getGraphicsAlgorithm().getX() &&
+		      						pointInfo.y > parent.getGraphicsAlgorithm().getY()) {
+		      					
+		      					pointInfo.x = pointInfo.x - parent.getGraphicsAlgorithm().getX();
+		      					pointInfo.y = pointInfo.y - parent.getGraphicsAlgorithm().getY();
+		      				}
+		      			}
+		      			
 		      			bendpointList.add(pointList.get(i));
 		      		}
 		      	}
@@ -1019,11 +1052,20 @@ public class BpmnFileReader {
         }
       }
     }
-    
     AddContext addContext = new AddContext();
     addContext.setNewObject(flowElement);
     addContext.setTargetContainer(parent);
-    addContext.setX(graphicInfo.x);
+    
+    if(parent instanceof Diagram) {
+    	addContext.setX(graphicInfo.x);
+    
+    } else {
+    	
+    	if(graphicInfo.x > parent.getGraphicsAlgorithm().getX()) {
+	    	addContext.setX(graphicInfo.x - parent.getGraphicsAlgorithm().getX());
+	    	graphicInfo.y = graphicInfo.y - parent.getGraphicsAlgorithm().getY();
+    	}
+    }
     
     if(useBPMNDI) {
     	addContext.setHeight(graphicInfo.height);
