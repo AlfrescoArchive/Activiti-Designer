@@ -4,6 +4,8 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.lang.reflect.InvocationTargetException;
+import java.text.CharacterIterator;
+import java.text.StringCharacterIterator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -198,7 +200,8 @@ public class DeploymentMenu implements org.eclipse.ui.IObjectActionDelegate{
         zipDirectory(out, file, absoluteDirPathToStrip);
         continue;
       }
-      final String entryName = StringUtils.removeStart(file.getAbsolutePath(), absoluteDirPathToStrip);
+      String entryName = StringUtils.removeStart(file.getAbsolutePath(), absoluteDirPathToStrip);
+      entryName = backlashReplace(entryName);
       ZipEntry entry = new ZipEntry(entryName);
       out.putNextEntry(entry);
       if (file.isFile()) {
@@ -218,6 +221,25 @@ public class DeploymentMenu implements org.eclipse.ui.IObjectActionDelegate{
 
   @Override
   public void setActivePart(IAction action, IWorkbenchPart part) {
+  }
+  
+  private String backlashReplace(String myStr){
+	  final StringBuilder result = new StringBuilder();
+	  final StringCharacterIterator iterator = new StringCharacterIterator(myStr);
+	  char character =  iterator.current();
+	  while (character != CharacterIterator.DONE ){
+	     
+		  if (character == '\\') {
+	         result.append("/");
+	      }
+	      else {
+	        result.append(character);
+	      }
+
+	      
+	      character = iterator.next();
+	  }
+	  return result.toString();
   }
 }
 
