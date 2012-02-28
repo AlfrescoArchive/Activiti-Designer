@@ -170,8 +170,6 @@
          <uri
                name="http://www.omg.org/spec/BPMN/20100524/MODEL" 
                uri="xsd/BPMN20.xsd"/> 
-      </catalogContribution> 
-        <catalogContribution> 
          <uri
                name="http://activiti.org/bpmn" 
                uri="xsd/activiti-bpmn-extensions-5.2.xsd"/> 

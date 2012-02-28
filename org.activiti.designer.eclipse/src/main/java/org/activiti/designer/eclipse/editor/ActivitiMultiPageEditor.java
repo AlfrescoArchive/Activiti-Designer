@@ -4,12 +4,10 @@ import java.io.File;
 
 import org.activiti.designer.eclipse.bpmnimport.ImportBpmnUtil;
 import org.activiti.designer.eclipse.common.ActivitiBPMNDiagramConstants;
-import org.activiti.designer.eclipse.editor.sync.DiagramUpdater;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResourceChangeEvent;
 import org.eclipse.core.resources.IResourceChangeListener;
-import org.eclipse.core.resources.IStorage;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
@@ -25,7 +23,6 @@ import org.eclipse.gef.LayerConstants;
 import org.eclipse.gef.editparts.LayerManager;
 import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
-import org.eclipse.graphiti.ui.editor.DiagramEditorFactory;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.swt.widgets.Display;
@@ -116,13 +113,17 @@ public class ActivitiMultiPageEditor extends MultiPageEditorPart implements IRes
       getEditor(1).doSave(monitor);
 
       // sync Activiti Diagram
+      /*
+      TODO: Bardioc: This code does no longer work for Graphiti 0.9 and was not used anyway
+      TODO: Bardioc: The multi page editor seems not to be used at all?
       DiagramEditorInput diagramEditorInput = (DiagramEditorInput) getEditor(0).getEditorInput();
       Diagram diagram = diagramEditorInput.getDiagram();
       FileEditorInput bpmn2EditorInput = (FileEditorInput) getEditor(1).getEditorInput();
       
       IStorage bpmnStorage = bpmn2EditorInput.getStorage();
       //DiagramUpdater.syncDiagram(diagramEditor, diagram, bpmnStorage);
-
+      */
+      
       // Save BPMN editor contents
       getEditor(0).doSave(monitor);
     }
@@ -166,10 +167,15 @@ public class ActivitiMultiPageEditor extends MultiPageEditorPart implements IRes
           ImportBpmnUtil.createDiagram(processName, bpmnFile, 
                   associatedBPMN2File.getProject(), associatedBPMN2File.getParent());
         }
+        // TODO: Bardioc: according to the Graphiti team, this is no longer needed, resp. 
+        // TODO: Bardioc: automatically done
+        /*
         final IEditorInput diagramFileEditorInput = new FileEditorInput(diagramFile);
 
         // creates DiagramEditorInput from FileEditorInput
-        editorInput = new DiagramEditorFactory().createEditorInput(diagramFileEditorInput);
+        
+        editorInput = new DiagramEditorInputFactory().createEditorInput(diagramFileEditorInput);
+        */
       }
     }
     super.init(site, editorInput);
@@ -227,7 +233,7 @@ public class ActivitiMultiPageEditor extends MultiPageEditorPart implements IRes
 
   private URI getAssociatedBPMN2URI() {
 
-    final Diagram diagram = ((DiagramEditorInput) diagramEditor.getEditorInput()).getDiagram();
+    final Diagram diagram = (Diagram) diagramEditor.getAdapter(Diagram.class); 
     final URI originalURI = diagram.eResource().getURI();
     final URI parentURI = originalURI.trimSegments(1);
     final String REGEX_FILENAME = "\\$originalFile";

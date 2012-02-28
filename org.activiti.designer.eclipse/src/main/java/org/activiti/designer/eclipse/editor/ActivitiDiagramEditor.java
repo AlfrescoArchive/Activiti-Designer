@@ -1,19 +1,12 @@
 package org.activiti.designer.eclipse.editor;
 
-import java.util.Collection;
 import java.util.List;
 
-import org.activiti.designer.eclipse.Logger;
-import org.activiti.designer.eclipse.extension.export.ExportMarshaller;
-import org.activiti.designer.eclipse.extension.export.SequenceFlowSynchronizer;
 import org.activiti.designer.eclipse.ui.ActivitiEditorContextMenuProvider;
-import org.activiti.designer.eclipse.ui.ExportMarshallerRunnable;
-import org.activiti.designer.eclipse.util.ExtensionPointUtil;
-import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.eclipse.bpmn2.Task;
-import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.transaction.RecordingCommand;
 import org.eclipse.gef.ContextMenuProvider;
 import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.LayerConstants;
@@ -27,15 +20,12 @@ import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
+import org.eclipse.graphiti.ui.editor.DefaultPersistencyBehavior;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
-import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
-import org.eclipse.ui.IEditorPart;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.progress.IProgressService;
 
 public class ActivitiDiagramEditor extends DiagramEditor {
 
@@ -69,64 +59,31 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 	}
 
 	@Override
-	public void doSave(final IProgressMonitor monitor) {
-		// Get a reference to the editor part
-
-		final IEditorPart editorPart = getEditorSite().getPage().getActiveEditor();
-		final DiagramEditorInput editorInput;
-
-		editorInput = (DiagramEditorInput) editorPart.getEditorInput();
-		SequenceFlowSynchronizer.synchronize(editorInput.getDiagram()
-				.getConnections(), (DiagramEditor) editorPart);
-
-		activeGraphicalViewer = (GraphicalViewer) getAdapter(GraphicalViewer.class);
-
-		// Regular save
-		try {
-		  super.doSave(monitor);
-		} catch(Throwable e) {
-		  e.printStackTrace();
-		}
-
-		// Determine list of ExportMarshallers to invoke after regular save
-		final Collection<ExportMarshaller> marshallers = ExtensionPointUtil
-				.getActiveExportMarshallers();
-
-		if (marshallers.size() > 0) {
-			// Get the resource belonging to the editor part
-			final Diagram diagram = editorInput.getDiagram();
-
-			// Get the progress service so we can have a progress monitor
-			final IProgressService progressService = PlatformUI.getWorkbench()
-					.getProgressService();
-
-			try {
-				final ExportMarshallerRunnable runnable = new ExportMarshallerRunnable(
-						diagram, marshallers);
-				progressService.busyCursorWhile(runnable);
-			} catch (Exception e) {
-				Logger.logError("Exception while performing save", e);
-			}
-		}
+	protected DefaultPersistencyBehavior createPersistencyBehavior() {
+	  return new ActivitiDiagramEditorPersistenceBehavior(this);
 	}
 
 	@Override
-  protected void setInput(final IEditorInput input) {
-		super.setInput(input);
-	  if(input instanceof DiagramEditorInput) {
-	  	final Diagram diagram = ((DiagramEditorInput) input).getDiagram();
-	  	boolean shouldMigrate = Graphiti.getMigrationService().shouldMigrate070To080(diagram);
-	  	if(shouldMigrate) {
-	  		ActivitiUiUtil.runModelChange(new Runnable() {
-					public void run() {
-						setTransparencyAndLineWidth(diagram, diagram);
-						Graphiti.getMigrationService().migrate070To080(diagram);
-					}
-				}, getEditingDomain(), "Mirgation from Graphiti 0.7 to 0.8");
-	  	}
-	  }
+  protected void migrateDiagramModelIfNecessary() {
+    // do a migration from 0.7 to 0.8 first
+    final Diagram diagram = getDiagramTypeProvider().getDiagram();
+    if (Graphiti.getMigrationService().shouldMigrate070To080(diagram)) {
+      getEditingDomain().getCommandStack().execute(new RecordingCommand(getEditingDomain()
+                             , "Migrating from Graphiti 0.7 to 0.8") {
+
+        @Override
+        protected void doExecute() {
+          setTransparencyAndLineWidth(diagram, diagram);
+          Graphiti.getMigrationService().migrate070To080(diagram);
+        }
+        
+      });
+    }
+    
+    // by default, a migration from 0.8 to 0.9 is done here
+    super.migrateDiagramModelIfNecessary();
   }
-	
+
 	private void setTransparencyAndLineWidth(ContainerShape parent, Diagram diagram) {
 		List<Shape> shapes = parent.getChildren();
 		for (Shape shape : shapes) {
@@ -167,7 +124,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 	@Override
 	protected ContextMenuProvider createContextMenuProvider() {
 		return new ActivitiEditorContextMenuProvider(getGraphicalViewer(),
-				getActionRegistry(), getConfigurationProvider());
+				getActionRegistry(), getDiagramTypeProvider());
 	}
 
 	public static GraphicalViewer getActiveGraphicalViewer() {

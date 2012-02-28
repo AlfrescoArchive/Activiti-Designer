@@ -97,7 +97,7 @@ public abstract class AddAlfrescoTaskFeature extends AbstractAddShapeFeature {
       text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
       text.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);
       if (OSUtil.getOperatingSystem() == OSEnum.Mac) {
-        text.getFont().setSize(11);
+        text.setFont(gaService.manageFont(getDiagram(), text.getFont().getName(), 11));
       }
 
       gaService.setLocationAndSize(text, 0, 20, width, 30);

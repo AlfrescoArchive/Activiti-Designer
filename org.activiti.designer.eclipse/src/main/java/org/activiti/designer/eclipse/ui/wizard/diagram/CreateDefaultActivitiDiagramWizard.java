@@ -32,6 +32,7 @@ import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.services.Graphiti;
+import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 import org.eclipse.graphiti.ui.services.GraphitiUi;
 import org.eclipse.jdt.core.IJavaProject;
@@ -219,10 +220,12 @@ public class CreateDefaultActivitiDiagramWizard extends BasicNewResourceWizard {
     }
 
     String providerId = GraphitiUi.getExtensionManager().getDiagramTypeProviderId(diagram.getDiagramTypeId());
-    DiagramEditorInput editorInput = new DiagramEditorInput(EcoreUtil.getURI(diagram), domain, providerId);
+    DiagramEditorInput editorInput = new DiagramEditorInput(EcoreUtil.getURI(diagram), providerId);
 
+    DiagramEditor editor = null;
     try {
-      PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(editorInput, ActivitiBPMNDiagramConstants.DIAGRAM_EDITOR_ID);
+      editor 
+        = (DiagramEditor) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(editorInput, ActivitiBPMNDiagramConstants.DIAGRAM_EDITOR_ID);
     } catch (PartInitException e) {
       String error = "Error while opening diagram editor";
       IStatus status = new Status(IStatus.ERROR, ActivitiPlugin.getID(), error, e);
@@ -239,7 +242,7 @@ public class CreateDefaultActivitiDiagramWizard extends BasicNewResourceWizard {
   
       if (marshallers.size() > 0) {
         // Get the resource belonging to the editor part
-        final Diagram diagram = editorInput.getDiagram();
+        final Diagram diagram = editor.getDiagramTypeProvider().getDiagram();
   
         // Get the progress service so we can have a progress monitor
         final IProgressService progressService = PlatformUI.getWorkbench().getProgressService();

@@ -176,7 +176,7 @@ public class ActivitiUiUtil {
     IWorkbenchPart part = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActivePart();
     if (part instanceof DiagramEditor) {
       DiagramEditor editor = (DiagramEditor) part;
-      return editor.getActionRegistryInternal();
+      return (ActionRegistry) editor.getAdapter(ActionRegistry.class);
     }
     return null;
   }

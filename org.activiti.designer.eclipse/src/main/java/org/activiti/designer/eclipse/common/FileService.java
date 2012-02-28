@@ -43,7 +43,7 @@ import org.eclipse.emf.transaction.Transaction;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.emf.transaction.impl.TransactionalEditingDomainImpl;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
-import org.eclipse.graphiti.ui.editor.DiagramEditorFactory;
+import org.eclipse.graphiti.ui.internal.services.GraphitiUiInternal;
 
 public class FileService {
 
@@ -51,8 +51,13 @@ public class FileService {
 			final InputStream contentStream, final IFile resourceFile) {
 
 		// Create a resource set and EditingDomain
-		final TransactionalEditingDomain editingDomain = DiagramEditorFactory.createResourceSetAndEditingDomain();
+	  
+	  // TODO: Bardioc: check this, as we currently need the internal EMFService. Graphiti has been 
+	  // TODO: Bardioc: modified, so that the editing domain is no longer needed, but simply the URI
+	  // TODO: Bardioc: to create a diagram
+		final TransactionalEditingDomain editingDomain = GraphitiUiInternal.getEmfService().createResourceSetAndEditingDomain();
 		final ResourceSet resourceSet = editingDomain.getResourceSet();
+		
 		// Create a resource for this file.
 		final Resource resource = resourceSet.createResource(diagramResourceUri);
 

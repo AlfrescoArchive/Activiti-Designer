@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.activiti.designer</groupId>
 		<artifactId>org.activiti.designer.parent</artifactId>
-		<version>5.8.1</version>
+		<version>5.9.0</version>
 		<relativePath>../org.activiti.designer.parent/pom.xml</relativePath>
 	</parent>
 

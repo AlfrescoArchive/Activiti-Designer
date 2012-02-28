@@ -14,6 +14,7 @@ import org.eclipse.graphiti.mm.algorithms.Ellipse;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.RoundedRectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;
+import org.eclipse.graphiti.mm.algorithms.styles.Font;
 import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
 import org.eclipse.graphiti.mm.pictograms.BoxRelativeAnchor;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
@@ -82,10 +83,14 @@ public class AddEmbeddedSubProcessFeature extends AbstractAddShapeFeature {
 			text.setStyle(StyleUtil.getStyleForEvent(getDiagram()));
 			text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
 			text.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);
-			text.getFont().setBold(true);
+			Font font = null;
       if (OSUtil.getOperatingSystem() == OSEnum.Mac) {
-        text.getFont().setSize(11);
+        font = gaService.manageFont(getDiagram(), text.getFont().getName(), 11, false, true);
       }
+      else {
+        font = gaService.manageDefaultFont(getDiagram(), false, true);
+      }      
+      text.setFont(font);
 			gaService.setLocationAndSize(text, 0, 0, width, 20);
 
 			// create link and wire it

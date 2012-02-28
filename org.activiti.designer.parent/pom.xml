@@ -3,12 +3,12 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.activiti.designer</groupId>
 	<artifactId>org.activiti.designer.parent</artifactId>
-	<version>5.8.1</version>
+	<version>5.9.0</version>
 	<packaging>pom</packaging>
 	<name>Activiti Designer - Parent project</name>
 
 	<properties>
-		<tycho-version>0.12.0</tycho-version>
+		<tycho-version>0.14.0</tycho-version>
 	</properties>
 
 	<modules>
@@ -29,17 +29,18 @@
 		<repository>
 			<id>eclipse-helios</id>
 			<layout>p2</layout>
-			<url>http://download.eclipse.org/releases/helios</url>
+			<url>http://download.eclipse.org/releases/indigo</url>
 		</repository>
 		<repository>
 			<id>Graphiti</id>
 			<layout>p2</layout>
-			<url>http://download.eclipse.org/graphiti/updates/0.8.0/</url>
+			<url>http://download.eclipse.org/graphiti/updates/milestones/</url>
 		</repository>
 		<repository>
 			<id>Oribit</id>
 			<layout>p2</layout>
-			<url>http://download.eclipse.org/tools/orbit/downloads/drops/R20100519200754/updateSite/</url>
+			<url>http://download.eclipse.org/tools/orbit/downloads/drops/R20120119162704/repository</url>
+			<!-- <url>http://download.eclipse.org/tools/orbit/downloads/drops/R20100519200754/updateSite/</url> -->
 		</repository>
 	</repositories>
 

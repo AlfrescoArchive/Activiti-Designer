@@ -229,7 +229,7 @@ public abstract class AddTaskFeature extends AbstractAddShapeFeature {
       text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
       text.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);
       if (OSUtil.getOperatingSystem() == OSEnum.Mac) {
-        text.getFont().setSize(11);
+        text.setFont(gaService.manageFont(getDiagram(), text.getFont().getName(), 11));
       }
 
       switch (baseShape) {

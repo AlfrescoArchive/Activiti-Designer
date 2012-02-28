@@ -25,4 +25,21 @@
 		<nature>org.eclipse.jdt.core.javanature</nature>
 		<nature>org.eclipse.pde.PluginNature</nature>
 	</natures>
+	<linkedResources>
+		<link>
+			<name>jdi.jar</name>
+			<type>1</type>
+			<location>/Users/trademakers/.m2/repository/.cache/tycho/org.eclipse.jdt.debug-3.7.1.v20111006_r372.jar/jdi.jar</location>
+		</link>
+		<link>
+			<name>jdimodel.jar</name>
+			<type>1</type>
+			<location>/Users/trademakers/.m2/repository/.cache/tycho/org.eclipse.jdt.debug-3.7.1.v20111006_r372.jar/jdimodel.jar</location>
+		</link>
+		<link>
+			<name>junit.jar</name>
+			<type>1</type>
+			<location>/Users/trademakers/.m2/repository/.cache/tycho/org.junit-4.8.2.v4_8_2_v20110321-1705.jar/junit.jar</location>
+		</link>
+	</linkedResources>
 </projectDescription>
