@@ -84,7 +84,7 @@ public class BpmnParser {
 				try {
 					xtr.next();
 				} catch(Exception e) {
-					// probably an empty file
+					return;
 				}
 
 				if (xtr.isEndElement()  && "subProcess".equalsIgnoreCase(xtr.getLocalName())) {
