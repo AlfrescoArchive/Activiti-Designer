@@ -5,7 +5,6 @@ import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
@@ -99,7 +98,7 @@ public class PropertyAlfrescoMailTaskSection extends ActivitiPropertySection imp
 			templateModelText.removeFocusListener(listener);
 			htmlText.removeFocusListener(listener);
 			nonHtmlText.removeFocusListener(listener);
-			Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
+			Object bo = getBusinessObject(pe);
 			// the filter assured, that it is a EClass
 			if (bo == null)
 				return;
@@ -133,16 +132,12 @@ public class PropertyAlfrescoMailTaskSection extends ActivitiPropertySection imp
 		public void focusLost(final FocusEvent e) {
 			PictogramElement pe = getSelectedPictogramElement();
 			if (pe != null) {
-				Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
+				final Object bo = getBusinessObject(pe);
 				if (bo instanceof AlfrescoMailTask) {
 					DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
 					TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
 					ActivitiUiUtil.runModelChange(new Runnable() {
 						public void run() {
-							Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(getSelectedPictogramElement());
-							if (bo == null) {
-								return;
-							}
 							AlfrescoMailTask mailTask = (AlfrescoMailTask)  bo;
 							if (toText.getText() != null) {
 								mailTask.setTo(toText.getText());

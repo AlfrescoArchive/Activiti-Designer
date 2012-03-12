@@ -21,11 +21,11 @@ import org.activiti.designer.bpmn2.model.Activity;
 import org.activiti.designer.bpmn2.model.Process;
 import org.activiti.designer.bpmn2.model.SequenceFlow;
 import org.activiti.designer.model.FieldExtensionModel;
+import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.services.Graphiti;
 
 
 /**
@@ -34,11 +34,12 @@ import org.eclipse.graphiti.services.Graphiti;
 public class BpmnBOUtil {
   
   public static Object getExecutionListenerBO(PictogramElement pe, Diagram diagram) {
+  	Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(diagram));
     Object bo = null;
     if(pe instanceof Diagram) {
-      bo = ModelHandler.getModel(EcoreUtil.getURI(diagram)).getProcess();
+      bo = model.getProcess();
     } else {
-      bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
+      bo = model.getFeatureProvider().getBusinessObjectForPictogramElement(pe);
     }
     return bo;
   }

@@ -19,7 +19,6 @@ import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -96,7 +95,7 @@ public class PropertyCallActivitySection extends ActivitiPropertySection impleme
 
     PictogramElement pe = getSelectedPictogramElement();
     if (pe != null) {
-      Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
+      Object bo = getBusinessObject(pe);
       // the filter assured, that it is a EClass
       if (bo == null)
         return;
@@ -210,17 +209,13 @@ public class PropertyCallActivitySection extends ActivitiPropertySection impleme
     public void focusLost(final FocusEvent e) {
       PictogramElement pe = getSelectedPictogramElement();
       if (pe != null) {
-        Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
+        final Object bo = getBusinessObject(pe);
         if (bo instanceof CallActivity) {
           DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
           TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
           ActivitiUiUtil.runModelChange(new Runnable() {
 
             public void run() {
-              Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(getSelectedPictogramElement());
-              if (bo == null) {
-                return;
-              }
               String calledElement = callElementText.getText();
               CallActivity callActivity = (CallActivity) bo;
               callActivity.setCalledElement(calledElement);

@@ -7,7 +7,6 @@ import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
@@ -170,8 +169,7 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 
 						ActivitiUiUtil.runModelChange(new Runnable() {
 							public void run() {
-								Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(
-										getSelectedPictogramElement());
+								Object bo = getBusinessObject(getSelectedPictogramElement());
 								if (bo == null) {
 									return;
 								}
@@ -280,7 +278,7 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 			expressionText.removeFocusListener(listener);
 			delegateExpressionText.removeFocusListener(listener);
 			resultVariableText.removeFocusListener(listener);
-			Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
+			Object bo = getBusinessObject(pe);
 			if (bo == null)
 				return;
 			
@@ -321,16 +319,12 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 	private void saveImplementationType(final String type) {
 		PictogramElement pe = getSelectedPictogramElement();
 		if (pe != null) {
-			Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
+			final Object bo = getBusinessObject(pe);
 			if (bo instanceof ServiceTask) {
 				DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
 				TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
 				ActivitiUiUtil.runModelChange(new Runnable() {
 					public void run() {
-						Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(getSelectedPictogramElement());
-						if (bo == null) {
-							return;
-						}
 						ServiceTask serviceTask = (ServiceTask)  bo;
 						serviceTask.setImplementationType(type);
 						serviceTask.setImplementation("");
@@ -368,16 +362,12 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 		public void focusLost(final FocusEvent e) {
 			PictogramElement pe = getSelectedPictogramElement();
 			if (pe != null) {
-				Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
+				final Object bo = getBusinessObject(pe);
 				if (bo instanceof ServiceTask) {
 					DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
 					TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
 					ActivitiUiUtil.runModelChange(new Runnable() {
 						public void run() {
-							Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(getSelectedPictogramElement());
-							if (bo == null) {
-								return;
-							}
 							ServiceTask serviceTask = (ServiceTask)  bo;
 							if (expressionText.isVisible() && expressionText.getText() != null) {
 								serviceTask.setImplementation(expressionText.getText());

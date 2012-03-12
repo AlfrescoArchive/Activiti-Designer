@@ -4,16 +4,14 @@ import org.activiti.designer.bpmn2.model.BoundaryEvent;
 import org.activiti.designer.bpmn2.model.EndEvent;
 import org.activiti.designer.bpmn2.model.ErrorEventDefinition;
 import org.activiti.designer.bpmn2.model.EventDefinition;
-import org.eclipse.emf.ecore.EObject;
+import org.activiti.designer.util.property.ActivitiPropertyFilter;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.services.Graphiti;
-import org.eclipse.graphiti.ui.platform.AbstractPropertySectionFilter;
 
-public class PropertyBoundaryErrorFilter extends AbstractPropertySectionFilter {
+public class PropertyBoundaryErrorFilter extends ActivitiPropertyFilter {
 	
 	@Override
 	protected boolean accept(PictogramElement pe) {
-		EObject bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
+		Object bo = getBusinessObject(pe);
 		if (bo instanceof BoundaryEvent) {
 		  if(((BoundaryEvent) bo).getEventDefinitions() != null) {
 		    for(EventDefinition eventDefinition : ((BoundaryEvent) bo).getEventDefinitions()) {

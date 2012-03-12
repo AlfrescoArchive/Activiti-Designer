@@ -45,7 +45,7 @@ public class PropertyStartEventSection extends ActivitiPropertySection implement
 		formKeyText.removeFocusListener(listener);
 		PictogramElement pe = getSelectedPictogramElement();
 		if (pe != null) {
-			Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
+			Object bo = getBusinessObject(pe);
 			// the filter assured, that it is a EClass
 			if (bo == null)
 				return;
@@ -64,19 +64,12 @@ public class PropertyStartEventSection extends ActivitiPropertySection implement
 		public void focusLost(final FocusEvent e) {
 			PictogramElement pe = getSelectedPictogramElement();
 			if (pe != null) {
-				Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
+				final Object bo = getBusinessObject(pe);
 				if (bo instanceof StartEvent) {
 					DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
 					TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
 					ActivitiUiUtil.runModelChange(new Runnable() {
 						public void run() {
-							Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(getSelectedPictogramElement());
-							if (bo == null) {
-								return;
-							}
-							if (bo instanceof StartEvent == false) {
-								return;
-							}
 							StartEvent startEvent = (StartEvent) bo;
 							
 							

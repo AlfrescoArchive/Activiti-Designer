@@ -12,7 +12,6 @@ import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
@@ -83,7 +82,7 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
     documentationText.removeFocusListener(listener);
     PictogramElement pe = getSelectedPictogramElement();
     if (pe != null) {
-      Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
+      Object bo = getBusinessObject(pe);
       if (bo == null)
         return;
 
@@ -164,18 +163,14 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
       currentType = performerType;
       PictogramElement pe = getSelectedPictogramElement();
       if (pe != null) {
-        Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
+        final Object bo = getBusinessObject(pe);
         if (bo instanceof UserTask) {
           DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
           TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
           ActivitiUiUtil.runModelChange(new Runnable() {
 
             public void run() {
-              Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(getSelectedPictogramElement());
-              if (bo == null) {
-                return;
-              }
-              org.activiti.designer.bpmn2.model.UserTask userTask = (UserTask) bo;
+              UserTask userTask = (UserTask) bo;
               String expression = expressionText.getText();
               if (performerType != null && expression != null && expression.length() > 0) {
                 if ("assignee".equalsIgnoreCase(performerType)) {

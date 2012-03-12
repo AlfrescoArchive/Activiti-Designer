@@ -1,16 +1,14 @@
 package org.activiti.designer.property;
 
 import org.activiti.designer.bpmn2.model.CallActivity;
-import org.eclipse.emf.ecore.EObject;
+import org.activiti.designer.util.property.ActivitiPropertyFilter;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.services.Graphiti;
-import org.eclipse.graphiti.ui.platform.AbstractPropertySectionFilter;
 
-public class PropertyCallActivityFilter extends AbstractPropertySectionFilter {
+public class PropertyCallActivityFilter extends ActivitiPropertyFilter {
 	
 	@Override
 	protected boolean accept(PictogramElement pe) {
-		EObject bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
+		Object bo = getBusinessObject(pe);
 		if (bo instanceof CallActivity) {
 			return true;
 		}

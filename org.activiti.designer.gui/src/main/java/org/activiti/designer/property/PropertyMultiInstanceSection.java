@@ -21,7 +21,6 @@ import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
@@ -116,7 +115,7 @@ public class PropertyMultiInstanceSection extends ActivitiPropertySection implem
 	  PictogramElement pe = getSelectedPictogramElement();
     if (pe == null) return;
     
-    Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
+    Object bo = getBusinessObject(pe);
     if (bo == null || bo instanceof Activity == false)
       return;
     
@@ -166,7 +165,7 @@ public class PropertyMultiInstanceSection extends ActivitiPropertySection implem
 	  PictogramElement pe = getSelectedPictogramElement();
     if (pe == null) return;
     
-    Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
+    final Object bo = getBusinessObject(pe);
     if (bo instanceof Activity == false) return;
     final Activity activity = (Activity) bo;
     
@@ -175,10 +174,6 @@ public class PropertyMultiInstanceSection extends ActivitiPropertySection implem
     TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
     ActivitiUiUtil.runModelChange(new Runnable() {
       public void run() {
-        Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(getSelectedPictogramElement());
-        if (bo == null) {
-          return;
-        }
         getMultiInstanceDef(activity).setSequential(sequential);
       }
     }, editingDomain, "Model Update");
@@ -193,7 +188,7 @@ public class PropertyMultiInstanceSection extends ActivitiPropertySection implem
 		  PictogramElement pe = getSelectedPictogramElement();
       if (pe == null) return;
       
-      Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
+      Object bo = getBusinessObject(pe);
       if (bo instanceof Activity == false) return;
       final Activity activity = (Activity) bo;
       
