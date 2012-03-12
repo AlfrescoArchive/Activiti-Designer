@@ -1,6 +1,7 @@
 package org.activiti.designer.property;
 
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 
 import org.activiti.designer.bpmn2.model.IntermediateCatchEvent;
 import org.activiti.designer.bpmn2.model.TimerEventDefinition;
@@ -23,8 +24,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
-
-import com.ibm.icu.text.SimpleDateFormat;
 
 public class PropertyIntermediateCatchTimerSection extends ActivitiPropertySection implements ITabbedPropertyConstants {
 

@@ -13,6 +13,7 @@
 
 package org.activiti.designer.eclipse.bpmn;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -57,8 +58,6 @@ import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.GraphicInfo;
 import org.activiti.designer.util.preferences.Preferences;
 import org.apache.commons.lang.StringUtils;
-
-import com.ibm.icu.text.SimpleDateFormat;
 
 /**
  * @author Tijs Rademakers

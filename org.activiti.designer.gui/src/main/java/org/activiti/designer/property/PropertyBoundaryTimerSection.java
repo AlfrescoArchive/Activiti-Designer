@@ -1,5 +1,6 @@
 package org.activiti.designer.property;
 
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
 
@@ -25,8 +26,6 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
-
-import com.ibm.icu.text.SimpleDateFormat;
 
 public class PropertyBoundaryTimerSection extends ActivitiPropertySection implements ITabbedPropertyConstants {
 
