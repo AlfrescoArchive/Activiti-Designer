@@ -3,14 +3,15 @@ package org.activiti.designer.features;
 import java.util.List;
 
 import org.activiti.designer.ActivitiImageProvider;
-import org.activiti.designer.eclipse.extension.ExtensionConstants;
+import org.activiti.designer.bpmn2.model.CustomProperty;
+import org.activiti.designer.bpmn2.model.ServiceTask;
+import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.integration.servicetask.CustomServiceTask;
 import org.activiti.designer.property.extension.util.ExtensionUtil;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
-import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.CustomProperty;
-import org.eclipse.bpmn2.ServiceTask;
-import org.eclipse.bpmn2.SubProcess;
+import org.activiti.designer.util.eclipse.ExtensionConstants;
+import org.activiti.designer.util.editor.ModelHandler;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -38,7 +39,7 @@ public class CreateServiceTaskFeature extends AbstractCreateFastBPMNFeature {
 
   @Override
   public Object[] create(ICreateContext context) {
-    ServiceTask newServiceTask = Bpmn2Factory.eINSTANCE.createServiceTask();
+    ServiceTask newServiceTask = new ServiceTask();
 
     newServiceTask.setId(getNextId());
     setName("Service Task", newServiceTask, context);
@@ -60,13 +61,11 @@ public class CreateServiceTaskFeature extends AbstractCreateFastBPMNFeature {
 
       if (targetTask != null) {
         // Create custom property containing task name
-        CustomProperty customServiceTaskProperty = Bpmn2Factory.eINSTANCE.createCustomProperty();
+        CustomProperty customServiceTaskProperty = new CustomProperty();
 
         customServiceTaskProperty.setId(ExtensionUtil.wrapCustomPropertyId(newServiceTask, ExtensionConstants.PROPERTY_ID_CUSTOM_SERVICE_TASK));
         customServiceTaskProperty.setName(ExtensionConstants.PROPERTY_ID_CUSTOM_SERVICE_TASK);
         customServiceTaskProperty.setSimpleValue(this.customServiceTaskId);
-
-        getDiagram().eResource().getContents().add(customServiceTaskProperty);
 
         newServiceTask.getCustomProperties().add(customServiceTaskProperty);
         newServiceTask.setImplementation(targetTask.getRuntimeClassname());
@@ -79,7 +78,7 @@ public class CreateServiceTaskFeature extends AbstractCreateFastBPMNFeature {
     if (parentObject instanceof SubProcess) {
       ((SubProcess) parentObject).getFlowElements().add(newServiceTask);
     } else {
-      getDiagram().eResource().getContents().add(newServiceTask);
+    	ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).addFlowElement(newServiceTask);
     }
 
     addGraphicalContent(newServiceTask, context);
@@ -100,7 +99,7 @@ public class CreateServiceTaskFeature extends AbstractCreateFastBPMNFeature {
   @SuppressWarnings("rawtypes")
   @Override
   protected Class getFeatureClass() {
-    return Bpmn2Factory.eINSTANCE.createServiceTask().getClass();
+    return new ServiceTask().getClass();
   }
 
 }

@@ -14,8 +14,7 @@ package org.activiti.designer.export.bpmn20.export;
 
 import javax.xml.stream.XMLStreamWriter;
 
-import org.eclipse.bpmn2.Activity;
-import org.eclipse.emf.ecore.EObject;
+import org.activiti.designer.bpmn2.model.Activity;
 
 
 /**
@@ -23,7 +22,7 @@ import org.eclipse.emf.ecore.EObject;
  */
 public class AsyncActivityExport implements ActivitiNamespaceConstants {
 
-  public static void createDefaultFlow(EObject object, XMLStreamWriter xtw) throws Exception {
+  public static void createAsyncAttribute(Object object, XMLStreamWriter xtw) throws Exception {
     boolean async = false;
     if(object instanceof Activity) {
       Activity activity = (Activity) object;

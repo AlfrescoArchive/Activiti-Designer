@@ -1,9 +1,10 @@
 package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
+import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.designer.util.features.AbstractCreateBPMNFeature;
-import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.SubProcess;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -23,11 +24,11 @@ public class CreateEmbeddedSubProcessFeature extends AbstractCreateBPMNFeature {
 
 	@Override
 	public Object[] create(ICreateContext context) {
-		SubProcess newSubProcess = Bpmn2Factory.eINSTANCE.createSubProcess();
+		SubProcess newSubProcess = new SubProcess();
 		newSubProcess.setId(getNextId());
 		newSubProcess.setName("Sub Process");
 
-		getDiagram().eResource().getContents().add(newSubProcess);
+		ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).addFlowElement(newSubProcess);
 
 		// do the add
 		addGraphicalRepresentation(context, newSubProcess);
@@ -50,7 +51,7 @@ public class CreateEmbeddedSubProcessFeature extends AbstractCreateBPMNFeature {
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected Class getFeatureClass() {
-		return Bpmn2Factory.eINSTANCE.createSubProcess().getClass();
+		return new SubProcess().getClass();
 	}
 
 }

@@ -3,10 +3,9 @@ package org.activiti.designer.property.ui;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.activiti.designer.bpmn2.model.CallActivity;
+import org.activiti.designer.bpmn2.model.IOParameter;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
-import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.CallActivity;
-import org.eclipse.bpmn2.IOParameter;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
@@ -133,7 +132,7 @@ public class IOParameterEditor extends TableFieldEditor {
                 parameter.setTarget(target);
                 newParameterList.add(parameter);
               } else {
-                IOParameter newParameter = Bpmn2Factory.eINSTANCE.createIOParameter();
+                IOParameter newParameter = new IOParameter();
                 newParameter.setSource(source);
                 newParameter.setTarget(target);
                 newParameterList.add(newParameter);

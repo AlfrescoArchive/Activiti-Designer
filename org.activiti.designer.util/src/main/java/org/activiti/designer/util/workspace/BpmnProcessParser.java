@@ -20,8 +20,7 @@ import java.util.Set;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
-import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.Process;
+import org.activiti.designer.bpmn2.model.Process;
 import org.eclipse.core.resources.IFile;
 
 /**
@@ -53,7 +52,7 @@ public class BpmnProcessParser {
         xtr.next();
 
         if (isProcessStartElement(xtr)) {
-          currentProcess = Bpmn2Factory.eINSTANCE.createProcess();
+          currentProcess = new Process();
           currentProcess.setId(xtr.getAttributeValue(null, "id"));
         } else if (isProcessEndElement(xtr)) {
           result.add(currentProcess);

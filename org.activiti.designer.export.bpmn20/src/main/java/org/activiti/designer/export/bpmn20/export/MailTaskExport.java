@@ -15,11 +15,10 @@ package org.activiti.designer.export.bpmn20.export;
 
 import javax.xml.stream.XMLStreamWriter;
 
+import org.activiti.designer.bpmn2.model.BoundaryEvent;
+import org.activiti.designer.bpmn2.model.MailTask;
+import org.activiti.designer.bpmn2.model.alfresco.AlfrescoMailTask;
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.bpmn2.AlfrescoMailTask;
-import org.eclipse.bpmn2.BoundaryEvent;
-import org.eclipse.bpmn2.MailTask;
-import org.eclipse.emf.ecore.EObject;
 
 
 /**
@@ -27,7 +26,7 @@ import org.eclipse.emf.ecore.EObject;
  */
 public class MailTaskExport implements ActivitiNamespaceConstants {
 
-  public static void createMailTask(EObject object, XMLStreamWriter xtw) throws Exception {
+  public static void createMailTask(Object object, XMLStreamWriter xtw) throws Exception {
   	if(object instanceof AlfrescoMailTask) {
   		writeAlfrescoScriptMailTask((AlfrescoMailTask) object, xtw);
   	} else {
@@ -46,11 +45,11 @@ public class MailTaskExport implements ActivitiNamespaceConstants {
     xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE,
             "class", "org.alfresco.repo.workflow.activiti.script.AlfrescoScriptDelegate");
     DefaultFlowExport.createDefaultFlow(mailTask, xtw);
-    AsyncActivityExport.createDefaultFlow(mailTask, xtw);
+    AsyncActivityExport.createAsyncAttribute(mailTask, xtw);
     
     xtw.writeStartElement("extensionElements");
     
-    ExtensionListenerExport.createExtensionListenerXML(mailTask.getActivitiListeners(), false, EXECUTION_LISTENER, xtw);
+    ExecutionListenerExport.createExecutionListenerXML(mailTask.getExecutionListeners(), false, xtw);
     
     xtw.writeStartElement(ACTIVITI_EXTENSIONS_PREFIX, "field", ACTIVITI_EXTENSIONS_NAMESPACE);
     xtw.writeAttribute("name", "script");
@@ -66,8 +65,8 @@ public class MailTaskExport implements ActivitiNamespaceConstants {
     // end AlfrescoMailTask element
     xtw.writeEndElement();
     
-    if(mailTask.getBoundaryEventRefs().size() > 0) {
-    	for(BoundaryEvent event : mailTask.getBoundaryEventRefs()) {
+    if(mailTask.getBoundaryEvents().size() > 0) {
+    	for(BoundaryEvent event : mailTask.getBoundaryEvents()) {
     		BoundaryEventExport.createBoundaryEvent(event, xtw);
     	}
     }
@@ -129,11 +128,11 @@ public class MailTaskExport implements ActivitiNamespaceConstants {
       xtw.writeAttribute("name", mailTask.getName());
     }
     DefaultFlowExport.createDefaultFlow(mailTask, xtw);
-    AsyncActivityExport.createDefaultFlow(mailTask, xtw);
+    AsyncActivityExport.createAsyncAttribute(mailTask, xtw);
     xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "type", "mail");
 
     xtw.writeStartElement("extensionElements");
-    ExtensionListenerExport.createExtensionListenerXML(mailTask.getActivitiListeners(), false, EXECUTION_LISTENER, xtw);
+    ExecutionListenerExport.createExecutionListenerXML(mailTask.getExecutionListeners(), false, xtw);
 
     if (mailTask.getTo() != null && mailTask.getTo().length() > 0) {
     	writeField("to", mailTask.getTo(), xtw);
@@ -163,8 +162,8 @@ public class MailTaskExport implements ActivitiNamespaceConstants {
     // end MailTask element
     xtw.writeEndElement();
     
-    if(mailTask.getBoundaryEventRefs().size() > 0) {
-    	for(BoundaryEvent event : mailTask.getBoundaryEventRefs()) {
+    if(mailTask.getBoundaryEvents().size() > 0) {
+    	for(BoundaryEvent event : mailTask.getBoundaryEvents()) {
     		BoundaryEventExport.createBoundaryEvent(event, xtw);
     	}
     }

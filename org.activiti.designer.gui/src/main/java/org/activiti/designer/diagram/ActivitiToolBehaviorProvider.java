@@ -1,15 +1,26 @@
 package org.activiti.designer.diagram;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
 
 import org.activiti.designer.ActivitiImageProvider;
+import org.activiti.designer.bpmn2.model.BusinessRuleTask;
+import org.activiti.designer.bpmn2.model.CallActivity;
+import org.activiti.designer.bpmn2.model.ExclusiveGateway;
+import org.activiti.designer.bpmn2.model.Gateway;
+import org.activiti.designer.bpmn2.model.InclusiveGateway;
+import org.activiti.designer.bpmn2.model.MailTask;
+import org.activiti.designer.bpmn2.model.ManualTask;
+import org.activiti.designer.bpmn2.model.ParallelGateway;
+import org.activiti.designer.bpmn2.model.ReceiveTask;
+import org.activiti.designer.bpmn2.model.ScriptTask;
+import org.activiti.designer.bpmn2.model.ServiceTask;
+import org.activiti.designer.bpmn2.model.StartEvent;
+import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.designer.bpmn2.model.Task;
+import org.activiti.designer.bpmn2.model.UserTask;
 import org.activiti.designer.eclipse.common.ActivitiBPMNDiagramConstants;
 import org.activiti.designer.eclipse.extension.AbstractDiagramWorker;
 import org.activiti.designer.eclipse.extension.validation.ProcessValidator;
@@ -19,7 +30,6 @@ import org.activiti.designer.features.CreateBoundaryErrorFeature;
 import org.activiti.designer.features.CreateBoundaryTimerFeature;
 import org.activiti.designer.features.CreateBusinessRuleTaskFeature;
 import org.activiti.designer.features.CreateCallActivityFeature;
-import org.activiti.designer.features.CreateCustomServiceTaskFeature;
 import org.activiti.designer.features.CreateEmbeddedSubProcessFeature;
 import org.activiti.designer.features.CreateEndEventFeature;
 import org.activiti.designer.features.CreateErrorEndEventFeature;
@@ -35,32 +45,11 @@ import org.activiti.designer.features.CreateStartEventFeature;
 import org.activiti.designer.features.CreateTimerCatchingEventFeature;
 import org.activiti.designer.features.CreateTimerStartEventFeature;
 import org.activiti.designer.features.CreateUserTaskFeature;
-import org.activiti.designer.features.DeleteSequenceFlowFeature;
-import org.activiti.designer.features.ExpandCollapseSubProcessFeature;
-import org.activiti.designer.features.SaveBpmnModelFeature;
 import org.activiti.designer.integration.palette.PaletteEntry;
-import org.activiti.designer.property.extension.CustomServiceTaskContext;
-import org.activiti.designer.property.extension.util.ExtensionUtil;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.features.AbstractCreateBPMNFeature;
 import org.activiti.designer.util.preferences.Preferences;
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.bpmn2.BusinessRuleTask;
-import org.eclipse.bpmn2.CallActivity;
-import org.eclipse.bpmn2.ExclusiveGateway;
-import org.eclipse.bpmn2.Gateway;
-import org.eclipse.bpmn2.InclusiveGateway;
-import org.eclipse.bpmn2.MailTask;
-import org.eclipse.bpmn2.ManualTask;
-import org.eclipse.bpmn2.ParallelGateway;
-import org.eclipse.bpmn2.ReceiveTask;
-import org.eclipse.bpmn2.ScriptTask;
-import org.eclipse.bpmn2.SequenceFlow;
-import org.eclipse.bpmn2.ServiceTask;
-import org.eclipse.bpmn2.StartEvent;
-import org.eclipse.bpmn2.SubProcess;
-import org.eclipse.bpmn2.Task;
-import org.eclipse.bpmn2.UserTask;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
@@ -90,22 +79,16 @@ import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.palette.IPaletteCompartmentEntry;
 import org.eclipse.graphiti.palette.IToolEntry;
-import org.eclipse.graphiti.palette.impl.ObjectCreationToolEntry;
 import org.eclipse.graphiti.palette.impl.PaletteCompartmentEntry;
 import org.eclipse.graphiti.platform.IPlatformImageConstants;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.tb.ContextButtonEntry;
-import org.eclipse.graphiti.tb.ContextMenuEntry;
 import org.eclipse.graphiti.tb.DefaultToolBehaviorProvider;
 import org.eclipse.graphiti.tb.IContextButtonPadData;
 import org.eclipse.graphiti.tb.IContextMenuEntry;
 import org.eclipse.graphiti.tb.IDecorator;
 import org.eclipse.graphiti.tb.ImageDecorator;
-import org.eclipse.graphiti.ui.internal.GraphitiUIPlugin;
 import org.eclipse.graphiti.ui.internal.services.GraphitiUiInternal;
-import org.eclipse.jface.resource.ImageRegistry;
-import org.eclipse.swt.graphics.Image;
-import org.eclipse.ui.PlatformUI;
 
 import com.alfresco.designer.gui.features.CreateAlfrescoMailTaskFeature;
 import com.alfresco.designer.gui.features.CreateAlfrescoScriptTaskFeature;
@@ -179,7 +162,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
   	taskContext.setTargetContainer((ContainerShape) pe.eContainer());
   	taskContext.putProperty("org.activiti.designer.connectionContext", connectionContext);
     
-    if (bo instanceof StartEvent || bo instanceof Task || bo instanceof CallActivity || bo instanceof Gateway) {
+  	if (bo instanceof StartEvent || bo instanceof Task || bo instanceof CallActivity || bo instanceof Gateway) {
     	
     	CreateUserTaskFeature userTaskfeature = new CreateUserTaskFeature(getFeatureProvider());
       ContextButtonEntry newUserTaskButton = new ContextButtonEntry(userTaskfeature, taskContext);
@@ -202,7 +185,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
       newEndButton.setIconId(ActivitiImageProvider.IMG_ENDEVENT_NONE);
       data.getDomainSpecificContextButtons().add(newEndButton);
     }
-    
+  	
     CreateConnectionContext ccc = new CreateConnectionContext();
     ccc.setSourcePictogramElement(pe);
     Anchor anchor = null;
@@ -364,25 +347,12 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
         EList<EObject> boList = pictogramElement.getLink().getBusinessObjects();
         if(boList != null) {
           for (EObject bObject : boList) {
-            if(bObject instanceof SequenceFlow) {
-              ContextMenuEntry subMenuDelete = new ContextMenuEntry(new DeleteSequenceFlowFeature(getFeatureProvider()), context);
-              subMenuDelete.setText("Delete sequence flow"); //$NON-NLS-1$
-              subMenuDelete.setSubmenu(false);
-              menuList.add(subMenuDelete);
-            }
+            
           }
         }
       }
     }
 
-    ContextMenuEntry subMenuExport = new ContextMenuEntry(new SaveBpmnModelFeature(getFeatureProvider()), context);
-    subMenuExport.setText("Export to BPMN 2.0 XML"); //$NON-NLS-1$
-    subMenuExport.setSubmenu(false);
-    menuList.add(subMenuExport);
-
-    ContextMenuEntry subMenuExpandOrCollapse = new ContextMenuEntry(new ExpandCollapseSubProcessFeature(getFeatureProvider()), context);
-    subMenuExpandOrCollapse.setText("Expand/Collapse Subprocess"); //$NON-NLS-1$
-    subMenuExpandOrCollapse.setSubmenu(false);
 
     return menuList.toArray(new IContextMenuEntry[menuList.size()]);
   }
@@ -493,50 +463,6 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
       ret.add(alfrescoCompartmentEntry);
     }
 
-    final Map<String, List<CustomServiceTaskContext>> tasksInDrawers = new HashMap<String, List<CustomServiceTaskContext>>();
-
-    final List<CustomServiceTaskContext> customServiceTaskContexts = ExtensionUtil.getCustomServiceTaskContexts(project);
-
-    final ImageRegistry reg = GraphitiUIPlugin.getDefault().getImageRegistry();
-    for (final CustomServiceTaskContext taskContext : customServiceTaskContexts) {
-      if (reg.get(taskContext.getSmallImageKey()) == null) {
-        reg.put(taskContext.getSmallImageKey(),
-                new Image(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().getDisplay(), taskContext.getSmallIconStream()));
-      }
-      if (reg.get(taskContext.getLargeImageKey()) == null) {
-        reg.put(taskContext.getLargeImageKey(),
-                new Image(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().getDisplay(), taskContext.getLargeIconStream()));
-      }
-      if (reg.get(taskContext.getShapeImageKey()) == null) {
-        reg.put(taskContext.getShapeImageKey(),
-                new Image(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().getDisplay(), taskContext.getShapeIconStream()));
-      }
-    }
-
-    for (final CustomServiceTaskContext taskContext : customServiceTaskContexts) {
-      if (!tasksInDrawers.containsKey(taskContext.getServiceTask().contributeToPaletteDrawer())) {
-        tasksInDrawers.put(taskContext.getServiceTask().contributeToPaletteDrawer(), new ArrayList<CustomServiceTaskContext>());
-      }
-      tasksInDrawers.get(taskContext.getServiceTask().contributeToPaletteDrawer()).add(taskContext);
-    }
-
-    for (final Entry<String, List<CustomServiceTaskContext>> drawer : tasksInDrawers.entrySet()) {
-
-      // Sort the list
-      Collections.sort(drawer.getValue());
-
-      final IPaletteCompartmentEntry paletteCompartmentEntry = new PaletteCompartmentEntry(drawer.getKey(), null);
-
-      for (final CustomServiceTaskContext currentDrawerItem : drawer.getValue()) {
-        final CreateCustomServiceTaskFeature feature = new CreateCustomServiceTaskFeature(getFeatureProvider(), currentDrawerItem.getServiceTask().getName(),
-                currentDrawerItem.getServiceTask().getDescription(), currentDrawerItem.getServiceTask().getClass().getCanonicalName());
-        final IToolEntry entry = new ObjectCreationToolEntry(currentDrawerItem.getServiceTask().getName(), currentDrawerItem.getServiceTask().getDescription(),
-                currentDrawerItem.getSmallImageKey(), null, feature);
-        paletteCompartmentEntry.getToolEntries().add(entry);
-      }
-      ret.add(paletteCompartmentEntry);
-    }
-
     return ret.toArray(new IPaletteCompartmentEntry[ret.size()]);
   }
 
@@ -549,30 +475,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
    */
   private void pruneDisabledPaletteEntries(final IProject project, final IPaletteCompartmentEntry entry) {
 
-    final Set<PaletteEntry> disabledPaletteEntries = ExtensionUtil.getDisabledPaletteEntries(project);
-
-    if (!disabledPaletteEntries.isEmpty()) {
-
-      final Iterator<IToolEntry> entryIterator = entry.getToolEntries().iterator();
-
-      while (entryIterator.hasNext()) {
-
-        final IToolEntry toolEntry = entryIterator.next();
-
-        if (disabledPaletteEntries.contains(PaletteEntry.ALL)) {
-          entryIterator.remove();
-        } else {
-          if (toolEntry instanceof ObjectCreationToolEntry) {
-            final ObjectCreationToolEntry objToolEntry = (ObjectCreationToolEntry) toolEntry;
-            if (toolMapping.containsKey(objToolEntry.getCreateFeature().getClass())) {
-              if (disabledPaletteEntries.contains(toolMapping.get(objToolEntry.getCreateFeature().getClass()))) {
-                entryIterator.remove();
-              }
-            }
-          }
-        }
-      }
-    }
+    
   }
 
   @Override
@@ -594,52 +497,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
         imageRenderingDecorator.setMessage("This subprocess does not have a diagram model yet");//$NON-NLS-1$
         return new IDecorator[] { imageRenderingDecorator };
       }*/
-    } else if (bo instanceof ServiceTask && bo instanceof EObject && ExtensionUtil.isCustomServiceTask((EObject) bo)) {
-
-      final Resource resource = pe.getLink().eResource();
-      final IResource res = ResourcesPlugin.getWorkspace().getRoot().findMember(resource.getURI().toPlatformString(true));
-
-      final List<IMarker> markers = getMarkers(res, (ServiceTask) bo);
-
-      if (markers.size() > 0) {
-
-        int maximumSeverity = 0;
-
-        try {
-          for (final IMarker marker : markers) {
-            final Object severity = marker.getAttribute(IMarker.SEVERITY);
-            if (severity != null && severity instanceof Integer) {
-              maximumSeverity = Math.max(maximumSeverity, (Integer) severity);
-            }
-          }
-        } catch (CoreException e) {
-          e.printStackTrace();
-        }
-
-        String decoratorImagePath = null;
-
-        switch (maximumSeverity) {
-        case IMarker.SEVERITY_INFO:
-          decoratorImagePath = IPlatformImageConstants.IMG_ECLIPSE_INFORMATION_TSK;
-          break;
-        case IMarker.SEVERITY_WARNING:
-          decoratorImagePath = IPlatformImageConstants.IMG_ECLIPSE_WARNING_TSK;
-          break;
-        default:
-          decoratorImagePath = IPlatformImageConstants.IMG_ECLIPSE_ERROR_TSK;
-        }
-
-        final ImageDecorator imageRenderingDecorator = new ImageDecorator(decoratorImagePath);
-        imageRenderingDecorator.setMessage("There are validation markers for the properties of this node");//$NON-NLS-1$ 
-        imageRenderingDecorator.setX(pe.getGraphicsAlgorithm().getWidth() / 2 - 10);
-        imageRenderingDecorator.setY(4);
-
-        return new IDecorator[] { imageRenderingDecorator };
-
-      } else {
-        return new IDecorator[] {};
-      }
-    }
+    } 
     return super.getDecorators(pe);
   }
   protected List<IMarker> getMarkers(IResource resource, ServiceTask serviceTask) {

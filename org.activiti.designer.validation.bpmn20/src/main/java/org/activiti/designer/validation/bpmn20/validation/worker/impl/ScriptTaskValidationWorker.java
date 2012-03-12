@@ -5,12 +5,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.designer.bpmn2.model.ScriptTask;
 import org.activiti.designer.validation.bpmn20.validation.worker.ProcessValidationWorker;
 import org.activiti.designer.validation.bpmn20.validation.worker.ProcessValidationWorkerMarker;
-import org.eclipse.bpmn2.ScriptTask;
-import org.eclipse.bpmn2.impl.ScriptTaskImpl;
 import org.eclipse.core.resources.IMarker;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 
 /**
@@ -27,14 +25,14 @@ public class ScriptTaskValidationWorker implements ProcessValidationWorker {
   private static final String NO_SCRIPT_EXCEPTION_MESSAGE_PATTERN = "ScriptTask '%s' has no format specified";
 
   @Override
-  public Collection<ProcessValidationWorkerMarker> validate(final Diagram diagram, final Map<String, List<EObject>> processNodes) {
+  public Collection<ProcessValidationWorkerMarker> validate(final Diagram diagram, final Map<String, List<Object>> processNodes) {
 
     final Collection<ProcessValidationWorkerMarker> result = new ArrayList<ProcessValidationWorkerMarker>();
 
-    final List<EObject> scriptTasks = processNodes.get(ScriptTaskImpl.class.getCanonicalName());
+    final List<Object> scriptTasks = processNodes.get(ScriptTask.class.getCanonicalName());
 
     if (scriptTasks != null && !scriptTasks.isEmpty()) {
-      for (final EObject object : scriptTasks) {
+      for (final Object object : scriptTasks) {
 
         final ScriptTask scriptTask = (ScriptTask) object;
         if (scriptTask.getScriptFormat() == null || scriptTask.getScriptFormat().length() == 0) {

@@ -13,7 +13,7 @@
 
 package org.activiti.designer.features;
 
-import org.eclipse.bpmn2.SubProcess;
+import org.activiti.designer.bpmn2.model.SubProcess;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IResizeShapeContext;
 import org.eclipse.graphiti.features.impl.DefaultResizeShapeFeature;

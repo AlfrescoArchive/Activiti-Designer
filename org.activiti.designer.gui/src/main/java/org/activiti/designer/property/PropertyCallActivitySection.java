@@ -4,13 +4,13 @@ import java.util.Set;
 
 import org.activiti.designer.Activator;
 import org.activiti.designer.PluginImage;
+import org.activiti.designer.bpmn2.model.CallActivity;
 import org.activiti.designer.eclipse.common.ActivitiBPMNDiagramConstants;
 import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.activiti.designer.util.workspace.ActivitiWorkspaceUtil;
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.bpmn2.CallActivity;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;

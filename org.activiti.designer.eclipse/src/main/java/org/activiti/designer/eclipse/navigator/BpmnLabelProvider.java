@@ -1,9 +1,9 @@
 package org.activiti.designer.eclipse.navigator;
 
+import org.activiti.designer.bpmn2.model.BaseElement;
 import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.eclipse.navigator.nodes.BpmnElementsNode;
 import org.activiti.designer.eclipse.navigator.nodes.base.IContainerNode;
-import org.eclipse.bpmn2.BaseElement;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;

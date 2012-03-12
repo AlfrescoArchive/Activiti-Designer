@@ -11,9 +11,9 @@
  * limitations under the License.
  */
 
-package org.activiti.designer.eclipse.bpmn;
+package org.activiti.designer.util.editor;
 
-import org.eclipse.bpmn2.FlowElement;
+import org.activiti.designer.bpmn2.model.FlowElement;
 
 
 /**

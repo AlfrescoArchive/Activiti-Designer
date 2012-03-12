@@ -21,10 +21,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.eclipse.common.ActivitiBPMNDiagramConstants;
 import org.activiti.designer.eclipse.extension.export.ExportMarshaller;
 import org.activiti.designer.eclipse.extension.validation.ProcessValidator;
-import org.eclipse.bpmn2.FlowElement;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
@@ -251,40 +251,38 @@ public abstract class AbstractDiagramWorker {
    *         and the value is a list of all constructs of that type found in the
    *         diagram.
    */
-  protected Map<String, List<EObject>> extractProcessConstructs(final List<EObject> objects, final IProgressMonitor monitor) {
+  protected Map<String, List<Object>> extractProcessConstructs(final List<FlowElement> objects, final IProgressMonitor monitor) {
 
     monitor.beginTask("Analyzing process constructs", objects.size() * EXTRACTION_WORK_UNIT);
 
-    final Map<String, List<EObject>> result = new HashMap<String, List<EObject>>();
+    final Map<String, List<Object>> result = new HashMap<String, List<Object>>();
 
-    for (final EObject object : objects) {
+    for (final FlowElement object : objects) {
 
-      if (object instanceof FlowElement) {
-        String nodeType = null;
+      String nodeType = null;
 
-        // TODO: custom service tasks
-        // if (ExtensionUtil.isCustomServiceTask(object)) {
-        //
-        // final ServiceTask serviceTask = (ServiceTask) object;
-        // final CustomProperty customProperty =
-        // ExtensionUtil.getCustomProperty(serviceTask,
-        // ExtensionConstants.PROPERTY_ID_CUSTOM_SERVICE_TASK);
-        //
-        // if (customProperty != null) {
-        // final String nodeType = customProperty.getSimpleValue();
-        //
-        //
-        // }
-        // }
+      // TODO: custom service tasks
+      // if (ExtensionUtil.isCustomServiceTask(object)) {
+      //
+      // final ServiceTask serviceTask = (ServiceTask) object;
+      // final CustomProperty customProperty =
+      // ExtensionUtil.getCustomProperty(serviceTask,
+      // ExtensionConstants.PROPERTY_ID_CUSTOM_SERVICE_TASK);
+      //
+      // if (customProperty != null) {
+      // final String nodeType = customProperty.getSimpleValue();
+      //
+      //
+      // }
+      // }
 
-        nodeType = object.getClass().getCanonicalName();
+      nodeType = object.getClass().getCanonicalName();
 
-        if (nodeType != null) {
-          if (!result.containsKey(nodeType)) {
-            result.put(nodeType, new ArrayList<EObject>());
-          }
-          result.get(nodeType).add(object);
+      if (nodeType != null) {
+        if (!result.containsKey(nodeType)) {
+          result.put(nodeType, new ArrayList<Object>());
         }
+        result.get(nodeType).add(object);
       }
 
       monitor.worked(EXTRACTION_WORK_UNIT);

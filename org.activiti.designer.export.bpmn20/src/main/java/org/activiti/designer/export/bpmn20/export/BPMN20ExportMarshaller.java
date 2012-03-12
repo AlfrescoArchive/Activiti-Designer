@@ -3,52 +3,38 @@
  */
 package org.activiti.designer.export.bpmn20.export;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.List;
 
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 
-import org.activiti.designer.eclipse.common.ActivitiBPMNDiagramConstants;
-import org.activiti.designer.eclipse.extension.export.AbstractExportMarshaller;
-import org.activiti.designer.eclipse.extension.export.ExportMarshaller;
-import org.activiti.designer.eclipse.extension.validation.ProcessValidator;
-import org.activiti.designer.eclipse.preferences.PreferencesUtil;
-import org.activiti.designer.eclipse.util.ExtensionPointUtil;
-import org.activiti.designer.util.preferences.Preferences;
+import org.activiti.designer.bpmn2.model.BoundaryEvent;
+import org.activiti.designer.bpmn2.model.BusinessRuleTask;
+import org.activiti.designer.bpmn2.model.CallActivity;
+import org.activiti.designer.bpmn2.model.EndEvent;
+import org.activiti.designer.bpmn2.model.ErrorEventDefinition;
+import org.activiti.designer.bpmn2.model.ExclusiveGateway;
+import org.activiti.designer.bpmn2.model.FlowElement;
+import org.activiti.designer.bpmn2.model.InclusiveGateway;
+import org.activiti.designer.bpmn2.model.IntermediateCatchEvent;
+import org.activiti.designer.bpmn2.model.MailTask;
+import org.activiti.designer.bpmn2.model.ManualTask;
+import org.activiti.designer.bpmn2.model.ParallelGateway;
+import org.activiti.designer.bpmn2.model.ReceiveTask;
+import org.activiti.designer.bpmn2.model.ScriptTask;
+import org.activiti.designer.bpmn2.model.SequenceFlow;
+import org.activiti.designer.bpmn2.model.ServiceTask;
+import org.activiti.designer.bpmn2.model.StartEvent;
+import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.designer.bpmn2.model.TimerEventDefinition;
+import org.activiti.designer.bpmn2.model.UserTask;
+import org.activiti.designer.bpmn2.model.alfresco.AlfrescoScriptTask;
+import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.bpmn2.AlfrescoScriptTask;
-import org.eclipse.bpmn2.BoundaryEvent;
-import org.eclipse.bpmn2.BusinessRuleTask;
-import org.eclipse.bpmn2.CallActivity;
-import org.eclipse.bpmn2.EndEvent;
-import org.eclipse.bpmn2.ErrorEventDefinition;
-import org.eclipse.bpmn2.ExclusiveGateway;
-import org.eclipse.bpmn2.FlowElement;
-import org.eclipse.bpmn2.FlowNode;
-import org.eclipse.bpmn2.FormalExpression;
-import org.eclipse.bpmn2.InclusiveGateway;
-import org.eclipse.bpmn2.IntermediateCatchEvent;
-import org.eclipse.bpmn2.MailTask;
-import org.eclipse.bpmn2.ManualTask;
-import org.eclipse.bpmn2.ParallelGateway;
-import org.eclipse.bpmn2.Process;
-import org.eclipse.bpmn2.ReceiveTask;
-import org.eclipse.bpmn2.ScriptTask;
-import org.eclipse.bpmn2.SequenceFlow;
-import org.eclipse.bpmn2.ServiceTask;
-import org.eclipse.bpmn2.StartEvent;
-import org.eclipse.bpmn2.SubProcess;
-import org.eclipse.bpmn2.TimerEventDefinition;
-import org.eclipse.bpmn2.UserTask;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.NullProgressMonitor;
-import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.graphiti.mm.pictograms.Diagram;
+import org.eclipse.graphiti.features.IFeatureProvider;
 
 /**
  * @author Tiese Barrell
@@ -56,128 +42,36 @@ import org.eclipse.graphiti.mm.pictograms.Diagram;
  * @version 2
  * 
  */
-public class BPMN20ExportMarshaller extends AbstractExportMarshaller implements ActivitiNamespaceConstants {
-
-  private static final String FILENAME_PATTERN = ExportMarshaller.PLACEHOLDER_ORIGINAL_FILENAME_WITHOUT_EXTENSION + ".bpmn20.xml";
+public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
 
   private static final int WORK_VALIDATION = 40;
   private static final int WORK_EXPORT = 60;
   private static final int WORK_TOTAL = WORK_VALIDATION + WORK_EXPORT;
 
-  private IProgressMonitor monitor;
-  private Diagram diagram;
+  private Bpmn2MemoryModel model;
+  private String modelFileName;
+  private IFeatureProvider featureProvider;
   private IndentingXMLStreamWriter xtw;
 
-  /**
-	 * 
-	 */
-  public BPMN20ExportMarshaller() {
-  }
-
-  @Override
-  public String getMarshallerName() {
-    return ActivitiBPMNDiagramConstants.BPMN_MARSHALLER_NAME;
-  }
-
-  @Override
-  public String getFormatName() {
-    return "Activiti BPMN 2.0";
-  }
-
-  @Override
-  public void marshallDiagram(Diagram diagram, IProgressMonitor monitor) {
-    this.monitor = monitor;
-    this.diagram = diagram;
-
-    this.monitor.beginTask("Exporting to BPMN 2.0", WORK_TOTAL);
-
-    // Clear problems for this diagram first
-    clearMarkers(getResource(diagram.eResource().getURI()));
-
-    boolean performMarshalling = true;
-
-    // Retrieve validatorId to allow for overriding the default validator
-    String validatorId = getValidatorId();
-
-    if (isValidationEnabled(validatorId)) {
-      boolean validBpmn = invokeValidator(validatorId, diagram, new SubProgressMonitor(this.monitor, WORK_VALIDATION));
-
-      if (!validBpmn) {
-
-        // Get the behavior required
-        final String behavior = PreferencesUtil.getStringPreference(Preferences.SKIP_BPMN_MARSHALLER_ON_VALIDATION_FAILURE);
-
-        // Flag marshalling to be skipped if the behavior is to skip or not
-        // defined (mirrors default behavior)
-        if (behavior == null || ActivitiBPMNDiagramConstants.BPMN_MARSHALLER_VALIDATION_SKIP.equals(behavior)) {
-          performMarshalling = false;
-          // add additional marker for user
-          addProblemToDiagram(diagram, "Marshalling to " + getFormatName() + " format was skipped because validation of the diagram failed.", null);
-        }
-      }
-    } else {
-      this.monitor.worked(WORK_VALIDATION);
-    }
-
-    if (performMarshalling) {
-      marshallBPMNDiagram();
-      this.monitor.worked(WORK_EXPORT);
-    }
-    this.monitor.done();
-  }
-  /**
-   * Gets the identifier of the {@link ProcessValidator} to be invoked from this
-   * marshaller. This implementation provides the default value of
-   * {@link ActivitiBPMNDiagramConstants#BPMN_VALIDATOR_ID}. Override this
-   * method to use this export marshaller for all BPMN 2.0 marshalling, but use
-   * your own {@link ProcessValidator} instead of the one provided by Activiti
-   * Designer by default.
-   * 
-   * @return The string identifier of the {@link ProcessValidator}, may not be
-   *         null or empty or validation will be skipped.
-   */
-  public String getValidatorId() {
-    return ActivitiBPMNDiagramConstants.BPMN_VALIDATOR_ID;
-  }
-
-  private boolean isValidationEnabled(String validatorId) {
-
-    boolean result = true;
-
-    if (ActivitiBPMNDiagramConstants.BPMN_VALIDATOR_ID.equals(validatorId)) {
-      // Validate if the BPMN validator is checked in the preferences
-      result = PreferencesUtil.getBooleanPreference(Preferences.VALIDATE_ACTIVITI_BPMN_FORMAT);
-    } else {
-      result = StringUtils.isNotBlank(validatorId) && ExtensionPointUtil.getProcessValidator(validatorId) != null;
-    }
-
-    return result;
+  public void marshallDiagram(Bpmn2MemoryModel model, String modelFileName, IFeatureProvider featureProvider) {
+    this.model = model;
+    this.modelFileName = modelFileName;
+    this.featureProvider = featureProvider;
+    marshallBPMNDiagram();
   }
 
   private void marshallBPMNDiagram() {
     try {
 
+    	File objectsFile = new File(modelFileName);
+			
+			FileOutputStream fos = new FileOutputStream(objectsFile);
+    	
       XMLOutputFactory xof = XMLOutputFactory.newInstance();
-      ByteArrayOutputStream baos = new ByteArrayOutputStream();
-      OutputStreamWriter out = new OutputStreamWriter(baos, "UTF-8");
+      OutputStreamWriter out = new OutputStreamWriter(fos, "UTF-8");
 
       XMLStreamWriter writer = xof.createXMLStreamWriter(out);
       xtw = new IndentingXMLStreamWriter(writer);
-
-      final EList<EObject> contents = diagram.eResource().getContents();
-
-      Process process = null;
-
-      for (final EObject eObject : contents) {
-        if (eObject instanceof Process) {
-          process = (Process) eObject;
-          break;
-        }
-      }
-
-      if (process == null) {
-        addProblemToDiagram(diagram, "Process cannot be null", null);
-      }
 
       xtw.writeStartDocument("UTF-8", "1.0");
 
@@ -192,40 +86,32 @@ public class BPMN20ExportMarshaller extends AbstractExportMarshaller implements 
       xtw.writeNamespace(OMGDI_PREFIX, OMGDI_NAMESPACE);
       xtw.writeAttribute("typeLanguage", SCHEMA_NAMESPACE);
       xtw.writeAttribute("expressionLanguage", XPATH_NAMESPACE);
-      if (process != null && StringUtils.isNotEmpty(process.getNamespace())) {
-        xtw.writeAttribute("targetNamespace", process.getNamespace());
+      if (model.getProcess() != null && StringUtils.isNotEmpty(model.getProcess().getNamespace())) {
+        xtw.writeAttribute("targetNamespace", model.getProcess().getNamespace());
       } else {
         xtw.writeAttribute("targetNamespace", PROCESS_NAMESPACE);
       }
 
       // start process element
       xtw.writeStartElement("process");
-      xtw.writeAttribute("id", process.getId());
-      xtw.writeAttribute("name", process.getName());
-      ExtensionListenerExport.createExtensionListenerXML(process.getExecutionListeners(), true, EXECUTION_LISTENER, xtw);
-      if (process.getDocumentation() != null && process.getDocumentation().size() > 0 && process.getDocumentation().get(0) != null
-              && process.getDocumentation().get(0).getText() != null && process.getDocumentation().get(0).getText().length() > 0) {
+      xtw.writeAttribute("id", "test");
+      xtw.writeAttribute("name", "test");
+      ExecutionListenerExport.createExecutionListenerXML(model.getProcess().getExecutionListeners(), true, xtw);
+      if (StringUtils.isNotEmpty(model.getProcess().getDocumentation())) {
 
         xtw.writeStartElement("documentation");
-        xtw.writeCharacters(process.getDocumentation().get(0).getText());
+        xtw.writeCharacters(model.getProcess().getDocumentation());
         xtw.writeEndElement();
       }
-
-      for (EObject object : contents) {
-        if (object instanceof FlowNode) {
-          FlowNode node = (FlowNode) object;
-          if (node.getIncoming().size() == 0 && node.getOutgoing().size() == 0 && node instanceof BoundaryEvent == false &&
-      				node instanceof EndEvent == false) {
-            continue;
-          }
-        }
-        createXML(object);
+      
+      for (FlowElement flowElement : model.getProcess().getFlowElements()) {
+	      createXML(flowElement);
       }
 
       // end process element
       xtw.writeEndElement();
 
-      BpmnDIExport.createDIXML(process, diagram, xtw);
+      BpmnDIExport.createDIXML(model.getProcess(), featureProvider, xtw);
 
       // end definitions root element
       xtw.writeEndElement();
@@ -233,18 +119,15 @@ public class BPMN20ExportMarshaller extends AbstractExportMarshaller implements 
 
       xtw.flush();
 
-      final byte[] bytes = baos.toByteArray();
-      final ByteArrayInputStream bais = new ByteArrayInputStream(bytes);
-      saveResource(getRelativeURIForDiagram(diagram, FILENAME_PATTERN), bais, new NullProgressMonitor());
+      fos.close();
 
       xtw.close();
     } catch (Exception e) {
       e.printStackTrace();
-      addProblemToDiagram(diagram, "An exception occurred while creating the BPMN 2.0 XML: " + e.getMessage(), null);
     }
   }
 
-  private void createXML(EObject object) throws Exception {
+  private void createXML(FlowElement object) throws Exception {
     if (object instanceof StartEvent) {
       StartEvent startEvent = (StartEvent) object;
       // start StartEvent element
@@ -264,32 +147,28 @@ public class BPMN20ExportMarshaller extends AbstractExportMarshaller implements 
 
         TimerEventDefinition timerDef = (TimerEventDefinition) startEvent.getEventDefinitions().get(0);
 
-        if (timerDef.getTimeDuration() != null
-                && ((((FormalExpression) timerDef.getTimeDuration()).getBody() != null && ((FormalExpression) timerDef.getTimeDuration()).getBody().length() > 0)
-                        ||
-
-                        (((FormalExpression) timerDef.getTimeDate()).getBody() != null && ((FormalExpression) timerDef.getTimeDate()).getBody().length() > 0) ||
-
-                (((FormalExpression) timerDef.getTimeCycle()).getBody() != null && ((FormalExpression) timerDef.getTimeCycle()).getBody().length() > 0))) {
+        if ((timerDef.getTimeDuration() != null && timerDef.getTimeDuration().length() > 0) ||
+                timerDef.getTimeDate() != null ||
+                (timerDef.getTimeCycle() != null && timerDef.getTimeCycle().length() > 0)) {
 
           xtw.writeStartElement("timerEventDefinition");
 
-          if (((FormalExpression) timerDef.getTimeDuration()).getBody() != null && ((FormalExpression) timerDef.getTimeDuration()).getBody().length() > 0) {
+          if (timerDef.getTimeDuration().length() > 0) {
 
             xtw.writeStartElement("timeDuration");
-            xtw.writeCharacters(((FormalExpression) timerDef.getTimeDuration()).getBody());
+            xtw.writeCharacters(timerDef.getTimeDuration());
             xtw.writeEndElement();
 
-          } else if (((FormalExpression) timerDef.getTimeDate()).getBody() != null && ((FormalExpression) timerDef.getTimeDate()).getBody().length() > 0) {
+          } else if (timerDef.getTimeDate() != null) {
 
             xtw.writeStartElement("timeDate");
-            xtw.writeCharacters(((FormalExpression) timerDef.getTimeDate()).getBody());
+            xtw.writeCharacters(timerDef.getTimeDate().toString());
             xtw.writeEndElement();
 
           } else {
 
             xtw.writeStartElement("timeCycle");
-            xtw.writeCharacters(((FormalExpression) timerDef.getTimeCycle()).getBody());
+            xtw.writeCharacters(timerDef.getTimeCycle());
             xtw.writeEndElement();
           }
 
@@ -408,9 +287,9 @@ public class BPMN20ExportMarshaller extends AbstractExportMarshaller implements 
         }
         
         DefaultFlowExport.createDefaultFlow(object, xtw);
-        AsyncActivityExport.createDefaultFlow(object, xtw);
+        AsyncActivityExport.createAsyncAttribute(object, xtw);
 
-        ExtensionListenerExport.createExtensionListenerXML(subProcess.getActivitiListeners(), true, EXECUTION_LISTENER, xtw);
+        ExecutionListenerExport.createExecutionListenerXML(subProcess.getExecutionListeners(), true, xtw);
         MultiInstanceExport.createMultiInstance(object, xtw);
 
         for (FlowElement flowElement : flowElementList) {
@@ -420,8 +299,8 @@ public class BPMN20ExportMarshaller extends AbstractExportMarshaller implements 
         // end SubProcess element
         xtw.writeEndElement();
         
-        if(subProcess.getBoundaryEventRefs().size() > 0) {
-        	for(BoundaryEvent event : subProcess.getBoundaryEventRefs()) {
+        if(subProcess.getBoundaryEvents().size() > 0) {
+        	for(BoundaryEvent event : subProcess.getBoundaryEvents()) {
         		BoundaryEventExport.createBoundaryEvent(event, xtw);
         	}
         }

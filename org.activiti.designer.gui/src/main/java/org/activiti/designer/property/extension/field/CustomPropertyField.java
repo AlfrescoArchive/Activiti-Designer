@@ -13,9 +13,9 @@
 
 package org.activiti.designer.property.extension.field;
 
+import org.activiti.designer.bpmn2.model.ComplexDataType;
+import org.activiti.designer.bpmn2.model.CustomProperty;
 import org.activiti.designer.integration.servicetask.PropertyType;
-import org.eclipse.bpmn2.ComplexDataType;
-import org.eclipse.bpmn2.CustomProperty;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;

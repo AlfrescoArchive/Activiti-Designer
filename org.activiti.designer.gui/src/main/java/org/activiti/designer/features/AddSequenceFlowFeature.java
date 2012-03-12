@@ -1,18 +1,15 @@
 package org.activiti.designer.features;
 
-import java.util.Collection;
 import java.util.List;
 
-import org.activiti.designer.eclipse.bpmn.GraphicInfo;
+import org.activiti.designer.bpmn2.model.EndEvent;
+import org.activiti.designer.bpmn2.model.FlowNode;
+import org.activiti.designer.bpmn2.model.Gateway;
+import org.activiti.designer.bpmn2.model.SequenceFlow;
+import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.designer.util.editor.GraphicInfo;
 import org.activiti.designer.util.style.StyleUtil;
-import org.eclipse.bpmn2.EndEvent;
-import org.eclipse.bpmn2.FlowNode;
-import org.eclipse.bpmn2.Gateway;
-import org.eclipse.bpmn2.SequenceFlow;
-import org.eclipse.bpmn2.SubProcess;
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddConnectionContext;
 import org.eclipse.graphiti.features.context.IAddContext;
@@ -31,7 +28,6 @@ import org.eclipse.graphiti.mm.pictograms.ConnectionDecorator;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.FreeFormConnection;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.mm.pictograms.PictogramLink;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
@@ -251,19 +247,7 @@ public class AddSequenceFlowFeature extends AbstractAddFeature {
 		return polyline;
 	}
 
-	private PictogramElement getPictogramElement(EObject businessObject) {
-		Collection<PictogramLink> pictogramLinks = getDiagram().getPictogramLinks();
-		for (PictogramLink pictogramLink : pictogramLinks) {
-			List<EObject> businessObjects = pictogramLink.getBusinessObjects();
-			for (EObject obj : businessObjects) {
-				if (EcoreUtil.equals((EObject) businessObject, obj)) {
-					PictogramElement pe = pictogramLink.getPictogramElement();
-					if (pe != null) {
-						return pe;
-					}
-				}
-			}
-		}
-		return null;
+	private PictogramElement getPictogramElement(Object businessObject) {
+		return getFeatureProvider().getPictogramElementForBusinessObject(businessObject);
 	}
 }

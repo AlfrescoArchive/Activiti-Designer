@@ -1,10 +1,10 @@
 package com.alfresco.designer.gui.features;
 
+import org.activiti.designer.bpmn2.model.EndEvent;
+import org.activiti.designer.bpmn2.model.Event;
+import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.style.StyleUtil;
-import org.eclipse.bpmn2.EndEvent;
-import org.eclipse.bpmn2.Event;
-import org.eclipse.bpmn2.SubProcess;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.impl.AbstractAddShapeFeature;
@@ -58,18 +58,6 @@ public class AddAlfrescoStartEventFeature extends AbstractAddShapeFeature {
 			  circle.setLineWidth(3);
 			}
 			gaService.setLocationAndSize(circle, 0, 0, width, height);
-
-			// if addedClass has no resource we add it to the resource of the
-			// diagram
-			// in a real scenario the business model would have its own resource
-			if (addedEvent.eResource() == null) {
-				Object parentObject = getBusinessObjectForPictogramElement(parent);
-	      if (parentObject instanceof SubProcess) {
-	        ((SubProcess) parentObject).getFlowElements().add(addedEvent);
-	      } else {
-	        getDiagram().eResource().getContents().add(addedEvent);
-	      }
-			}
 
 			// create link and wire it
 			link(containerShape, addedEvent);

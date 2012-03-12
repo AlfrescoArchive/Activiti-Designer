@@ -1,9 +1,9 @@
 package org.activiti.designer.features;
 
+import org.activiti.designer.bpmn2.model.Gateway;
+import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.style.StyleUtil;
-import org.eclipse.bpmn2.Gateway;
-import org.eclipse.bpmn2.SubProcess;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.impl.AbstractAddShapeFeature;
@@ -54,18 +54,6 @@ public class AddParallelGatewayFeature extends AbstractAddShapeFeature {
 			polygon.setParentGraphicsAlgorithm(invisiblePolygon);
 			polygon.setStyle(StyleUtil.getStyleForEvent(getDiagram()));
 			gaService.setLocationAndSize(polygon, 0, 0, width, height);
-
-			// if addedClass has no resource we add it to the resource of the
-			// diagram. In a real scenario the business model would have its own
-			// resource
-			if (addedGateway.eResource() == null) {
-			  Object parentObject = getBusinessObjectForPictogramElement(parent);
-        if (parentObject instanceof SubProcess) {
-          ((SubProcess) parentObject).getFlowElements().add(addedGateway);
-        } else {
-          getDiagram().eResource().getContents().add(addedGateway);
-        }
-			}
 
 			// create link and wire it
 			link(containerShape, addedGateway);

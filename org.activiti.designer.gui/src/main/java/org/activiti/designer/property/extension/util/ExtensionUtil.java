@@ -11,8 +11,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.jar.Manifest;
 
+import org.activiti.designer.bpmn2.model.CustomProperty;
+import org.activiti.designer.bpmn2.model.ServiceTask;
 import org.activiti.designer.eclipse.common.ActivitiPlugin;
-import org.activiti.designer.eclipse.extension.ExtensionConstants;
 import org.activiti.designer.integration.palette.AbstractDefaultPaletteCustomizer;
 import org.activiti.designer.integration.palette.DefaultPaletteCustomizer;
 import org.activiti.designer.integration.palette.PaletteEntry;
@@ -22,13 +23,11 @@ import org.activiti.designer.property.extension.CustomServiceTaskContext;
 import org.activiti.designer.property.extension.CustomServiceTaskContextImpl;
 import org.activiti.designer.property.extension.JarClassLoader;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
+import org.activiti.designer.util.eclipse.ExtensionConstants;
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.bpmn2.CustomProperty;
-import org.eclipse.bpmn2.ServiceTask;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.jdt.core.IClassFile;
 import org.eclipse.jdt.core.IClasspathContainer;
@@ -262,7 +261,7 @@ public final class ExtensionUtil {
    * @return the id if the business object is a custom service task, null
    *         otherwise
    */
-  public static final String getCustomServiceTaskId(final EObject bo) {
+  public static final String getCustomServiceTaskId(final Object bo) {
     String result = null;
 
     if (isCustomServiceTask(bo)) {
@@ -284,7 +283,7 @@ public final class ExtensionUtil {
    * @return true if the business object is a custom service task, false
    *         otherwise
    */
-  public static final boolean isCustomServiceTask(final EObject bo) {
+  public static final boolean isCustomServiceTask(final Object bo) {
     boolean result = false;
     if (bo instanceof ServiceTask) {
       final ServiceTask serviceTask = (ServiceTask) bo;

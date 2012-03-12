@@ -15,9 +15,8 @@ package org.activiti.designer.export.bpmn20.export;
 
 import javax.xml.stream.XMLStreamWriter;
 
-import org.eclipse.bpmn2.AlfrescoScriptTask;
-import org.eclipse.bpmn2.BoundaryEvent;
-import org.eclipse.emf.ecore.EObject;
+import org.activiti.designer.bpmn2.model.BoundaryEvent;
+import org.activiti.designer.bpmn2.model.alfresco.AlfrescoScriptTask;
 
 
 /**
@@ -25,7 +24,7 @@ import org.eclipse.emf.ecore.EObject;
  */
 public class AlfrescoScriptTaskExport implements ActivitiNamespaceConstants {
 
-  public static void createScriptTask(EObject object, XMLStreamWriter xtw) throws Exception {
+  public static void createScriptTask(Object object, XMLStreamWriter xtw) throws Exception {
     AlfrescoScriptTask scriptTask = (AlfrescoScriptTask) object;
     // start AlfrescoScriptTask element
     xtw.writeStartElement("serviceTask");
@@ -35,12 +34,12 @@ public class AlfrescoScriptTaskExport implements ActivitiNamespaceConstants {
     }
     xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE,
             "class", "org.alfresco.repo.workflow.activiti.script.AlfrescoScriptDelegate");
-    DefaultFlowExport.createDefaultFlow(object, xtw);
-    AsyncActivityExport.createDefaultFlow(object, xtw);
+    DefaultFlowExport.createDefaultFlow(scriptTask, xtw);
+    AsyncActivityExport.createAsyncAttribute(scriptTask, xtw);
     
     xtw.writeStartElement("extensionElements");
     
-    ExtensionListenerExport.createExtensionListenerXML(scriptTask.getActivitiListeners(), false, EXECUTION_LISTENER, xtw);
+    ExecutionListenerExport.createExecutionListenerXML(scriptTask.getExecutionListeners(), false, xtw);
     
     xtw.writeStartElement(ACTIVITI_EXTENSIONS_PREFIX, "field", ACTIVITI_EXTENSIONS_NAMESPACE);
     xtw.writeAttribute("name", "script");
@@ -70,8 +69,8 @@ public class AlfrescoScriptTaskExport implements ActivitiNamespaceConstants {
     // end AlfrescoScriptTask element
     xtw.writeEndElement();
     
-    if(scriptTask.getBoundaryEventRefs().size() > 0) {
-    	for(BoundaryEvent event : scriptTask.getBoundaryEventRefs()) {
+    if(scriptTask.getBoundaryEvents().size() > 0) {
+    	for(BoundaryEvent event : scriptTask.getBoundaryEvents()) {
     		BoundaryEventExport.createBoundaryEvent(event, xtw);
     	}
     }

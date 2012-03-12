@@ -17,15 +17,14 @@ import java.util.List;
 
 import javax.xml.stream.XMLStreamWriter;
 
-import org.eclipse.bpmn2.ActivitiListener;
+import org.activiti.designer.bpmn2.model.ActivitiListener;
 
 /**
  * @author Tijs Rademakers
  */
-public class ExtensionListenerExport implements ActivitiNamespaceConstants {
+public class ExecutionListenerExport implements ActivitiNamespaceConstants {
 
-  public static void createExtensionListenerXML(List<ActivitiListener> listenerList, boolean writeExtensionsElement, 
-          String listenerType, XMLStreamWriter xtw) throws Exception {
+  public static void createExecutionListenerXML(List<ActivitiListener> listenerList, boolean writeExtensionsElement, XMLStreamWriter xtw) throws Exception {
 
     if (listenerList == null || listenerList.size() == 0)
       return;
@@ -34,11 +33,11 @@ public class ExtensionListenerExport implements ActivitiNamespaceConstants {
       xtw.writeStartElement("extensionElements");
 
     for (ActivitiListener listener : listenerList) {
-      xtw.writeStartElement(ACTIVITI_EXTENSIONS_PREFIX, listenerType, ACTIVITI_EXTENSIONS_NAMESPACE);
+      xtw.writeStartElement(ACTIVITI_EXTENSIONS_PREFIX, EXECUTION_LISTENER, ACTIVITI_EXTENSIONS_NAMESPACE);
       if (listener.getEvent() != null) {
         xtw.writeAttribute("event", listener.getEvent());
       }
-      ImplementationValueExport.writeImplementationValue(xtw, listenerType, listener.getImplementationType(), listener.getImplementation(), false);
+      ImplementationValueExport.writeImplementationValue(xtw, EXECUTION_LISTENER, listener.getImplementationType(), listener.getImplementation(), false);
       FieldExtensionsExport.writeFieldExtensions(xtw, listener.getFieldExtensions(), false);
       xtw.writeEndElement();
     }

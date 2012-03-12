@@ -1,11 +1,9 @@
 package org.activiti.designer.eclipse.util;
 
 import java.lang.reflect.Method;
-import java.util.List;
 
+import org.activiti.designer.bpmn2.model.FlowElement;
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.bpmn2.ActivitiListener;
-import org.eclipse.bpmn2.FlowElement;
 
 public class FlowElementUtil {
 
@@ -72,7 +70,7 @@ public class FlowElementUtil {
           Method sourceMethod = source.getClass().getMethod("getActivitiListeners", null);
           Method targetMethod = target.getClass().getMethod("getActivitiListeners", null);
 
-          List<ActivitiListener> sourceListeners = (List<ActivitiListener>) sourceMethod.invoke(source);
+          /*List<ActivitiListener> sourceListeners = (List<ActivitiListener>) sourceMethod.invoke(source);
           List<ActivitiListener> targetListeners = (List<ActivitiListener>) targetMethod.invoke(source);
           
           for (int i = 0; i < sourceListeners.size(); i++) {
@@ -80,7 +78,7 @@ public class FlowElementUtil {
             ActivitiListener sourceListener = sourceListeners.get(i);
             sourceListener.getImplementation();
             
-          }
+          }*/
           
         }
       } catch (Exception e) {

@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.eclipse.bpmn2.Process;
+import org.activiti.designer.bpmn2.model.Process;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -70,11 +70,6 @@ public class ActivitiWorkspaceUtil {
     final Set<String> result = new HashSet<String>();
 
     final BpmnProcessParser parser = new BpmnProcessParser(resource);
-    final Set<Process> processes = parser.getProcesses();
-
-    for (final Process process : processes) {
-      result.add(process.getId());
-    }
 
     return result;
   }

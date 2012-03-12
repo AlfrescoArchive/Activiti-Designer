@@ -1,9 +1,10 @@
 package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
-import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.SubProcess;
-import org.eclipse.bpmn2.UserTask;
+import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.designer.bpmn2.model.UserTask;
+import org.activiti.designer.util.editor.ModelHandler;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -24,17 +25,19 @@ public class CreateUserTaskFeature extends AbstractCreateFastBPMNFeature {
 
 	@Override
 	public Object[] create(ICreateContext context) {
-		UserTask newUserTask = Bpmn2Factory.eINSTANCE.createUserTask();
+		UserTask newUserTask = new UserTask();
 
 		newUserTask.setId(getNextId());
 		setName("User Task", newUserTask, context);
+		
+		ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).addFlowElement(newUserTask);
 
-		Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
+		/*Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
     if (parentObject instanceof SubProcess) {
       ((SubProcess) parentObject).getFlowElements().add(newUserTask);
     } else {
       getDiagram().eResource().getContents().add(newUserTask);
-    }
+    }*/
 
     addGraphicalContent(newUserTask, context);
 
@@ -57,7 +60,7 @@ public class CreateUserTaskFeature extends AbstractCreateFastBPMNFeature {
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected Class getFeatureClass() {
-		return Bpmn2Factory.eINSTANCE.createUserTask().getClass();
+		return new UserTask().getClass();
 	}
 
 }

@@ -17,19 +17,18 @@ package org.activiti.designer.property;
 
 import java.util.List;
 
+import org.activiti.designer.bpmn2.model.Activity;
+import org.activiti.designer.bpmn2.model.ExclusiveGateway;
+import org.activiti.designer.bpmn2.model.FlowElement;
+import org.activiti.designer.bpmn2.model.InclusiveGateway;
+import org.activiti.designer.bpmn2.model.SequenceFlow;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
-import org.eclipse.bpmn2.Activity;
-import org.eclipse.bpmn2.ExclusiveGateway;
-import org.eclipse.bpmn2.FlowElement;
-import org.eclipse.bpmn2.InclusiveGateway;
-import org.eclipse.bpmn2.SequenceFlow;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.ConnectionDecorator;
 import org.eclipse.graphiti.mm.pictograms.FreeFormConnection;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
@@ -106,7 +105,7 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
     PictogramElement pe = getSelectedPictogramElement();
 
     if (pe != null) {
-      Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
+      Object bo = getBusinessObject(pe);
       // the filter assured, that it is a EClass
       if (bo == null)
         return;
@@ -157,11 +156,11 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
           
           SequenceFlow defaultFlow;
           if(bo instanceof Activity) {
-            defaultFlow = ((Activity) bo).getDefault();
+            defaultFlow = ((Activity) bo).getDefaultFlow();
           } else if(bo instanceof ExclusiveGateway) {
-            defaultFlow = ((ExclusiveGateway) bo).getDefault();
+            defaultFlow = ((ExclusiveGateway) bo).getDefaultFlow();
           } else {
-            defaultFlow = ((InclusiveGateway) bo).getDefault();
+            defaultFlow = ((InclusiveGateway) bo).getDefaultFlow();
           }
           if(defaultFlow != null) {
             defaultCombo.select(defaultCombo.indexOf(defaultFlow.getId()));
@@ -243,7 +242,7 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
       PictogramElement pe = getSelectedPictogramElement();
       if (pe == null)
         return;
-      Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
+      final Object bo = getBusinessObject(pe);
 
       if (!(bo instanceof FlowElement))
         return;
@@ -253,10 +252,6 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
       ActivitiUiUtil.runModelChange(new Runnable() {
 
         public void run() {
-          Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(getSelectedPictogramElement());
-          if (bo == null)
-            return;
-          
           String id = idText.getText();
           ((FlowElement) bo).setId(id);
           
@@ -285,11 +280,11 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
               }
             }
             if(bo instanceof Activity) {
-              ((Activity) bo).setDefault(defaultFlow);
+              ((Activity) bo).setDefaultFlow(defaultFlow);
             } else if(bo instanceof ExclusiveGateway) {
-              ((ExclusiveGateway) bo).setDefault(defaultFlow);
+              ((ExclusiveGateway) bo).setDefaultFlow(defaultFlow);
             } else {
-              ((InclusiveGateway) bo).setDefault(defaultFlow);
+              ((InclusiveGateway) bo).setDefaultFlow(defaultFlow);
             }
           }
           

@@ -3,12 +3,11 @@ package org.activiti.designer.property.ui;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.activiti.designer.bpmn2.model.FormProperty;
+import org.activiti.designer.bpmn2.model.FormValue;
+import org.activiti.designer.bpmn2.model.StartEvent;
+import org.activiti.designer.bpmn2.model.UserTask;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
-import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.FormProperty;
-import org.eclipse.bpmn2.FormValue;
-import org.eclipse.bpmn2.StartEvent;
-import org.eclipse.bpmn2.UserTask;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
@@ -95,7 +94,7 @@ public class FormPropertyEditor extends TableFieldEditor {
       	if(i > 0) {
       		formValuesString += ";";
       	}
-      	formValuesString += formValue.getValueId() + ":" + formValue.getValueName();
+      	formValuesString += formValue.getId() + ":" + formValue.getName();
       }
       tableItem.setText(7, formValuesString);
     }
@@ -188,7 +187,7 @@ public class FormPropertyEditor extends TableFieldEditor {
             String formValues = item.getText(7);
             if(id != null && id.length() > 0) {
               
-              FormProperty newFormProperty = Bpmn2Factory.eINSTANCE.createFormProperty();
+              FormProperty newFormProperty = new FormProperty();
               newFormProperty.setId(id);
               newFormProperty.setName(name);
               newFormProperty.setType(type);
@@ -214,9 +213,9 @@ public class FormPropertyEditor extends TableFieldEditor {
               	String[] formValueArray = formValues.split(";");
               	if(formValueArray != null) {
               		for(String formValue : formValueArray) {
-              			FormValue formValueObj = Bpmn2Factory.eINSTANCE.createFormValue();
-              			formValueObj.setValueId(formValue.substring(0, formValue.lastIndexOf(":")));
-              			formValueObj.setValueName(formValue.substring(formValue.lastIndexOf(":") + 1));
+              			FormValue formValueObj = new FormValue();
+              			formValueObj.setId(formValue.substring(0, formValue.lastIndexOf(":")));
+              			formValueObj.setName(formValue.substring(formValue.lastIndexOf(":") + 1));
               			formValueList.add(formValueObj);
               		}
               	}

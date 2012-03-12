@@ -17,7 +17,7 @@ import java.util.List;
 
 import javax.xml.stream.XMLStreamWriter;
 
-import org.eclipse.bpmn2.FieldExtension;
+import org.activiti.designer.bpmn2.model.FieldExtension;
 
 
 /**
@@ -32,11 +32,11 @@ public class FieldExtensionsExport implements ActivitiNamespaceConstants {
         xtw.writeStartElement("extensionElements");
 
       for (FieldExtension fieldExtension : fieldExtensionList) {
-        if(fieldExtension.getFieldname() != null && fieldExtension.getFieldname().length() > 0 &&
+        if(fieldExtension.getFieldName() != null && fieldExtension.getFieldName().length() > 0 &&
                 fieldExtension.getExpression() != null && fieldExtension.getExpression().length() > 0) {
           
           xtw.writeStartElement(ACTIVITI_EXTENSIONS_PREFIX, "field", ACTIVITI_EXTENSIONS_NAMESPACE);
-          xtw.writeAttribute("name", fieldExtension.getFieldname());
+          xtw.writeAttribute("name", fieldExtension.getFieldName());
           if (fieldExtension.getExpression().contains("${")) {
             xtw.writeStartElement(ACTIVITI_EXTENSIONS_PREFIX, "expression", ACTIVITI_EXTENSIONS_NAMESPACE);
           } else {

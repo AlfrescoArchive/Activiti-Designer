@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.activiti.designer.eclipse.extension;
+package org.activiti.designer.util.eclipse;
 
 /**
  * @author Tiese Barrell

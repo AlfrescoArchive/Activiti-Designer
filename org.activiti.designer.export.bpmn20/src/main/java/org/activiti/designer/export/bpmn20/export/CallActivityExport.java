@@ -15,10 +15,9 @@ package org.activiti.designer.export.bpmn20.export;
 
 import javax.xml.stream.XMLStreamWriter;
 
-import org.eclipse.bpmn2.BoundaryEvent;
-import org.eclipse.bpmn2.CallActivity;
-import org.eclipse.bpmn2.IOParameter;
-import org.eclipse.emf.ecore.EObject;
+import org.activiti.designer.bpmn2.model.BoundaryEvent;
+import org.activiti.designer.bpmn2.model.CallActivity;
+import org.activiti.designer.bpmn2.model.IOParameter;
 
 
 /**
@@ -26,7 +25,7 @@ import org.eclipse.emf.ecore.EObject;
  */
 public class CallActivityExport implements ActivitiNamespaceConstants {
 
-  public static void createCallActivity(EObject object, XMLStreamWriter xtw) throws Exception {
+  public static void createCallActivity(Object object, XMLStreamWriter xtw) throws Exception {
     CallActivity callActivity = (CallActivity) object;
     
     // start CallActivity element
@@ -36,21 +35,21 @@ public class CallActivityExport implements ActivitiNamespaceConstants {
       xtw.writeAttribute("name", callActivity.getName());
     }
     
-    DefaultFlowExport.createDefaultFlow(object, xtw);
-    AsyncActivityExport.createDefaultFlow(object, xtw);
+    DefaultFlowExport.createDefaultFlow(callActivity, xtw);
+    AsyncActivityExport.createAsyncAttribute(callActivity, xtw);
 
     if(callActivity.getCalledElement() != null && callActivity.getCalledElement().length() > 0) {
       xtw.writeAttribute("calledElement", callActivity.getCalledElement());
     }
     
-    if(callActivity.getActivitiListeners().size() > 0 || 
+    if(callActivity.getExecutionListeners().size() > 0 || 
     		callActivity.getInParameters().size() > 0 || 
     		callActivity.getOutParameters().size() > 0) {
     	
       xtw.writeStartElement("extensionElements");
     }
     
-    ExtensionListenerExport.createExtensionListenerXML(callActivity.getActivitiListeners(), false, EXECUTION_LISTENER, xtw);
+    ExecutionListenerExport.createExecutionListenerXML(callActivity.getExecutionListeners(), false, xtw);
     
     if(callActivity.getInParameters().size() > 0 || callActivity.getOutParameters().size() > 0) {
       
@@ -63,7 +62,7 @@ public class CallActivityExport implements ActivitiNamespaceConstants {
       }
     }
     
-    if(callActivity.getActivitiListeners().size() > 0 || 
+    if(callActivity.getExecutionListeners().size() > 0 || 
     		callActivity.getInParameters().size() > 0 || 
     		callActivity.getOutParameters().size() > 0) {
     	
@@ -75,8 +74,8 @@ public class CallActivityExport implements ActivitiNamespaceConstants {
     // end CallActivity element
     xtw.writeEndElement();
     
-    if(callActivity.getBoundaryEventRefs().size() > 0) {
-    	for(BoundaryEvent event : callActivity.getBoundaryEventRefs()) {
+    if(callActivity.getBoundaryEvents().size() > 0) {
+    	for(BoundaryEvent event : callActivity.getBoundaryEvents()) {
     		BoundaryEventExport.createBoundaryEvent(event, xtw);
     	}
     }

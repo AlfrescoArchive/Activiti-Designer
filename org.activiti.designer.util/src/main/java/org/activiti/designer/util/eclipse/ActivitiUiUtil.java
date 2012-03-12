@@ -2,13 +2,15 @@ package org.activiti.designer.util.eclipse;
 
 import java.util.List;
 
+import org.activiti.designer.bpmn2.model.Activity;
+import org.activiti.designer.bpmn2.model.BoundaryEvent;
+import org.activiti.designer.bpmn2.model.EventDefinition;
+import org.activiti.designer.bpmn2.model.FlowElement;
+import org.activiti.designer.bpmn2.model.Process;
+import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.designer.util.editor.Bpmn2MemoryModel;
+import org.activiti.designer.util.editor.ModelHandler;
 import org.apache.commons.lang.ArrayUtils;
-import org.eclipse.bpmn2.Activity;
-import org.eclipse.bpmn2.BaseElement;
-import org.eclipse.bpmn2.BoundaryEvent;
-import org.eclipse.bpmn2.EventDefinition;
-import org.eclipse.bpmn2.FlowElement;
-import org.eclipse.bpmn2.SubProcess;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
 import org.eclipse.core.resources.IResource;
@@ -20,6 +22,7 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.transaction.RecordingCommand;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.gef.ui.actions.ActionRegistry;
@@ -97,13 +100,8 @@ public class ActivitiUiUtil {
     return ret;
   }
 
-  public static org.eclipse.bpmn2.Process getProcessObject(Diagram diagram) {
-    for (EObject eObject : diagram.eResource().getContents()) {
-      if (eObject instanceof org.eclipse.bpmn2.Process) {
-        return (org.eclipse.bpmn2.Process) eObject;
-      }
-    }
-    return null;
+  public static Process getProcessObject(Diagram diagram) {
+    return ModelHandler.getModel(EcoreUtil.getURI(diagram)).getProcess();
   }
 
   public static void doProjectReferenceChange(IProject currentProject, IJavaProject containerProject, String className) throws CoreException {
@@ -201,19 +199,19 @@ public class ActivitiUiUtil {
   public static final String getNextId(final Class featureClass, final String featureIdKey, final Diagram diagram) {
 
     int determinedId = 0;
-
-    for (EObject contentObject : diagram.eResource().getContents()) {
+    Bpmn2MemoryModel model =  ModelHandler.getModel(EcoreUtil.getURI(diagram));
+    for (FlowElement element : model.getProcess().getFlowElements()) {
       
-      if(contentObject instanceof SubProcess) {
+      if(element instanceof SubProcess) {
         
-        for (FlowElement flowElement : ((SubProcess) contentObject).getFlowElements()) {
+        for (FlowElement flowElement : ((SubProcess) element).getFlowElements()) {
           
           if (flowElement.getClass() == featureClass) {
             String contentObjectId = flowElement.getId().replace(featureIdKey, "");
             determinedId = getId(contentObjectId, determinedId);
           }
           if (flowElement instanceof Activity) {
-          	List<BoundaryEvent> eventList = ((Activity) flowElement).getBoundaryEventRefs();
+          	List<BoundaryEvent> eventList = ((Activity) flowElement).getBoundaryEvents();
           	for (BoundaryEvent boundaryEvent : eventList) {
 	            List<EventDefinition> definitionList = boundaryEvent.getEventDefinitions();
 	            for (EventDefinition eventDefinition : definitionList) {
@@ -227,13 +225,12 @@ public class ActivitiUiUtil {
         }
       }
       
-      if (contentObject.getClass() == featureClass) {
-        BaseElement tempElement = (BaseElement) contentObject;
-        String contentObjectId = tempElement.getId().replace(featureIdKey, "");
+      if (element.getClass() == featureClass) {
+        String contentObjectId = element.getId().replace(featureIdKey, "");
         determinedId = getId(contentObjectId, determinedId);
       }
-      if (contentObject instanceof Activity) {
-      	List<BoundaryEvent> eventList = ((Activity) contentObject).getBoundaryEventRefs();
+      if (element instanceof Activity) {
+      	List<BoundaryEvent> eventList = ((Activity) element).getBoundaryEvents();
       	for (BoundaryEvent boundaryEvent : eventList) {
           List<EventDefinition> definitionList = boundaryEvent.getEventDefinitions();
           for (EventDefinition eventDefinition : definitionList) {

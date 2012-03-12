@@ -1,10 +1,10 @@
 package com.alfresco.designer.gui.property;
 
+import org.activiti.designer.bpmn2.model.StartEvent;
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.preferences.Preferences;
 import org.activiti.designer.util.property.ActivitiPropertySection;
-import org.eclipse.bpmn2.StartEvent;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;

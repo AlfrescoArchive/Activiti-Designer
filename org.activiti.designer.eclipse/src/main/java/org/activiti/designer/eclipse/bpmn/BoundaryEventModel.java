@@ -13,7 +13,7 @@
 
 package org.activiti.designer.eclipse.bpmn;
 
-import org.eclipse.bpmn2.BoundaryEvent;
+import org.activiti.designer.bpmn2.model.BoundaryEvent;
 
 
 /**

@@ -1,21 +1,16 @@
 package org.activiti.designer.features;
 
-import java.util.List;
-
-import org.eclipse.bpmn2.BaseElement;
-import org.eclipse.bpmn2.BoundaryEvent;
-import org.eclipse.bpmn2.FlowElement;
-import org.eclipse.bpmn2.SubProcess;
-import org.eclipse.emf.ecore.EObject;
+import org.activiti.designer.bpmn2.model.BoundaryEvent;
+import org.activiti.designer.bpmn2.model.FlowElement;
+import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.designer.util.editor.ModelHandler;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IMoveShapeContext;
 import org.eclipse.graphiti.features.impl.DefaultMoveShapeFeature;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
-import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
-import org.eclipse.graphiti.services.Graphiti;
-import org.eclipse.graphiti.services.ILinkService;
 
 public class MoveBoundaryEventFeature extends DefaultMoveShapeFeature {
 
@@ -31,16 +26,8 @@ public class MoveBoundaryEventFeature extends DefaultMoveShapeFeature {
     Shape shape = context.getShape();
     BoundaryEvent event = (BoundaryEvent) getBusinessObjectForPictogramElement(shape);
     
-    ILinkService linkService = Graphiti.getLinkService();
-    List<PictogramElement> pictoList = linkService.getPictogramElements(getDiagram(), event.getAttachedToRef());
-    
-    SubProcess parentInSubProcess = null;
-    ContainerShape parent = null;
-    if(pictoList != null && pictoList.size() > 0) {
-      parent = (ContainerShape) pictoList.get(0);
-      BaseElement element = (BaseElement) getBusinessObjectForPictogramElement(parent);
-      parentInSubProcess = inSubProcess(element.getId());
-    }
+    ContainerShape parent = (ContainerShape) getFeatureProvider().getPictogramElementForBusinessObject(event.getAttachedToRef());
+    SubProcess parentInSubProcess = inSubProcess(event.getAttachedToRef().getId());
     
     if(parentInSubProcess == null && source instanceof Diagram && source.getClass() != target.getClass()) {
       return false;
@@ -82,23 +69,19 @@ public class MoveBoundaryEventFeature extends DefaultMoveShapeFeature {
   }
   
   private SubProcess inSubProcess(String id) {
-  	for(EObject object : getDiagram().eResource().getContents()) {
-  		if(object instanceof BaseElement) {
-  			BaseElement element = (BaseElement) object;
-  			
-  			if(element instanceof SubProcess) {
-  				SubProcess subProcess = (SubProcess) element;
-  				for(FlowElement subElement : subProcess.getFlowElements()) {
-  					if(subElement.getId().equals(id)) {
-  	  				return subProcess;
-  	  			}
-  				}
-  			}
-  			
-  			if(element.getId().equals(id)) {
-  				return null;
-  			}
-  		}
+  	for(FlowElement element : ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getProcess().getFlowElements()) {
+  		if(element instanceof SubProcess) {
+				SubProcess subProcess = (SubProcess) element;
+				for(FlowElement subElement : subProcess.getFlowElements()) {
+					if(subElement.getId().equals(id)) {
+	  				return subProcess;
+	  			}
+				}
+			}
+			
+			if(element.getId().equals(id)) {
+				return null;
+			}
   	}
   	return null;
   }

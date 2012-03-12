@@ -1,9 +1,9 @@
 package org.activiti.designer.property;
 
+import org.activiti.designer.bpmn2.model.ServiceTask;
 import org.activiti.designer.property.ui.FieldExtensionEditor;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
-import org.eclipse.bpmn2.ServiceTask;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;

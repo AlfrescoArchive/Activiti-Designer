@@ -1,10 +1,11 @@
 package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
-import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.EndEvent;
-import org.eclipse.bpmn2.ErrorEventDefinition;
-import org.eclipse.bpmn2.SubProcess;
+import org.activiti.designer.bpmn2.model.EndEvent;
+import org.activiti.designer.bpmn2.model.ErrorEventDefinition;
+import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.designer.util.editor.ModelHandler;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -24,8 +25,8 @@ public class CreateErrorEndEventFeature extends AbstractCreateFastBPMNFeature {
 	}
 
 	public Object[] create(ICreateContext context) {
-		EndEvent endEvent = Bpmn2Factory.eINSTANCE.createEndEvent();
-		ErrorEventDefinition eventDef = Bpmn2Factory.eINSTANCE.createErrorEventDefinition();
+		EndEvent endEvent = new EndEvent();
+		ErrorEventDefinition eventDef = new ErrorEventDefinition();
 		endEvent.getEventDefinitions().add(eventDef);
 		
 		endEvent.setId(getNextId());
@@ -35,7 +36,7 @@ public class CreateErrorEndEventFeature extends AbstractCreateFastBPMNFeature {
 		if (parentObject instanceof SubProcess) {
       ((SubProcess) parentObject).getFlowElements().add(endEvent);
     } else {
-      getDiagram().eResource().getContents().add(endEvent);
+    	ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).addFlowElement(endEvent);
     }
 
     addGraphicalContent(endEvent, context);
@@ -57,7 +58,7 @@ public class CreateErrorEndEventFeature extends AbstractCreateFastBPMNFeature {
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected Class getFeatureClass() {
-		return Bpmn2Factory.eINSTANCE.createEndEvent().getClass();
+		return new EndEvent().getClass();
 	}
 
 }

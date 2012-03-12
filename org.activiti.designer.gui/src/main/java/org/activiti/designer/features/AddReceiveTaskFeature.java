@@ -1,7 +1,6 @@
 package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.features.IFeatureProvider;
 
 public class AddReceiveTaskFeature extends AddTaskFeature {
@@ -10,7 +9,7 @@ public class AddReceiveTaskFeature extends AddTaskFeature {
 		super(fp);
 	}
 
-	protected String getIcon(EObject bo) {
+	protected String getIcon(Object bo) {
 		return ActivitiImageProvider.IMG_RECEIVETASK;
 	}
 }

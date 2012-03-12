@@ -6,7 +6,6 @@ import org.activiti.designer.ActivitiImageProvider;
 import org.activiti.designer.property.extension.CustomServiceTaskContext;
 import org.activiti.designer.property.extension.util.ExtensionUtil;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.features.IFeatureProvider;
 
 public class AddServiceTaskFeature extends AddTaskFeature {
@@ -15,7 +14,7 @@ public class AddServiceTaskFeature extends AddTaskFeature {
     super(fp);
   }
 
-  protected String getIcon(EObject bo) {
+  protected String getIcon(Object bo) {
 
     if (ExtensionUtil.isCustomServiceTask(bo)) {
       final List<CustomServiceTaskContext> customServiceTaskContexts = ExtensionUtil.getCustomServiceTaskContexts(ActivitiUiUtil

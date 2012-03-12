@@ -14,11 +14,11 @@ package org.activiti.designer.export.bpmn20.export;
 
 import javax.xml.stream.XMLStreamWriter;
 
-import org.eclipse.bpmn2.Activity;
-import org.eclipse.bpmn2.ExclusiveGateway;
-import org.eclipse.bpmn2.InclusiveGateway;
-import org.eclipse.bpmn2.SequenceFlow;
-import org.eclipse.emf.ecore.EObject;
+import org.activiti.designer.bpmn2.model.Activity;
+import org.activiti.designer.bpmn2.model.ExclusiveGateway;
+import org.activiti.designer.bpmn2.model.FlowElement;
+import org.activiti.designer.bpmn2.model.InclusiveGateway;
+import org.activiti.designer.bpmn2.model.SequenceFlow;
 
 
 /**
@@ -26,14 +26,14 @@ import org.eclipse.emf.ecore.EObject;
  */
 public class DefaultFlowExport {
 
-  public static void createDefaultFlow(EObject object, XMLStreamWriter xtw) throws Exception {
+  public static void createDefaultFlow(FlowElement object, XMLStreamWriter xtw) throws Exception {
     SequenceFlow defaultFlow = null;
     if(object instanceof Activity) {
-      defaultFlow = ((Activity) object).getDefault();
+      defaultFlow = ((Activity) object).getDefaultFlow();
     } else if(object instanceof ExclusiveGateway) {
-      defaultFlow = ((ExclusiveGateway) object).getDefault();
+      defaultFlow = ((ExclusiveGateway) object).getDefaultFlow();
     } else if(object instanceof InclusiveGateway) {
-      defaultFlow = ((InclusiveGateway) object).getDefault();
+      defaultFlow = ((InclusiveGateway) object).getDefaultFlow();
     }
     else {
         throw new Exception("Invalid default flow chosen.  Expected 'Activity', " +

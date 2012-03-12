@@ -17,8 +17,8 @@ import java.util.List;
 
 import javax.xml.stream.XMLStreamWriter;
 
-import org.eclipse.bpmn2.FormProperty;
-import org.eclipse.bpmn2.FormValue;
+import org.activiti.designer.bpmn2.model.FormProperty;
+import org.activiti.designer.bpmn2.model.FormValue;
 
 /**
  * @author Tijs Rademakers
@@ -56,8 +56,8 @@ public class FormPropertiesExport implements ActivitiNamespaceConstants {
       if(formProperty.getFormValues().size() > 0) {
       	for (FormValue formValue : formProperty.getFormValues()) {
       		xtw.writeStartElement(ACTIVITI_EXTENSIONS_PREFIX, "value", ACTIVITI_EXTENSIONS_NAMESPACE);
-        	xtw.writeAttribute("id", formValue.getValueId());
-        	xtw.writeAttribute("name", formValue.getValueName());
+        	xtw.writeAttribute("id", formValue.getId());
+        	xtw.writeAttribute("name", formValue.getName());
         	xtw.writeEndElement();
         }
       }

@@ -45,7 +45,7 @@ public class ImportBpmnElementsCommand extends RecordingCommand {
     IFeatureProvider featureProvider = dtp.getFeatureProvider();
     BpmnFileReader bpmnFileReader = new BpmnFileReader(bpmnFileName, diagram, featureProvider);
     bpmnFileReader.openStream();
-    bpmnFileReader.readBpmn();
+    bpmnFileReader.readBpmn(null);
 	}
 
 	/**

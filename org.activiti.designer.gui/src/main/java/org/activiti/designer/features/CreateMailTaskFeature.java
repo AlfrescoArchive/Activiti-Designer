@@ -1,9 +1,10 @@
 package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
-import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.MailTask;
-import org.eclipse.bpmn2.SubProcess;
+import org.activiti.designer.bpmn2.model.MailTask;
+import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.designer.util.editor.ModelHandler;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -24,7 +25,7 @@ public class CreateMailTaskFeature extends AbstractCreateFastBPMNFeature {
 
 	@Override
 	public Object[] create(ICreateContext context) {
-		MailTask newMailTask = Bpmn2Factory.eINSTANCE.createMailTask();
+		MailTask newMailTask = new MailTask();
 		newMailTask.setId(getNextId());
 		setName("Mail Task", newMailTask, context);
 		
@@ -32,7 +33,7 @@ public class CreateMailTaskFeature extends AbstractCreateFastBPMNFeature {
     if (parentObject instanceof SubProcess) {
       ((SubProcess) parentObject).getFlowElements().add(newMailTask);
     } else {
-      getDiagram().eResource().getContents().add(newMailTask);
+    	ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).addFlowElement(newMailTask);
     }
 		
     addGraphicalContent(newMailTask, context);
@@ -52,7 +53,7 @@ public class CreateMailTaskFeature extends AbstractCreateFastBPMNFeature {
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected Class getFeatureClass() {
-		return Bpmn2Factory.eINSTANCE.createMailTask().getClass();
+		return new MailTask().getClass();
 	}
 
 }

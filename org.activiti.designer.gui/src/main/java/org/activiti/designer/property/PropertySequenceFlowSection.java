@@ -1,10 +1,8 @@
 package org.activiti.designer.property;
 
+import org.activiti.designer.bpmn2.model.SequenceFlow;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
-import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.FormalExpression;
-import org.eclipse.bpmn2.SequenceFlow;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
@@ -63,7 +61,7 @@ public class PropertySequenceFlowSection extends ActivitiPropertySection impleme
 			if(sequenceFlow.getConditionExpression() != null) {
 				
 				conditionExpressionText.removeFocusListener(listener);
-				String condition = sequenceFlow.getConditionExpression().getBody();
+				String condition = sequenceFlow.getConditionExpression();
 				conditionExpressionText.setText(condition);
 				conditionExpressionText.addFocusListener(listener);
 			} else {
@@ -96,19 +94,10 @@ public class PropertySequenceFlowSection extends ActivitiPropertySection impleme
 							SequenceFlow sequenceFlow = (SequenceFlow) bo;
 							String condition = conditionExpressionText.getText();
 							if (condition != null && condition.length() > 0) {
-								FormalExpression expression = sequenceFlow.getConditionExpression();
-								if(expression == null) {
-									expression = Bpmn2Factory.eINSTANCE.createFormalExpression();
-									expression.setId(sequenceFlow.getId() + "_condition");
-									sequenceFlow.setConditionExpression(expression);
-								}
-								expression.setBody(condition);
+								sequenceFlow.setConditionExpression(condition);
 								
 							} else {
-								FormalExpression expression = sequenceFlow.getConditionExpression();
-								if(expression != null) {
-									sequenceFlow.setConditionExpression(null);
-								}
+								sequenceFlow.setConditionExpression(null);
 							}
 						}
 					}, editingDomain, "Model Update");

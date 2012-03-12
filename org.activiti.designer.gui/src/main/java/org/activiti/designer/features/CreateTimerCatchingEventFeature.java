@@ -1,10 +1,11 @@
 package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
-import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.IntermediateCatchEvent;
-import org.eclipse.bpmn2.SubProcess;
-import org.eclipse.bpmn2.TimerEventDefinition;
+import org.activiti.designer.bpmn2.model.IntermediateCatchEvent;
+import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.designer.bpmn2.model.TimerEventDefinition;
+import org.activiti.designer.util.editor.ModelHandler;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -24,8 +25,8 @@ public class CreateTimerCatchingEventFeature extends AbstractCreateFastBPMNFeatu
 	}
 
 	public Object[] create(ICreateContext context) {
-		IntermediateCatchEvent catchEvent = Bpmn2Factory.eINSTANCE.createIntermediateCatchEvent();
-		TimerEventDefinition eventDef = Bpmn2Factory.eINSTANCE.createTimerEventDefinition();
+		IntermediateCatchEvent catchEvent = new IntermediateCatchEvent();
+		TimerEventDefinition eventDef = new TimerEventDefinition();
 		catchEvent.getEventDefinitions().add(eventDef);
 		
 		catchEvent.setId(getNextId());
@@ -35,7 +36,7 @@ public class CreateTimerCatchingEventFeature extends AbstractCreateFastBPMNFeatu
 		if (parentObject instanceof SubProcess) {
       ((SubProcess) parentObject).getFlowElements().add(catchEvent);
     } else {
-      getDiagram().eResource().getContents().add(catchEvent);
+    	ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).addFlowElement(catchEvent);
     }
 
     addGraphicalContent(catchEvent, context);
@@ -57,7 +58,7 @@ public class CreateTimerCatchingEventFeature extends AbstractCreateFastBPMNFeatu
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected Class getFeatureClass() {
-		return Bpmn2Factory.eINSTANCE.createIntermediateCatchEvent().getClass();
+		return new IntermediateCatchEvent().getClass();
 	}
 
 }

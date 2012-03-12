@@ -1,7 +1,7 @@
 package org.activiti.designer.property;
 
-import org.eclipse.bpmn2.AlfrescoStartEvent;
-import org.eclipse.bpmn2.StartEvent;
+import org.activiti.designer.bpmn2.model.StartEvent;
+import org.activiti.designer.bpmn2.model.alfresco.AlfrescoStartEvent;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;

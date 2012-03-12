@@ -4,13 +4,12 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.eclipse.common.FileService;
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.eclipse.util.Util;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.preferences.Preferences;
-import org.eclipse.bpmn2.SubProcess;
-import org.eclipse.bpmn2.impl.SubProcessImpl;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -50,13 +49,12 @@ public class ExpandCollapseSubProcessFeature extends AbstractDrillDownFeature {
 
 	@Override
 	public boolean canExecute(ICustomContext context) {
-		return ActivitiUiUtil.contextPertainsToBusinessObject(context, SubProcessImpl.class);
+		return ActivitiUiUtil.contextPertainsToBusinessObject(context, SubProcess.class);
 	}
 
 	public void execute(ICustomContext context) {
 		try {
-			SubProcess subprocess = (SubProcess) ActivitiUiUtil.getBusinessObjectFromContext(context,
-					SubProcessImpl.class);
+			SubProcess subprocess = (SubProcess) ActivitiUiUtil.getBusinessObjectFromContext(context, SubProcess.class);
 			this.subprocessId = subprocess.getId();
 			this.subprocessName = subprocess.getName();
 		} catch (Exception e) {

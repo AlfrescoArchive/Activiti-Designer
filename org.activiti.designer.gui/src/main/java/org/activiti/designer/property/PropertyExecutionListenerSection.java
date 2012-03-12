@@ -2,11 +2,11 @@ package org.activiti.designer.property;
 
 import java.util.List;
 
+import org.activiti.designer.bpmn2.model.ActivitiListener;
+import org.activiti.designer.bpmn2.model.SequenceFlow;
 import org.activiti.designer.property.ui.ExecutionListenerEditor;
 import org.activiti.designer.util.BpmnBOUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
-import org.eclipse.bpmn2.ActivitiListener;
-import org.eclipse.bpmn2.SequenceFlow;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;

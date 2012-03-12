@@ -20,6 +20,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.activiti.designer.bpmn2.model.ComplexDataType;
+import org.activiti.designer.bpmn2.model.CustomProperty;
+import org.activiti.designer.bpmn2.model.ServiceTask;
 import org.activiti.designer.integration.servicetask.annotation.Help;
 import org.activiti.designer.integration.servicetask.annotation.Property;
 import org.activiti.designer.integration.servicetask.validator.FieldValidator;
@@ -27,9 +30,6 @@ import org.activiti.designer.integration.servicetask.validator.ValidationExcepti
 import org.activiti.designer.property.PropertyCustomServiceTaskSection;
 import org.activiti.designer.property.extension.util.ExtensionUtil;
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.bpmn2.ComplexDataType;
-import org.eclipse.bpmn2.CustomProperty;
-import org.eclipse.bpmn2.ServiceTask;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;

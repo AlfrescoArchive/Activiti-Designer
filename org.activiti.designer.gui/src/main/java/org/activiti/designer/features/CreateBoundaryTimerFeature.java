@@ -1,13 +1,14 @@
 package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
+import org.activiti.designer.bpmn2.model.Activity;
+import org.activiti.designer.bpmn2.model.BoundaryEvent;
+import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.designer.bpmn2.model.Task;
+import org.activiti.designer.bpmn2.model.TimerEventDefinition;
+import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.designer.util.features.AbstractCreateBPMNFeature;
-import org.eclipse.bpmn2.Activity;
-import org.eclipse.bpmn2.BoundaryEvent;
-import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.SubProcess;
-import org.eclipse.bpmn2.Task;
-import org.eclipse.bpmn2.TimerEventDefinition;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -32,15 +33,15 @@ public class CreateBoundaryTimerFeature extends AbstractCreateBPMNFeature {
 	}
 
 	public Object[] create(ICreateContext context) {
-	  BoundaryEvent boundaryEvent = Bpmn2Factory.eINSTANCE.createBoundaryEvent();
-		TimerEventDefinition timerEvent = Bpmn2Factory.eINSTANCE.createTimerEventDefinition();
+	  BoundaryEvent boundaryEvent = new BoundaryEvent();
+		TimerEventDefinition timerEvent = new TimerEventDefinition();
 		boundaryEvent.getEventDefinitions().add(timerEvent);
 		
 		boundaryEvent.setId(getNextId());
 		
 		Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
     if (parentObject instanceof SubProcess) {
-      getDiagram().eResource().getContents().add(boundaryEvent);
+    	ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).addFlowElement(boundaryEvent);
     } else if(context.getTargetContainer().getContainer() != null && 
             context.getTargetContainer().getContainer() instanceof Diagram == false) {
       
@@ -50,10 +51,10 @@ public class CreateBoundaryTimerFeature extends AbstractCreateBPMNFeature {
       }
       
     } else {
-      getDiagram().eResource().getContents().add(boundaryEvent);
+    	ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).addFlowElement(boundaryEvent);
     }
     
-    ((Activity) parentObject).getBoundaryEventRefs().add(boundaryEvent);
+    ((Activity) parentObject).getBoundaryEvents().add(boundaryEvent);
     boundaryEvent.setAttachedToRef((Activity) parentObject);
 
 		// do the add
@@ -76,7 +77,7 @@ public class CreateBoundaryTimerFeature extends AbstractCreateBPMNFeature {
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected Class getFeatureClass() {
-		return Bpmn2Factory.eINSTANCE.createTimerEventDefinition().getClass();
+		return new TimerEventDefinition().getClass();
 	}
 
 }

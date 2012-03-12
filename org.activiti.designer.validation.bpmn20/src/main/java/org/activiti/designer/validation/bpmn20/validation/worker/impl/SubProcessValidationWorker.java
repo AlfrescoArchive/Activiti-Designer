@@ -5,11 +5,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.validation.bpmn20.validation.worker.ProcessValidationWorker;
 import org.activiti.designer.validation.bpmn20.validation.worker.ProcessValidationWorkerMarker;
-import org.eclipse.bpmn2.SubProcess;
-import org.eclipse.bpmn2.impl.SubProcessImpl;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 
 /**
@@ -22,14 +20,14 @@ import org.eclipse.graphiti.mm.pictograms.Diagram;
 public class SubProcessValidationWorker implements ProcessValidationWorker {
 
   @Override
-  public Collection<ProcessValidationWorkerMarker> validate(final Diagram diagram, final Map<String, List<EObject>> processNodes) {
+  public Collection<ProcessValidationWorkerMarker> validate(final Diagram diagram, final Map<String, List<Object>> processNodes) {
 
     final Collection<ProcessValidationWorkerMarker> result = new ArrayList<ProcessValidationWorkerMarker>();
 
-    final List<EObject> subProcesses = processNodes.get(SubProcessImpl.class.getCanonicalName());
+    final List<Object> subProcesses = processNodes.get(SubProcess.class.getCanonicalName());
 
     if (subProcesses != null && !subProcesses.isEmpty()) {
-      for (final EObject object : subProcesses) {
+      for (final Object object : subProcesses) {
 
         final SubProcess subProcess = (SubProcess) object;
 

@@ -5,6 +5,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.activiti.designer.bpmn2.model.ComplexDataType;
+import org.activiti.designer.bpmn2.model.CustomProperty;
+import org.activiti.designer.bpmn2.model.ServiceTask;
 import org.activiti.designer.integration.servicetask.CustomServiceTask;
 import org.activiti.designer.integration.servicetask.annotation.Help;
 import org.activiti.designer.integration.servicetask.annotation.Property;
@@ -23,10 +26,6 @@ import org.activiti.designer.property.extension.util.ExtensionUtil;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.ComplexDataType;
-import org.eclipse.bpmn2.CustomProperty;
-import org.eclipse.bpmn2.ServiceTask;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
@@ -393,8 +392,7 @@ public class PropertyCustomServiceTaskSection extends ActivitiPropertySection im
         CustomProperty property = ExtensionUtil.getCustomProperty(task, key);
 
         if (property == null) {
-          property = Bpmn2Factory.eINSTANCE.createCustomProperty();
-          getDiagram().eResource().getContents().add(property);
+          property = new CustomProperty();
           task.getCustomProperties().add(property);
         }
 

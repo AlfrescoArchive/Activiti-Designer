@@ -1,9 +1,10 @@
 package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
-import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.CallActivity;
-import org.eclipse.bpmn2.SubProcess;
+import org.activiti.designer.bpmn2.model.CallActivity;
+import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.designer.util.editor.ModelHandler;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -24,7 +25,7 @@ public class CreateCallActivityFeature extends AbstractCreateFastBPMNFeature {
 
 	@Override
 	public Object[] create(ICreateContext context) {
-		CallActivity callActivity = Bpmn2Factory.eINSTANCE.createCallActivity();
+		CallActivity callActivity = new CallActivity();
 		callActivity.setId(getNextId());
 		setName("Call activity", callActivity, context);
 
@@ -32,7 +33,7 @@ public class CreateCallActivityFeature extends AbstractCreateFastBPMNFeature {
     if (parentObject instanceof SubProcess) {
       ((SubProcess) parentObject).getFlowElements().add(callActivity);
     } else {
-      getDiagram().eResource().getContents().add(callActivity);
+    	ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).addFlowElement(callActivity);
     }
 
 		// do the add
@@ -56,7 +57,7 @@ public class CreateCallActivityFeature extends AbstractCreateFastBPMNFeature {
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected Class getFeatureClass() {
-		return Bpmn2Factory.eINSTANCE.createCallActivity().getClass();
+		return new CallActivity().getClass();
 	}
 
 }

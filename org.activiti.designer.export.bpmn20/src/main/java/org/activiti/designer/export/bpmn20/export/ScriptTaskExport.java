@@ -15,9 +15,9 @@ package org.activiti.designer.export.bpmn20.export;
 
 import javax.xml.stream.XMLStreamWriter;
 
-import org.eclipse.bpmn2.BoundaryEvent;
-import org.eclipse.bpmn2.ScriptTask;
-import org.eclipse.emf.ecore.EObject;
+import org.activiti.designer.bpmn2.model.BoundaryEvent;
+import org.activiti.designer.bpmn2.model.ScriptTask;
+import org.apache.commons.lang.StringUtils;
 
 
 /**
@@ -25,7 +25,7 @@ import org.eclipse.emf.ecore.EObject;
  */
 public class ScriptTaskExport implements ActivitiNamespaceConstants {
 
-  public static void createScriptTask(EObject object, XMLStreamWriter xtw) throws Exception {
+  public static void createScriptTask(Object object, XMLStreamWriter xtw) throws Exception {
     ScriptTask scriptTask = (ScriptTask) object;
     // start ScriptTask element
     xtw.writeStartElement("scriptTask");
@@ -33,14 +33,18 @@ public class ScriptTaskExport implements ActivitiNamespaceConstants {
     if (scriptTask.getName() != null) {
       xtw.writeAttribute("name", scriptTask.getName());
     }
-    DefaultFlowExport.createDefaultFlow(object, xtw);
-    AsyncActivityExport.createDefaultFlow(object, xtw);
-    xtw.writeAttribute("scriptFormat", scriptTask.getScriptFormat());
+    DefaultFlowExport.createDefaultFlow(scriptTask, xtw);
+    AsyncActivityExport.createAsyncAttribute(scriptTask, xtw);
+    if(StringUtils.isNotEmpty(scriptTask.getScriptFormat())) {
+    	xtw.writeAttribute("scriptFormat", scriptTask.getScriptFormat());
+    }
 
-    ExtensionListenerExport.createExtensionListenerXML(scriptTask.getActivitiListeners(), true, EXECUTION_LISTENER, xtw);
+    ExecutionListenerExport.createExecutionListenerXML(scriptTask.getExecutionListeners(), true, xtw);
 
     xtw.writeStartElement("script");
-    xtw.writeCData(scriptTask.getScript());
+    if(StringUtils.isNotEmpty(scriptTask.getScript())) {
+    	xtw.writeCData(scriptTask.getScript());
+    }
     xtw.writeEndElement();
     
     MultiInstanceExport.createMultiInstance(object, xtw);
@@ -48,8 +52,8 @@ public class ScriptTaskExport implements ActivitiNamespaceConstants {
     // end ScriptTask element
     xtw.writeEndElement();
     
-    if(scriptTask.getBoundaryEventRefs().size() > 0) {
-    	for(BoundaryEvent event : scriptTask.getBoundaryEventRefs()) {
+    if(scriptTask.getBoundaryEvents().size() > 0) {
+    	for(BoundaryEvent event : scriptTask.getBoundaryEvents()) {
     		BoundaryEventExport.createBoundaryEvent(event, xtw);
     	}
     }

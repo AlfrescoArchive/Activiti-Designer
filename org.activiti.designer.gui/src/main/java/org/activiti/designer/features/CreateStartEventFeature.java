@@ -1,10 +1,11 @@
 package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
+import org.activiti.designer.bpmn2.model.StartEvent;
+import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.designer.util.features.AbstractCreateBPMNFeature;
-import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.StartEvent;
-import org.eclipse.bpmn2.SubProcess;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -24,18 +25,12 @@ public class CreateStartEventFeature extends AbstractCreateBPMNFeature {
 	}
 
 	public Object[] create(ICreateContext context) {
-		StartEvent startEvent = Bpmn2Factory.eINSTANCE.createStartEvent();
+		StartEvent startEvent = new StartEvent();
 		
 		startEvent.setId(getNextId());
 		startEvent.setName("Start");
 		
-		Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-    if (parentObject instanceof SubProcess) {
-      ((SubProcess) parentObject).getFlowElements().add(startEvent);
-    } else {
-      getDiagram().eResource().getContents().add(startEvent);
-    }
-    
+		ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).addFlowElement(startEvent);
 		addGraphicalRepresentation(context, startEvent);
 		
 		// return newly created business object(s)
@@ -55,7 +50,7 @@ public class CreateStartEventFeature extends AbstractCreateBPMNFeature {
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected Class getFeatureClass() {
-		return Bpmn2Factory.eINSTANCE.createStartEvent().getClass();
+		return new StartEvent().getClass();
 	}
 
 }

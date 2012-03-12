@@ -3,10 +3,10 @@ package org.activiti.designer.property.ui;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.activiti.designer.bpmn2.model.ActivitiListener;
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.model.FieldExtensionModel;
 import org.activiti.designer.util.preferences.Preferences;
-import org.eclipse.bpmn2.ActivitiListener;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.search.SearchEngine;
 import org.eclipse.jdt.ui.IJavaElementSearchConstants;

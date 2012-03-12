@@ -1,6 +1,6 @@
 package org.activiti.designer.property;
 
-import org.eclipse.bpmn2.CallActivity;
+import org.activiti.designer.bpmn2.model.CallActivity;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;

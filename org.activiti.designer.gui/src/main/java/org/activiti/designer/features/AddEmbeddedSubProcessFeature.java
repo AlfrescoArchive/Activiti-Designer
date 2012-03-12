@@ -1,11 +1,11 @@
 package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
+import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.platform.OSEnum;
 import org.activiti.designer.util.platform.OSUtil;
 import org.activiti.designer.util.style.StyleUtil;
-import org.eclipse.bpmn2.SubProcess;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddContext;
@@ -61,13 +61,6 @@ public class AddEmbeddedSubProcessFeature extends AbstractAddShapeFeature {
 			roundedRectangle.setParentGraphicsAlgorithm(invisibleRectangle);
 			roundedRectangle.setStyle(StyleUtil.getStyleForEvent(getDiagram()));
 			gaService.setLocationAndSize(roundedRectangle, 0, 0, width, height);
-
-			// if addedClass has no resource we add it to the resource of the
-			// diagram
-			// in a real scenario the business model would have its own resource
-			if (addedSubProcess.eResource() == null) {
-				getDiagram().eResource().getContents().add(addedSubProcess);
-			}
 
 			// create link and wire it
 			link(containerShape, addedSubProcess);

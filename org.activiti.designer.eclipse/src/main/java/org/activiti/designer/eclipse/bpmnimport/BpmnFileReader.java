@@ -28,41 +28,33 @@ import java.util.Set;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
+import org.activiti.designer.bpmn2.model.BoundaryEvent;
+import org.activiti.designer.bpmn2.model.BusinessRuleTask;
+import org.activiti.designer.bpmn2.model.CallActivity;
+import org.activiti.designer.bpmn2.model.EndEvent;
+import org.activiti.designer.bpmn2.model.Event;
+import org.activiti.designer.bpmn2.model.ExclusiveGateway;
+import org.activiti.designer.bpmn2.model.FlowElement;
+import org.activiti.designer.bpmn2.model.FlowNode;
+import org.activiti.designer.bpmn2.model.Gateway;
+import org.activiti.designer.bpmn2.model.InclusiveGateway;
+import org.activiti.designer.bpmn2.model.ManualTask;
+import org.activiti.designer.bpmn2.model.ParallelGateway;
+import org.activiti.designer.bpmn2.model.ReceiveTask;
+import org.activiti.designer.bpmn2.model.ScriptTask;
+import org.activiti.designer.bpmn2.model.SequenceFlow;
+import org.activiti.designer.bpmn2.model.ServiceTask;
+import org.activiti.designer.bpmn2.model.StartEvent;
+import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.designer.bpmn2.model.Task;
+import org.activiti.designer.bpmn2.model.UserTask;
 import org.activiti.designer.eclipse.bpmn.BpmnParser;
-import org.activiti.designer.eclipse.bpmn.GraphicInfo;
 import org.activiti.designer.eclipse.bpmn.SequenceFlowModel;
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
+import org.activiti.designer.util.editor.Bpmn2MemoryModel;
+import org.activiti.designer.util.editor.GraphicInfo;
 import org.activiti.designer.util.preferences.Preferences;
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.bpmn2.Activity;
-import org.eclipse.bpmn2.BoundaryEvent;
-import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.BusinessRuleTask;
-import org.eclipse.bpmn2.CallActivity;
-import org.eclipse.bpmn2.CandidateGroup;
-import org.eclipse.bpmn2.CandidateUser;
-import org.eclipse.bpmn2.Documentation;
-import org.eclipse.bpmn2.EndEvent;
-import org.eclipse.bpmn2.ErrorEventDefinition;
-import org.eclipse.bpmn2.Event;
-import org.eclipse.bpmn2.EventDefinition;
-import org.eclipse.bpmn2.ExclusiveGateway;
-import org.eclipse.bpmn2.FieldExtension;
-import org.eclipse.bpmn2.FlowElement;
-import org.eclipse.bpmn2.FlowNode;
-import org.eclipse.bpmn2.Gateway;
-import org.eclipse.bpmn2.InclusiveGateway;
-import org.eclipse.bpmn2.MailTask;
-import org.eclipse.bpmn2.ManualTask;
-import org.eclipse.bpmn2.ParallelGateway;
-import org.eclipse.bpmn2.ReceiveTask;
-import org.eclipse.bpmn2.ScriptTask;
-import org.eclipse.bpmn2.SequenceFlow;
-import org.eclipse.bpmn2.ServiceTask;
-import org.eclipse.bpmn2.StartEvent;
-import org.eclipse.bpmn2.SubProcess;
-import org.eclipse.bpmn2.Task;
-import org.eclipse.bpmn2.UserTask;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -72,7 +64,6 @@ import org.eclipse.graphiti.mm.pictograms.Anchor;
 import org.eclipse.graphiti.mm.pictograms.ChopboxAnchor;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
-import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.ILinkService;
@@ -102,6 +93,7 @@ public class BpmnFileReader {
   private BpmnParser bpmnParser = new BpmnParser();
   private Map<String, GraphicInfo> yMap = new HashMap<String, GraphicInfo>();
   private List<SubProcess> subProcessList = new ArrayList<SubProcess>();
+  private Bpmn2MemoryModel model = new Bpmn2MemoryModel(null, "test");
   
   private boolean useBPMNDI = false;
   
@@ -133,50 +125,24 @@ public class BpmnFileReader {
     }
   }
 
-  public void readBpmn() {
+  public void readBpmn(Bpmn2MemoryModel model) {
     try {
       XMLInputFactory xif = XMLInputFactory.newInstance();
       InputStreamReader in = new InputStreamReader(fileStream, "UTF-8");
       XMLStreamReader xtr = xif.createXMLStreamReader(in);
-      bpmnParser.parseBpmn(xtr);
+      bpmnParser.parseBpmn(xtr, model);
       
-      if(bpmnParser.bpmnList.size() == 0) return;
+      if(model.getProcess().getFlowElements().size() == 0) return;
       
-      org.eclipse.bpmn2.Process process = Bpmn2Factory.eINSTANCE.createProcess();
       String processId = processName.replace(" ", "");
-      process.setId(processId);
-      if(bpmnParser.process != null && StringUtils.isNotEmpty(bpmnParser.process.getName())) {
-      	process.setName(bpmnParser.process.getName());
-      } else {
-      	process.setName(processName);
-      }
-      if(bpmnParser.process != null && StringUtils.isNotEmpty(bpmnParser.process.getNamespace())) {
-      	process.setNamespace(bpmnParser.process.getNamespace());
-      }
-      
-      Documentation documentation = null;
-      if(bpmnParser.process == null || bpmnParser.process.getDocumentation().size() == 0) {
-      	documentation = Bpmn2Factory.eINSTANCE.createDocumentation();
-	      documentation.setId("documentation_process");
-	      documentation.setText("");
-      } else {
-      	documentation = bpmnParser.process.getDocumentation().get(0);
-      }
-      
-      process.getDocumentation().add(documentation);
-      
-      if(bpmnParser.process != null && bpmnParser.process.getExecutionListeners().size() > 0) {
-        process.getExecutionListeners().addAll(bpmnParser.process.getExecutionListeners());
-      }
-      diagram.eResource().getContents().add(process);
+      model.getProcess().setId(processId);
       
       if(PreferencesUtil.getBooleanPreference(Preferences.IMPORT_USE_BPMNDI) && bpmnParser.bpmdiInfoFound == true) {
       	useBPMNDI = true;
-        drawDiagramWithBPMNDI(diagram, featureProvider, bpmnParser.bpmnList, bpmnParser.sequenceFlowList,
-                bpmnParser.locationMap);
+        drawDiagramWithBPMNDI(diagram, featureProvider, model.getProcess().getFlowElements(), bpmnParser.sequenceFlowList, model.getLocationMap());
       } else {
       
-        createDiagramElements(bpmnParser.bpmnList);
+        createDiagramElements(model.getProcess().getFlowElements());
         drawSequenceFlows();
       }
       setFriendlyIds();
@@ -437,7 +403,7 @@ public class BpmnFileReader {
       
       int differenceInitialStartEventAndSubProcessHeight = (graphicInfo.height / 2) - 50 - (EVENT_HEIGHT / 2);
       
-      ILinkService linkService = Graphiti.getLinkService();
+      /*ILinkService linkService = Graphiti.getLinkService();
       List<PictogramElement> pictoList = linkService.getPictogramElements(diagram, (SubProcess) newFlowElement);
       if(pictoList != null && pictoList.size() > 0) {
         ContainerShape parent = (ContainerShape) pictoList.get(0);
@@ -446,7 +412,7 @@ public class BpmnFileReader {
         	subInfoElem.y += differenceInitialStartEventAndSubProcessHeight;
           addBpmnElementToDiagram(subFlowElement, subYMap.get(subFlowElement.getId()), parent);
         }
-      }
+      }*/
       
     } else {
       graphicInfo.height = TASK_HEIGHT;
@@ -507,7 +473,7 @@ public class BpmnFileReader {
       }
     }
     if(sourceRefString != null) {
-      for (FlowElement flowElement : bpmnParser.bpmnList) {
+      for (FlowElement flowElement : model.getProcess().getFlowElements()) {
         if(flowElement.getId().equals(sourceRefString)) {
           sourceRef = flowElement;
         }
@@ -533,7 +499,7 @@ public class BpmnFileReader {
       }
     }
     if(sourceRef != null) {
-      for (FlowElement flowElement : bpmnParser.bpmnList) {
+      for (FlowElement flowElement : model.getProcess().getFlowElements()) {
         if(flowElement.getId().equals(sourceRef)) {
           if(flowElement instanceof Event) {
             maxX += EVENT_WIDTH;
@@ -567,7 +533,7 @@ public class BpmnFileReader {
       	int sourceCounter = 0;
       	for (SequenceFlowModel sourceFlowModel : sequenceFlowList) {
       		if(sourceFlowModel.sourceRef.equals(source)) {
-      			for(FlowElement flowElement : bpmnParser.bpmnList) {
+      			for(FlowElement flowElement : model.getProcess().getFlowElements()) {
       				if(flowElement.getId().equals(source) && flowElement instanceof BoundaryEvent == false) {
       					sourceCounter++;
       				}
@@ -757,11 +723,11 @@ public class BpmnFileReader {
       	activeSubProcess = (SubProcess) flowElement;
       	subProcessList.add(activeSubProcess);
       	
-      	ILinkService linkService = Graphiti.getLinkService();
+      	/*ILinkService linkService = Graphiti.getLinkService();
         List<PictogramElement> pictoList = linkService.getPictogramElements(diagram, activeSubProcess);
         if(pictoList != null && pictoList.size() > 0) {
         	processShape = (ContainerShape) pictoList.get(0);
-        }
+        }*/
       }
     }
     drawSequenceFlows();
@@ -769,7 +735,7 @@ public class BpmnFileReader {
   
   private void setFriendlyIds() {
     Map<String, Integer> idMap = new HashMap<String, Integer>();
-    for (FlowElement flowElement : bpmnParser.bpmnList) {
+    for (FlowElement flowElement : model.getProcess().getFlowElements()) {
     	if(StringUtils.isEmpty(flowElement.getId()) == false && 
     			flowElement.getId().matches("sid-\\w{4,12}-\\w{4,12}-\\w{4,12}-\\w{4,12}-\\w{4,12}") == false) {
     		
@@ -778,11 +744,11 @@ public class BpmnFileReader {
       if(flowElement instanceof StartEvent) {
         flowElement.setId(getNextId("startevent", idMap));
       } else if(flowElement instanceof EndEvent) {
-        if(((EndEvent) flowElement).getEventDefinitions().size() > 0) {
+        /*if(((EndEvent) flowElement).getEventDefinitions().size() > 0) {
           flowElement.setId(getNextId("errorendevent", idMap));
         } else {
           flowElement.setId(getNextId("endevent", idMap));
-        }
+        }*/
       } else if(flowElement instanceof ExclusiveGateway) {
         flowElement.setId(getNextId("exclusivegateway", idMap));
       } else if(flowElement instanceof InclusiveGateway) {
@@ -801,17 +767,17 @@ public class BpmnFileReader {
         flowElement.setId(getNextId("receivetask", idMap));
       } else if(flowElement instanceof BusinessRuleTask) {
         flowElement.setId(getNextId("businessruletask", idMap));
-      } else if(flowElement instanceof MailTask) {
-        flowElement.setId(getNextId("mailtask", idMap));
+      //} else if(flowElement instanceof MailTask) {
+      //  flowElement.setId(getNextId("mailtask", idMap));
       } else if(flowElement instanceof BoundaryEvent) {
-        if(((BoundaryEvent) flowElement).getEventDefinitions().size() > 0) {
+        /*if(((BoundaryEvent) flowElement).getEventDefinitions().size() > 0) {
           EventDefinition definition = ((BoundaryEvent) flowElement).getEventDefinitions().get(0);
           if(definition instanceof ErrorEventDefinition) {
             flowElement.setId(getNextId("boundaryerror", idMap));
           } else {
             flowElement.setId(getNextId("boundarytimer", idMap));
           }
-        }
+        }*/
       } else if(flowElement instanceof CallActivity) {
         flowElement.setId(getNextId("callactivity", idMap));
       } else if(flowElement instanceof SubProcess) {
@@ -832,7 +798,7 @@ public class BpmnFileReader {
   private void drawSequenceFlows() {
     int sequenceCounter = 1;
     for(SequenceFlowModel sequenceFlowModel : bpmnParser.sequenceFlowList) {
-      SequenceFlow sequenceFlow = Bpmn2Factory.eINSTANCE.createSequenceFlow();
+      SequenceFlow sequenceFlow = new SequenceFlow();
       if(StringUtils.isEmpty(sequenceFlowModel.id) || sequenceFlowModel.id.matches("sid-\\w{4,12}-\\w{4,12}-\\w{4,12}-\\w{4,12}-\\w{4,12}")) {
       	sequenceFlow.setId("flow" + sequenceCounter);
       	sequenceCounter++;
@@ -846,23 +812,23 @@ public class BpmnFileReader {
       if(sequenceFlowModel.conditionExpression != null) {
         sequenceFlow.setConditionExpression(sequenceFlowModel.conditionExpression);
       }
-      if(sequenceFlowModel.listenerList.size() > 0) {
+      /*if(sequenceFlowModel.listenerList.size() > 0) {
         sequenceFlow.getExecutionListeners().addAll(sequenceFlowModel.listenerList);
-      }
+      }*/
       
       ContainerShape parent = null;
       SubProcess subProcess = subProcessContains(sequenceFlow.getSourceRef(), subProcessList);
       if(subProcess != null) {
-        ILinkService linkService = Graphiti.getLinkService();
+        /*ILinkService linkService = Graphiti.getLinkService();
         List<PictogramElement> pictoList = linkService.getPictogramElements(diagram, subProcess);
         if(pictoList != null && pictoList.size() > 0) {
           parent = (ContainerShape) pictoList.get(0);
           subProcess.getFlowElements().add(sequenceFlow);
-        }
+        }*/
       } 
       
       if(parent == null) {
-        diagram.eResource().getContents().add(sequenceFlow);
+        //diagram.eResource().getContents().add(sequenceFlow);
         parent = diagram;
       }
       
@@ -965,11 +931,11 @@ public class BpmnFileReader {
           String defaultId = bpmnParser.defaultFlowMap.get(flowNode);
           if(defaultId.equalsIgnoreCase(sequenceFlowModel.id)) {
             if(flowNode instanceof ExclusiveGateway) {
-              ((ExclusiveGateway) flowNode).setDefault(sequenceFlow);
+              //((ExclusiveGateway) flowNode).setDefault(sequenceFlow);
             } else if(flowNode instanceof InclusiveGateway) {
-              ((InclusiveGateway) flowNode).setDefault(sequenceFlow);
+              //((InclusiveGateway) flowNode).setDefault(sequenceFlow);
             } else {
-              ((Activity) flowNode).setDefault(sequenceFlow);
+              //((Activity) flowNode).setDefault(sequenceFlow);
             }
           }
         }
@@ -990,7 +956,7 @@ public class BpmnFileReader {
   
   private FlowNode getFlowNode(String elementid) {
     FlowNode flowNode = null;
-    for(FlowElement flowElement : bpmnParser.bpmnList) {
+    for(FlowElement flowElement : model.getProcess().getFlowElements()) {
       if(flowElement.getId().equalsIgnoreCase(elementid)) {
         flowNode = (FlowNode) flowElement;
       }
@@ -1011,10 +977,10 @@ public class BpmnFileReader {
       }
       
       ILinkService linkService = Graphiti.getLinkService();
-      List<PictogramElement> pictoList = linkService.getPictogramElements(diagram, boundaryEvent.getAttachedToRef());
+      /*List<PictogramElement> pictoList = linkService.getPictogramElements(diagram, boundaryEvent.getAttachedToRef());
       if(pictoList != null && pictoList.size() > 0) {
         addContext.setTargetContainer((ContainerShape) pictoList.get(0));
-      }
+      }*/
       
       addContext.setNewObject(boundaryEvent);
       if(parentIsSubProcess == true) {
@@ -1032,7 +998,7 @@ public class BpmnFileReader {
       return;
     }
     
-    if(flowElement instanceof UserTask) {
+    /*if(flowElement instanceof UserTask) {
       UserTask userTask = (UserTask) flowElement;
       if(userTask.getCandidateUsers() != null && userTask.getCandidateUsers().size() > 0) {
         for (CandidateUser candidateUser : userTask.getCandidateUsers()) {
@@ -1051,7 +1017,7 @@ public class BpmnFileReader {
           diagram.eResource().getContents().add(fieldExtension);
         }
       }
-    }
+    }*/
     AddContext addContext = new AddContext();
     addContext.setNewObject(flowElement);
     addContext.setTargetContainer(parent);

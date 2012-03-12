@@ -15,11 +15,10 @@
  *******************************************************************************/
 package org.activiti.designer.property;
 
+import org.activiti.designer.bpmn2.model.Activity;
+import org.activiti.designer.bpmn2.model.MultiInstanceLoopCharacteristics;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
-import org.eclipse.bpmn2.Activity;
-import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.MultiInstanceLoopCharacteristics;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
@@ -131,12 +130,12 @@ public class PropertyMultiInstanceSection extends ActivitiPropertySection implem
 	  completionConditionText.removeFocusListener(listener);
 	  
     
-	  if(multiInstanceDef.isIsSequential() == true && yesButton.getSelection() == false) {
+	  if(multiInstanceDef.isSequential() == true && yesButton.getSelection() == false) {
 	    yesButton.setSelection(true);
 	    noButton.setSelection(false);
     }
 	  
-	  if(multiInstanceDef.isIsSequential() == false && yesButton.getSelection() == true) {
+	  if(multiInstanceDef.isSequential() == false && yesButton.getSelection() == true) {
       yesButton.setSelection(false);
       noButton.setSelection(true);
     }
@@ -180,7 +179,7 @@ public class PropertyMultiInstanceSection extends ActivitiPropertySection implem
         if (bo == null) {
           return;
         }
-        getMultiInstanceDef(activity).setIsSequential(sequential);
+        getMultiInstanceDef(activity).setSequential(sequential);
       }
     }, editingDomain, "Model Update");
 	}
@@ -225,7 +224,7 @@ public class PropertyMultiInstanceSection extends ActivitiPropertySection implem
 	
 	private MultiInstanceLoopCharacteristics getMultiInstanceDef(Activity activity) {
 	  if(activity.getLoopCharacteristics() == null) {
-	    activity.setLoopCharacteristics(Bpmn2Factory.eINSTANCE.createMultiInstanceLoopCharacteristics());
+	    activity.setLoopCharacteristics(new MultiInstanceLoopCharacteristics());
 	  }
 	  return (MultiInstanceLoopCharacteristics) activity.getLoopCharacteristics();
 	}

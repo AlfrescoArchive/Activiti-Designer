@@ -19,12 +19,12 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
+import org.activiti.designer.bpmn2.model.ServiceTask;
 import org.activiti.designer.integration.servicetask.PropertyType;
 import org.activiti.designer.integration.servicetask.annotation.DatePickerProperty;
 import org.activiti.designer.integration.servicetask.validator.RequiredFieldValidator;
 import org.activiti.designer.property.PropertyCustomServiceTaskSection;
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.bpmn2.ServiceTask;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.layout.FormAttachment;

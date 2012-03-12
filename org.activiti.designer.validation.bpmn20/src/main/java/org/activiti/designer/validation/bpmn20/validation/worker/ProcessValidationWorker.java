@@ -4,7 +4,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 
 /**
@@ -17,6 +16,6 @@ import org.eclipse.graphiti.mm.pictograms.Diagram;
  */
 public interface ProcessValidationWorker {
 
-  Collection<ProcessValidationWorkerMarker> validate(Diagram diagram, Map<String, List<EObject>> processNodes);
+  Collection<ProcessValidationWorkerMarker> validate(Diagram diagram, Map<String, List<Object>> processNodes);
 
 }

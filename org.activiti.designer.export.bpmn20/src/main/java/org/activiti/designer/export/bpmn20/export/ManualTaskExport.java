@@ -15,9 +15,8 @@ package org.activiti.designer.export.bpmn20.export;
 
 import javax.xml.stream.XMLStreamWriter;
 
-import org.eclipse.bpmn2.BoundaryEvent;
-import org.eclipse.bpmn2.ManualTask;
-import org.eclipse.emf.ecore.EObject;
+import org.activiti.designer.bpmn2.model.BoundaryEvent;
+import org.activiti.designer.bpmn2.model.ManualTask;
 
 
 /**
@@ -25,7 +24,7 @@ import org.eclipse.emf.ecore.EObject;
  */
 public class ManualTaskExport implements ActivitiNamespaceConstants {
 
-  public static void createManualTask(EObject object, XMLStreamWriter xtw) throws Exception {
+  public static void createManualTask(Object object, XMLStreamWriter xtw) throws Exception {
     ManualTask manualTask = (ManualTask) object;
     // start ManualTask element
     xtw.writeStartElement("manualTask");
@@ -33,17 +32,17 @@ public class ManualTaskExport implements ActivitiNamespaceConstants {
     if (manualTask.getName() != null) {
       xtw.writeAttribute("name", manualTask.getName());
     }
-    DefaultFlowExport.createDefaultFlow(object, xtw);
-    AsyncActivityExport.createDefaultFlow(object, xtw);
-    ExtensionListenerExport.createExtensionListenerXML(manualTask.getActivitiListeners(), true, EXECUTION_LISTENER, xtw);
+    DefaultFlowExport.createDefaultFlow(manualTask, xtw);
+    AsyncActivityExport.createAsyncAttribute(manualTask, xtw);
+    ExecutionListenerExport.createExecutionListenerXML(manualTask.getExecutionListeners(), true, xtw);
     
     MultiInstanceExport.createMultiInstance(object, xtw);
 
     // end ManualTask element
     xtw.writeEndElement();
     
-    if(manualTask.getBoundaryEventRefs().size() > 0) {
-    	for(BoundaryEvent event : manualTask.getBoundaryEventRefs()) {
+    if(manualTask.getBoundaryEvents().size() > 0) {
+    	for(BoundaryEvent event : manualTask.getBoundaryEvents()) {
     		BoundaryEventExport.createBoundaryEvent(event, xtw);
     	}
     }

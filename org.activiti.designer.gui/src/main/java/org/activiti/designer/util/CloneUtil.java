@@ -3,6 +3,22 @@
  */
 package org.activiti.designer.util;
 
+import org.activiti.designer.bpmn2.model.ComplexDataType;
+import org.activiti.designer.bpmn2.model.CustomProperty;
+import org.activiti.designer.bpmn2.model.DataGrid;
+import org.activiti.designer.bpmn2.model.DataGridField;
+import org.activiti.designer.bpmn2.model.DataGridRow;
+import org.activiti.designer.bpmn2.model.EndEvent;
+import org.activiti.designer.bpmn2.model.ExclusiveGateway;
+import org.activiti.designer.bpmn2.model.FlowElement;
+import org.activiti.designer.bpmn2.model.InclusiveGateway;
+import org.activiti.designer.bpmn2.model.MailTask;
+import org.activiti.designer.bpmn2.model.ManualTask;
+import org.activiti.designer.bpmn2.model.ParallelGateway;
+import org.activiti.designer.bpmn2.model.ScriptTask;
+import org.activiti.designer.bpmn2.model.ServiceTask;
+import org.activiti.designer.bpmn2.model.StartEvent;
+import org.activiti.designer.bpmn2.model.UserTask;
 import org.activiti.designer.features.CreateEndEventFeature;
 import org.activiti.designer.features.CreateExclusiveGatewayFeature;
 import org.activiti.designer.features.CreateInclusiveGatewayFeature;
@@ -14,23 +30,8 @@ import org.activiti.designer.features.CreateStartEventFeature;
 import org.activiti.designer.features.CreateUserTaskFeature;
 import org.activiti.designer.property.extension.util.ExtensionUtil;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
-import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.ComplexDataType;
-import org.eclipse.bpmn2.CustomProperty;
-import org.eclipse.bpmn2.DataGrid;
-import org.eclipse.bpmn2.DataGridField;
-import org.eclipse.bpmn2.DataGridRow;
-import org.eclipse.bpmn2.EndEvent;
-import org.eclipse.bpmn2.ExclusiveGateway;
-import org.eclipse.bpmn2.FlowElement;
-import org.eclipse.bpmn2.InclusiveGateway;
-import org.eclipse.bpmn2.MailTask;
-import org.eclipse.bpmn2.ManualTask;
-import org.eclipse.bpmn2.ParallelGateway;
-import org.eclipse.bpmn2.ScriptTask;
-import org.eclipse.bpmn2.ServiceTask;
-import org.eclipse.bpmn2.StartEvent;
-import org.eclipse.bpmn2.UserTask;
+import org.activiti.designer.util.editor.ModelHandler;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 
 /**
@@ -86,12 +87,12 @@ public final class CloneUtil {
    */
   private static final StartEvent clone(final StartEvent original, final Diagram diagram) {
 
-    StartEvent result = Bpmn2Factory.eINSTANCE.createStartEvent();
+    StartEvent result = new StartEvent();
 
     result.setId(ActivitiUiUtil.getNextId(result.getClass(), CreateStartEventFeature.FEATURE_ID_KEY, diagram));
     result.setName(original.getName());
 
-    diagram.eResource().getContents().add(result);
+    ModelHandler.getModel(EcoreUtil.getURI(diagram)).addFlowElement(result);
 
     return result;
 
@@ -106,12 +107,12 @@ public final class CloneUtil {
    */
   private static final EndEvent clone(final EndEvent original, final Diagram diagram) {
 
-    EndEvent result = Bpmn2Factory.eINSTANCE.createEndEvent();
+    EndEvent result = new EndEvent();
 
     result.setId(ActivitiUiUtil.getNextId(result.getClass(), CreateEndEventFeature.FEATURE_ID_KEY, diagram));
     result.setName(original.getName());
 
-    diagram.eResource().getContents().add(result);
+    ModelHandler.getModel(EcoreUtil.getURI(diagram)).addFlowElement(result);
 
     return result;
 
@@ -126,13 +127,12 @@ public final class CloneUtil {
    */
   private static final ExclusiveGateway clone(final ExclusiveGateway original, final Diagram diagram) {
 
-    ExclusiveGateway result = Bpmn2Factory.eINSTANCE.createExclusiveGateway();
+    ExclusiveGateway result = new ExclusiveGateway();
 
     result.setId(ActivitiUiUtil.getNextId(result.getClass(), CreateExclusiveGatewayFeature.FEATURE_ID_KEY, diagram));
     result.setName(original.getName());
-    result.setGatewayDirection(original.getGatewayDirection());
-
-    diagram.eResource().getContents().add(result);
+    
+    ModelHandler.getModel(EcoreUtil.getURI(diagram)).addFlowElement(result);
 
     return result;
 
@@ -147,13 +147,12 @@ public final class CloneUtil {
    */
   private static final InclusiveGateway clone(final InclusiveGateway original, final Diagram diagram) {
 
-    InclusiveGateway result = Bpmn2Factory.eINSTANCE.createInclusiveGateway();
+    InclusiveGateway result = new InclusiveGateway();
 
     result.setId(ActivitiUiUtil.getNextId(result.getClass(), CreateInclusiveGatewayFeature.FEATURE_ID_KEY, diagram));
     result.setName(original.getName());
-    result.setGatewayDirection(original.getGatewayDirection());
-
-    diagram.eResource().getContents().add(result);
+    
+    ModelHandler.getModel(EcoreUtil.getURI(diagram)).addFlowElement(result);
 
     return result;
 
@@ -168,7 +167,7 @@ public final class CloneUtil {
    */
   private static final MailTask clone(final MailTask original, final Diagram diagram) {
 
-    MailTask result = Bpmn2Factory.eINSTANCE.createMailTask();
+    MailTask result = new MailTask();
 
     result.setId(ActivitiUiUtil.getNextId(result.getClass(), CreateMailTaskFeature.FEATURE_ID_KEY, diagram));
     result.setName(original.getName());
@@ -180,7 +179,7 @@ public final class CloneUtil {
     result.setText(original.getText());
     result.setTo(original.getTo());
 
-    diagram.eResource().getContents().add(result);
+    ModelHandler.getModel(EcoreUtil.getURI(diagram)).addFlowElement(result);
 
     return result;
 
@@ -195,12 +194,12 @@ public final class CloneUtil {
    */
   private static final ManualTask clone(final ManualTask original, final Diagram diagram) {
 
-    ManualTask result = Bpmn2Factory.eINSTANCE.createManualTask();
+    ManualTask result = new ManualTask();
 
     result.setId(ActivitiUiUtil.getNextId(result.getClass(), CreateMailTaskFeature.FEATURE_ID_KEY, diagram));
     result.setName(original.getName());
 
-    diagram.eResource().getContents().add(result);
+    ModelHandler.getModel(EcoreUtil.getURI(diagram)).addFlowElement(result);
 
     return result;
 
@@ -215,13 +214,12 @@ public final class CloneUtil {
    */
   private static final ParallelGateway clone(final ParallelGateway original, final Diagram diagram) {
 
-    ParallelGateway result = Bpmn2Factory.eINSTANCE.createParallelGateway();
+    ParallelGateway result = new ParallelGateway();
 
     result.setId(ActivitiUiUtil.getNextId(result.getClass(), CreateParallelGatewayFeature.FEATURE_ID_KEY, diagram));
     result.setName(original.getName());
-    result.setGatewayDirection(original.getGatewayDirection());
-
-    diagram.eResource().getContents().add(result);
+    
+    ModelHandler.getModel(EcoreUtil.getURI(diagram)).addFlowElement(result);
 
     return result;
 
@@ -236,14 +234,14 @@ public final class CloneUtil {
    */
   private static final ScriptTask clone(final ScriptTask original, final Diagram diagram) {
 
-    ScriptTask result = Bpmn2Factory.eINSTANCE.createScriptTask();
+    ScriptTask result = new ScriptTask();
 
     result.setId(ActivitiUiUtil.getNextId(result.getClass(), CreateScriptTaskFeature.FEATURE_ID_KEY, diagram));
     result.setName(original.getName());
     result.setScript(original.getScript());
     result.setScriptFormat(original.getScriptFormat());
 
-    diagram.eResource().getContents().add(result);
+    ModelHandler.getModel(EcoreUtil.getURI(diagram)).addFlowElement(result);
 
     return result;
 
@@ -258,15 +256,14 @@ public final class CloneUtil {
    */
   private static final UserTask clone(final UserTask original, final Diagram diagram) {
 
-    UserTask result = Bpmn2Factory.eINSTANCE.createUserTask();
+    UserTask result = new UserTask();
 
     result.setId(ActivitiUiUtil.getNextId(result.getClass(), CreateUserTaskFeature.FEATURE_ID_KEY, diagram));
     result.setName(original.getName());
     result.setAssignee(original.getAssignee());
     result.setFormKey(original.getFormKey());
-    result.setImplementation(original.getImplementation());
-
-    diagram.eResource().getContents().add(result);
+    
+    ModelHandler.getModel(EcoreUtil.getURI(diagram)).addFlowElement(result);
 
     return result;
 
@@ -281,7 +278,7 @@ public final class CloneUtil {
    */
   private static final ServiceTask clone(final ServiceTask original, final Diagram diagram) {
 
-    ServiceTask result = Bpmn2Factory.eINSTANCE.createServiceTask();
+    ServiceTask result = new ServiceTask();
 
     result.setId(ActivitiUiUtil.getNextId(result.getClass(), CreateServiceTaskFeature.FEATURE_ID_KEY, diagram));
     result.setName(original.getName());
@@ -292,11 +289,10 @@ public final class CloneUtil {
       final CustomProperty clone = clone(property, diagram);
       // Reset the id
       clone.setId(ExtensionUtil.wrapCustomPropertyId(result, ExtensionUtil.upWrapCustomPropertyId(clone.getId())));
-      diagram.eResource().getContents().add(clone);
       result.getCustomProperties().add(clone);
     }
 
-    diagram.eResource().getContents().add(result);
+    ModelHandler.getModel(EcoreUtil.getURI(diagram)).addFlowElement(result);
 
     return result;
 
@@ -311,7 +307,7 @@ public final class CloneUtil {
    */
   private static final CustomProperty clone(final CustomProperty original, final Diagram diagram) {
 
-    CustomProperty result = Bpmn2Factory.eINSTANCE.createCustomProperty();
+    CustomProperty result = new CustomProperty();
 
     result.setId(original.getId());
     if (original.getComplexValue() != null) {
@@ -327,17 +323,17 @@ public final class CloneUtil {
   private static ComplexDataType clone(ComplexDataType complexValue) {
     if (complexValue instanceof DataGrid) {
       final DataGrid dataGrid = (DataGrid) complexValue;
-      DataGrid result = Bpmn2Factory.eINSTANCE.createDataGrid();
-      for (final DataGridRow dataGridRow : dataGrid.getRow()) {
-        final DataGridRow rowClone = Bpmn2Factory.eINSTANCE.createDataGridRow();
+      DataGrid result = new DataGrid();
+      for (final DataGridRow dataGridRow : dataGrid.getRows()) {
+        final DataGridRow rowClone = new DataGridRow();
         rowClone.setIndex(dataGridRow.getIndex());
-        for (final DataGridField dataGridField : dataGridRow.getField()) {
-          final DataGridField fieldClone = Bpmn2Factory.eINSTANCE.createDataGridField();
+        for (final DataGridField dataGridField : dataGridRow.getFields()) {
+          final DataGridField fieldClone = new DataGridField();
           fieldClone.setName(dataGridField.getName());
-          fieldClone.setSimpleValue(dataGridField.getSimpleValue());
-          rowClone.getField().add(fieldClone);
+          fieldClone.setValue(dataGridField.getValue());
+          rowClone.getFields().add(fieldClone);
         }
-        result.getRow().add(rowClone);
+        result.getRows().add(rowClone);
       }
       return result;
     }

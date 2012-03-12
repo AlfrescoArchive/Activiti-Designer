@@ -6,16 +6,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.designer.property.extension.util.ExtensionUtil;
+import org.activiti.designer.bpmn2.model.FlowElement;
+import org.activiti.designer.bpmn2.model.ServiceTask;
+import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.validation.bpmn20.validation.worker.ProcessValidationWorker;
 import org.activiti.designer.validation.bpmn20.validation.worker.ProcessValidationWorkerMarker;
-import org.eclipse.bpmn2.FlowElement;
-import org.eclipse.bpmn2.ServiceTask;
-import org.eclipse.bpmn2.SubProcess;
-import org.eclipse.bpmn2.impl.ServiceTaskImpl;
-import org.eclipse.bpmn2.impl.SubProcessImpl;
-import org.eclipse.core.resources.IMarker;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 
 /**
@@ -30,37 +25,27 @@ public class ServiceTaskValidationWorker implements ProcessValidationWorker {
   private static final String NO_CLASS_EXCEPTION_MESSAGE_PATTERN = "ServiceTask '%s' has no class specified";
 
   @Override
-  public Collection<ProcessValidationWorkerMarker> validate(final Diagram diagram, final Map<String, List<EObject>> processNodes) {
+  public Collection<ProcessValidationWorkerMarker> validate(final Diagram diagram, final Map<String, List<Object>> processNodes) {
 
     final Collection<ProcessValidationWorkerMarker> result = new ArrayList<ProcessValidationWorkerMarker>();
 
-    final List<EObject> serviceTasks = processNodes.get(ServiceTaskImpl.class.getCanonicalName());
+    final List<Object> serviceTasks = processNodes.get(ServiceTask.class.getCanonicalName());
 
     if (serviceTasks != null && !serviceTasks.isEmpty()) {
-      for (final EObject object : serviceTasks) {
+      for (final Object object : serviceTasks) {
 
-        if (!ExtensionUtil.isCustomServiceTask(object)) {
-
-          final ServiceTask serviceTask = (ServiceTask) object;
-
-          if ((serviceTask.getImplementationType() == null || serviceTask.getImplementationType().length() == 0 || "classType".equalsIgnoreCase(serviceTask
-                  .getImplementationType())) && serviceTask.getImplementation() == null || serviceTask.getImplementation().length() == 0) {
-
-            result.add(new ProcessValidationWorkerMarker(IMarker.SEVERITY_ERROR, String.format(NO_CLASS_EXCEPTION_MESSAGE_PATTERN, serviceTask.getName()),
-                    serviceTask.getId(), ValidationCode.VAL_004));
-          }
-        }
+        
       }
     }
     
-    final List<EObject> subProcesses = processNodes.get(SubProcessImpl.class.getCanonicalName());
+    final List<Object> subProcesses = processNodes.get(SubProcess.class.getCanonicalName());
 
     if (subProcesses != null && !subProcesses.isEmpty()) {
-      for (final EObject object : subProcesses) {
+      for (final Object object : subProcesses) {
 
         final SubProcess subProcess = (SubProcess) object;
         
-        final Map<String, List<EObject>> subElementsMap = new HashMap<String, List<EObject>>();
+        final Map<String, List<Object>> subElementsMap = new HashMap<String, List<Object>>();
 
         for (final FlowElement subElement : subProcess.getFlowElements()) {
 
@@ -68,7 +53,7 @@ public class ServiceTaskValidationWorker implements ProcessValidationWorker {
 
           if (nodeType != null) {
             if (!subElementsMap.containsKey(nodeType)) {
-            	subElementsMap.put(nodeType, new ArrayList<EObject>());
+            	subElementsMap.put(nodeType, new ArrayList<Object>());
             }
             subElementsMap.get(nodeType).add(subElement);
           }

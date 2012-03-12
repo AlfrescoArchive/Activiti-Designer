@@ -1,9 +1,10 @@
 package com.alfresco.designer.gui.features;
 
+import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.designer.bpmn2.model.alfresco.AlfrescoScriptTask;
 import org.activiti.designer.features.AbstractCreateFastBPMNFeature;
-import org.eclipse.bpmn2.AlfrescoScriptTask;
-import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.SubProcess;
+import org.activiti.designer.util.editor.ModelHandler;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -24,7 +25,7 @@ public class CreateAlfrescoScriptTaskFeature extends AbstractCreateFastBPMNFeatu
 
 	@Override
 	public Object[] create(ICreateContext context) {
-		AlfrescoScriptTask newScriptTask = Bpmn2Factory.eINSTANCE.createAlfrescoScriptTask();
+		AlfrescoScriptTask newScriptTask = new AlfrescoScriptTask();
 
 		newScriptTask.setId(getNextId());
 		newScriptTask.setName("Alfresco Script Task");
@@ -33,7 +34,7 @@ public class CreateAlfrescoScriptTaskFeature extends AbstractCreateFastBPMNFeatu
     if (parentObject instanceof SubProcess) {
       ((SubProcess) parentObject).getFlowElements().add(newScriptTask);
     } else {
-      getDiagram().eResource().getContents().add(newScriptTask);
+    	ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).addFlowElement(newScriptTask);
     }
 
     addGraphicalContent(newScriptTask, context);
@@ -57,7 +58,7 @@ public class CreateAlfrescoScriptTaskFeature extends AbstractCreateFastBPMNFeatu
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected Class getFeatureClass() {
-		return Bpmn2Factory.eINSTANCE.createAlfrescoScriptTask().getClass();
+		return new AlfrescoScriptTask().getClass();
 	}
 
 }

@@ -1,8 +1,8 @@
 package org.activiti.designer.property;
 
-import org.eclipse.bpmn2.BoundaryEvent;
-import org.eclipse.bpmn2.EventDefinition;
-import org.eclipse.bpmn2.TimerEventDefinition;
+import org.activiti.designer.bpmn2.model.BoundaryEvent;
+import org.activiti.designer.bpmn2.model.EventDefinition;
+import org.activiti.designer.bpmn2.model.TimerEventDefinition;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;

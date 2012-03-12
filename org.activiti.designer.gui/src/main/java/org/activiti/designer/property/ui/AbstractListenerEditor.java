@@ -3,12 +3,11 @@ package org.activiti.designer.property.ui;
 import java.util.Iterator;
 import java.util.List;
 
+import org.activiti.designer.bpmn2.model.ActivitiListener;
+import org.activiti.designer.bpmn2.model.FieldExtension;
 import org.activiti.designer.model.FieldExtensionModel;
 import org.activiti.designer.util.BpmnBOUtil;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
-import org.eclipse.bpmn2.ActivitiListener;
-import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.FieldExtension;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
@@ -71,7 +70,7 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
           if(fieldString.length() > 0) {
             fieldString += "± ";
           }
-          fieldString += fieldExtension.getFieldname() + ":" + fieldExtension.getExpression();
+          fieldString += fieldExtension.getFieldName() + ":" + fieldExtension.getExpression();
         }
       }
       tableItem.setText(3, fieldString);
@@ -145,7 +144,7 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
 			TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
 			ActivitiUiUtil.runModelChange(new Runnable() {
 				public void run() {
-				  ActivitiListener newListener = Bpmn2Factory.eINSTANCE.createActivitiListener();
+				  ActivitiListener newListener = new ActivitiListener();
 				  newListener.setEvent(dialog.eventName);
 				  newListener.setImplementationType(dialog.implementationType);
 				  newListener.setImplementation(dialog.implementation);
@@ -214,10 +213,10 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
 	  for (FieldExtensionModel fieldModel : fieldList) {
 	    FieldExtension fieldExtension = fieldExtensionExists(listener.getFieldExtensions(), fieldModel.fieldName);
 	    if(fieldExtension == null) {
-	      fieldExtension = Bpmn2Factory.eINSTANCE.createFieldExtension();
+	      fieldExtension = new FieldExtension();
 	      listener.getFieldExtensions().add(fieldExtension);
 	    }
-	    fieldExtension.setFieldname(fieldModel.fieldName);
+	    fieldExtension.setFieldName(fieldModel.fieldName);
 	    fieldExtension.setExpression(fieldModel.expression);
     }
 	  removeFieldExtensionsNotInList(listener.getFieldExtensions(), fieldList);
@@ -226,7 +225,7 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
 	private FieldExtension fieldExtensionExists(List<FieldExtension> fieldList, String fieldname) {
 	  if(fieldList == null) return null;
 	  for(FieldExtension fieldExtension : fieldList) {
-      if(fieldname.equalsIgnoreCase(fieldExtension.getFieldname())) {
+      if(fieldname.equalsIgnoreCase(fieldExtension.getFieldName())) {
         return fieldExtension;
       }
     }
@@ -240,7 +239,7 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
       boolean found = false;
       if(newfieldList != null && newfieldList.size() > 0) {
         for (FieldExtensionModel field : newfieldList) {
-          if(field.fieldName.equals(fieldExtension.getFieldname())) {
+          if(field.fieldName.equals(fieldExtension.getFieldName())) {
             found = true;
             break;
           }

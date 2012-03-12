@@ -1,9 +1,10 @@
 package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
-import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.ReceiveTask;
-import org.eclipse.bpmn2.SubProcess;
+import org.activiti.designer.bpmn2.model.ReceiveTask;
+import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.designer.util.editor.ModelHandler;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -24,7 +25,7 @@ public class CreateReceiveTaskFeature extends AbstractCreateFastBPMNFeature {
 
 	@Override
 	public Object[] create(ICreateContext context) {
-		ReceiveTask newReceiveTask = Bpmn2Factory.eINSTANCE.createReceiveTask();
+		ReceiveTask newReceiveTask = new ReceiveTask();
 		newReceiveTask.setId(getNextId());
 		setName("Receive Task", newReceiveTask, context);
 		
@@ -32,7 +33,7 @@ public class CreateReceiveTaskFeature extends AbstractCreateFastBPMNFeature {
     if (parentObject instanceof SubProcess) {
       ((SubProcess) parentObject).getFlowElements().add(newReceiveTask);
     } else {
-      getDiagram().eResource().getContents().add(newReceiveTask);
+    	ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).addFlowElement(newReceiveTask);
     }
 		
     addGraphicalContent(newReceiveTask, context);
@@ -52,7 +53,7 @@ public class CreateReceiveTaskFeature extends AbstractCreateFastBPMNFeature {
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected Class getFeatureClass() {
-		return Bpmn2Factory.eINSTANCE.createReceiveTask().getClass();
+		return new ReceiveTask().getClass();
 	}
 
 }

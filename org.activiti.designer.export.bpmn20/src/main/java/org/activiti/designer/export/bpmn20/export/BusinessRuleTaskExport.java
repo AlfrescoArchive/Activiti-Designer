@@ -15,9 +15,8 @@ package org.activiti.designer.export.bpmn20.export;
 
 import javax.xml.stream.XMLStreamWriter;
 
-import org.eclipse.bpmn2.BoundaryEvent;
-import org.eclipse.bpmn2.BusinessRuleTask;
-import org.eclipse.emf.ecore.EObject;
+import org.activiti.designer.bpmn2.model.BoundaryEvent;
+import org.activiti.designer.bpmn2.model.BusinessRuleTask;
 
 
 /**
@@ -25,7 +24,7 @@ import org.eclipse.emf.ecore.EObject;
  */
 public class BusinessRuleTaskExport implements ActivitiNamespaceConstants {
 
-  public static void createBusinessRuleTask(EObject object, XMLStreamWriter xtw) throws Exception {
+  public static void createBusinessRuleTask(Object object, XMLStreamWriter xtw) throws Exception {
     BusinessRuleTask businessRuleTask = (BusinessRuleTask) object;
     // start BusinessRuleTask element
     xtw.writeStartElement("businessRuleTask");
@@ -33,8 +32,8 @@ public class BusinessRuleTaskExport implements ActivitiNamespaceConstants {
     if (businessRuleTask.getName() != null) {
       xtw.writeAttribute("name", businessRuleTask.getName());
     }
-    DefaultFlowExport.createDefaultFlow(object, xtw);
-    AsyncActivityExport.createDefaultFlow(object, xtw);
+    DefaultFlowExport.createDefaultFlow(businessRuleTask, xtw);
+    AsyncActivityExport.createAsyncAttribute(businessRuleTask, xtw);
     if(businessRuleTask.getRuleNames().size() > 0) {
       StringBuilder ruleNameBuilder = new StringBuilder();
       for (String ruleName: businessRuleTask.getRuleNames()) {
@@ -74,8 +73,8 @@ public class BusinessRuleTaskExport implements ActivitiNamespaceConstants {
     // end BusinessRuleTask element
     xtw.writeEndElement();
     
-    if(businessRuleTask.getBoundaryEventRefs().size() > 0) {
-    	for(BoundaryEvent event : businessRuleTask.getBoundaryEventRefs()) {
+    if(businessRuleTask.getBoundaryEvents().size() > 0) {
+    	for(BoundaryEvent event : businessRuleTask.getBoundaryEvents()) {
     		BoundaryEventExport.createBoundaryEvent(event, xtw);
     	}
     }

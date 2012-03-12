@@ -1,6 +1,6 @@
 package org.activiti.designer.features;
 
-import org.eclipse.bpmn2.FlowElement;
+import org.activiti.designer.bpmn2.model.FlowElement;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.IReason;
 import org.eclipse.graphiti.features.context.IUpdateContext;

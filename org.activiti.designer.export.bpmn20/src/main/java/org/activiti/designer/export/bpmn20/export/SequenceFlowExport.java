@@ -15,8 +15,7 @@ package org.activiti.designer.export.bpmn20.export;
 
 import javax.xml.stream.XMLStreamWriter;
 
-import org.eclipse.bpmn2.SequenceFlow;
-import org.eclipse.emf.ecore.EObject;
+import org.activiti.designer.bpmn2.model.SequenceFlow;
 
 
 /**
@@ -24,7 +23,7 @@ import org.eclipse.emf.ecore.EObject;
  */
 public class SequenceFlowExport implements ActivitiNamespaceConstants {
 
-  public static void createSequenceFlow(EObject object, XMLStreamWriter xtw) throws Exception {
+  public static void createSequenceFlow(Object object, XMLStreamWriter xtw) throws Exception {
     SequenceFlow sequenceFlow = (SequenceFlow) object;
     // start SequenceFlow element
     xtw.writeStartElement("sequenceFlow");
@@ -37,7 +36,7 @@ public class SequenceFlowExport implements ActivitiNamespaceConstants {
     xtw.writeAttribute("sourceRef", sequenceFlow.getSourceRef().getId());
     xtw.writeAttribute("targetRef", sequenceFlow.getTargetRef().getId());
 
-    ExtensionListenerExport.createExtensionListenerXML(sequenceFlow.getExecutionListeners(), true, EXECUTION_LISTENER, xtw);
+    /*ExtensionListenerExport.createExtensionListenerXML(sequenceFlow.getExecutionListeners(), true, EXECUTION_LISTENER, xtw);
 
     if (sequenceFlow.getConditionExpression() != null && sequenceFlow.getConditionExpression().getBody() != null
             && sequenceFlow.getConditionExpression().getBody().length() > 0) {
@@ -50,7 +49,7 @@ public class SequenceFlowExport implements ActivitiNamespaceConstants {
 
       // end conditionExpression element
       xtw.writeEndElement();
-    }
+    }*/
 
     // end SequenceFlow element
     xtw.writeEndElement();

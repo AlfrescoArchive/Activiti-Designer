@@ -3,10 +3,11 @@ package org.activiti.designer.features;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.bpmn2.BaseElement;
-import org.eclipse.bpmn2.FlowElement;
-import org.eclipse.bpmn2.FlowNode;
-import org.eclipse.bpmn2.SequenceFlow;
+import org.activiti.designer.bpmn2.model.BaseElement;
+import org.activiti.designer.bpmn2.model.FlowElement;
+import org.activiti.designer.bpmn2.model.FlowNode;
+import org.activiti.designer.bpmn2.model.SequenceFlow;
+import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -124,7 +125,7 @@ public class ChangeElementTypeFeature extends AbstractCustomFeature {
 	  for (Shape shape : toDeleteShapes) {
 	  	targetContainer.getChildren().remove(shape);
 	  }
-	  EcoreUtil.delete(oldObject, true);
+	  ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getProcess().getFlowElements().remove(oldObject);
 	  
 	  if("servicetask".equals(newType)) {
 	  	new CreateServiceTaskFeature(getFeatureProvider()).create(taskContext);

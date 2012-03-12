@@ -8,9 +8,9 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.designer.eclipse.Logger;
 import org.activiti.designer.eclipse.common.ActivitiBPMNDiagramConstants;
 import org.activiti.designer.eclipse.extension.validation.AbstractProcessValidator;
+import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.designer.validation.bpmn20.bundle.PluginConstants;
 import org.activiti.designer.validation.bpmn20.validation.worker.ProcessValidationWorkerInfo;
 import org.activiti.designer.validation.bpmn20.validation.worker.ProcessValidationWorkerMarker;
@@ -22,7 +22,7 @@ import org.activiti.designer.validation.bpmn20.validation.worker.impl.UserTaskVa
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 
 /**
@@ -66,8 +66,8 @@ public class BPMN20ProcessValidator extends AbstractProcessValidator {
     // Clear problems for this diagram first
     clearMarkers(getResource(diagram.eResource().getURI()));
 
-    final Map<String, List<EObject>> processNodes = extractProcessConstructs(getResourceForDiagram(diagram).getContents(), new SubProgressMonitor(monitor,
-            PluginConstants.WORK_EXTRACT_CONSTRUCTS));
+    final Map<String, List<Object>> processNodes = extractProcessConstructs(ModelHandler.getModel(EcoreUtil.getURI(diagram)).getProcess().getFlowElements(), 
+    		new SubProgressMonitor(monitor, PluginConstants.WORK_EXTRACT_CONSTRUCTS));
 
     final List<ProcessValidationWorkerInfo> workers = getWorkers();
 

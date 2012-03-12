@@ -15,9 +15,8 @@ package org.activiti.designer.export.bpmn20.export;
 
 import javax.xml.stream.XMLStreamWriter;
 
-import org.eclipse.bpmn2.BoundaryEvent;
-import org.eclipse.bpmn2.ReceiveTask;
-import org.eclipse.emf.ecore.EObject;
+import org.activiti.designer.bpmn2.model.BoundaryEvent;
+import org.activiti.designer.bpmn2.model.ReceiveTask;
 
 
 /**
@@ -25,25 +24,25 @@ import org.eclipse.emf.ecore.EObject;
  */
 public class ReceiveTaskExport implements ActivitiNamespaceConstants {
 
-  public static void createReceiveTask(EObject object, XMLStreamWriter xtw) throws Exception {
-    ReceiveTask receiveTask = (ReceiveTask) object;
+  public static void createReceiveTask(Object object, XMLStreamWriter xtw) throws Exception {
+    org.activiti.designer.bpmn2.model.ReceiveTask receiveTask = (ReceiveTask) object;
     // start ReceiveTask element
     xtw.writeStartElement("receiveTask");
     xtw.writeAttribute("id", receiveTask.getId());
     if (receiveTask.getName() != null) {
       xtw.writeAttribute("name", receiveTask.getName());
     }
-    DefaultFlowExport.createDefaultFlow(object, xtw);
-    AsyncActivityExport.createDefaultFlow(object, xtw);
-    ExtensionListenerExport.createExtensionListenerXML(receiveTask.getActivitiListeners(), true, EXECUTION_LISTENER, xtw);
+    DefaultFlowExport.createDefaultFlow(receiveTask, xtw);
+    AsyncActivityExport.createAsyncAttribute(receiveTask, xtw);
+    ExecutionListenerExport.createExecutionListenerXML(receiveTask.getExecutionListeners(), true, xtw);
     
     MultiInstanceExport.createMultiInstance(object, xtw);
 
     // end ReceiveTask element
     xtw.writeEndElement();
     
-    if(receiveTask.getBoundaryEventRefs().size() > 0) {
-    	for(BoundaryEvent event : receiveTask.getBoundaryEventRefs()) {
+    if(receiveTask.getBoundaryEvents().size() > 0) {
+    	for(BoundaryEvent event : receiveTask.getBoundaryEvents()) {
     		BoundaryEventExport.createBoundaryEvent(event, xtw);
     	}
     }

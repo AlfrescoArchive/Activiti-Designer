@@ -17,109 +17,88 @@ import java.util.Iterator;
 
 import javax.xml.stream.XMLStreamWriter;
 
-import org.eclipse.bpmn2.BoundaryEvent;
-import org.eclipse.bpmn2.CandidateGroup;
-import org.eclipse.bpmn2.CandidateUser;
-import org.eclipse.bpmn2.Documentation;
-import org.eclipse.bpmn2.UserTask;
-import org.eclipse.emf.ecore.EObject;
-
+import org.activiti.designer.bpmn2.model.UserTask;
 
 /**
  * @author Tijs Rademakers
  */
 public class UserTaskExport implements ActivitiNamespaceConstants {
 
-  public static void createUserTask(EObject object, XMLStreamWriter xtw) throws Exception {
+  public static void createUserTask(Object object, XMLStreamWriter xtw) throws Exception {
     UserTask userTask = (UserTask) object;
-    if ((userTask.getAssignee() != null && userTask.getAssignee().length() > 0)
-            || (userTask.getCandidateUsers() != null && userTask.getCandidateUsers().size() > 0)
-            || (userTask.getCandidateGroups() != null && userTask.getCandidateGroups().size() > 0)) {
 
-      // start UserTask element
-      xtw.writeStartElement("userTask");
-      xtw.writeAttribute("id", userTask.getId());
-      if (userTask.getName() != null) {
-        xtw.writeAttribute("name", userTask.getName());
+    // start UserTask element
+    xtw.writeStartElement("userTask");
+    xtw.writeAttribute("id", userTask.getId());
+    if (userTask.getName() != null) {
+      xtw.writeAttribute("name", userTask.getName());
+    }
+    
+    if (userTask.getDueDate() != null) {
+      //xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "dueDate", userTask.getDueDate());
+    }
+    
+    //DefaultFlowExport.createDefaultFlow(object, xtw);
+    //AsyncActivityExport.createDefaultFlow(object, xtw);
+
+    // TODO revisit once the designer supports mixing these
+    // configurations as they are now exclusive
+    if (userTask.getAssignee() != null && userTask.getAssignee().length() > 0) {
+      xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "assignee", userTask.getAssignee());
+    } else if (userTask.getCandidateUsers() != null && userTask.getCandidateUsers().size() > 0) {
+      Iterator<String> candidateUserIterator = userTask.getCandidateUsers().iterator();
+      String candidateUsers = candidateUserIterator.next();
+      while (candidateUserIterator.hasNext()) {
+        candidateUsers += ", " + candidateUserIterator.next();
       }
-      
-      if (userTask.getDueDate() != null && userTask.getDueDate().length() > 0) {
-        xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "dueDate", userTask.getDueDate());
+      xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "candidateUsers", candidateUsers);
+    } else if (userTask.getCandidateGroups() != null && userTask.getCandidateGroups().size() > 0) {
+      Iterator<String> candidateGroupIterator = userTask.getCandidateGroups().iterator();
+      String candidateGroups = candidateGroupIterator.next();
+      while (candidateGroupIterator.hasNext()) {
+        candidateGroups += ", " + candidateGroupIterator.next();
       }
-      
-      DefaultFlowExport.createDefaultFlow(object, xtw);
-      AsyncActivityExport.createDefaultFlow(object, xtw);
+      xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "candidateGroups", candidateGroups);
+    }
 
-      // TODO revisit once the designer supports mixing these
-      // configurations as they are now exclusive
-      if (userTask.getAssignee() != null && userTask.getAssignee().length() > 0) {
-        xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "assignee", userTask.getAssignee());
-      } else if (userTask.getCandidateUsers() != null && userTask.getCandidateUsers().size() > 0) {
-        Iterator<CandidateUser> candidateUserIterator = userTask.getCandidateUsers().iterator();
-        String candidateUsers = candidateUserIterator.next().getUser();
-        while (candidateUserIterator.hasNext()) {
-          candidateUsers += ", " + candidateUserIterator.next().getUser();
-        }
-        xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "candidateUsers", candidateUsers);
-      } else {
-        Iterator<CandidateGroup> candidateGroupIterator = userTask.getCandidateGroups().iterator();
-        String candidateGroups = candidateGroupIterator.next().getGroup();
-        while (candidateGroupIterator.hasNext()) {
-          candidateGroups += ", " + candidateGroupIterator.next().getGroup();
-        }
-        xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "candidateGroups", candidateGroups);
-      }
+    if (userTask.getFormKey() != null && userTask.getFormKey().length() > 0) {
+      xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "formKey", userTask.getFormKey());
+    }
+    
+    if (userTask.getPriority() != null) {
+      xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "priority", userTask.getPriority().toString());
+    }
+    
+    if (userTask.getDocumentation() != null && userTask.getDocumentation().length() > 0) {
 
-      if (userTask.getFormKey() != null && userTask.getFormKey().length() > 0) {
-        xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "formKey", userTask.getFormKey());
-      }
-      
-      if (userTask.getPriority() != null) {
-        xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "priority", userTask.getPriority().toString());
-      }
-      
-      if (userTask.getDocumentation() != null && userTask.getDocumentation().size() > 0) {
-
-        final Documentation documentation = userTask.getDocumentation().get(0);
-
-        if (documentation.getText() != null && !"".equals(documentation.getText())) {
-
-          // start documentation element
-          xtw.writeStartElement("documentation");
-
-          if (documentation.getId() != null) {
-            xtw.writeAttribute("id", documentation.getId());
-          }
-          xtw.writeCharacters(documentation.getText());
-
-          // end documentation element
-          xtw.writeEndElement();
-        }
-
-      }
-      
-      boolean extensionsElement = true;
-      if(userTask.getFormProperties().size() > 0) {
-        extensionsElement = false;
-        xtw.writeStartElement("extensionElements");
-      }
-      
-      FormPropertiesExport.createFormPropertiesXML(userTask.getFormProperties(), xtw);
-      ExtensionListenerExport.createExtensionListenerXML(userTask.getActivitiListeners(), extensionsElement, TASK_LISTENER, xtw);
-      
-      if(extensionsElement == false) {
-        xtw.writeEndElement();
-      }
-      
-      MultiInstanceExport.createMultiInstance(object, xtw);
-
-      // end UserTask element
+      xtw.writeStartElement("documentation");
+      xtw.writeCharacters(userTask.getDocumentation());
+      // end documentation element
       xtw.writeEndElement();
     }
-    if(userTask.getBoundaryEventRefs().size() > 0) {
+    
+    /*boolean extensionsElement = true;
+    if(userTask.getFormProperties().size() > 0) {
+      extensionsElement = false;
+      xtw.writeStartElement("extensionElements");
+    }
+    
+    FormPropertiesExport.createFormPropertiesXML(userTask.getFormProperties(), xtw);
+    ExtensionListenerExport.createExtensionListenerXML(userTask.getActivitiListeners(), extensionsElement, TASK_LISTENER, xtw);
+    
+    if(extensionsElement == false) {
+      xtw.writeEndElement();
+    }
+    
+    MultiInstanceExport.createMultiInstance(object, xtw);*/
+
+    // end UserTask element
+    xtw.writeEndElement();
+    
+    /*if(userTask.getBoundaryEventRefs().size() > 0) {
     	for(BoundaryEvent event : userTask.getBoundaryEventRefs()) {
     		BoundaryEventExport.createBoundaryEvent(event, xtw);
     	}
-    }
+    }*/
   }
 }

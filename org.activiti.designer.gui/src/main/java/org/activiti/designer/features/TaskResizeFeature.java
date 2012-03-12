@@ -15,8 +15,8 @@ package org.activiti.designer.features;
 
 import java.util.List;
 
-import org.eclipse.bpmn2.CallActivity;
-import org.eclipse.bpmn2.Task;
+import org.activiti.designer.bpmn2.model.CallActivity;
+import org.activiti.designer.bpmn2.model.Task;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IResizeShapeContext;
 import org.eclipse.graphiti.features.impl.DefaultResizeShapeFeature;

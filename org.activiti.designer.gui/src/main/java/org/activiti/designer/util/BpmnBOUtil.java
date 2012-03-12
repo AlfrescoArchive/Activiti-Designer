@@ -16,11 +16,13 @@ package org.activiti.designer.util;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.activiti.designer.bpmn2.model.ActivitiListener;
+import org.activiti.designer.bpmn2.model.Activity;
+import org.activiti.designer.bpmn2.model.Process;
+import org.activiti.designer.bpmn2.model.SequenceFlow;
 import org.activiti.designer.model.FieldExtensionModel;
-import org.activiti.designer.util.eclipse.ActivitiUiUtil;
-import org.eclipse.bpmn2.ActivitiListener;
-import org.eclipse.bpmn2.Activity;
-import org.eclipse.bpmn2.SequenceFlow;
+import org.activiti.designer.util.editor.ModelHandler;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
@@ -34,7 +36,7 @@ public class BpmnBOUtil {
   public static Object getExecutionListenerBO(PictogramElement pe, Diagram diagram) {
     Object bo = null;
     if(pe instanceof Diagram) {
-      bo = ActivitiUiUtil.getProcessObject(diagram);
+      bo = ModelHandler.getModel(EcoreUtil.getURI(diagram)).getProcess();
     } else {
       bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
     }
@@ -44,42 +46,42 @@ public class BpmnBOUtil {
   public static List<ActivitiListener> getListeners(Object bo) {
     List<ActivitiListener> listenerList = null;
     if(bo instanceof Activity) {
-      listenerList = ((Activity) bo).getActivitiListeners();
+      listenerList = ((Activity) bo).getExecutionListeners();
     } else if(bo instanceof SequenceFlow) {
       listenerList = ((SequenceFlow) bo).getExecutionListeners();
-    } else if(bo instanceof org.eclipse.bpmn2.Process) {
-      listenerList = ((org.eclipse.bpmn2.Process) bo).getExecutionListeners();
+    } else if(bo instanceof Process) {
+      listenerList = ((Process) bo).getExecutionListeners();
     }
     return listenerList;
   }
   
   public static void addListener(Object bo, ActivitiListener listener) {
     if(bo instanceof Activity) {
-      ((Activity) bo).getActivitiListeners().add(listener);
+      ((Activity) bo).getExecutionListeners().add(listener);
     } else if(bo instanceof SequenceFlow) {
       ((SequenceFlow) bo).getExecutionListeners().add(listener);
-    } else if(bo instanceof org.eclipse.bpmn2.Process) {
-      ((org.eclipse.bpmn2.Process) bo).getExecutionListeners().add(listener);
+    } else if(bo instanceof Process) {
+      ((Process) bo).getExecutionListeners().add(listener);
     }
   }
   
   public static void setListener(Object bo, ActivitiListener listener, int index) {
     if(bo instanceof Activity) {
-      ((Activity) bo).getActivitiListeners().set(index, listener);
+      ((Activity) bo).getExecutionListeners().set(index, listener);
     } else if(bo instanceof SequenceFlow) {
       ((SequenceFlow) bo).getExecutionListeners().set(index, listener);
-    } else if(bo instanceof org.eclipse.bpmn2.Process) {
-      ((org.eclipse.bpmn2.Process) bo).getExecutionListeners().set(index, listener);
+    } else if(bo instanceof Process) {
+      ((Process) bo).getExecutionListeners().set(index, listener);
     }
   }
   
   public static void removeListener(Object bo, ActivitiListener listener) {
     if(bo instanceof Activity) {
-      ((Activity) bo).getActivitiListeners().remove(listener);
+      ((Activity) bo).getExecutionListeners().remove(listener);
     } else if(bo instanceof SequenceFlow) {
       ((SequenceFlow) bo).getExecutionListeners().remove(listener);
-    } else if(bo instanceof org.eclipse.bpmn2.Process) {
-      ((org.eclipse.bpmn2.Process) bo).getExecutionListeners().remove(listener);
+    } else if(bo instanceof Process) {
+      ((Process) bo).getExecutionListeners().remove(listener);
     }
   }
   

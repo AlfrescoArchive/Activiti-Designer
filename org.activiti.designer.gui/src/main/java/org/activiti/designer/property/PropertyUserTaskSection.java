@@ -1,16 +1,14 @@
 package org.activiti.designer.property;
 
+import java.text.ParseException;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import org.activiti.designer.bpmn2.model.UserTask;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
-import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.CandidateGroup;
-import org.eclipse.bpmn2.CandidateUser;
-import org.eclipse.bpmn2.Documentation;
-import org.eclipse.bpmn2.UserTask;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.services.Graphiti;
@@ -28,6 +26,8 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
+
+import com.ibm.icu.text.SimpleDateFormat;
 
 public class PropertyUserTaskSection extends ActivitiPropertySection implements ITabbedPropertyConstants {
 
@@ -94,22 +94,22 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
       if (userTask.getCandidateUsers() != null && userTask.getCandidateUsers().size() > 0) {
         performerIndex = performerTypes.indexOf("Candidate users");
         StringBuffer expressionBuffer = new StringBuffer();
-        for (CandidateUser user : userTask.getCandidateUsers()) {
+        for (String user : userTask.getCandidateUsers()) {
           if (expressionBuffer.length() > 0) {
             expressionBuffer.append(";");
           }
-          expressionBuffer.append(user.getUser());
+          expressionBuffer.append(user);
         }
         currentType = "Candidate users";
         expressionText.setText(expressionBuffer.toString());
       } else if (userTask.getCandidateGroups() != null && userTask.getCandidateGroups().size() > 0) {
         performerIndex = performerTypes.indexOf("Candidate groups");
         StringBuffer expressionBuffer = new StringBuffer();
-        for (CandidateGroup group : userTask.getCandidateGroups()) {
+        for (String group : userTask.getCandidateGroups()) {
           if (expressionBuffer.length() > 0) {
             expressionBuffer.append(";");
           }
-          expressionBuffer.append(group.getGroup());
+          expressionBuffer.append(group);
         }
         currentType = "Candidate groups";
         expressionText.setText(expressionBuffer.toString());
@@ -129,7 +129,7 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
       
       dueDateText.setText("");
       if(userTask.getDueDate() != null) {
-      	dueDateText.setText(userTask.getDueDate());
+      	dueDateText.setText(userTask.getDueDate().toString());
       }
       
       priorityText.setText("");
@@ -138,8 +138,8 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
       }
 
       documentationText.setText("");
-      if (userTask.getDocumentation() != null && userTask.getDocumentation().size() > 0) {
-        documentationText.setText(userTask.getDocumentation().get(0).getText());
+      if (StringUtils.isNotEmpty(userTask.getDocumentation())) {
+        documentationText.setText(userTask.getDocumentation());
       }
 
       performerTypeCombo.select(performerIndex == -1 ? 0 : performerIndex);
@@ -176,7 +176,7 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
               if (bo == null) {
                 return;
               }
-              UserTask userTask = (UserTask) bo;
+              org.activiti.designer.bpmn2.model.UserTask userTask = (UserTask) bo;
               String expression = expressionText.getText();
               if (performerType != null && expression != null && expression.length() > 0) {
                 if ("assignee".equalsIgnoreCase(performerType)) {
@@ -192,10 +192,7 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
                   }
                   for (String user : expressionList) {
                     if (!candidateUserExists(userTask, user)) {
-                      CandidateUser candidateUser = Bpmn2Factory.eINSTANCE.createCandidateUser();
-                      candidateUser.setUser(user);
-                      getDiagram().eResource().getContents().add(candidateUser);
-                      userTask.getCandidateUsers().add(candidateUser);
+                      userTask.getCandidateUsers().add(user);
                     }
                   }
                   removeCandidateUsersNotInList(expressionList, userTask);
@@ -210,10 +207,7 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
                   }
                   for (String group : expressionList) {
                     if (!candidateGroupExists(userTask, group)) {
-                      CandidateGroup candidateGroup = Bpmn2Factory.eINSTANCE.createCandidateGroup();
-                      candidateGroup.setGroup(group);
-                      getDiagram().eResource().getContents().add(candidateGroup);
-                      userTask.getCandidateGroups().add(candidateGroup);
+                      userTask.getCandidateGroups().add(group);
                     }
                   }
                   removeCandidateGroupsNotInList(expressionList, userTask);
@@ -230,9 +224,14 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
               
               String dueDate = dueDateText.getText();
               if (dueDate != null) {
-                userTask.setDueDate(dueDate);
+                try {
+	                userTask.setDueDate(new SimpleDateFormat().parse(dueDate));
+                } catch (ParseException e) {
+	                // TODO Auto-generated catch block
+	                e.printStackTrace();
+                }
               } else {
-                userTask.setDueDate("");
+                userTask.setDueDate(null);
               }
               
               if(priorityText.getText() != null && priorityText.getText().length() > 0) {
@@ -245,15 +244,7 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
 
               String documentation = documentationText.getText();
               if (documentation != null) {
-
-                Documentation documentationModel;
-                if (userTask.getDocumentation().size() < 1) {
-                  documentationModel = Bpmn2Factory.eINSTANCE.createDocumentation();
-                  userTask.getDocumentation().add(documentationModel);
-                } else {
-                  documentationModel = userTask.getDocumentation().get(0);
-                }
-                documentationModel.setText(documentation);
+                userTask.setDocumentation(documentation);
               }
             }
           }, editingDomain, "Model Update");
@@ -265,25 +256,21 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
     private void removeCandidateUsers(UserTask userTask) {
       if (userTask.getCandidateUsers() == null)
         return;
-      for (CandidateUser user : userTask.getCandidateUsers()) {
-        getDiagram().eResource().getContents().remove(user);
-      }
       userTask.getCandidateUsers().clear();
     }
 
     private void removeCandidateUsersNotInList(String[] expressionList, UserTask userTask) {
-      Iterator<CandidateUser> entryIterator = userTask.getCandidateUsers().iterator();
+      Iterator<String> entryIterator = userTask.getCandidateUsers().iterator();
       while (entryIterator.hasNext()) {
-        CandidateUser candidateUser = entryIterator.next();
+        String candidateUser = entryIterator.next();
         boolean found = false;
         for (String user : expressionList) {
-          if (user.equals(candidateUser.getUser())) {
+          if (user.equals(candidateUser)) {
             found = true;
             break;
           }
         }
         if (found == false) {
-          getDiagram().eResource().getContents().remove(candidateUser);
           entryIterator.remove();
         }
       }
@@ -292,8 +279,8 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
     private boolean candidateUserExists(UserTask userTask, String userText) {
       if (userTask.getCandidateUsers() == null)
         return false;
-      for (CandidateUser user : userTask.getCandidateUsers()) {
-        if (userText.equalsIgnoreCase(user.getUser())) {
+      for (String user : userTask.getCandidateUsers()) {
+        if (userText.equalsIgnoreCase(user)) {
           return true;
         }
       }
@@ -303,25 +290,21 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
     private void removeCandidateGroups(UserTask userTask) {
       if (userTask.getCandidateGroups() == null)
         return;
-      for (CandidateGroup group : userTask.getCandidateGroups()) {
-        getDiagram().eResource().getContents().remove(group);
-      }
       userTask.getCandidateGroups().clear();
     }
 
     private void removeCandidateGroupsNotInList(String[] expressionList, UserTask userTask) {
-      Iterator<CandidateGroup> entryIterator = userTask.getCandidateGroups().iterator();
+      Iterator<String> entryIterator = userTask.getCandidateGroups().iterator();
       while (entryIterator.hasNext()) {
-        CandidateGroup candidateGroup = entryIterator.next();
+        String candidateGroup = entryIterator.next();
         boolean found = false;
         for (String group : expressionList) {
-          if (group.equals(candidateGroup.getGroup())) {
+          if (group.equals(candidateGroup)) {
             found = true;
             break;
           }
         }
         if (found == false) {
-          getDiagram().eResource().getContents().remove(candidateGroup);
           entryIterator.remove();
         }
       }
@@ -330,8 +313,8 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
     private boolean candidateGroupExists(UserTask userTask, String groupText) {
       if (userTask.getCandidateGroups() == null)
         return false;
-      for (CandidateGroup group : userTask.getCandidateGroups()) {
-        if (groupText.equalsIgnoreCase(group.getGroup())) {
+      for (String group : userTask.getCandidateGroups()) {
+        if (groupText.equalsIgnoreCase(group)) {
           return true;
         }
       }

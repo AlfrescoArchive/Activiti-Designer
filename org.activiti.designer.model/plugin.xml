@@ -18,52 +18,12 @@
 
 <plugin>
 
-   <extension point="org.eclipse.emf.ecore.generated_package">
-      <package
-            uri="http://www.omg.org/spec/BPMN/20100524/MODEL-XMI"
-            class="org.eclipse.bpmn2.Bpmn2Package"/>
-   </extension>
 
-   <extension point="org.eclipse.emf.ecore.extension_parser">
-      <parser
-            type="bpmn2"
-            class="org.eclipse.bpmn2.util.Bpmn2ResourceFactoryImpl"/>
-   </extension>
 
-   <extension point="org.eclipse.emf.ecore.generated_package">
-      <package
-            uri="http://www.omg.org/spec/BPMN/20100524/DI-XMI"
-            class="org.eclipse.bpmn2.di.BpmnDiPackage"/>
-   </extension>
 
-   <extension point="org.eclipse.emf.ecore.extension_parser">
-      <parser
-            type="bpmndi"
-            class="org.eclipse.bpmn2.di.util.BpmnDiResourceFactoryImpl"/>
-   </extension>
 
-   <extension point="org.eclipse.emf.ecore.generated_package">
-      <package
-            uri="http://www.omg.org/spec/DD/20100524/DI-XMI"
-            class="org.eclipse.dd.di.DiPackage"/>
-   </extension>
 
-   <extension point="org.eclipse.emf.ecore.extension_parser">
-      <parser
-            type="di"
-            class="org.eclipse.dd.di.util.DiResourceFactoryImpl"/>
-   </extension>
 
-   <extension point="org.eclipse.emf.ecore.generated_package">
-      <package
-            uri="http://www.omg.org/spec/DD/20100524/DC-XMI"
-            class="org.eclipse.dd.dc.DcPackage"/>
-   </extension>
 
-   <extension point="org.eclipse.emf.ecore.extension_parser">
-      <parser
-            type="dc"
-            class="org.eclipse.dd.dc.util.DcResourceFactoryImpl"/>
-   </extension>
 
 </plugin>

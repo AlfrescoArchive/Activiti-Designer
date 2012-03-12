@@ -1,12 +1,12 @@
 package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
+import org.activiti.designer.bpmn2.model.EndEvent;
+import org.activiti.designer.bpmn2.model.Event;
+import org.activiti.designer.bpmn2.model.StartEvent;
+import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.style.StyleUtil;
-import org.eclipse.bpmn2.EndEvent;
-import org.eclipse.bpmn2.Event;
-import org.eclipse.bpmn2.StartEvent;
-import org.eclipse.bpmn2.SubProcess;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.impl.AbstractAddShapeFeature;
@@ -32,6 +32,7 @@ public class AddEventFeature extends AbstractAddShapeFeature {
 	@Override
 	public PictogramElement add(IAddContext context) {
 		final Event addedEvent = (Event) context.getNewObject();
+		System.out.println("addedEvent " + addedEvent);
 		final ContainerShape parent = context.getTargetContainer();
 
 		// CONTAINER SHAPE WITH CIRCLE
@@ -61,18 +62,6 @@ public class AddEventFeature extends AbstractAddShapeFeature {
 			}
 			gaService.setLocationAndSize(circle, 0, 0, width, height);
 
-			// if addedClass has no resource we add it to the resource of the
-			// diagram
-			// in a real scenario the business model would have its own resource
-			if (addedEvent.eResource() == null) {
-				Object parentObject = getBusinessObjectForPictogramElement(parent);
-	      if (parentObject instanceof SubProcess) {
-	        ((SubProcess) parentObject).getFlowElements().add(addedEvent);
-	      } else {
-	        getDiagram().eResource().getContents().add(addedEvent);
-	      }
-			}
-
 			// create link and wire it
 			link(containerShape, addedEvent);
 		}
@@ -90,7 +79,7 @@ public class AddEventFeature extends AbstractAddShapeFeature {
 			gaService.setLocationAndSize(ellipse, 0, 0, 0, 0);
 		}
 		
-		if (addedEvent instanceof StartEvent && ((StartEvent) addedEvent).getEventDefinitions().size() > 0) {
+		if (addedEvent instanceof StartEvent && false) {
 			
 			final Shape shape = peCreateService.createShape(containerShape, false);
       final Image image = gaService.createImage(shape, ActivitiImageProvider.IMG_BOUNDARY_TIMER);

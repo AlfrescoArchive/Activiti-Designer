@@ -1,12 +1,12 @@
 package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
+import org.activiti.designer.bpmn2.model.CallActivity;
+import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.platform.OSEnum;
 import org.activiti.designer.util.platform.OSUtil;
 import org.activiti.designer.util.style.StyleUtil;
-import org.eclipse.bpmn2.CallActivity;
-import org.eclipse.bpmn2.SubProcess;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddContext;
@@ -64,18 +64,6 @@ public class AddCallActivityFeature extends AbstractAddShapeFeature {
 			roundedRectangle.setStyle(StyleUtil.getStyleForTask(getDiagram()));
 			roundedRectangle.setLineWidth(3);
 			gaService.setLocationAndSize(roundedRectangle, 0, 0, width, height);
-
-			// if addedClass has no resource we add it to the resource of the
-			// diagram
-			// in a real scenario the business model would have its own resource
-			if (addedCallActivity.eResource() == null) {
-			  Object parentObject = getBusinessObjectForPictogramElement(parent);
-        if (parentObject instanceof SubProcess) {
-          ((SubProcess) parentObject).getFlowElements().add(addedCallActivity);
-        } else {
-          getDiagram().eResource().getContents().add(addedCallActivity);
-        }
-			}
 
 			// create link and wire it
 			link(containerShape, addedCallActivity);

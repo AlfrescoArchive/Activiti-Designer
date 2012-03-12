@@ -15,13 +15,13 @@ package org.activiti.designer.property.extension.field;
 
 import java.lang.reflect.Field;
 
+import org.activiti.designer.bpmn2.model.ServiceTask;
 import org.activiti.designer.integration.servicetask.PropertyType;
 import org.activiti.designer.property.PropertyCustomServiceTaskSection;
 import org.activiti.designer.property.custom.PeriodPropertyElement;
 import org.activiti.designer.property.extension.field.validator.PeriodRequiredFieldValidator;
 import org.activiti.designer.property.extension.util.ExtensionPropertyUtil;
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.bpmn2.ServiceTask;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.FocusListener;

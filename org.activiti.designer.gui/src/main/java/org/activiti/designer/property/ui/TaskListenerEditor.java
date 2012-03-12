@@ -1,6 +1,6 @@
 package org.activiti.designer.property.ui;
 
-import org.eclipse.bpmn2.ActivitiListener;
+import org.activiti.designer.bpmn2.model.ActivitiListener;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.TableItem;

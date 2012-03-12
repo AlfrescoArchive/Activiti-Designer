@@ -21,6 +21,11 @@ import java.util.List;
 
 import org.activiti.designer.Activator;
 import org.activiti.designer.PluginImage;
+import org.activiti.designer.bpmn2.model.ComplexDataType;
+import org.activiti.designer.bpmn2.model.DataGrid;
+import org.activiti.designer.bpmn2.model.DataGridField;
+import org.activiti.designer.bpmn2.model.DataGridRow;
+import org.activiti.designer.bpmn2.model.ServiceTask;
 import org.activiti.designer.integration.servicetask.PropertyType;
 import org.activiti.designer.integration.servicetask.annotation.DataGridProperty;
 import org.activiti.designer.integration.servicetask.annotation.Help;
@@ -31,12 +36,6 @@ import org.activiti.designer.property.custom.MultilineTextDialog;
 import org.activiti.designer.property.custom.PeriodDialog;
 import org.activiti.designer.property.extension.FormToolTip;
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.ComplexDataType;
-import org.eclipse.bpmn2.DataGrid;
-import org.eclipse.bpmn2.DataGridField;
-import org.eclipse.bpmn2.DataGridRow;
-import org.eclipse.bpmn2.ServiceTask;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.emf.common.util.ECollections;
 import org.eclipse.emf.common.util.EList;
@@ -95,7 +94,7 @@ public class CustomPropertyDataGridField extends AbstractCustomPropertyField {
     if (dataGrid == null) {
       final ComplexDataType value = getComplexValueFromModel();
       if (value == null) {
-        dataGrid = Bpmn2Factory.eINSTANCE.createDataGrid();
+        dataGrid = new DataGrid();
       } else {
         dataGrid = (DataGrid) value;
       }
@@ -260,13 +259,13 @@ public class CustomPropertyDataGridField extends AbstractCustomPropertyField {
   }
 
   private void createBody() {
-    if (dataGrid.getRow().size() == 0) {
+    if (dataGrid.getRows().size() == 0) {
       final CLabel label = factory.createCLabel(dataGridControl, "There are no rows at the moment.", SWT.WRAP);
       //
     } else {
 
       // Create rows with fields
-      for (final DataGridRow dataGridRow : dataGrid.getRow()) {
+      for (final DataGridRow dataGridRow : dataGrid.getRows()) {
 
         if (dataGridAnnotation.orderable()) {
           final CLabel orderLabel = factory.createCLabel(dataGridControl, dataGridRow.getIndex() + ". ", SWT.WRAP);
@@ -421,14 +420,14 @@ public class CustomPropertyDataGridField extends AbstractCustomPropertyField {
                     final int currentPosition = dataGridRow.getIndex();
 
                     if (currentPosition != 1) {
-                      for (final DataGridRow currentDataGridRow : dataGrid.getRow()) {
+                      for (final DataGridRow currentDataGridRow : dataGrid.getRows()) {
                         if (currentDataGridRow.equals(dataGridRow)) {
                           currentDataGridRow.setIndex(currentDataGridRow.getIndex() - 1);
                         } else if (currentDataGridRow.getIndex() == currentPosition - 1) {
                           currentDataGridRow.setIndex(currentDataGridRow.getIndex() + 1);
                         }
                       }
-                      ECollections.sort((EList<DataGridRow>) dataGrid.getRow(), new DataGridRowComparator());
+                      ECollections.sort((EList<DataGridRow>) dataGrid.getRows(), new DataGridRowComparator());
                     }
                   }
                 };
@@ -450,7 +449,7 @@ public class CustomPropertyDataGridField extends AbstractCustomPropertyField {
           }
 
           // if the row is not the last row
-          if (dataGridRow.getIndex() < dataGrid.getRow().size()) {
+          if (dataGridRow.getIndex() < dataGrid.getRows().size()) {
             final Button orderDownButton = factory.createButton(dataGridControl, "", SWT.BUTTON1);
             orderDownButton.setImage(Activator.getImage(PluginImage.ACTION_DOWN));
             orderDownButton.addMouseListener(new MouseListener() {
@@ -462,15 +461,15 @@ public class CustomPropertyDataGridField extends AbstractCustomPropertyField {
                   public void run() {
                     final int currentPosition = dataGridRow.getIndex();
 
-                    if (currentPosition != dataGrid.getRow().size()) {
-                      for (final DataGridRow currentDataGridRow : dataGrid.getRow()) {
+                    if (currentPosition != dataGrid.getRows().size()) {
+                      for (final DataGridRow currentDataGridRow : dataGrid.getRows()) {
                         if (currentDataGridRow.equals(dataGridRow)) {
                           currentDataGridRow.setIndex(currentDataGridRow.getIndex() + 1);
                         } else if (currentDataGridRow.getIndex() == currentPosition + 1) {
                           currentDataGridRow.setIndex(currentDataGridRow.getIndex() - 1);
                         }
                       }
-                      ECollections.sort((EList<DataGridRow>) dataGrid.getRow(), new DataGridRowComparator());
+                      ECollections.sort((EList<DataGridRow>) dataGrid.getRows(), new DataGridRowComparator());
                     }
                   }
                 };
@@ -504,15 +503,15 @@ public class CustomPropertyDataGridField extends AbstractCustomPropertyField {
 
                 final int currentPosition = dataGridRow.getIndex();
 
-                boolean success = dataGrid.getRow().remove(dataGridRow);
+                boolean success = dataGrid.getRows().remove(dataGridRow);
 
                 if (success) {
-                  for (final DataGridRow currentDataGridRow : dataGrid.getRow()) {
+                  for (final DataGridRow currentDataGridRow : dataGrid.getRows()) {
                     if (currentDataGridRow.getIndex() > currentPosition) {
                       currentDataGridRow.setIndex(currentDataGridRow.getIndex() - 1);
                     }
                   }
-                  ECollections.sort((EList<DataGridRow>) dataGrid.getRow(), new DataGridRowComparator());
+                  ECollections.sort((EList<DataGridRow>) dataGrid.getRows(), new DataGridRowComparator());
                 }
               }
             };
@@ -533,7 +532,7 @@ public class CustomPropertyDataGridField extends AbstractCustomPropertyField {
     }
   }
   private String getSimpleValueOrDefault(DataGridField field, Property propertyAnnotation) {
-    String value = field.getSimpleValue();
+    String value = field.getValue();
     if (value == null) {
       if (StringUtils.isNotBlank(propertyAnnotation.defaultValue())) {
         value = propertyAnnotation.defaultValue();
@@ -556,20 +555,20 @@ public class CustomPropertyDataGridField extends AbstractCustomPropertyField {
 
       @Override
       public void mouseUp(MouseEvent e) {
-        final DataGridRow newRow = Bpmn2Factory.eINSTANCE.createDataGridRow();
-        newRow.setIndex(dataGrid.getRow().size() + 1);
+        final DataGridRow newRow = new DataGridRow();
+        newRow.setIndex(dataGrid.getRows().size() + 1);
 
         for (final FieldInfo fieldInfo : gridFields) {
-          final DataGridField newField = Bpmn2Factory.eINSTANCE.createDataGridField();
+          final DataGridField newField = new DataGridField();
           newField.setName(fieldInfo.getFieldName());
-          newField.setSimpleValue(null);
-          newRow.getField().add(newField);
+          newField.setValue(null);
+          newRow.getFields().add(newField);
         }
 
         final Runnable runnable = new Runnable() {
 
           public void run() {
-            dataGrid.getRow().add(newRow);
+            dataGrid.getRows().add(newRow);
           }
         };
         runModelChange(runnable);
@@ -588,7 +587,7 @@ public class CustomPropertyDataGridField extends AbstractCustomPropertyField {
 
   private DataGridField getFieldByName(final DataGridRow dataGridRow, final String name) {
     DataGridField result = null;
-    final List<DataGridField> fields = dataGridRow.getField();
+    final List<DataGridField> fields = dataGridRow.getFields();
     for (final DataGridField field : fields) {
       if (StringUtils.equalsIgnoreCase(name, field.getName())) {
         result = field;
@@ -619,7 +618,7 @@ public class CustomPropertyDataGridField extends AbstractCustomPropertyField {
 
         @Override
         public void run() {
-          dataGridField.setSimpleValue(textControl.getText());
+          dataGridField.setValue(textControl.getText());
         }
 
       };

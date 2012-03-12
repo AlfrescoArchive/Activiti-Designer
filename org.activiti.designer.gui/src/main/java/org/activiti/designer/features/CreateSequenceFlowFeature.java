@@ -1,14 +1,15 @@
 package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
+import org.activiti.designer.bpmn2.model.EndEvent;
+import org.activiti.designer.bpmn2.model.FlowNode;
+import org.activiti.designer.bpmn2.model.SequenceFlow;
+import org.activiti.designer.bpmn2.model.StartEvent;
+import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
+import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.designer.util.preferences.Preferences;
-import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.EndEvent;
-import org.eclipse.bpmn2.FlowNode;
-import org.eclipse.bpmn2.SequenceFlow;
-import org.eclipse.bpmn2.StartEvent;
-import org.eclipse.bpmn2.SubProcess;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateConnectionContext;
 import org.eclipse.graphiti.features.context.impl.AddConnectionContext;
@@ -57,7 +58,8 @@ public class CreateSequenceFlowFeature extends AbstractCreateBPMNConnectionFeatu
 		if (source != null && target != null) {
 			// create new business object
 			SequenceFlow sequenceFlow = createSequenceFlow(source, target, context);
-
+			ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).addFlowElement(sequenceFlow);
+			
 			// add connection for business object
 			AddConnectionContext addContext = new AddConnectionContext(context.getSourceAnchor(),
 					context.getTargetAnchor());
@@ -84,7 +86,7 @@ public class CreateSequenceFlowFeature extends AbstractCreateBPMNConnectionFeatu
 	 * Creates a SequenceFlow between two BaseElements.
 	 */
 	private SequenceFlow createSequenceFlow(FlowNode source, FlowNode target, ICreateConnectionContext context) {
-		SequenceFlow sequenceFlow = Bpmn2Factory.eINSTANCE.createSequenceFlow();
+		SequenceFlow sequenceFlow = new SequenceFlow();
 
 		sequenceFlow.setId(getNextId());
 		sequenceFlow.setSourceRef(source);
@@ -96,7 +98,7 @@ public class CreateSequenceFlowFeature extends AbstractCreateBPMNConnectionFeatu
 			sequenceFlow.setName("");
 		}
 		
-		Object parentObject = null;
+		/*Object parentObject = null;
 		if(context.getSourcePictogramElement().eContainer() instanceof ContainerShape) {
 		  ContainerShape parentShape = (ContainerShape) context.getSourcePictogramElement().eContainer();
 		  parentObject = getBusinessObjectForPictogramElement(parentShape.getGraphicsAlgorithm().getPictogramElement());
@@ -104,13 +106,13 @@ public class CreateSequenceFlowFeature extends AbstractCreateBPMNConnectionFeatu
 		    parentShape = (ContainerShape) context.getTargetPictogramElement().eContainer();
 		    parentObject = getBusinessObjectForPictogramElement(parentShape.getGraphicsAlgorithm().getPictogramElement());
 		  }
-		}
+		}*/
 		
-		if (parentObject != null && parentObject instanceof SubProcess) {
+		/*if (parentObject != null && parentObject instanceof SubProcess) {
       ((SubProcess) parentObject).getFlowElements().add(sequenceFlow);
     } else {
       getDiagram().eResource().getContents().add(sequenceFlow);
-    }
+    }*/
 
 		source.getOutgoing().add(sequenceFlow);
 		target.getIncoming().add(sequenceFlow);
@@ -130,7 +132,7 @@ public class CreateSequenceFlowFeature extends AbstractCreateBPMNConnectionFeatu
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected Class getFeatureClass() {
-		return Bpmn2Factory.eINSTANCE.createSequenceFlow().getClass();
+		return new SequenceFlow().getClass();
 	}
 
 }

@@ -1,9 +1,10 @@
 package com.alfresco.designer.gui.features;
 
+import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.designer.bpmn2.model.alfresco.AlfrescoMailTask;
 import org.activiti.designer.features.AbstractCreateFastBPMNFeature;
-import org.eclipse.bpmn2.AlfrescoMailTask;
-import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.SubProcess;
+import org.activiti.designer.util.editor.ModelHandler;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -24,7 +25,7 @@ public class CreateAlfrescoMailTaskFeature extends AbstractCreateFastBPMNFeature
 
 	@Override
 	public Object[] create(ICreateContext context) {
-		AlfrescoMailTask newMailTask = Bpmn2Factory.eINSTANCE.createAlfrescoMailTask();
+		AlfrescoMailTask newMailTask = new AlfrescoMailTask();
 
 		newMailTask.setId(getNextId());
 		newMailTask.setName("Alfresco Mail Task");
@@ -33,7 +34,7 @@ public class CreateAlfrescoMailTaskFeature extends AbstractCreateFastBPMNFeature
     if (parentObject instanceof SubProcess) {
       ((SubProcess) parentObject).getFlowElements().add(newMailTask);
     } else {
-      getDiagram().eResource().getContents().add(newMailTask);
+    	ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).addFlowElement(newMailTask);
     }
 
     addGraphicalContent(newMailTask, context);
@@ -57,7 +58,7 @@ public class CreateAlfrescoMailTaskFeature extends AbstractCreateFastBPMNFeature
 	@SuppressWarnings("rawtypes")
 	@Override
 	protected Class getFeatureClass() {
-		return Bpmn2Factory.eINSTANCE.createAlfrescoMailTask().getClass();
+		return new AlfrescoMailTask().getClass();
 	}
 
 }

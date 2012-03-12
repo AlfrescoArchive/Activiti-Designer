@@ -17,12 +17,11 @@ import java.util.List;
 
 import javax.xml.stream.XMLStreamWriter;
 
-import org.eclipse.bpmn2.BoundaryEvent;
-import org.eclipse.bpmn2.ErrorEventDefinition;
-import org.eclipse.bpmn2.EventDefinition;
-import org.eclipse.bpmn2.FormalExpression;
-import org.eclipse.bpmn2.TimerEventDefinition;
-import org.eclipse.emf.ecore.EObject;
+import org.activiti.designer.bpmn2.model.BoundaryEvent;
+import org.activiti.designer.bpmn2.model.ErrorEventDefinition;
+import org.activiti.designer.bpmn2.model.EventDefinition;
+import org.activiti.designer.bpmn2.model.TimerEventDefinition;
+import org.apache.commons.lang.StringUtils;
 
 
 /**
@@ -30,21 +29,15 @@ import org.eclipse.emf.ecore.EObject;
  */
 public class BoundaryEventExport implements ActivitiNamespaceConstants {
 
-  public static void createBoundaryEvent(EObject object, XMLStreamWriter xtw) throws Exception {
+  public static void createBoundaryEvent(Object object, XMLStreamWriter xtw) throws Exception {
     BoundaryEvent boundaryEvent = (BoundaryEvent) object;
     List<EventDefinition> eventDefinitionList = boundaryEvent.getEventDefinitions();
     if(eventDefinitionList.size() == 1) {
       if(eventDefinitionList.get(0) instanceof TimerEventDefinition) {
         TimerEventDefinition timerDef = (TimerEventDefinition) eventDefinitionList.get(0);
-        if(timerDef.getTimeDuration() != null && 
-                ((((FormalExpression) timerDef.getTimeDuration()).getBody() != null && 
-                        ((FormalExpression) timerDef.getTimeDuration()).getBody().length() > 0) ||
-                        
-                        (((FormalExpression) timerDef.getTimeDate()).getBody() != null && 
-                                ((FormalExpression) timerDef.getTimeDate()).getBody().length() > 0) ||
-                                
-                                (((FormalExpression) timerDef.getTimeCycle()).getBody() != null && 
-                                        ((FormalExpression) timerDef.getTimeCycle()).getBody().length() > 0))) {
+        if(StringUtils.isNotEmpty(timerDef.getTimeDuration())  ||
+        		StringUtils.isNotEmpty(timerDef.getTimeCycle()) ||
+        		timerDef.getTimeDate() != null) {
           
           // start TimerBoundaryEvent element
           xtw.writeStartElement("boundaryEvent");
@@ -64,24 +57,22 @@ public class BoundaryEventExport implements ActivitiNamespaceConstants {
           
           xtw.writeStartElement("timerEventDefinition");
           
-          if(((FormalExpression) timerDef.getTimeDuration()).getBody() != null && 
-                        ((FormalExpression) timerDef.getTimeDuration()).getBody().length() > 0) {
+          if(StringUtils.isNotEmpty(timerDef.getTimeDuration())) {
             
             xtw.writeStartElement("timeDuration");
-            xtw.writeCharacters(((FormalExpression) timerDef.getTimeDuration()).getBody());
+            xtw.writeCharacters(timerDef.getTimeDuration());
             xtw.writeEndElement();
           
-          } else if(((FormalExpression) timerDef.getTimeDate()).getBody() != null && 
-                        ((FormalExpression) timerDef.getTimeDate()).getBody().length() > 0) {
+          } else if(timerDef.getTimeDate() != null) {
             
             xtw.writeStartElement("timeDate");
-            xtw.writeCharacters(((FormalExpression) timerDef.getTimeDate()).getBody());
+            xtw.writeCharacters(timerDef.getTimeDate().toString());
             xtw.writeEndElement();
           
           } else {
             
             xtw.writeStartElement("timeCycle");
-            xtw.writeCharacters(((FormalExpression) timerDef.getTimeCycle()).getBody());
+            xtw.writeCharacters(timerDef.getTimeCycle());
             xtw.writeEndElement();
           }
           

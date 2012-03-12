@@ -8,6 +8,7 @@ import org.activiti.designer.eclipse.extension.export.SequenceFlowSynchronizer;
 import org.activiti.designer.eclipse.ui.ExportMarshallerRunnable;
 import org.activiti.designer.eclipse.util.ExtensionPointUtil;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.emf.common.command.BasicCommandStack;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.ui.editor.DefaultPersistencyBehavior;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
@@ -24,6 +25,7 @@ public class ActivitiDiagramEditorPersistenceBehavior extends DefaultPersistency
 
   @Override
   public void saveDiagram(IProgressMonitor monitor) {
+  	System.out.println("exporting");
     final IEditorPart editorPart = diagramEditor.getEditorSite().getPage().getActiveEditor();
     
     final Diagram diagram = (Diagram) editorPart.getAdapter(Diagram.class);
@@ -31,11 +33,11 @@ public class ActivitiDiagramEditorPersistenceBehavior extends DefaultPersistency
     SequenceFlowSynchronizer.synchronize(diagram.getConnections(), (DiagramEditor) editorPart);
 
     // Regular save
-    try {
+    /*try {
       super.saveDiagram(monitor);
     } catch(Throwable e) {
       e.printStackTrace();
-    }
+    }*/
 
     // Determine list of ExportMarshallers to invoke after regular save
     final Collection<ExportMarshaller> marshallers = ExtensionPointUtil
@@ -55,6 +57,8 @@ public class ActivitiDiagramEditorPersistenceBehavior extends DefaultPersistency
         Logger.logError("Exception while performing save", e);
       }
     }
+    
+    System.out.println("done");
   }
 
   

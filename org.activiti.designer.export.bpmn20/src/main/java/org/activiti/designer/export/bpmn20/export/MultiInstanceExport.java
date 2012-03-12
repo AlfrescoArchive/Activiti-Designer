@@ -15,10 +15,9 @@ package org.activiti.designer.export.bpmn20.export;
 
 import javax.xml.stream.XMLStreamWriter;
 
+import org.activiti.designer.bpmn2.model.Activity;
+import org.activiti.designer.bpmn2.model.MultiInstanceLoopCharacteristics;
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.bpmn2.Activity;
-import org.eclipse.bpmn2.MultiInstanceLoopCharacteristics;
-import org.eclipse.emf.ecore.EObject;
 
 
 /**
@@ -26,7 +25,7 @@ import org.eclipse.emf.ecore.EObject;
  */
 public class MultiInstanceExport implements ActivitiNamespaceConstants {
 
-  public static void createMultiInstance(EObject object, XMLStreamWriter xtw) throws Exception {
+  public static void createMultiInstance(Object object, XMLStreamWriter xtw) throws Exception {
     Activity activity = (Activity) object;
     if(activity.getLoopCharacteristics() == null) return;
     
@@ -39,7 +38,7 @@ public class MultiInstanceExport implements ActivitiNamespaceConstants {
     
 	    // start multiInstance element
 	    xtw.writeStartElement("multiInstanceLoopCharacteristics");
-	    xtw.writeAttribute("isSequential", "" + multiInstanceDef.isIsSequential());
+	    xtw.writeAttribute("isSequential", "" + multiInstanceDef.isSequential());
 	    if(multiInstanceDef.getInputDataItem() != null && multiInstanceDef.getInputDataItem().contains("${")) {
 	      xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "collection", multiInstanceDef.getInputDataItem());
 	      if(multiInstanceDef.getElementVariable() != null && multiInstanceDef.getElementVariable().length() > 0) {

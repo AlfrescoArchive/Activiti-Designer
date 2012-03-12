@@ -1,10 +1,10 @@
 package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
+import org.activiti.designer.bpmn2.model.BoundaryEvent;
+import org.activiti.designer.bpmn2.model.CallActivity;
+import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.util.style.StyleUtil;
-import org.eclipse.bpmn2.BoundaryEvent;
-import org.eclipse.bpmn2.CallActivity;
-import org.eclipse.bpmn2.SubProcess;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.impl.AbstractAddShapeFeature;
@@ -35,17 +35,13 @@ public class AddBoundaryErrorFeature extends AbstractAddShapeFeature {
     
     Object parentObject = getBusinessObjectForPictogramElement(parent);
     if (parentObject instanceof SubProcess) {
-      if (addedEvent.eResource() == null) {
-        getDiagram().eResource().getContents().add(addedEvent);
-      }
       
       x += parent.getGraphicsAlgorithm().getX();
       y += parent.getGraphicsAlgorithm().getY();
       
       parent = getDiagram();
       
-    } else if(parent.getContainer() != null && 
-            parent.getContainer() instanceof Diagram == false) {
+    } else if(parent.getContainer() != null && parent.getContainer() instanceof Diagram == false) {
       
       x += parent.getGraphicsAlgorithm().getX();
       y += parent.getGraphicsAlgorithm().getY();
@@ -55,20 +51,12 @@ public class AddBoundaryErrorFeature extends AbstractAddShapeFeature {
         parent = parent.getContainer();
       }
       
-      if (addedEvent.eResource() == null) {
-        ((SubProcess) parentObject).getFlowElements().add(addedEvent);
-      }
-      
     } else {
       
       x += parent.getGraphicsAlgorithm().getX();
       y += parent.getGraphicsAlgorithm().getY();
       
       parent = getDiagram();
-      
-      if (addedEvent.eResource() == null) {
-        getDiagram().eResource().getContents().add(addedEvent);
-      }
     } 
 
     // CONTAINER SHAPE WITH CIRCLE

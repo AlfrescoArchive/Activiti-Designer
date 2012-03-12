@@ -37,6 +37,18 @@
 			<url>http://download.eclipse.org/graphiti/updates/milestones/</url>
 		</repository>
 		<repository>
+      <id>eclipse-bpmn2</id>
+      <!--  TODO: change this when BPMN2 metamodel finds a premanent home -->
+      <url>http://download.eclipse.org/bpmn2-modeler/bpmn2/site</url>
+      <layout>p2</layout>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+    </repository>
+		<repository>
 			<id>Oribit</id>
 			<layout>p2</layout>
 			<url>http://download.eclipse.org/tools/orbit/downloads/drops/R20120119162704/repository</url>
