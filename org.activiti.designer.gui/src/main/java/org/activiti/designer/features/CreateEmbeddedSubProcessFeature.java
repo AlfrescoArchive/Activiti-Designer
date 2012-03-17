@@ -2,9 +2,7 @@ package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
 import org.activiti.designer.bpmn2.model.SubProcess;
-import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.designer.util.features.AbstractCreateBPMNFeature;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -25,17 +23,10 @@ public class CreateEmbeddedSubProcessFeature extends AbstractCreateBPMNFeature {
 	@Override
 	public Object[] create(ICreateContext context) {
 		SubProcess newSubProcess = new SubProcess();
-		newSubProcess.setId(getNextId());
-		newSubProcess.setName("Sub Process");
-
-		ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).addFlowElement(newSubProcess);
-
-		// do the add
-		addGraphicalRepresentation(context, newSubProcess);
+		addObjectToContainer(context, newSubProcess, "Sub Process");
 
 		// return newly created business object(s)
 		return new Object[] { newSubProcess };
-
 	}
 
 	@Override

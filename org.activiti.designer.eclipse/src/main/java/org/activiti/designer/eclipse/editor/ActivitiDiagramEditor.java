@@ -5,6 +5,7 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
@@ -13,6 +14,7 @@ import org.activiti.designer.bpmn2.model.BoundaryEvent;
 import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.FlowNode;
 import org.activiti.designer.bpmn2.model.SequenceFlow;
+import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.eclipse.bpmn.BpmnParser;
 import org.activiti.designer.eclipse.bpmn.SequenceFlowModel;
 import org.activiti.designer.eclipse.ui.ActivitiEditorContextMenuProvider;
@@ -176,33 +178,85 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 	
 	private void importDiagram() {
 		final Diagram diagram = getDiagramTypeProvider().getDiagram();
-		final IFeatureProvider featureProvider = getDiagramTypeProvider().getFeatureProvider();
 		diagram.setActive(true);
 		
 		getEditingDomain().getCommandStack().execute(new RecordingCommand(getEditingDomain()) {
 			@Override
 			protected void doExecute() {
 				
-				Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagramTypeProvider().getDiagram()));
-				
-				for (FlowElement flowElement : model.getProcess().getFlowElements()) {
-					
-					if(flowElement instanceof BoundaryEvent == true) continue;
-					
-					AddContext context = new AddContext(new AreaContext(), flowElement);
-					IAddFeature addFeature = featureProvider.getAddFeature(context);
-					
-					if (addFeature == null) {
-						System.out.println("Element not supported: " + flowElement);
-						return;
-					}
-					
-					GraphicInfo graphicInfo = model.getGraphicInfo(flowElement.getId());
-					if(graphicInfo != null) {
+				Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(diagram));
+				drawFlowElements(model.getProcess().getFlowElements(), model.getLocationMap(), diagram);
+				drawSequenceFlows();
+			}
+		});
+	}
+	
+	private void drawFlowElements(List<FlowElement> elementList, Map<String, GraphicInfo> locationMap, ContainerShape parentShape) {
+		
+		final IFeatureProvider featureProvider = getDiagramTypeProvider().getFeatureProvider();
+		
+		for (FlowElement flowElement : elementList) {
+			
+			if(flowElement instanceof BoundaryEvent == true) continue;
+			
+			AddContext context = new AddContext(new AreaContext(), flowElement);
+			IAddFeature addFeature = featureProvider.getAddFeature(context);
+			
+			if (addFeature == null) {
+				System.out.println("Element not supported: " + flowElement);
+				return;
+			}
+			
+			GraphicInfo graphicInfo = locationMap.get(flowElement.getId());
+			if(graphicInfo != null) {
 
-						context.setNewObject(flowElement);
-						context.setSize(graphicInfo.width, graphicInfo.height);
-						context.setTargetContainer(diagram);
+				context.setNewObject(flowElement);
+				context.setSize(graphicInfo.width, graphicInfo.height);
+				context.setTargetContainer(parentShape);
+				if(parentShape instanceof Diagram == false) {
+					context.setLocation(graphicInfo.x - parentShape.getGraphicsAlgorithm().getX(), 
+							graphicInfo.y - parentShape.getGraphicsAlgorithm().getY());
+				} else {
+					context.setLocation(graphicInfo.x, graphicInfo.y);
+				}
+
+				if (addFeature.canAdd(context)) {
+					PictogramElement newContainer = addFeature.add(context);
+					featureProvider.link(newContainer, new Object[] { flowElement });
+					
+					if(flowElement instanceof SubProcess) {
+						drawFlowElements(((SubProcess) flowElement).getFlowElements(), locationMap, (ContainerShape) newContainer);
+					}
+				}
+			}
+    }
+		
+		for (FlowElement flowElement : elementList) {
+			
+			if(flowElement instanceof BoundaryEvent == false) continue;
+			
+			AddContext context = new AddContext(new AreaContext(), flowElement);
+			IAddFeature addFeature = featureProvider.getAddFeature(context);
+			
+			if (addFeature == null) {
+				System.out.println("Element not supported: " + flowElement);
+				return;
+			}
+			
+			GraphicInfo graphicInfo = locationMap.get(flowElement.getId());
+			if(graphicInfo != null) {
+
+				context.setNewObject(flowElement);
+				context.setSize(graphicInfo.width, graphicInfo.height);
+				
+				BoundaryEvent boundaryEvent = (BoundaryEvent) flowElement;
+				if(boundaryEvent.getAttachedToRef() != null) {
+					ContainerShape container = (ContainerShape) featureProvider.getPictogramElementForBusinessObject(
+							boundaryEvent.getAttachedToRef());
+					
+					if(container != null) {
+					
+						context.setTargetContainer(container);
 						context.setLocation(graphicInfo.x, graphicInfo.y);
 	
 						if (addFeature.canAdd(context)) {
@@ -210,48 +264,9 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 							featureProvider.link(newContainer, new Object[] { flowElement });
 						}
 					}
-        }
-				
-				for (FlowElement flowElement : model.getProcess().getFlowElements()) {
-					
-					if(flowElement instanceof BoundaryEvent == false) continue;
-					
-					AddContext context = new AddContext(new AreaContext(), flowElement);
-					IAddFeature addFeature = featureProvider.getAddFeature(context);
-					
-					if (addFeature == null) {
-						System.out.println("Element not supported: " + flowElement);
-						return;
-					}
-					
-					GraphicInfo graphicInfo = model.getGraphicInfo(flowElement.getId());
-					if(graphicInfo != null) {
-
-						context.setNewObject(flowElement);
-						context.setSize(graphicInfo.width, graphicInfo.height);
-						
-						BoundaryEvent boundaryEvent = (BoundaryEvent) flowElement;
-						if(boundaryEvent.getAttachedToRef() != null) {
-							ContainerShape container = (ContainerShape) featureProvider.getPictogramElementForBusinessObject(
-									boundaryEvent.getAttachedToRef());
-							
-							if(container != null) {
-							
-								context.setTargetContainer(container);
-								context.setLocation(graphicInfo.x, graphicInfo.y);
-			
-								if (addFeature.canAdd(context)) {
-									PictogramElement newContainer = addFeature.add(context);
-									featureProvider.link(newContainer, new Object[] { flowElement });
-								}
-							}
-						}
-					}
 				}
-				
-				drawSequenceFlows();
 			}
-		});
+		}
 	}
 	
 	private void drawSequenceFlows() {
@@ -265,8 +280,8 @@ public class ActivitiDiagramEditor extends DiagramEditor {
       } else {
       	sequenceFlow.setId(sequenceFlowModel.id);
       }
-      sequenceFlow.setSourceRef(getFlowNode(sequenceFlowModel.sourceRef));
-      sequenceFlow.setTargetRef(getFlowNode(sequenceFlowModel.targetRef));
+      sequenceFlow.setSourceRef(getFlowNode(sequenceFlowModel.sourceRef, model.getProcess().getFlowElements()));
+      sequenceFlow.setTargetRef(getFlowNode(sequenceFlowModel.targetRef, model.getProcess().getFlowElements()));
       if(sequenceFlow.getSourceRef() == null || sequenceFlow.getSourceRef().getId() == null || 
               sequenceFlow.getTargetRef() == null || sequenceFlow.getTargetRef().getId() == null) continue;
       if(sequenceFlowModel.conditionExpression != null) {
@@ -276,17 +291,21 @@ public class ActivitiDiagramEditor extends DiagramEditor {
         sequenceFlow.getExecutionListeners().addAll(sequenceFlowModel.listenerList);
       }
       
-      model.addFlowElement(sequenceFlow);
+      SubProcess subProcessContainsFlow = null;
+      for (FlowElement flowElement : model.getProcess().getFlowElements()) {
+	      if(flowElement instanceof SubProcess) {
+	      	SubProcess subProcess = (SubProcess) flowElement;
+	      	if(subProcess.getFlowElements().contains(sequenceFlow.getSourceRef())) {
+	      		subProcessContainsFlow = subProcess;
+	      	}
+	      }
+      }
       
-      /*SubProcess subProcess = subProcessContains(sequenceFlow.getSourceRef(), subProcessList);
-      if(subProcess != null) {
-        ILinkService linkService = Graphiti.getLinkService();
-        List<PictogramElement> pictoList = linkService.getPictogramElements(diagram, subProcess);
-        if(pictoList != null && pictoList.size() > 0) {
-          parent = (ContainerShape) pictoList.get(0);
-          subProcess.getFlowElements().add(sequenceFlow);
-        }
-      }*/
+      if(subProcessContainsFlow != null) {
+      	subProcessContainsFlow.getFlowElements().add(sequenceFlow);
+      } else {
+      	model.addFlowElement(sequenceFlow);
+      }
       
       sequenceFlow.getSourceRef().getOutgoing().add(sequenceFlow);
       sequenceFlow.getTargetRef().getIncoming().add(sequenceFlow);
@@ -332,11 +351,16 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     }
   }
 	
-	private FlowNode getFlowNode(String elementid) {
+	private FlowNode getFlowNode(String elementid, List<FlowElement> elementList) {
     FlowNode flowNode = null;
-    for(FlowElement flowElement : ModelHandler.getModel(EcoreUtil.getURI(getDiagramTypeProvider().getDiagram())).getProcess().getFlowElements()) {
+    for(FlowElement flowElement : elementList) {
       if(flowElement.getId().equalsIgnoreCase(elementid)) {
         flowNode = (FlowNode) flowElement;
+        break;
+      }
+      
+      if(flowElement instanceof SubProcess) {
+      	flowNode = getFlowNode(elementid, ((SubProcess) flowElement).getFlowElements());
       }
     }
     return flowNode;

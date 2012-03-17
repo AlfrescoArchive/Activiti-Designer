@@ -10,8 +10,6 @@ import org.activiti.designer.integration.servicetask.CustomServiceTask;
 import org.activiti.designer.property.extension.util.ExtensionUtil;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.eclipse.ExtensionConstants;
-import org.activiti.designer.util.editor.ModelHandler;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -40,9 +38,7 @@ public class CreateServiceTaskFeature extends AbstractCreateFastBPMNFeature {
   @Override
   public Object[] create(ICreateContext context) {
     ServiceTask newServiceTask = new ServiceTask();
-
-    newServiceTask.setId(getNextId());
-    setName("Service Task", newServiceTask, context);
+    addObjectToContainer(context, newServiceTask, "Service Task");
 
     // Process custom service tasks
     if (this.customServiceTaskId != null) {
@@ -73,15 +69,6 @@ public class CreateServiceTaskFeature extends AbstractCreateFastBPMNFeature {
       }
 
     }
-    
-    Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-    if (parentObject instanceof SubProcess) {
-      ((SubProcess) parentObject).getFlowElements().add(newServiceTask);
-    } else {
-    	ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).addFlowElement(newServiceTask);
-    }
-
-    addGraphicalContent(newServiceTask, context);
     
     return new Object[] { newServiceTask };
   }

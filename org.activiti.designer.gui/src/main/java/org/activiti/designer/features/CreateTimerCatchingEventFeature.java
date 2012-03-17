@@ -4,8 +4,6 @@ import org.activiti.designer.ActivitiImageProvider;
 import org.activiti.designer.bpmn2.model.IntermediateCatchEvent;
 import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.bpmn2.model.TimerEventDefinition;
-import org.activiti.designer.util.editor.ModelHandler;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -28,18 +26,7 @@ public class CreateTimerCatchingEventFeature extends AbstractCreateFastBPMNFeatu
 		IntermediateCatchEvent catchEvent = new IntermediateCatchEvent();
 		TimerEventDefinition eventDef = new TimerEventDefinition();
 		catchEvent.getEventDefinitions().add(eventDef);
-		
-		catchEvent.setId(getNextId());
-		catchEvent.setName("TimerCatchEvent");
-		
-		Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-		if (parentObject instanceof SubProcess) {
-      ((SubProcess) parentObject).getFlowElements().add(catchEvent);
-    } else {
-    	ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).addFlowElement(catchEvent);
-    }
-
-    addGraphicalContent(catchEvent, context);
+		addObjectToContainer(context, catchEvent, "TimerCatchEvent");
 		
 		// return newly created business object(s)
 		return new Object[] { catchEvent };

@@ -3,8 +3,6 @@ package org.activiti.designer.features;
 import org.activiti.designer.ActivitiImageProvider;
 import org.activiti.designer.bpmn2.model.InclusiveGateway;
 import org.activiti.designer.bpmn2.model.SubProcess;
-import org.activiti.designer.util.editor.ModelHandler;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -25,16 +23,7 @@ public class CreateInclusiveGatewayFeature extends AbstractCreateFastBPMNFeature
 
 	public Object[] create(ICreateContext context) {
 		InclusiveGateway inclusiveGateway = new InclusiveGateway();
-		inclusiveGateway.setId(getNextId());
-		inclusiveGateway.setName("Inclusive Gateway");
-		Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-    if (parentObject instanceof SubProcess) {
-      ((SubProcess) parentObject).getFlowElements().add(inclusiveGateway);
-    } else {
-    	ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).addFlowElement(inclusiveGateway);
-    }
-
-    addGraphicalContent(inclusiveGateway, context);
+		addObjectToContainer(context, inclusiveGateway, "Inclusive Gateway");
 		
 		return new Object[] { inclusiveGateway };
 	}

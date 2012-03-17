@@ -3,8 +3,6 @@ package org.activiti.designer.features;
 import org.activiti.designer.ActivitiImageProvider;
 import org.activiti.designer.bpmn2.model.ScriptTask;
 import org.activiti.designer.bpmn2.model.SubProcess;
-import org.activiti.designer.util.editor.ModelHandler;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -26,17 +24,7 @@ public class CreateScriptTaskFeature extends AbstractCreateFastBPMNFeature {
 	@Override
 	public Object[] create(ICreateContext context) {
 		ScriptTask newScriptTask = new ScriptTask();
-		newScriptTask.setId(getNextId());
-		setName("Script Task", newScriptTask, context);
-		
-		Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-    if (parentObject instanceof SubProcess) {
-      ((SubProcess) parentObject).getFlowElements().add(newScriptTask);
-    } else {
-    	ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).addFlowElement(newScriptTask);
-    }
-		
-    addGraphicalContent(newScriptTask, context);
+		addObjectToContainer(context, newScriptTask, "Script Task");
 		
 		return new Object[] { newScriptTask };
 	}

@@ -4,8 +4,6 @@ import org.activiti.designer.ActivitiImageProvider;
 import org.activiti.designer.bpmn2.model.EndEvent;
 import org.activiti.designer.bpmn2.model.ErrorEventDefinition;
 import org.activiti.designer.bpmn2.model.SubProcess;
-import org.activiti.designer.util.editor.ModelHandler;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -28,18 +26,7 @@ public class CreateErrorEndEventFeature extends AbstractCreateFastBPMNFeature {
 		EndEvent endEvent = new EndEvent();
 		ErrorEventDefinition eventDef = new ErrorEventDefinition();
 		endEvent.getEventDefinitions().add(eventDef);
-		
-		endEvent.setId(getNextId());
-		endEvent.setName("ErrorEnd");
-		
-		Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-		if (parentObject instanceof SubProcess) {
-      ((SubProcess) parentObject).getFlowElements().add(endEvent);
-    } else {
-    	ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).addFlowElement(endEvent);
-    }
-
-    addGraphicalContent(endEvent, context);
+		addObjectToContainer(context, endEvent, "ErrorEnd");
 		
 		// return newly created business object(s)
 		return new Object[] { endEvent };

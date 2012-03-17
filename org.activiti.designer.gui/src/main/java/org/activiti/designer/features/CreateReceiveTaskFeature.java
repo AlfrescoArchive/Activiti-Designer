@@ -3,8 +3,6 @@ package org.activiti.designer.features;
 import org.activiti.designer.ActivitiImageProvider;
 import org.activiti.designer.bpmn2.model.ReceiveTask;
 import org.activiti.designer.bpmn2.model.SubProcess;
-import org.activiti.designer.util.editor.ModelHandler;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -26,17 +24,8 @@ public class CreateReceiveTaskFeature extends AbstractCreateFastBPMNFeature {
 	@Override
 	public Object[] create(ICreateContext context) {
 		ReceiveTask newReceiveTask = new ReceiveTask();
-		newReceiveTask.setId(getNextId());
-		setName("Receive Task", newReceiveTask, context);
+		addObjectToContainer(context, newReceiveTask, "Receive Task");
 		
-		Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-    if (parentObject instanceof SubProcess) {
-      ((SubProcess) parentObject).getFlowElements().add(newReceiveTask);
-    } else {
-    	ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).addFlowElement(newReceiveTask);
-    }
-		
-    addGraphicalContent(newReceiveTask, context);
 		return new Object[] { newReceiveTask };
 	}
 	

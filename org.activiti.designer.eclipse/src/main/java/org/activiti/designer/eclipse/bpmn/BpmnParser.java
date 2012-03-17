@@ -127,23 +127,17 @@ public class BpmnParser {
 
 				} else {
 
+					FlowNode currentActivity = null;
+					String elementId = xtr.getAttributeValue(null, "id");
 					processExtensionAvailable = false;
 
 					if (xtr.isStartElement() && "startEvent".equalsIgnoreCase(xtr.getLocalName())) {
-						String elementid = xtr.getAttributeValue(null, "id");
-						StartEvent startEvent = parseStartEvent(xtr);
-						startEvent.setId(elementid);
-						if (activeSubProcess != null)
-							activeSubProcess.getFlowElements().add(startEvent);
-						model.addFlowElement(startEvent);
+						currentActivity = parseStartEvent(xtr);
 					
 					} else if (xtr.isStartElement() && "subProcess".equalsIgnoreCase(xtr.getLocalName())) {
-						String elementid = xtr.getAttributeValue(null, "id");
-						SubProcess subProcess = parseSubProcess(xtr);
-						subProcess.setId(elementid);
-						activeSubProcess = subProcess;
-						model.addFlowElement(subProcess);
-
+						currentActivity = parseSubProcess(xtr);
+						activeSubProcess = (SubProcess) currentActivity;
+						
 					} else if (activeSubProcess != null && xtr.isStartElement() && "extensionElements".equalsIgnoreCase(xtr.getLocalName())) {
 						activeSubProcess.getExecutionListeners().addAll(parseListeners(xtr));
 
@@ -154,124 +148,51 @@ public class BpmnParser {
 						parseMultiInstanceDef(multiInstanceDef, xtr);
 	
 					} else if (xtr.isStartElement() && "userTask".equalsIgnoreCase(xtr.getLocalName())) {
-						String elementid = xtr.getAttributeValue(null, "id");
-						UserTask userTask = parseUserTask(xtr);
-						userTask.setId(elementid);
-						if (activeSubProcess != null)
-							activeSubProcess.getFlowElements().add(userTask);
-						model.addFlowElement(userTask);
+						currentActivity = parseUserTask(xtr);
 					
 					} else if (xtr.isStartElement() && "serviceTask".equalsIgnoreCase(xtr.getLocalName())) {
 						
-						String elementid = xtr.getAttributeValue(null, "id");
-						Task task = null;
 						if ("mail".equalsIgnoreCase(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "type"))) {
-							task = parseMailTask(xtr);
+							currentActivity = parseMailTask(xtr);
 						} else if ("org.alfresco.repo.workflow.activiti.script.AlfrescoScriptDelegate".equalsIgnoreCase(
 								xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "class"))) {
-							task = parseAlfrescoScriptTask(xtr);
+							currentActivity = parseAlfrescoScriptTask(xtr);
 						} else {
-							task = parseServiceTask(xtr);
+							currentActivity = parseServiceTask(xtr);
 						}
-						task.setId(elementid);
-						if (activeSubProcess != null)
-							activeSubProcess.getFlowElements().add(task);
-						model.addFlowElement(task);
 					
 					} else if (xtr.isStartElement() && "task".equalsIgnoreCase(xtr.getLocalName())) {
-						
-						String elementid = xtr.getAttributeValue(null, "id");
-						ServiceTask task = parseTask(xtr);
-						task.setId(elementid);
-						if (activeSubProcess != null)
-							activeSubProcess.getFlowElements().add(task);
-						model.addFlowElement(task);
+						currentActivity = parseTask(xtr);
 
 					} else if (xtr.isStartElement() && "scriptTask".equalsIgnoreCase(xtr.getLocalName())) {
-						
-						String elementid = xtr.getAttributeValue(null, "id");
-						ScriptTask scriptTask = parseScriptTask(xtr);
-						scriptTask.setId(elementid);
-						if (activeSubProcess != null)
-							activeSubProcess.getFlowElements().add(scriptTask);
-						model.addFlowElement(scriptTask);
+						currentActivity = parseScriptTask(xtr);
 
 					} else if (xtr.isStartElement() && "manualTask".equalsIgnoreCase(xtr.getLocalName())) {
-						
-						String elementid = xtr.getAttributeValue(null, "id");
-						ManualTask manualTask = parseManualTask(xtr);
-						manualTask.setId(elementid);
-						if (activeSubProcess != null)
-							activeSubProcess.getFlowElements().add(manualTask);
-						model.addFlowElement(manualTask);
+						currentActivity = parseManualTask(xtr);
 
 					} else if (xtr.isStartElement() && "receiveTask".equalsIgnoreCase(xtr.getLocalName())) {
-						
-						String elementid = xtr.getAttributeValue(null, "id");
-						ReceiveTask receiveTask = parseReceiveTask(xtr);
-						receiveTask.setId(elementid);
-						if (activeSubProcess != null)
-							activeSubProcess.getFlowElements().add(receiveTask);
-						model.addFlowElement(receiveTask);
+						currentActivity = parseReceiveTask(xtr);
 
 					} else if (xtr.isStartElement() && "businessRuleTask".equalsIgnoreCase(xtr.getLocalName())) {
-						
-						String elementid = xtr.getAttributeValue(null, "id");
-						BusinessRuleTask businessRuleTask = parseBusinessRuleTask(xtr);
-						businessRuleTask.setId(elementid);
-						if (activeSubProcess != null)
-							activeSubProcess.getFlowElements().add(businessRuleTask);
-						model.addFlowElement(businessRuleTask);
+						currentActivity = parseBusinessRuleTask(xtr);
 
 					} else if (xtr.isStartElement() && "callActivity".equalsIgnoreCase(xtr.getLocalName())) {
-						
-						String elementid = xtr.getAttributeValue(null, "id");
-						CallActivity callActivity = parseCallActivity(xtr);
-						callActivity.setId(elementid);
-						if (activeSubProcess != null)
-							activeSubProcess.getFlowElements().add(callActivity);
-						model.addFlowElement(callActivity);
+						currentActivity = parseCallActivity(xtr);
 
 					} else if (xtr.isStartElement() && "endEvent".equalsIgnoreCase(xtr.getLocalName())) {
-						
-						String elementid = xtr.getAttributeValue(null, "id");
-						EndEvent endEvent = parseEndEvent(xtr);
-						endEvent.setId(elementid);
-						if (activeSubProcess != null)
-							activeSubProcess.getFlowElements().add(endEvent);
-						model.addFlowElement(endEvent);
+						currentActivity = parseEndEvent(xtr);
 					
 					} else if (xtr.isStartElement() && "intermediateCatchEvent".equalsIgnoreCase(xtr.getLocalName())) {
-						String elementid = xtr.getAttributeValue(null, "id");
-						IntermediateCatchEvent catchEvent = parseIntermediateCatchEvent(xtr);
-						catchEvent.setId(elementid);
-						if (activeSubProcess != null)
-							activeSubProcess.getFlowElements().add(catchEvent);
-						model.addFlowElement(catchEvent);
+						currentActivity = parseIntermediateCatchEvent(xtr);
 
 					} else if (xtr.isStartElement() && "exclusiveGateway".equalsIgnoreCase(xtr.getLocalName())) {
-						String elementid = xtr.getAttributeValue(null, "id");
-						ExclusiveGateway exclusiveGateway = parseExclusiveGateway(xtr);
-						exclusiveGateway.setId(elementid);
-						if (activeSubProcess != null)
-							activeSubProcess.getFlowElements().add(exclusiveGateway);
-						model.addFlowElement(exclusiveGateway);
+						currentActivity = parseExclusiveGateway(xtr);
 
 					} else if (xtr.isStartElement() && "inclusiveGateway".equalsIgnoreCase(xtr.getLocalName())) {
-            String elementid = xtr.getAttributeValue(null, "id");
-            InclusiveGateway inclusiveGateway = parseInclusiveGateway(xtr);
-            inclusiveGateway.setId(elementid);
-            if (activeSubProcess != null)
-                activeSubProcess.getFlowElements().add(inclusiveGateway);
-            model.addFlowElement(inclusiveGateway);
+						currentActivity = parseInclusiveGateway(xtr);
 
           } else if (xtr.isStartElement() && "parallelGateway".equalsIgnoreCase(xtr.getLocalName())) {
-						String elementid = xtr.getAttributeValue(null, "id");
-						ParallelGateway parallelGateway = parseParallelGateway(xtr);
-						parallelGateway.setId(elementid);
-						if (activeSubProcess != null)
-							activeSubProcess.getFlowElements().add(parallelGateway);
-						model.addFlowElement(parallelGateway);
+          	currentActivity = parseParallelGateway(xtr);
 
 					} else if (xtr.isStartElement() && "boundaryEvent".equalsIgnoreCase(xtr.getLocalName())) {
 						String elementid = xtr.getAttributeValue(null, "id");
@@ -280,7 +201,8 @@ public class BpmnParser {
 						boundaryList.add(event);
 						if (activeSubProcess != null)
 							activeSubProcess.getFlowElements().add(event.boundaryEvent);
-						model.addFlowElement(event.boundaryEvent);
+						else
+							model.addFlowElement(event.boundaryEvent);
 
 					} else if (xtr.isStartElement() && "sequenceFlow".equalsIgnoreCase(xtr.getLocalName())) {
 						SequenceFlowModel sequenceFlow = parseSequenceFlow(xtr);
@@ -317,6 +239,14 @@ public class BpmnParser {
 							}
 						}
 						flowLocationMap.put(id, wayPointList);
+					}
+					
+					if(currentActivity != null) {
+						currentActivity.setId(elementId);
+						if (currentActivity != activeSubProcess && activeSubProcess != null)
+							activeSubProcess.getFlowElements().add(currentActivity);
+						else
+							model.addFlowElement(currentActivity);
 					}
 				}
 			}
@@ -872,7 +802,6 @@ public class BpmnParser {
 						fillListenerWithFields(listener, fieldList);
 						fieldList = new ArrayList<FieldModel>();
 					}
-					listenerList.add(listener);
 
 				} else if (xtr.isEndElement() && "extensionElements".equalsIgnoreCase(xtr.getLocalName())) {
 					if (fieldList.size() > 0) {
@@ -1104,7 +1033,6 @@ public class BpmnParser {
 						listener.getFieldExtensions().addAll(extensionList);
 						extensionList = new ArrayList<FieldExtension>();
 					}
-					serviceTask.getExecutionListeners().add(listener);
 
 				} else if (xtr.isEndElement() && "extensionElements".equalsIgnoreCase(xtr.getLocalName())) {
 					if (extensionList.size() > 0) {
@@ -1170,7 +1098,6 @@ public class BpmnParser {
             listener.getFieldExtensions().addAll(extensionList);
             extensionList = new ArrayList<FieldExtension>();
           }
-          callActivity.getExecutionListeners().add(listener);
         
         } else if(xtr.isStartElement() && "in".equalsIgnoreCase(xtr.getLocalName())) {
         	String source = xtr.getAttributeValue(null, "source");

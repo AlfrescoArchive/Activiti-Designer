@@ -147,33 +147,28 @@ public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
 
         TimerEventDefinition timerDef = (TimerEventDefinition) startEvent.getEventDefinitions().get(0);
 
-        if ((timerDef.getTimeDuration() != null && timerDef.getTimeDuration().length() > 0) ||
-                timerDef.getTimeDate() != null ||
-                (timerDef.getTimeCycle() != null && timerDef.getTimeCycle().length() > 0)) {
+        xtw.writeStartElement("timerEventDefinition");
 
-          xtw.writeStartElement("timerEventDefinition");
+        if (StringUtils.isNotEmpty(timerDef.getTimeDuration())) {
 
-          if (timerDef.getTimeDuration().length() > 0) {
+          xtw.writeStartElement("timeDuration");
+          xtw.writeCharacters(timerDef.getTimeDuration());
+          xtw.writeEndElement();
 
-            xtw.writeStartElement("timeDuration");
-            xtw.writeCharacters(timerDef.getTimeDuration());
-            xtw.writeEndElement();
+        } else if (timerDef.getTimeDate() != null) {
 
-          } else if (timerDef.getTimeDate() != null) {
+          xtw.writeStartElement("timeDate");
+          xtw.writeCharacters(timerDef.getTimeDate().toString());
+          xtw.writeEndElement();
 
-            xtw.writeStartElement("timeDate");
-            xtw.writeCharacters(timerDef.getTimeDate().toString());
-            xtw.writeEndElement();
+        } else if (StringUtils.isNotEmpty(timerDef.getTimeCycle())) {
 
-          } else {
-
-            xtw.writeStartElement("timeCycle");
-            xtw.writeCharacters(timerDef.getTimeCycle());
-            xtw.writeEndElement();
-          }
-
+          xtw.writeStartElement("timeCycle");
+          xtw.writeCharacters(timerDef.getTimeCycle());
           xtw.writeEndElement();
         }
+
+        xtw.writeEndElement();
       }
 
       if (startEvent.getFormProperties().size() > 0) {
@@ -194,11 +189,11 @@ public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
 
       if (endEvent.getEventDefinitions().size() > 0) {
         ErrorEventDefinition errorDef = (ErrorEventDefinition) endEvent.getEventDefinitions().get(0);
-        if (errorDef.getErrorCode() != null && errorDef.getErrorCode().length() > 0) {
-          xtw.writeStartElement("errorEventDefinition");
-          xtw.writeAttribute("errorRef", errorDef.getErrorCode());
-          xtw.writeEndElement();
+        xtw.writeStartElement("errorEventDefinition");
+        if(StringUtils.isNotEmpty(errorDef.getErrorCode())) {
+        	xtw.writeAttribute("errorRef", errorDef.getErrorCode());
         }
+        xtw.writeEndElement();
       }
 
       // end EndEvent element
@@ -277,33 +272,32 @@ public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
 
     } else if (object instanceof SubProcess) {
       SubProcess subProcess = (SubProcess) object;
+      
+      // start SubProcess element
+      xtw.writeStartElement("subProcess");
+      xtw.writeAttribute("id", subProcess.getId());
+      if (subProcess.getName() != null) {
+        xtw.writeAttribute("name", subProcess.getName());
+      }
+      
+      DefaultFlowExport.createDefaultFlow(object, xtw);
+      AsyncActivityExport.createAsyncAttribute(object, xtw);
+
+      ExecutionListenerExport.createExecutionListenerXML(subProcess.getExecutionListeners(), true, xtw);
+      MultiInstanceExport.createMultiInstance(object, xtw);
+
       List<FlowElement> flowElementList = subProcess.getFlowElements();
-      if (flowElementList != null && flowElementList.size() > 0) {
-        // start SubProcess element
-        xtw.writeStartElement("subProcess");
-        xtw.writeAttribute("id", subProcess.getId());
-        if (subProcess.getName() != null) {
-          xtw.writeAttribute("name", subProcess.getName());
-        }
-        
-        DefaultFlowExport.createDefaultFlow(object, xtw);
-        AsyncActivityExport.createAsyncAttribute(object, xtw);
+      for (FlowElement flowElement : flowElementList) {
+        createXML(flowElement);
+      }
 
-        ExecutionListenerExport.createExecutionListenerXML(subProcess.getExecutionListeners(), true, xtw);
-        MultiInstanceExport.createMultiInstance(object, xtw);
-
-        for (FlowElement flowElement : flowElementList) {
-          createXML(flowElement);
-        }
-
-        // end SubProcess element
-        xtw.writeEndElement();
-        
-        if(subProcess.getBoundaryEvents().size() > 0) {
-        	for(BoundaryEvent event : subProcess.getBoundaryEvents()) {
-        		BoundaryEventExport.createBoundaryEvent(event, xtw);
-        	}
-        }
+      // end SubProcess element
+      xtw.writeEndElement();
+      
+      if(subProcess.getBoundaryEvents().size() > 0) {
+      	for(BoundaryEvent event : subProcess.getBoundaryEvents()) {
+      		BoundaryEventExport.createBoundaryEvent(event, xtw);
+      	}
       }
     }
   }
