@@ -36,9 +36,6 @@ public class AddBoundaryErrorFeature extends AbstractAddShapeFeature {
     Object parentObject = getBusinessObjectForPictogramElement(parent);
     if (parentObject instanceof SubProcess) {
       
-      x += parent.getGraphicsAlgorithm().getX();
-      y += parent.getGraphicsAlgorithm().getY();
-      
       parent = getDiagram();
       
     } else if(parent.getContainer() != null && parent.getContainer() instanceof Diagram == false) {
@@ -52,9 +49,6 @@ public class AddBoundaryErrorFeature extends AbstractAddShapeFeature {
       }
       
     } else {
-      
-      x += parent.getGraphicsAlgorithm().getX();
-      y += parent.getGraphicsAlgorithm().getY();
       
       parent = getDiagram();
     } 

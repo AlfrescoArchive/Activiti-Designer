@@ -256,13 +256,10 @@ public class BpmnParser {
 					BoundaryEvent boundaryEvent = (BoundaryEvent) flowElement;
 					for (BoundaryEventModel eventModel : boundaryList) {
 						if (boundaryEvent.getId().equals(eventModel.boundaryEvent.getId())) {
-							for (FlowElement attachElement : model.getProcess().getFlowElements()) {
-								if (attachElement instanceof Activity) {
-									if (attachElement.getId().equals(eventModel.attachedRef)) {
-										boundaryEvent.setAttachedToRef((Activity) attachElement);
-										((Activity) attachElement).getBoundaryEvents().add(boundaryEvent);
-									}
-								}
+							FlowNode flowNode = getFlowNode(eventModel.attachedRef, model.getProcess().getFlowElements());
+							if(flowNode != null) {
+								boundaryEvent.setAttachedToRef((Activity) flowNode);
+								((Activity) flowNode).getBoundaryEvents().add(boundaryEvent);
 							}
 						}
 					}
@@ -273,6 +270,21 @@ public class BpmnParser {
 			e.printStackTrace();
 		}
 	}
+	
+	private FlowNode getFlowNode(String elementid, List<FlowElement> elementList) {
+    FlowNode flowNode = null;
+    for(FlowElement flowElement : elementList) {
+      if(flowElement.getId().equalsIgnoreCase(elementid)) {
+        flowNode = (FlowNode) flowElement;
+        break;
+      }
+      
+      if(flowElement instanceof SubProcess) {
+      	flowNode = getFlowNode(elementid, ((SubProcess) flowElement).getFlowElements());
+      }
+    }
+    return flowNode;
+  }
 
 	private StartEvent parseStartEvent(XMLStreamReader xtr) {
 		StartEvent startEvent = null;

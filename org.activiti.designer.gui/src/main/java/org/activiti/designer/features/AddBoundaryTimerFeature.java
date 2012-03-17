@@ -35,8 +35,6 @@ public class AddBoundaryTimerFeature extends AbstractAddShapeFeature {
     
     Object parentObject = getBusinessObjectForPictogramElement(parent);
     if (parentObject instanceof SubProcess) {
-      x += parent.getGraphicsAlgorithm().getX();
-      y += parent.getGraphicsAlgorithm().getY();
       
       parent = getDiagram();
       

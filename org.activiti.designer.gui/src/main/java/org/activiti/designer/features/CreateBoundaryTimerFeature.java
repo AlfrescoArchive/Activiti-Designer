@@ -41,7 +41,7 @@ public class CreateBoundaryTimerFeature extends AbstractCreateBPMNFeature {
 		
 		Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
     if (parentObject instanceof SubProcess) {
-    	ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).addFlowElement(boundaryEvent);
+    	((SubProcess) parentObject).getFlowElements().add(boundaryEvent);
     } else if(context.getTargetContainer().getContainer() != null && 
             context.getTargetContainer().getContainer() instanceof Diagram == false) {
       
