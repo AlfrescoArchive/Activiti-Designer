@@ -29,6 +29,7 @@ import org.activiti.designer.bpmn2.model.BusinessRuleTask;
 import org.activiti.designer.bpmn2.model.CallActivity;
 import org.activiti.designer.bpmn2.model.EndEvent;
 import org.activiti.designer.bpmn2.model.ErrorEventDefinition;
+import org.activiti.designer.bpmn2.model.EventDefinition;
 import org.activiti.designer.bpmn2.model.ExclusiveGateway;
 import org.activiti.designer.bpmn2.model.FieldExtension;
 import org.activiti.designer.bpmn2.model.FlowElement;
@@ -288,8 +289,7 @@ public class BpmnParser {
 					} else if (xtr.isStartElement() && "BPMNShape".equalsIgnoreCase(xtr.getLocalName())) {
 						bpmdiInfoFound = true;
 						String id = xtr.getAttributeValue(null, "bpmnElement");
-						boolean readyWithBPMNShape = false;
-						while (readyWithBPMNShape == false && xtr.hasNext()) {
+						while (xtr.hasNext()) {
 							xtr.next();
 							if (xtr.isStartElement() && "Bounds".equalsIgnoreCase(xtr.getLocalName())) {
 								GraphicInfo graphicInfo = new GraphicInfo();
@@ -298,15 +298,14 @@ public class BpmnParser {
 								graphicInfo.height = Double.valueOf(xtr.getAttributeValue(null, "height")).intValue();
 								graphicInfo.width = Double.valueOf(xtr.getAttributeValue(null, "width")).intValue();
 								model.addGraphicInfo(id, graphicInfo);
-								readyWithBPMNShape = true;
+								break;
 							}
 						}
 						
 					} else if(xtr.isStartElement() && "BPMNEdge".equalsIgnoreCase(xtr.getLocalName())) {
 						String id = xtr.getAttributeValue(null, "bpmnElement");
 						List<GraphicInfo> wayPointList = new ArrayList<GraphicInfo>();
-						boolean readyWithBPMNEdge = false;
-						while (readyWithBPMNEdge == false && xtr.hasNext()) {
+						while (xtr.hasNext()) {
 							xtr.next();
 							if (xtr.isStartElement() && "waypoint".equalsIgnoreCase(xtr.getLocalName())) {
 								GraphicInfo graphicInfo = new GraphicInfo();
@@ -314,7 +313,7 @@ public class BpmnParser {
 								graphicInfo.y = Double.valueOf(xtr.getAttributeValue(null, "y")).intValue();
 								wayPointList.add(graphicInfo);
 							} else if(xtr.isEndElement() && "BPMNEdge".equalsIgnoreCase(xtr.getLocalName())) {
-								readyWithBPMNEdge = true;
+								break;
 							}
 						}
 						flowLocationMap.put(id, wayPointList);
@@ -331,6 +330,7 @@ public class BpmnParser {
 								if (attachElement instanceof Activity) {
 									if (attachElement.getId().equals(eventModel.attachedRef)) {
 										boundaryEvent.setAttachedToRef((Activity) attachElement);
+										((Activity) attachElement).getBoundaryEvents().add(boundaryEvent);
 									}
 								}
 							}
@@ -1496,43 +1496,40 @@ public class BpmnParser {
 		BoundaryEventModel model = new BoundaryEventModel();
 		model.boundaryEvent = boundaryEvent;
 		model.attachedRef = xtr.getAttributeValue(null, "attachedToRef");
-		boolean readyWithEvent = false;
+		EventDefinition eventDefinition = null;
 		try {
-			while (readyWithEvent == false && xtr.hasNext()) {
+			while (xtr.hasNext()) {
 				xtr.next();
 				if (xtr.isStartElement() && "timerEventDefinition".equalsIgnoreCase(xtr.getLocalName())) {
 					model.type = BoundaryEventModel.TIMEEVENT;
+					eventDefinition = new TimerEventDefinition();
+					boundaryEvent.getEventDefinitions().add(eventDefinition);
 				} else if (xtr.isStartElement() && "errorEventDefinition".equalsIgnoreCase(xtr.getLocalName())) {
 					model.type = BoundaryEventModel.ERROREVENT;
-					ErrorEventDefinition eventDef = new ErrorEventDefinition();
+					eventDefinition = new ErrorEventDefinition();
+					boundaryEvent.getEventDefinitions().add(eventDefinition);
 					if (xtr.getAttributeValue(null, "errorRef") != null) {
-						eventDef.setErrorCode(xtr.getAttributeValue(null, "errorRef"));
+						((ErrorEventDefinition) eventDefinition).setErrorCode(xtr.getAttributeValue(null, "errorRef"));
 					}
-					boundaryEvent.getEventDefinitions().add(eventDef);
-					readyWithEvent = true;
+					break;
 
 				} else if (xtr.isStartElement() && "timeDuration".equalsIgnoreCase(xtr.getLocalName())) {
-					TimerEventDefinition eventDef = new TimerEventDefinition();
-					eventDef.setTimeDuration(xtr.getElementText());
-					boundaryEvent.getEventDefinitions().add(eventDef);
-					readyWithEvent = true;
+					((TimerEventDefinition) eventDefinition).setTimeDuration(xtr.getElementText());
+					break;
 
 				} else if (xtr.isStartElement() && "timeDate".equalsIgnoreCase(xtr.getLocalName())) {
-					TimerEventDefinition eventDef = new TimerEventDefinition();
-					eventDef.setTimeDate(new SimpleDateFormat().parse(xtr.getElementText()));
-					boundaryEvent.getEventDefinitions().add(eventDef);
-					readyWithEvent = true;
+					((TimerEventDefinition) eventDefinition).setTimeDate(new SimpleDateFormat().parse(xtr.getElementText()));
+					break;
 
 				} else if (xtr.isStartElement() && "timeCycle".equalsIgnoreCase(xtr.getLocalName())) {
-					TimerEventDefinition eventDef = new TimerEventDefinition();
-					eventDef.setTimeCycle(xtr.getElementText());
-					boundaryEvent.getEventDefinitions().add(eventDef);
-					readyWithEvent = true;
+					((TimerEventDefinition) eventDefinition).setTimeCycle(xtr.getElementText());
+					break;
 
 				} else if (xtr.isEndElement() && "boundaryEvent".equalsIgnoreCase(xtr.getLocalName())) {
-					readyWithEvent = true;
+					break;
 				}
 			}
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

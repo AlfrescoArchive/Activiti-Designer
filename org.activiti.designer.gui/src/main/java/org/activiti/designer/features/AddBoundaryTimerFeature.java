@@ -20,7 +20,7 @@ import org.eclipse.graphiti.services.IPeCreateService;
 
 public class AddBoundaryTimerFeature extends AbstractAddShapeFeature {
   
-  private static final int IMAGE_SIZE = 30;
+  private static final int IMAGE_SIZE = 20;
 	
 	public AddBoundaryTimerFeature(IFeatureProvider fp) {
 		super(fp);
@@ -52,9 +52,6 @@ public class AddBoundaryTimerFeature extends AbstractAddShapeFeature {
       }
       
     } else {
-      
-      x += parent.getGraphicsAlgorithm().getX();
-      y += parent.getGraphicsAlgorithm().getY();
       
       parent = getDiagram();
     }
@@ -97,8 +94,6 @@ public class AddBoundaryTimerFeature extends AbstractAddShapeFeature {
     {
       final Shape shape = peCreateService.createShape(containerShape, false);
       final Image image = gaService.createImage(shape, ActivitiImageProvider.IMG_BOUNDARY_TIMER);
-      image.setStretchH(true);
-      image.setStretchV(true);
       image.setWidth(IMAGE_SIZE);
       image.setHeight(IMAGE_SIZE);
       

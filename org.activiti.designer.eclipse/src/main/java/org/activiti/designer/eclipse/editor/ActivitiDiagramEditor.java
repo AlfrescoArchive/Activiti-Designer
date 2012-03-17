@@ -9,6 +9,7 @@ import java.util.List;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
+import org.activiti.designer.bpmn2.model.BoundaryEvent;
 import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.FlowNode;
 import org.activiti.designer.bpmn2.model.SequenceFlow;
@@ -63,9 +64,6 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 	public final static String ID = "org.activiti.designer.diagmrameditor"; //$NON-NLS-1$
 	private static GraphicalViewer activeGraphicalViewer;
 
-	private URI modelUri;
-	private URI diagramUri;
-
 	private IFile modelFile;
 	private IFile diagramFile;
 	
@@ -101,36 +99,26 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 	 */
 	private DiagramEditorInput createNewDiagramEditorInput() throws CoreException {
 		IPath fullPath = modelFile.getFullPath();
-		System.out.println("fullPath " + fullPath);
 		
-		modelUri = URI.createPlatformResourceURI(fullPath.toString(), true);
-
 		IFolder folder = Bpmn2DiagramCreator.getTempFolder(fullPath);
 		diagramFile = Bpmn2DiagramCreator.getTempFile(fullPath, folder);
 
 		// Create new temporary diagram file
 		Bpmn2DiagramCreator creator = new Bpmn2DiagramCreator();
-		System.out.println("diagramFile " + diagramFile);
 		creator.setDiagramFile(diagramFile);
 
 		DiagramEditorInput input = creator.createDiagram(false);
-		diagramUri = creator.getUri();
 		
-		System.out.println(diagramUri);
-
 		return input;
 	}
 
 	@Override
 	public void doSave(IProgressMonitor monitor) {
-		System.out.println("doSave");
-		
 		IDiagramTypeProvider diagramTypeProvider = this.getDiagramTypeProvider();
 		
 		try {
 			
 			String diagramFileString = modelFile.getLocationURI().getRawPath();
-			System.out.println("diagram " + diagramFileString);
 			
 			BPMN20ExportMarshaller marshaller = new BPMN20ExportMarshaller();
 			marshaller.marshallDiagram(ModelHandler.getModel(EcoreUtil.getURI(getDiagramTypeProvider().getDiagram())), 
@@ -198,6 +186,9 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 				Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagramTypeProvider().getDiagram()));
 				
 				for (FlowElement flowElement : model.getProcess().getFlowElements()) {
+					
+					if(flowElement instanceof BoundaryEvent == true) continue;
+					
 					AddContext context = new AddContext(new AreaContext(), flowElement);
 					IAddFeature addFeature = featureProvider.getAddFeature(context);
 					
@@ -220,6 +211,44 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 						}
 					}
         }
+				
+				for (FlowElement flowElement : model.getProcess().getFlowElements()) {
+					
+					if(flowElement instanceof BoundaryEvent == false) continue;
+					
+					AddContext context = new AddContext(new AreaContext(), flowElement);
+					IAddFeature addFeature = featureProvider.getAddFeature(context);
+					
+					if (addFeature == null) {
+						System.out.println("Element not supported: " + flowElement);
+						return;
+					}
+					
+					GraphicInfo graphicInfo = model.getGraphicInfo(flowElement.getId());
+					if(graphicInfo != null) {
+
+						context.setNewObject(flowElement);
+						context.setSize(graphicInfo.width, graphicInfo.height);
+						
+						BoundaryEvent boundaryEvent = (BoundaryEvent) flowElement;
+						if(boundaryEvent.getAttachedToRef() != null) {
+							ContainerShape container = (ContainerShape) featureProvider.getPictogramElementForBusinessObject(
+									boundaryEvent.getAttachedToRef());
+							
+							if(container != null) {
+							
+								context.setTargetContainer(container);
+								context.setLocation(graphicInfo.x, graphicInfo.y);
+			
+								if (addFeature.canAdd(context)) {
+									PictogramElement newContainer = addFeature.add(context);
+									featureProvider.link(newContainer, new Object[] { flowElement });
+								}
+							}
+						}
+					}
+				}
+				
 				drawSequenceFlows();
 			}
 		});

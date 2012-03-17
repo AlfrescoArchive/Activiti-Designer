@@ -33,78 +33,61 @@ public class BoundaryEventExport implements ActivitiNamespaceConstants {
     BoundaryEvent boundaryEvent = (BoundaryEvent) object;
     List<EventDefinition> eventDefinitionList = boundaryEvent.getEventDefinitions();
     if(eventDefinitionList.size() == 1) {
+    	
+    	xtw.writeStartElement("boundaryEvent");
+      xtw.writeAttribute("id", boundaryEvent.getId());
+      if (boundaryEvent.getName() != null) {
+        xtw.writeAttribute("name", boundaryEvent.getName());
+      }
+      if (boundaryEvent.isCancelActivity()) {
+      	xtw.writeAttribute("cancelActivity", "true");
+      } else {
+      	xtw.writeAttribute("cancelActivity", "false");
+      }
+      
+      if (boundaryEvent.getAttachedToRef() != null) {
+        xtw.writeAttribute("attachedToRef", boundaryEvent.getAttachedToRef().getId());
+      }
+    	
       if(eventDefinitionList.get(0) instanceof TimerEventDefinition) {
         TimerEventDefinition timerDef = (TimerEventDefinition) eventDefinitionList.get(0);
-        if(StringUtils.isNotEmpty(timerDef.getTimeDuration())  ||
-        		StringUtils.isNotEmpty(timerDef.getTimeCycle()) ||
-        		timerDef.getTimeDate() != null) {
           
-          // start TimerBoundaryEvent element
-          xtw.writeStartElement("boundaryEvent");
-          xtw.writeAttribute("id", boundaryEvent.getId());
-          if (boundaryEvent.getName() != null) {
-            xtw.writeAttribute("name", boundaryEvent.getName());
-          }
-          if (boundaryEvent.isCancelActivity()) {
-          	xtw.writeAttribute("cancelActivity", "true");
-          } else {
-          	xtw.writeAttribute("cancelActivity", "false");
-          }
+        xtw.writeStartElement("timerEventDefinition");
+        
+        if(StringUtils.isNotEmpty(timerDef.getTimeDuration())) {
           
-          if (boundaryEvent.getAttachedToRef() != null) {
-            xtw.writeAttribute("attachedToRef", boundaryEvent.getAttachedToRef().getId());
-          }
-          
-          xtw.writeStartElement("timerEventDefinition");
-          
-          if(StringUtils.isNotEmpty(timerDef.getTimeDuration())) {
-            
-            xtw.writeStartElement("timeDuration");
-            xtw.writeCharacters(timerDef.getTimeDuration());
-            xtw.writeEndElement();
-          
-          } else if(timerDef.getTimeDate() != null) {
-            
-            xtw.writeStartElement("timeDate");
-            xtw.writeCharacters(timerDef.getTimeDate().toString());
-            xtw.writeEndElement();
-          
-          } else {
-            
-            xtw.writeStartElement("timeCycle");
-            xtw.writeCharacters(timerDef.getTimeCycle());
-            xtw.writeEndElement();
-          }
-          
+          xtw.writeStartElement("timeDuration");
+          xtw.writeCharacters(timerDef.getTimeDuration());
           xtw.writeEndElement();
-
-          // end TimerBoundaryEvent element
+        
+        } else if(timerDef.getTimeDate() != null) {
+          
+          xtw.writeStartElement("timeDate");
+          xtw.writeCharacters(timerDef.getTimeDate().toString());
+          xtw.writeEndElement();
+        
+        } else if(StringUtils.isNotEmpty(timerDef.getTimeCycle())) {
+          
+          xtw.writeStartElement("timeCycle");
+          xtw.writeCharacters(timerDef.getTimeCycle());
           xtw.writeEndElement();
         }
+        
+        xtw.writeEndElement();
+        
       } else if(eventDefinitionList.get(0) instanceof ErrorEventDefinition) {
         ErrorEventDefinition errorDef = (ErrorEventDefinition) eventDefinitionList.get(0);
         
-        // start ErrorBoundaryEvent element
-        xtw.writeStartElement("boundaryEvent");
-        xtw.writeAttribute("id", boundaryEvent.getId());
-        if (boundaryEvent.getName() != null) {
-          xtw.writeAttribute("name", boundaryEvent.getName());
-        }
-        if (boundaryEvent.getAttachedToRef() != null) {
-          xtw.writeAttribute("attachedToRef", boundaryEvent.getAttachedToRef().getId());
-        }
-        
         xtw.writeStartElement("errorEventDefinition");
         
-        if(errorDef.getErrorCode() != null && errorDef.getErrorCode().length() > 0) {
+        if(StringUtils.isNotEmpty(errorDef.getErrorCode())) {
           xtw.writeAttribute("errorRef", errorDef.getErrorCode());
         }
         
         xtw.writeEndElement();
-
-        // end ErrorBoundaryEvent element
-        xtw.writeEndElement();
       }
+      
+      xtw.writeEndElement();
     }
   }
 }

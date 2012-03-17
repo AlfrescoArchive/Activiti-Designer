@@ -23,7 +23,7 @@ import org.eclipse.graphiti.services.IPeCreateService;
 
 public class AddEventFeature extends AbstractAddShapeFeature {
 	
-	private static final int IMAGE_SIZE = 30;
+	private static final int IMAGE_SIZE = 20;
 
 	public AddEventFeature(IFeatureProvider fp) {
 		super(fp);
@@ -32,7 +32,6 @@ public class AddEventFeature extends AbstractAddShapeFeature {
 	@Override
 	public PictogramElement add(IAddContext context) {
 		final Event addedEvent = (Event) context.getNewObject();
-		System.out.println("addedEvent " + addedEvent);
 		final ContainerShape parent = context.getTargetContainer();
 
 		// CONTAINER SHAPE WITH CIRCLE
@@ -79,12 +78,10 @@ public class AddEventFeature extends AbstractAddShapeFeature {
 			gaService.setLocationAndSize(ellipse, 0, 0, 0, 0);
 		}
 		
-		if (addedEvent instanceof StartEvent && false) {
+		if (addedEvent instanceof StartEvent && ((StartEvent) addedEvent).getEventDefinitions().size() > 0) {
 			
 			final Shape shape = peCreateService.createShape(containerShape, false);
       final Image image = gaService.createImage(shape, ActivitiImageProvider.IMG_BOUNDARY_TIMER);
-      image.setStretchH(true);
-      image.setStretchV(true);
       image.setWidth(IMAGE_SIZE);
       image.setHeight(IMAGE_SIZE);
       
