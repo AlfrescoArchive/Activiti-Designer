@@ -2,6 +2,7 @@ package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
 import org.activiti.designer.bpmn2.model.EndEvent;
+import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.FlowNode;
 import org.activiti.designer.bpmn2.model.SequenceFlow;
 import org.activiti.designer.bpmn2.model.StartEvent;
@@ -125,9 +126,8 @@ public class CreateSequenceFlowFeature extends AbstractCreateBPMNConnectionFeatu
 		return FEATURE_ID_KEY;
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
-	protected Class getFeatureClass() {
+	protected Class<? extends FlowElement> getFeatureClass() {
 		return new SequenceFlow().getClass();
 	}
 

@@ -16,6 +16,7 @@ import org.activiti.designer.bpmn2.model.ManualTask;
 import org.activiti.designer.bpmn2.model.ParallelGateway;
 import org.activiti.designer.bpmn2.model.ReceiveTask;
 import org.activiti.designer.bpmn2.model.ScriptTask;
+import org.activiti.designer.bpmn2.model.SequenceFlow;
 import org.activiti.designer.bpmn2.model.ServiceTask;
 import org.activiti.designer.bpmn2.model.StartEvent;
 import org.activiti.designer.bpmn2.model.SubProcess;
@@ -25,6 +26,7 @@ import org.activiti.designer.eclipse.common.ActivitiBPMNDiagramConstants;
 import org.activiti.designer.eclipse.extension.AbstractDiagramWorker;
 import org.activiti.designer.eclipse.extension.validation.ProcessValidator;
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
+import org.activiti.designer.features.AbstractCreateBPMNFeature;
 import org.activiti.designer.features.ChangeElementTypeFeature;
 import org.activiti.designer.features.CreateBoundaryErrorFeature;
 import org.activiti.designer.features.CreateBoundaryTimerFeature;
@@ -45,9 +47,9 @@ import org.activiti.designer.features.CreateStartEventFeature;
 import org.activiti.designer.features.CreateTimerCatchingEventFeature;
 import org.activiti.designer.features.CreateTimerStartEventFeature;
 import org.activiti.designer.features.CreateUserTaskFeature;
+import org.activiti.designer.features.DeleteSequenceFlowFeature;
 import org.activiti.designer.integration.palette.PaletteEntry;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
-import org.activiti.designer.util.features.AbstractCreateBPMNFeature;
 import org.activiti.designer.util.preferences.Preferences;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFile;
@@ -56,9 +58,7 @@ import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
@@ -83,6 +83,7 @@ import org.eclipse.graphiti.palette.impl.PaletteCompartmentEntry;
 import org.eclipse.graphiti.platform.IPlatformImageConstants;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.tb.ContextButtonEntry;
+import org.eclipse.graphiti.tb.ContextMenuEntry;
 import org.eclipse.graphiti.tb.DefaultToolBehaviorProvider;
 import org.eclipse.graphiti.tb.IContextButtonPadData;
 import org.eclipse.graphiti.tb.IContextMenuEntry;
@@ -343,17 +344,16 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     
     if(context.getPictogramElements() != null) {
       for (PictogramElement pictogramElement : context.getPictogramElements()) {
-        if(pictogramElement.getLink() == null) continue;
-        EList<EObject> boList = pictogramElement.getLink().getBusinessObjects();
-        if(boList != null) {
-          for (EObject bObject : boList) {
-            
-          }
+        if(getFeatureProvider().getBusinessObjectForPictogramElement(pictogramElement) == null) continue;
+        Object object = getFeatureProvider().getBusinessObjectForPictogramElement(pictogramElement);
+        if(object instanceof SequenceFlow) {
+          ContextMenuEntry subMenuDelete = new ContextMenuEntry(new DeleteSequenceFlowFeature(getFeatureProvider()), context);
+          subMenuDelete.setText("Delete sequence flow"); //$NON-NLS-1$
+          subMenuDelete.setSubmenu(false);
+          menuList.add(subMenuDelete);
         }
       }
     }
-
-
     return menuList.toArray(new IContextMenuEntry[menuList.size()]);
   }
 

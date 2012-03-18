@@ -5,7 +5,6 @@ import java.lang.reflect.InvocationTargetException;
 import org.activiti.designer.eclipse.common.ActivitiBPMNDiagramConstants;
 import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.eclipse.editor.Bpmn2DiagramCreator;
-import org.activiti.designer.eclipse.navigator.nodes.base.AbstractInstancesOfTypeContainerNode;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -76,9 +75,6 @@ public class CreateDefaultActivitiDiagramWizard extends BasicNewResourceWizard {
     } else if (element instanceof IJavaProject) {
       IJavaProject javaProject = (IJavaProject) element;
       project = javaProject.getProject();
-    } else if (element instanceof AbstractInstancesOfTypeContainerNode) {
-      AbstractInstancesOfTypeContainerNode aiocn = (AbstractInstancesOfTypeContainerNode) element;
-      project = aiocn.getProject();
     } else if (element instanceof IFolder) {
       diagramFolder = (IFolder) element;
       project = diagramFolder.getProject();

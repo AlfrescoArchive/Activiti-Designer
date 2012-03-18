@@ -80,7 +80,7 @@ public class BpmnParser {
 	public void parseBpmn(XMLStreamReader xtr, Bpmn2MemoryModel model) {
 		try {
 			boolean processExtensionAvailable = false;
-			SubProcess activeSubProcess = null;
+			List<SubProcess> activeSubProcessList = new ArrayList<SubProcess>();
 			while (xtr.hasNext()) {
 				try {
 					xtr.next();
@@ -89,7 +89,7 @@ public class BpmnParser {
 				}
 
 				if (xtr.isEndElement()  && "subProcess".equalsIgnoreCase(xtr.getLocalName())) {
-					activeSubProcess = null;
+					activeSubProcessList.remove(activeSubProcessList.size() - 1);
 				}
 
 				if (xtr.isStartElement() == false)
@@ -113,8 +113,8 @@ public class BpmnParser {
 					String docText = xtr.getElementText();
 					if(model.getProcess() != null && StringUtils.isEmpty(docText) == false) {
 						
-						if(activeSubProcess != null) {
-							activeSubProcess.setDocumentation(docText);
+						if(activeSubProcessList.size() > 0) {
+							activeSubProcessList.get(activeSubProcessList.size() - 1).setDocumentation(docText);
 						} else {
 							model.getProcess().setDocumentation(docText);
 						}
@@ -136,15 +136,15 @@ public class BpmnParser {
 					
 					} else if (xtr.isStartElement() && "subProcess".equalsIgnoreCase(xtr.getLocalName())) {
 						currentActivity = parseSubProcess(xtr);
-						activeSubProcess = (SubProcess) currentActivity;
+						activeSubProcessList.add((SubProcess) currentActivity);
 						
-					} else if (activeSubProcess != null && xtr.isStartElement() && "extensionElements".equalsIgnoreCase(xtr.getLocalName())) {
-						activeSubProcess.getExecutionListeners().addAll(parseListeners(xtr));
+					} else if (activeSubProcessList.size() > 0 && xtr.isStartElement() && "extensionElements".equalsIgnoreCase(xtr.getLocalName())) {
+						activeSubProcessList.get(activeSubProcessList.size() - 1).getExecutionListeners().addAll(parseListeners(xtr));
 
-					} else if (activeSubProcess != null && xtr.isStartElement() && "multiInstanceLoopCharacteristics".equalsIgnoreCase(xtr.getLocalName())) {
+					} else if (activeSubProcessList.size() > 0 && xtr.isStartElement() && "multiInstanceLoopCharacteristics".equalsIgnoreCase(xtr.getLocalName())) {
 						
 						MultiInstanceLoopCharacteristics multiInstanceDef = new MultiInstanceLoopCharacteristics();
-						activeSubProcess.setLoopCharacteristics(multiInstanceDef);
+						activeSubProcessList.get(activeSubProcessList.size() - 1).setLoopCharacteristics(multiInstanceDef);
 						parseMultiInstanceDef(multiInstanceDef, xtr);
 	
 					} else if (xtr.isStartElement() && "userTask".equalsIgnoreCase(xtr.getLocalName())) {
@@ -199,8 +199,8 @@ public class BpmnParser {
 						BoundaryEventModel event = parseBoundaryEvent(xtr);
 						event.boundaryEvent.setId(elementid);
 						boundaryList.add(event);
-						if (activeSubProcess != null)
-							activeSubProcess.getFlowElements().add(event.boundaryEvent);
+						if (activeSubProcessList.size() > 0)
+							activeSubProcessList.get(activeSubProcessList.size() - 1).getFlowElements().add(event.boundaryEvent);
 						else
 							model.addFlowElement(event.boundaryEvent);
 
@@ -243,10 +243,20 @@ public class BpmnParser {
 					
 					if(currentActivity != null) {
 						currentActivity.setId(elementId);
-						if (currentActivity != activeSubProcess && activeSubProcess != null)
-							activeSubProcess.getFlowElements().add(currentActivity);
-						else
+						
+						if(currentActivity instanceof SubProcess) {
+							if(isInSubProcess(activeSubProcessList)) {
+								activeSubProcessList.get(activeSubProcessList.size() - 2).getFlowElements().add(currentActivity);
+								
+							} else {
+								model.addFlowElement(currentActivity);
+							}
+							
+						} else if (activeSubProcessList.size() > 0) {
+							activeSubProcessList.get(activeSubProcessList.size() - 1).getFlowElements().add(currentActivity);
+						} else {
 							model.addFlowElement(currentActivity);
+						}
 					}
 				}
 			}
@@ -268,6 +278,14 @@ public class BpmnParser {
 
 		} catch (Exception e) {
 			e.printStackTrace();
+		}
+	}
+	
+	private boolean isInSubProcess(List<SubProcess> subProcessList) {
+		if(subProcessList.size() > 1) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 	

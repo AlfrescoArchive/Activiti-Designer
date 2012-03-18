@@ -1,5 +1,6 @@
 package org.activiti.designer.eclipse.editor;
 
+import java.awt.Point;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
@@ -214,8 +215,8 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 				context.setSize(graphicInfo.width, graphicInfo.height);
 				context.setTargetContainer(parentShape);
 				if(parentShape instanceof Diagram == false) {
-					context.setLocation(graphicInfo.x - parentShape.getGraphicsAlgorithm().getX(), 
-							graphicInfo.y - parentShape.getGraphicsAlgorithm().getY());
+					Point location = getLocation(parentShape);
+					context.setLocation(graphicInfo.x - location.x, graphicInfo.y - location.y);
 				} else {
 					context.setLocation(graphicInfo.x, graphicInfo.y);
 				}
@@ -267,6 +268,15 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 				}
 			}
 		}
+	}
+	
+	private Point getLocation(ContainerShape containerShape) {
+		if(containerShape instanceof Diagram == true) {
+			return new Point(containerShape.getGraphicsAlgorithm().getX(), containerShape.getGraphicsAlgorithm().getY());
+		}
+			
+		Point location = getLocation(containerShape.getContainer());
+		return new Point(location.x + containerShape.getGraphicsAlgorithm().getX(), location.y + containerShape.getGraphicsAlgorithm().getY());
 	}
 	
 	private void drawSequenceFlows() {

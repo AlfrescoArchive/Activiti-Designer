@@ -5,9 +5,9 @@ import org.activiti.designer.bpmn2.model.Activity;
 import org.activiti.designer.bpmn2.model.BoundaryEvent;
 import org.activiti.designer.bpmn2.model.CallActivity;
 import org.activiti.designer.bpmn2.model.ErrorEventDefinition;
+import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.util.editor.ModelHandler;
-import org.activiti.designer.util.features.AbstractCreateBPMNFeature;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
@@ -73,10 +73,9 @@ public class CreateBoundaryErrorFeature extends AbstractCreateBPMNFeature {
 		return FEATURE_ID_KEY;
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
-	protected Class getFeatureClass() {
-		return new ErrorEventDefinition().getClass();
+	protected Class<? extends FlowElement> getFeatureClass() {
+		return new BoundaryEvent().getClass();
 	}
 
 }

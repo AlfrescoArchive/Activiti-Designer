@@ -35,11 +35,11 @@ public class AddEmbeddedSubProcessFeature extends AbstractAddShapeFeature {
 	public PictogramElement add(IAddContext context) {
 
 		final SubProcess addedSubProcess = (SubProcess) context.getNewObject();
-		final Diagram targetDiagram = (Diagram) context.getTargetContainer();
+		final ContainerShape parent = context.getTargetContainer();
 
 		// CONTAINER SHAPE WITH ROUNDED RECTANGLE
 		final IPeCreateService peCreateService = Graphiti.getPeCreateService();
-		final ContainerShape containerShape = peCreateService.createContainerShape(targetDiagram, true);
+		final ContainerShape containerShape = peCreateService.createContainerShape(parent, true);
 
 		// EList<Property> props = containerShape.getProperties();
 
@@ -117,11 +117,15 @@ public class AddEmbeddedSubProcessFeature extends AbstractAddShapeFeature {
 	@Override
 	public boolean canAdd(IAddContext context) {
 		if (context.getNewObject() instanceof SubProcess) {
-			// check if user wants to add to a diagram
 			// TODO: lanes & pools
 			if (context.getTargetContainer() instanceof Diagram) {
 				return true;
 			}
+			
+			Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
+	    if (parentObject instanceof SubProcess == true) {
+	      return true;
+	    }
 		}
 		return false;
 	}

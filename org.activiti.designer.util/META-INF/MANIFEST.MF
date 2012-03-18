@@ -20,7 +20,6 @@ Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: org.activiti.designer.util.eclipse,
  org.activiti.designer.util.editor,
- org.activiti.designer.util.features,
  org.activiti.designer.util.platform,
  org.activiti.designer.util.preferences,
  org.activiti.designer.util.property,

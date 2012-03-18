@@ -217,7 +217,7 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
               }
               
               String dueDate = dueDateText.getText();
-              if (dueDate != null) {
+              if (StringUtils.isNotEmpty(dueDate)) {
                 try {
 	                userTask.setDueDate(new SimpleDateFormat().parse(dueDate));
                 } catch (ParseException e) {
@@ -228,7 +228,7 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
                 userTask.setDueDate(null);
               }
               
-              if(priorityText.getText() != null && priorityText.getText().length() > 0) {
+              if(StringUtils.isNotEmpty(priorityText.getText())) {
                 Integer priorityValue = null;
                 try {
                   priorityValue = Integer.valueOf(priorityText.getText());

@@ -2,12 +2,8 @@ package org.activiti.designer.eclipse.common;
 
 import java.net.URL;
 
-import org.activiti.designer.eclipse.outline.ContentOutlinePageAdapterFactory;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IAdapterManager;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
@@ -59,9 +55,6 @@ public class ActivitiPlugin extends AbstractUIPlugin {
   @Override
   public void start(BundleContext context) throws Exception {
     super.start(context);
-
-    IAdapterManager manager = Platform.getAdapterManager();
-    manager.registerAdapters(new ContentOutlinePageAdapterFactory(), DiagramEditor.class);
 
     // Initialize the image cache
     imageCache = new ImageCache();

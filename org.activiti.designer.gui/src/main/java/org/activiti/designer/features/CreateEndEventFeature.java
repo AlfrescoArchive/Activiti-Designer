@@ -2,6 +2,7 @@ package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
 import org.activiti.designer.bpmn2.model.EndEvent;
+import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.SubProcess;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
@@ -39,9 +40,8 @@ public class CreateEndEventFeature extends AbstractCreateFastBPMNFeature {
 		return FEATURE_ID_KEY;
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
-	protected Class getFeatureClass() {
+	protected Class<? extends FlowElement> getFeatureClass() {
 		return new EndEvent().getClass();
 	}
 

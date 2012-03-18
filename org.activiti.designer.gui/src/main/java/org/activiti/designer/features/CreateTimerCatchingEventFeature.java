@@ -1,6 +1,7 @@
 package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
+import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.IntermediateCatchEvent;
 import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.bpmn2.model.TimerEventDefinition;
@@ -42,9 +43,8 @@ public class CreateTimerCatchingEventFeature extends AbstractCreateFastBPMNFeatu
 		return FEATURE_ID_KEY;
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
-	protected Class getFeatureClass() {
+	protected Class<? extends FlowElement> getFeatureClass() {
 		return new IntermediateCatchEvent().getClass();
 	}
 

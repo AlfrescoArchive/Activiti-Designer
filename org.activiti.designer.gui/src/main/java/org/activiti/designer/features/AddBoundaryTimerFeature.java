@@ -21,6 +21,7 @@ import org.eclipse.graphiti.services.IPeCreateService;
 public class AddBoundaryTimerFeature extends AbstractAddShapeFeature {
   
   private static final int IMAGE_SIZE = 20;
+  private static final int EVENT_SIZE = 30;
 	
 	public AddBoundaryTimerFeature(IFeatureProvider fp) {
 		super(fp);
@@ -60,8 +61,8 @@ public class AddBoundaryTimerFeature extends AbstractAddShapeFeature {
 
     // check whether the context has a size (e.g. from a create feature)
     // otherwise define a default size for the shape
-    final int width = context.getWidth() <= 0 ? IMAGE_SIZE : context.getWidth();
-    final int height = context.getHeight() <= 0 ? IMAGE_SIZE : context.getHeight();
+    final int width = context.getWidth() <= 0 ? EVENT_SIZE : context.getWidth();
+    final int height = context.getHeight() <= 0 ? EVENT_SIZE : context.getHeight();
 
     final IGaService gaService = Graphiti.getGaService();
 

@@ -1,5 +1,6 @@
 package com.alfresco.designer.gui.features;
 
+import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.bpmn2.model.alfresco.AlfrescoScriptTask;
 import org.activiti.designer.features.AbstractCreateFastBPMNFeature;
@@ -37,7 +38,7 @@ public class CreateAlfrescoScriptTaskFeature extends AbstractCreateFastBPMNFeatu
     	ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).addFlowElement(newScriptTask);
     }
 
-    addGraphicalContent(newScriptTask, context);
+    addGraphicalContent(context, newScriptTask);
 
 		// activate direct editing after object creation
 		getFeatureProvider().getDirectEditingInfo().setActive(true);
@@ -55,9 +56,8 @@ public class CreateAlfrescoScriptTaskFeature extends AbstractCreateFastBPMNFeatu
 		return FEATURE_ID_KEY;
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
-	protected Class getFeatureClass() {
+	protected Class<? extends FlowElement> getFeatureClass() {
 		return new AlfrescoScriptTask().getClass();
 	}
 

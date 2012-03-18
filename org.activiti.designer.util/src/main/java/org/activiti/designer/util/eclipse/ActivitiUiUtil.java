@@ -2,9 +2,6 @@ package org.activiti.designer.util.eclipse;
 
 import java.util.List;
 
-import org.activiti.designer.bpmn2.model.Activity;
-import org.activiti.designer.bpmn2.model.BoundaryEvent;
-import org.activiti.designer.bpmn2.model.EventDefinition;
 import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.Process;
 import org.activiti.designer.bpmn2.model.SubProcess;
@@ -196,55 +193,28 @@ public class ActivitiUiUtil {
     }
   }
 
-  public static final String getNextId(final Class featureClass, final String featureIdKey, final Diagram diagram) {
-
-    int determinedId = 0;
+  public static final String getNextId(final Class<? extends FlowElement> featureClass, final String featureIdKey, final Diagram diagram) {
     Bpmn2MemoryModel model =  ModelHandler.getModel(EcoreUtil.getURI(diagram));
-    for (FlowElement element : model.getProcess().getFlowElements()) {
+    int determinedId = loopThroughElements(featureClass, 0, model.getProcess().getFlowElements(), featureIdKey);
+    determinedId++;
+    return String.format(ID_PATTERN, featureIdKey, determinedId);
+  }
+  
+  public static int loopThroughElements(final Class<? extends FlowElement> featureClass, int determinedId, 
+  		List<FlowElement> elementList, final String featureIdKey) {
+  	
+  	for (FlowElement element : elementList) {
       
       if(element instanceof SubProcess) {
-        
-        for (FlowElement flowElement : ((SubProcess) element).getFlowElements()) {
-          
-          if (flowElement.getClass() == featureClass) {
-            String contentObjectId = flowElement.getId().replace(featureIdKey, "");
-            determinedId = getId(contentObjectId, determinedId);
-          }
-          if (flowElement instanceof Activity) {
-          	List<BoundaryEvent> eventList = ((Activity) flowElement).getBoundaryEvents();
-          	for (BoundaryEvent boundaryEvent : eventList) {
-	            List<EventDefinition> definitionList = boundaryEvent.getEventDefinitions();
-	            for (EventDefinition eventDefinition : definitionList) {
-	              if(eventDefinition.getClass() == featureClass) {
-	              	String contentObjectId = boundaryEvent.getId().replace(featureIdKey, "");
-	                determinedId = getId(contentObjectId, determinedId);
-	              }
-              }
-            }
-          }
-        }
+      	determinedId = loopThroughElements(featureClass, determinedId, ((SubProcess) element).getFlowElements(), featureIdKey);
       }
       
       if (element.getClass() == featureClass) {
         String contentObjectId = element.getId().replace(featureIdKey, "");
         determinedId = getId(contentObjectId, determinedId);
       }
-      if (element instanceof Activity) {
-      	List<BoundaryEvent> eventList = ((Activity) element).getBoundaryEvents();
-      	for (BoundaryEvent boundaryEvent : eventList) {
-          List<EventDefinition> definitionList = boundaryEvent.getEventDefinitions();
-          for (EventDefinition eventDefinition : definitionList) {
-            if(eventDefinition.getClass() == featureClass) {
-            	String contentObjectId = boundaryEvent.getId().replace(featureIdKey, "");
-              determinedId = getId(contentObjectId, determinedId);
-            }
-          }
-        }
-      }
-    }
-    determinedId++;
-    return String.format(ID_PATTERN, featureIdKey, determinedId);
-
+  	}
+  	return determinedId;
   }
   
   private static int getId(String contentObjectId, int determinedId) {

@@ -28,7 +28,7 @@ public class DeleteSequenceFlowFeature extends AbstractCustomFeature {
   public boolean canExecute(ICustomContext context) {
     if(context.getPictogramElements() == null) return false;
     for (PictogramElement pictogramElement : context.getPictogramElements()) {
-      if(pictogramElement.getLink() == null) continue;
+      if(getBusinessObjectForPictogramElement(pictogramElement) == null) continue;
       Object boObject = getBusinessObjectForPictogramElement(pictogramElement);
       if(boObject instanceof SequenceFlow == false) {
         return false;
@@ -41,7 +41,7 @@ public class DeleteSequenceFlowFeature extends AbstractCustomFeature {
     if(context.getPictogramElements() == null) return;
     
     for (final PictogramElement pictogramElement : context.getPictogramElements()) {
-      if(pictogramElement.getLink() == null) continue;
+      if(getBusinessObjectForPictogramElement(pictogramElement) == null) continue;
       final Object boObject = getBusinessObjectForPictogramElement(pictogramElement);
       if(boObject instanceof SequenceFlow == true) {
         final SequenceFlow sequenceFlow = (SequenceFlow) boObject;

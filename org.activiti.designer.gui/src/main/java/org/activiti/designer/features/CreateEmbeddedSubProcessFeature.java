@@ -1,8 +1,8 @@
 package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
+import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.SubProcess;
-import org.activiti.designer.util.features.AbstractCreateBPMNFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -17,7 +17,14 @@ public class CreateEmbeddedSubProcessFeature extends AbstractCreateBPMNFeature {
 
 	@Override
 	public boolean canCreate(ICreateContext context) {
-		return context.getTargetContainer() instanceof Diagram;
+		if(context.getTargetContainer() instanceof Diagram) return true;
+		
+		Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
+    if (parentObject instanceof SubProcess == true) {
+      return true;
+    }
+    
+    return false;
 	}
 
 	@Override
@@ -39,9 +46,8 @@ public class CreateEmbeddedSubProcessFeature extends AbstractCreateBPMNFeature {
 		return FEATURE_ID_KEY;
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
-	protected Class getFeatureClass() {
+	protected Class<? extends FlowElement> getFeatureClass() {
 		return new SubProcess().getClass();
 	}
 

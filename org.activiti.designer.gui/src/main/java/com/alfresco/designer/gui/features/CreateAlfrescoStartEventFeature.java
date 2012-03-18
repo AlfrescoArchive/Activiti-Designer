@@ -1,10 +1,11 @@
 package com.alfresco.designer.gui.features;
 
+import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.StartEvent;
 import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.bpmn2.model.alfresco.AlfrescoStartEvent;
+import org.activiti.designer.features.AbstractCreateBPMNFeature;
 import org.activiti.designer.util.editor.ModelHandler;
-import org.activiti.designer.util.features.AbstractCreateBPMNFeature;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
@@ -53,9 +54,8 @@ public class CreateAlfrescoStartEventFeature extends AbstractCreateBPMNFeature {
 		return FEATURE_ID_KEY;
 	}
 
-	@SuppressWarnings("rawtypes")
 	@Override
-	protected Class getFeatureClass() {
+	protected Class<? extends FlowElement> getFeatureClass() {
 		return new AlfrescoStartEvent().getClass();
 	}
 
