@@ -25,7 +25,6 @@ import org.activiti.designer.bpmn2.model.SequenceFlow;
 import org.activiti.designer.bpmn2.model.SubProcess;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.mm.algorithms.styles.Point;
-import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.FreeFormConnection;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
@@ -50,34 +49,33 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
     xtw.writeAttribute("bpmnElement", process.getId());
     xtw.writeAttribute("id", "BPMNPlane_" + process.getId());
 
-    loopThroughElements(process.getFlowElements(), null, null);
+    loopThroughElements(process.getFlowElements(), null);
     
     xtw.writeEndElement();
     xtw.writeEndElement();
   }
   
-  private static void loopThroughElements(List<FlowElement> elementList, ContainerShape parent, SubProcess parentSubProcess) throws Exception {
+  private static void loopThroughElements(List<FlowElement> elementList, SubProcess parentSubProcess) throws Exception {
   	for (FlowElement element : elementList) {
 
       if (element instanceof FlowNode) {
       	FlowNode node = (FlowNode) element;
-        writeBpmnElement(node, null);
+        writeBpmnElement(node);
         if(element instanceof SubProcess) {
         	SubProcess subProcess = (SubProcess) node;
-        	ContainerShape newParent = (ContainerShape) featureProvider.getPictogramElementForBusinessObject(node);
-        	loopThroughElements(subProcess.getFlowElements(), newParent, subProcess);
+        	loopThroughElements(subProcess.getFlowElements(), subProcess);
         }
       }
     }
   	
   	for (FlowElement element : elementList) {
       if (element instanceof SequenceFlow) {
-        writeBpmnEdge((SequenceFlow) element, parent, parentSubProcess);
+        writeBpmnEdge((SequenceFlow) element, parentSubProcess);
       } 
     }
   }
   
-  private static void writeBpmnElement(FlowNode flowNode, ContainerShape parent) throws Exception {
+  private static void writeBpmnElement(FlowNode flowNode) throws Exception {
   	
   	PictogramElement picElement = featureProvider.getPictogramElementForBusinessObject(flowNode);
   	if(picElement instanceof Shape) {
@@ -85,6 +83,9 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
   		xtw.writeStartElement(BPMNDI_PREFIX, "BPMNShape", BPMNDI_NAMESPACE);
       xtw.writeAttribute("bpmnElement", flowNode.getId());
       xtw.writeAttribute("id", "BPMNShape_" + flowNode.getId());
+      if(flowNode instanceof SubProcess) {
+      	xtw.writeAttribute("isExpanded", "true");
+      }
       xtw.writeStartElement(OMGDC_PREFIX, "Bounds", OMGDC_NAMESPACE);
       xtw.writeAttribute("height", "" + shape.getGraphicsAlgorithm().getHeight());
       xtw.writeAttribute("width", "" + shape.getGraphicsAlgorithm().getWidth());
@@ -107,7 +108,7 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
   	return new java.awt.Point(parentPoint.x + x, parentPoint.y + y);
   }
   
-  private static void writeBpmnEdge(SequenceFlow sequenceFlow, ContainerShape parent, SubProcess subProcess) throws Exception {
+  private static void writeBpmnEdge(SequenceFlow sequenceFlow, SubProcess subProcess) throws Exception {
   	Shape sourceElement = null;
   	Shape targetElement = null;
   	if(sequenceFlow.getSourceRef() != null && sequenceFlow.getSourceRef().getId() != null) {
