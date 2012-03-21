@@ -2,6 +2,8 @@ package org.activiti.designer.util.eclipse;
 
 import java.util.List;
 
+import org.activiti.designer.bpmn2.model.Activity;
+import org.activiti.designer.bpmn2.model.BoundaryEvent;
 import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.Process;
 import org.activiti.designer.bpmn2.model.SubProcess;
@@ -207,6 +209,14 @@ public class ActivitiUiUtil {
       
       if(element instanceof SubProcess) {
       	determinedId = loopThroughElements(featureClass, determinedId, ((SubProcess) element).getFlowElements(), featureIdKey);
+      }
+      
+      if(featureClass == BoundaryEvent.class && element instanceof Activity) {
+      	Activity activity = (Activity) element;
+      	for (BoundaryEvent boundaryEvent : activity.getBoundaryEvents()) {
+      		String contentObjectId = boundaryEvent.getId().replace(featureIdKey, "");
+          determinedId = getId(contentObjectId, determinedId);
+        }
       }
       
       if (element.getClass() == featureClass) {

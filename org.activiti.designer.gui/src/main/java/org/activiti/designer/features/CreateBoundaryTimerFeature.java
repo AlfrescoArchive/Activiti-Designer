@@ -7,11 +7,8 @@ import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.bpmn2.model.Task;
 import org.activiti.designer.bpmn2.model.TimerEventDefinition;
-import org.activiti.designer.util.editor.ModelHandler;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
-import org.eclipse.graphiti.mm.pictograms.Diagram;
 
 public class CreateBoundaryTimerFeature extends AbstractCreateBPMNFeature {
 	
@@ -40,23 +37,9 @@ public class CreateBoundaryTimerFeature extends AbstractCreateBPMNFeature {
 		boundaryEvent.setId(getNextId());
 		
 		Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-    if (parentObject instanceof SubProcess) {
-    	((SubProcess) parentObject).getFlowElements().add(boundaryEvent);
-    } else if(context.getTargetContainer().getContainer() != null && 
-            context.getTargetContainer().getContainer() instanceof Diagram == false) {
-      
-      Object containerObject = getBusinessObjectForPictogramElement(context.getTargetContainer().getContainer());
-      if (containerObject instanceof SubProcess) {
-        ((SubProcess) containerObject).getFlowElements().add(boundaryEvent);
-      }
-      
-    } else {
-    	ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).addFlowElement(boundaryEvent);
-    }
-    
     ((Activity) parentObject).getBoundaryEvents().add(boundaryEvent);
     boundaryEvent.setAttachedToRef((Activity) parentObject);
-
+    
 		// do the add
 		addGraphicalRepresentation(context, boundaryEvent);
 		

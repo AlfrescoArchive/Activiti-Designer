@@ -17,18 +17,20 @@ import java.util.List;
 
 import javax.xml.stream.XMLStreamWriter;
 
+import org.activiti.designer.bpmn2.model.Activity;
 import org.activiti.designer.bpmn2.model.BoundaryEvent;
 import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.FlowNode;
 import org.activiti.designer.bpmn2.model.Process;
 import org.activiti.designer.bpmn2.model.SequenceFlow;
 import org.activiti.designer.bpmn2.model.SubProcess;
+import org.eclipse.graphiti.datatypes.ILocation;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.mm.algorithms.styles.Point;
-import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.FreeFormConnection;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
+import org.eclipse.graphiti.services.Graphiti;
 
 
 /**
@@ -65,6 +67,12 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
         	SubProcess subProcess = (SubProcess) node;
         	loopThroughElements(subProcess.getFlowElements(), subProcess);
         }
+        if(element instanceof Activity) {
+        	Activity activity = (Activity) node;
+        	for (BoundaryEvent boundaryEvent : activity.getBoundaryEvents()) {
+        		writeBpmnElement(boundaryEvent);
+          }
+        }
       }
     }
   	
@@ -89,23 +97,12 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
       xtw.writeStartElement(OMGDC_PREFIX, "Bounds", OMGDC_NAMESPACE);
       xtw.writeAttribute("height", "" + shape.getGraphicsAlgorithm().getHeight());
       xtw.writeAttribute("width", "" + shape.getGraphicsAlgorithm().getWidth());
-      java.awt.Point location = getLocation(shape);
-      xtw.writeAttribute("x", "" + location.x);
-      xtw.writeAttribute("y", "" + location.y);
+      ILocation shapeLocation = Graphiti.getLayoutService().getLocationRelativeToDiagram(shape);
+      xtw.writeAttribute("x", "" + shapeLocation.getX());
+      xtw.writeAttribute("y", "" + shapeLocation.getY());
       xtw.writeEndElement();
       xtw.writeEndElement();
   	}
-  }
-  
-  private static java.awt.Point getLocation(Shape shape) {
-  	int x = shape.getGraphicsAlgorithm().getX();
-  	int y = shape.getGraphicsAlgorithm().getY();
-  	if(shape.getContainer() instanceof Diagram) {
-  		return new java.awt.Point(x, y);
-  	}
-  	
-  	java.awt.Point parentPoint = getLocation(shape.getContainer());
-  	return new java.awt.Point(parentPoint.x + x, parentPoint.y + y);
   }
   
   private static void writeBpmnEdge(SequenceFlow sequenceFlow, SubProcess subProcess) throws Exception {

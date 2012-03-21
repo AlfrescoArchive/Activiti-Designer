@@ -15,7 +15,6 @@ package org.activiti.designer.export.bpmn20.export;
 
 import javax.xml.stream.XMLStreamWriter;
 
-import org.activiti.designer.bpmn2.model.BoundaryEvent;
 import org.activiti.designer.bpmn2.model.CallActivity;
 import org.activiti.designer.bpmn2.model.IOParameter;
 
@@ -73,12 +72,6 @@ public class CallActivityExport implements ActivitiNamespaceConstants {
 
     // end CallActivity element
     xtw.writeEndElement();
-    
-    if(callActivity.getBoundaryEvents().size() > 0) {
-    	for(BoundaryEvent event : callActivity.getBoundaryEvents()) {
-    		BoundaryEventExport.createBoundaryEvent(event, xtw);
-    	}
-    }
   }
   
   private static void writeParameter(IOParameter parameter, String name, XMLStreamWriter xtw) throws Exception {

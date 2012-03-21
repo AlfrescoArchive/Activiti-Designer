@@ -15,7 +15,6 @@ package org.activiti.designer.export.bpmn20.export;
 
 import javax.xml.stream.XMLStreamWriter;
 
-import org.activiti.designer.bpmn2.model.BoundaryEvent;
 import org.activiti.designer.bpmn2.model.ReceiveTask;
 
 
@@ -40,11 +39,5 @@ public class ReceiveTaskExport implements ActivitiNamespaceConstants {
 
     // end ReceiveTask element
     xtw.writeEndElement();
-    
-    if(receiveTask.getBoundaryEvents().size() > 0) {
-    	for(BoundaryEvent event : receiveTask.getBoundaryEvents()) {
-    		BoundaryEventExport.createBoundaryEvent(event, xtw);
-    	}
-    }
   }
 }

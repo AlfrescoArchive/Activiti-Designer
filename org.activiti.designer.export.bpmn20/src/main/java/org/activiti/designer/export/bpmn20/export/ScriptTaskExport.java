@@ -15,7 +15,6 @@ package org.activiti.designer.export.bpmn20.export;
 
 import javax.xml.stream.XMLStreamWriter;
 
-import org.activiti.designer.bpmn2.model.BoundaryEvent;
 import org.activiti.designer.bpmn2.model.ScriptTask;
 import org.apache.commons.lang.StringUtils;
 
@@ -51,11 +50,5 @@ public class ScriptTaskExport implements ActivitiNamespaceConstants {
 
     // end ScriptTask element
     xtw.writeEndElement();
-    
-    if(scriptTask.getBoundaryEvents().size() > 0) {
-    	for(BoundaryEvent event : scriptTask.getBoundaryEvents()) {
-    		BoundaryEventExport.createBoundaryEvent(event, xtw);
-    	}
-    }
   }
 }

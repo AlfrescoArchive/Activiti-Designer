@@ -15,7 +15,6 @@ package org.activiti.designer.export.bpmn20.export;
 
 import javax.xml.stream.XMLStreamWriter;
 
-import org.activiti.designer.bpmn2.model.BoundaryEvent;
 import org.activiti.designer.bpmn2.model.alfresco.AlfrescoScriptTask;
 
 
@@ -68,11 +67,5 @@ public class AlfrescoScriptTaskExport implements ActivitiNamespaceConstants {
 
     // end AlfrescoScriptTask element
     xtw.writeEndElement();
-    
-    if(scriptTask.getBoundaryEvents().size() > 0) {
-    	for(BoundaryEvent event : scriptTask.getBoundaryEvents()) {
-    		BoundaryEventExport.createBoundaryEvent(event, xtw);
-    	}
-    }
   }
 }

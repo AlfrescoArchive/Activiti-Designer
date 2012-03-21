@@ -11,6 +11,7 @@ import java.util.List;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 
+import org.activiti.designer.bpmn2.model.Activity;
 import org.activiti.designer.bpmn2.model.BoundaryEvent;
 import org.activiti.designer.bpmn2.model.BusinessRuleTask;
 import org.activiti.designer.bpmn2.model.CallActivity;
@@ -293,12 +294,13 @@ public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
 
       // end SubProcess element
       xtw.writeEndElement();
-      
-      if(subProcess.getBoundaryEvents().size() > 0) {
-      	for(BoundaryEvent event : subProcess.getBoundaryEvents()) {
-      		BoundaryEventExport.createBoundaryEvent(event, xtw);
-      	}
-      }
+    }
+    
+    if (object instanceof Activity) {
+    	Activity activity = (Activity) object;
+    	for(BoundaryEvent event : activity.getBoundaryEvents()) {
+    		BoundaryEventExport.createBoundaryEvent(event, xtw);
+    	}
     }
   }
 

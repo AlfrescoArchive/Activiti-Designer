@@ -35,11 +35,11 @@ public class UserTaskExport implements ActivitiNamespaceConstants {
     }
     
     if (userTask.getDueDate() != null) {
-      //xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "dueDate", userTask.getDueDate());
+      xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "dueDate", userTask.getDueDate().toString());
     }
     
-    //DefaultFlowExport.createDefaultFlow(object, xtw);
-    //AsyncActivityExport.createDefaultFlow(object, xtw);
+    DefaultFlowExport.createDefaultFlow(userTask, xtw);
+    AsyncActivityExport.createAsyncAttribute(userTask, xtw);
 
     // TODO revisit once the designer supports mixing these
     // configurations as they are now exclusive
@@ -77,28 +77,22 @@ public class UserTaskExport implements ActivitiNamespaceConstants {
       xtw.writeEndElement();
     }
     
-    /*boolean extensionsElement = true;
+    boolean extensionsElement = true;
     if(userTask.getFormProperties().size() > 0) {
       extensionsElement = false;
       xtw.writeStartElement("extensionElements");
     }
     
     FormPropertiesExport.createFormPropertiesXML(userTask.getFormProperties(), xtw);
-    ExtensionListenerExport.createExtensionListenerXML(userTask.getActivitiListeners(), extensionsElement, TASK_LISTENER, xtw);
+    ExecutionListenerExport.createExecutionListenerXML(userTask.getExecutionListeners(), extensionsElement, xtw);
     
     if(extensionsElement == false) {
       xtw.writeEndElement();
     }
     
-    MultiInstanceExport.createMultiInstance(object, xtw);*/
+    MultiInstanceExport.createMultiInstance(object, xtw);
 
     // end UserTask element
     xtw.writeEndElement();
-    
-    /*if(userTask.getBoundaryEventRefs().size() > 0) {
-    	for(BoundaryEvent event : userTask.getBoundaryEventRefs()) {
-    		BoundaryEventExport.createBoundaryEvent(event, xtw);
-    	}
-    }*/
   }
 }

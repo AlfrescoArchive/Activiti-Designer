@@ -5,13 +5,13 @@ import org.activiti.designer.bpmn2.model.BoundaryEvent;
 import org.activiti.designer.bpmn2.model.CallActivity;
 import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.util.style.StyleUtil;
+import org.eclipse.graphiti.datatypes.ILocation;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.impl.AbstractAddShapeFeature;
 import org.eclipse.graphiti.mm.algorithms.Ellipse;
 import org.eclipse.graphiti.mm.algorithms.Image;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
-import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
@@ -33,25 +33,11 @@ public class AddBoundaryErrorFeature extends AbstractAddShapeFeature {
     int x = context.getX();
     int y = context.getY();
     
-    Object parentObject = getBusinessObjectForPictogramElement(parent);
-    if (parentObject instanceof SubProcess) {
-      
-      parent = getDiagram();
-      
-    } else if(parent.getContainer() != null && parent.getContainer() instanceof Diagram == false) {
-      
-      x += parent.getGraphicsAlgorithm().getX();
-      y += parent.getGraphicsAlgorithm().getY();
-      
-      Object containerObject = getBusinessObjectForPictogramElement(parent.getContainer());
-      if (containerObject instanceof SubProcess) {
-        parent = parent.getContainer();
-      }
-      
-    } else {
-      
-      parent = getDiagram();
-    } 
+    ILocation shapeLocation = Graphiti.getLayoutService().getLocationRelativeToDiagram(parent);
+    x += shapeLocation.getX();
+    y += shapeLocation.getY();
+    
+    parent = getDiagram();
 
     // CONTAINER SHAPE WITH CIRCLE
     final IPeCreateService peCreateService = Graphiti.getPeCreateService();

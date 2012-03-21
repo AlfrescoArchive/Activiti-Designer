@@ -15,7 +15,6 @@ package org.activiti.designer.export.bpmn20.export;
 
 import javax.xml.stream.XMLStreamWriter;
 
-import org.activiti.designer.bpmn2.model.BoundaryEvent;
 import org.activiti.designer.bpmn2.model.CustomProperty;
 import org.activiti.designer.bpmn2.model.FieldExtension;
 import org.activiti.designer.bpmn2.model.ServiceTask;
@@ -101,11 +100,5 @@ public class ServiceTaskExport implements ActivitiNamespaceConstants {
     
     // end ServiceTask element
     xtw.writeEndElement();
-    
-    if(serviceTask.getBoundaryEvents().size() > 0) {
-    	for(BoundaryEvent event : serviceTask.getBoundaryEvents()) {
-    		BoundaryEventExport.createBoundaryEvent(event, xtw);
-    	}
-    }
   }
 }

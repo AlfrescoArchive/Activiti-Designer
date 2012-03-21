@@ -199,10 +199,6 @@ public class BpmnParser {
 						BoundaryEventModel event = parseBoundaryEvent(xtr);
 						event.boundaryEvent.setId(elementid);
 						boundaryList.add(event);
-						if (activeSubProcessList.size() > 0)
-							activeSubProcessList.get(activeSubProcessList.size() - 1).getFlowElements().add(event.boundaryEvent);
-						else
-							model.addFlowElement(event.boundaryEvent);
 
 					} else if (xtr.isStartElement() && "sequenceFlow".equalsIgnoreCase(xtr.getLocalName())) {
 						SequenceFlowModel sequenceFlow = parseSequenceFlow(xtr);
@@ -261,18 +257,11 @@ public class BpmnParser {
 				}
 			}
 
-			for (FlowElement flowElement : model.getProcess().getFlowElements()) {
-				if (flowElement instanceof BoundaryEvent) {
-					BoundaryEvent boundaryEvent = (BoundaryEvent) flowElement;
-					for (BoundaryEventModel eventModel : boundaryList) {
-						if (boundaryEvent.getId().equals(eventModel.boundaryEvent.getId())) {
-							FlowNode flowNode = getFlowNode(eventModel.attachedRef, model.getProcess().getFlowElements());
-							if(flowNode != null) {
-								boundaryEvent.setAttachedToRef((Activity) flowNode);
-								((Activity) flowNode).getBoundaryEvents().add(boundaryEvent);
-							}
-						}
-					}
+			for (BoundaryEventModel boundaryModel : boundaryList) {
+				FlowNode flowNode = getFlowNode(boundaryModel.attachedRef, model.getProcess().getFlowElements());
+				if(flowNode != null) {
+					boundaryModel.boundaryEvent.setAttachedToRef((Activity) flowNode);
+					((Activity) flowNode).getBoundaryEvents().add(boundaryModel.boundaryEvent);
 				}
 			}
 

@@ -11,6 +11,7 @@ import java.util.Map;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
+import org.activiti.designer.bpmn2.model.Activity;
 import org.activiti.designer.bpmn2.model.BoundaryEvent;
 import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.FlowNode;
@@ -198,8 +199,6 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 		
 		for (FlowElement flowElement : elementList) {
 			
-			if(flowElement instanceof BoundaryEvent == true) continue;
-			
 			AddContext context = new AddContext(new AreaContext(), flowElement);
 			IAddFeature addFeature = featureProvider.getAddFeature(context);
 			
@@ -220,54 +219,55 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 				} else {
 					context.setLocation(graphicInfo.x, graphicInfo.y);
 				}
-
+				
 				if (addFeature.canAdd(context)) {
 					PictogramElement newContainer = addFeature.add(context);
 					featureProvider.link(newContainer, new Object[] { flowElement });
 					
-					if(flowElement instanceof SubProcess) {
+					if (flowElement instanceof SubProcess) {
 						drawFlowElements(((SubProcess) flowElement).getFlowElements(), locationMap, (ContainerShape) newContainer);
 					}
-				}
-			}
-    }
-		
-		for (FlowElement flowElement : elementList) {
-			
-			if(flowElement instanceof BoundaryEvent == false) continue;
-			
-			AddContext context = new AddContext(new AreaContext(), flowElement);
-			IAddFeature addFeature = featureProvider.getAddFeature(context);
-			
-			if (addFeature == null) {
-				System.out.println("Element not supported: " + flowElement);
-				return;
-			}
-			
-			GraphicInfo graphicInfo = locationMap.get(flowElement.getId());
-			if(graphicInfo != null) {
+					
+					if (flowElement instanceof Activity) {
+						Activity activity = (Activity) flowElement;
+						for (BoundaryEvent boundaryEvent : activity.getBoundaryEvents()) {
+							System.out.println("found boundary event " + boundaryEvent);
+							AddContext boundaryContext = new AddContext(new AreaContext(), boundaryEvent);
+							IAddFeature boundaryAddFeature = featureProvider.getAddFeature(boundaryContext);
+							
+							if (boundaryAddFeature == null) {
+								System.out.println("Element not supported: " + boundaryEvent);
+								return;
+							}
+							
+							GraphicInfo boundaryGraphicInfo = locationMap.get(boundaryEvent.getId());
+							if(boundaryGraphicInfo != null) {
 
-				context.setNewObject(flowElement);
-				context.setSize(graphicInfo.width, graphicInfo.height);
-				
-				BoundaryEvent boundaryEvent = (BoundaryEvent) flowElement;
-				if(boundaryEvent.getAttachedToRef() != null) {
-					ContainerShape container = (ContainerShape) featureProvider.getPictogramElementForBusinessObject(
-							boundaryEvent.getAttachedToRef());
+								context.setNewObject(boundaryEvent);
+								context.setSize(boundaryGraphicInfo.width, boundaryGraphicInfo.height);
+								
+								if(boundaryEvent.getAttachedToRef() != null) {
+									ContainerShape container = (ContainerShape) featureProvider.getPictogramElementForBusinessObject(
+											boundaryEvent.getAttachedToRef());
+									
+									if(container != null) {
+									
+										boundaryContext.setTargetContainer(container);
+										Point location = getLocation(container);
+										boundaryContext.setLocation(boundaryGraphicInfo.x - location.x, boundaryGraphicInfo.y - location.y);
 					
-					if(container != null) {
-					
-						context.setTargetContainer(container);
-						context.setLocation(graphicInfo.x, graphicInfo.y);
-	
-						if (addFeature.canAdd(context)) {
-							PictogramElement newContainer = addFeature.add(context);
-							featureProvider.link(newContainer, new Object[] { flowElement });
+										if (boundaryAddFeature.canAdd(boundaryContext)) {
+											PictogramElement newBoundaryContainer = boundaryAddFeature.add(boundaryContext);
+											featureProvider.link(newBoundaryContainer, new Object[] { boundaryEvent });
+										}
+									}
+								}
+							}
 						}
 					}
 				}
 			}
-		}
+    }
 	}
 	
 	private Point getLocation(ContainerShape containerShape) {

@@ -15,7 +15,6 @@ package org.activiti.designer.export.bpmn20.export;
 
 import javax.xml.stream.XMLStreamWriter;
 
-import org.activiti.designer.bpmn2.model.BoundaryEvent;
 import org.activiti.designer.bpmn2.model.MailTask;
 import org.activiti.designer.bpmn2.model.alfresco.AlfrescoMailTask;
 import org.apache.commons.lang.StringUtils;
@@ -64,12 +63,6 @@ public class MailTaskExport implements ActivitiNamespaceConstants {
 
     // end AlfrescoMailTask element
     xtw.writeEndElement();
-    
-    if(mailTask.getBoundaryEvents().size() > 0) {
-    	for(BoundaryEvent event : mailTask.getBoundaryEvents()) {
-    		BoundaryEventExport.createBoundaryEvent(event, xtw);
-    	}
-    }
   }
   
   private static String createMailScript(AlfrescoMailTask mailTask) {
@@ -161,12 +154,6 @@ public class MailTaskExport implements ActivitiNamespaceConstants {
 
     // end MailTask element
     xtw.writeEndElement();
-    
-    if(mailTask.getBoundaryEvents().size() > 0) {
-    	for(BoundaryEvent event : mailTask.getBoundaryEvents()) {
-    		BoundaryEventExport.createBoundaryEvent(event, xtw);
-    	}
-    }
   }
   
   private static void writeField(String name, String expression, XMLStreamWriter xtw) throws Exception {
