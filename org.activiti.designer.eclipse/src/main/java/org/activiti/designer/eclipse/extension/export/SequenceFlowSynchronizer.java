@@ -5,6 +5,7 @@ import java.util.List;
 import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.FlowNode;
 import org.activiti.designer.bpmn2.model.SequenceFlow;
+import org.activiti.designer.eclipse.Logger;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.transaction.RecordingCommand;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
@@ -118,8 +119,7 @@ public class SequenceFlowSynchronizer {
 		public boolean update() {
 			if (isOutOfSync()) {
 
-				System.out
-						.println(String
+				Logger.logDebug(String
 								.format("Updating because the pictogram elements point from '%s' to '%s', but the business objects point from '%s' to '%s'. The difference must be corrected before saving the diagram",
 										graphicalStartId, graphicalEndId, businessStartId, businessEndId));
 
