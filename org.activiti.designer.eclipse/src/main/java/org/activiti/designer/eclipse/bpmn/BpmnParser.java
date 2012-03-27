@@ -53,6 +53,7 @@ import org.activiti.designer.bpmn2.model.TimerEventDefinition;
 import org.activiti.designer.bpmn2.model.UserTask;
 import org.activiti.designer.bpmn2.model.alfresco.AlfrescoMailTask;
 import org.activiti.designer.bpmn2.model.alfresco.AlfrescoScriptTask;
+import org.activiti.designer.bpmn2.model.alfresco.AlfrescoStartEvent;
 import org.activiti.designer.bpmn2.model.alfresco.AlfrescoUserTask;
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
@@ -85,6 +86,7 @@ public class BpmnParser {
 				try {
 					xtr.next();
 				} catch(Exception e) {
+					e.printStackTrace();
 					return;
 				}
 
@@ -104,7 +106,10 @@ public class BpmnParser {
 				} else if (xtr.isStartElement() && "process".equalsIgnoreCase(xtr.getLocalName())) {
 					
 					processExtensionAvailable = true;
-					if (xtr.getAttributeValue(null, "name") != null) {
+					if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, "id"))) {
+						model.getProcess().setId(xtr.getAttributeValue(null, "id"));
+					}
+					if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, "name"))) {
 						model.getProcess().setName(xtr.getAttributeValue(null, "name"));
 					}
 					
@@ -238,6 +243,7 @@ public class BpmnParser {
 					}
 					
 					if(currentActivity != null) {
+						
 						currentActivity.setId(elementId);
 						
 						if(currentActivity instanceof SubProcess) {
@@ -296,12 +302,10 @@ public class BpmnParser {
 	private StartEvent parseStartEvent(XMLStreamReader xtr) {
 		StartEvent startEvent = null;
 		if (xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "formKey") != null) {
-			String[] formTypes = PreferencesUtil
-			    .getStringArray(Preferences.ALFRESCO_FORMTYPES_STARTEVENT);
+			String[] formTypes = PreferencesUtil.getStringArray(Preferences.ALFRESCO_FORMTYPES_STARTEVENT);
 			for (String form : formTypes) {
-				if (form.equals(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE,
-				    "formKey"))) {
-					//startEvent = Bpmn2Factory.eINSTANCE.createAlfrescoStartEvent();
+				if (form.equals(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "formKey"))) {
+					startEvent = new AlfrescoStartEvent();
 				}
 			}
 		}

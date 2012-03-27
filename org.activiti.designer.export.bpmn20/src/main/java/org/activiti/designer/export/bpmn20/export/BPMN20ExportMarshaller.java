@@ -36,6 +36,7 @@ import org.activiti.designer.bpmn2.model.alfresco.AlfrescoScriptTask;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.graphiti.features.IFeatureProvider;
+import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 
 /**
  * @author Tiese Barrell
@@ -95,8 +96,8 @@ public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
 
       // start process element
       xtw.writeStartElement("process");
-      xtw.writeAttribute("id", "test");
-      xtw.writeAttribute("name", "test");
+      xtw.writeAttribute("id", model.getProcess().getId());
+      xtw.writeAttribute("name", model.getProcess().getName());
       ExecutionListenerExport.createExecutionListenerXML(model.getProcess().getExecutionListeners(), true, xtw);
       if (StringUtils.isNotEmpty(model.getProcess().getDocumentation())) {
 
@@ -106,6 +107,9 @@ public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
       }
       
       for (FlowElement flowElement : model.getProcess().getFlowElements()) {
+      	PictogramElement picElement = featureProvider.getPictogramElementForBusinessObject(flowElement);
+      	if(picElement == null) continue;
+      	
 	      createXML(flowElement);
       }
 
@@ -211,6 +215,9 @@ public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
 
     } else if (object instanceof ServiceTask) {
       ServiceTaskExport.createServiceTask(object, xtw);
+    
+    } else if (object instanceof AlfrescoScriptTask) {
+      AlfrescoScriptTaskExport.createScriptTask(object, xtw);
 
     } else if (object instanceof MailTask) {
       MailTaskExport.createMailTask(object, xtw);
@@ -223,9 +230,6 @@ public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
 
     } else if (object instanceof BusinessRuleTask) {
       BusinessRuleTaskExport.createBusinessRuleTask(object, xtw);
-
-    } else if (object instanceof AlfrescoScriptTask) {
-      AlfrescoScriptTaskExport.createScriptTask(object, xtw);
 
     } else if (object instanceof CallActivity) {
       CallActivityExport.createCallActivity(object, xtw);

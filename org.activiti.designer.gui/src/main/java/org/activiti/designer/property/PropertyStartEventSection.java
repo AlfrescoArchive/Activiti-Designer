@@ -3,9 +3,9 @@ package org.activiti.designer.property;
 import org.activiti.designer.bpmn2.model.StartEvent;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
@@ -51,6 +51,20 @@ public class PropertyStartEventSection extends ActivitiPropertySection implement
 				return;
 
 			StartEvent startEvent = ((StartEvent) bo);
+			
+			if(startEvent.getInitiator() != null) {
+				initiatorText.setText(startEvent.getInitiator());
+			} else {
+				initiatorText.setText("");
+			}
+			
+			if(startEvent.getFormKey() != null) {
+				
+				String condition = startEvent.getFormKey();
+				formKeyText.setText(condition);
+			} else {
+			  formKeyText.setText("");
+			}
 		}
 		initiatorText.addFocusListener(listener);
 		formKeyText.addFocusListener(listener);
@@ -72,7 +86,21 @@ public class PropertyStartEventSection extends ActivitiPropertySection implement
 						public void run() {
 							StartEvent startEvent = (StartEvent) bo;
 							
+							String initator = initiatorText.getText();
+							if (StringUtils.isNotEmpty(initator)) {
+							  startEvent.setInitiator(initator);
+								
+							} else {
+								startEvent.setInitiator("");
+							}
 							
+							String formKey = formKeyText.getText();
+							if (StringUtils.isNotEmpty(formKey)) {
+							  startEvent.setFormKey(formKey);
+								
+							} else {
+								startEvent.setFormKey("");
+							}
 						}
 					}, editingDomain, "Model Update");
 				}

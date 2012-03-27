@@ -16,6 +16,7 @@ package org.activiti.designer.export.bpmn20.export;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.activiti.designer.bpmn2.model.SequenceFlow;
+import org.apache.commons.lang.StringUtils;
 
 
 /**
@@ -36,12 +37,11 @@ public class SequenceFlowExport implements ActivitiNamespaceConstants {
     xtw.writeAttribute("sourceRef", sequenceFlow.getSourceRef().getId());
     xtw.writeAttribute("targetRef", sequenceFlow.getTargetRef().getId());
 
-    /*ExtensionListenerExport.createExtensionListenerXML(sequenceFlow.getExecutionListeners(), true, EXECUTION_LISTENER, xtw);
+    ExecutionListenerExport.createExecutionListenerXML(sequenceFlow.getExecutionListeners(), true, xtw);
 
-    if (sequenceFlow.getConditionExpression() != null && sequenceFlow.getConditionExpression().getBody() != null
-            && sequenceFlow.getConditionExpression().getBody().length() > 0) {
+    if (StringUtils.isNotEmpty(sequenceFlow.getConditionExpression())) {
 
-      String condition = sequenceFlow.getConditionExpression().getBody();
+      String condition = sequenceFlow.getConditionExpression();
       // start conditionExpression element
       xtw.writeStartElement("conditionExpression");
       xtw.writeAttribute("xsi", XSI_NAMESPACE, "type", "tFormalExpression");
@@ -49,7 +49,7 @@ public class SequenceFlowExport implements ActivitiNamespaceConstants {
 
       // end conditionExpression element
       xtw.writeEndElement();
-    }*/
+    }
 
     // end SequenceFlow element
     xtw.writeEndElement();

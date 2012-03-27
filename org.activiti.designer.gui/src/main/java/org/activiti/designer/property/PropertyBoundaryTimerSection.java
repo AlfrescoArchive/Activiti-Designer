@@ -134,23 +134,29 @@ public class PropertyBoundaryTimerSection extends ActivitiPropertySection implem
               TimerEventDefinition timerDefinition = (TimerEventDefinition) boundaryEvent.getEventDefinitions().get(0);
               
 							String timeDuration = timeDurationText.getText();
-							if (timeDuration != null) {
+							if (StringUtils.isNotEmpty(timeDuration)) {
 							  timerDefinition.setTimeDuration(timeDuration);
+							} else {
+								timerDefinition.setTimeDuration(null);
 							}
 							
 							String timeDate = timeDateText.getText();
-              if (timeDate != null) {
+              if (StringUtils.isNotEmpty(timeDate)) {
                 try {
 	                timerDefinition.setTimeDate(new SimpleDateFormat().parse(timeDate));
                 } catch (Exception e) {
 	                // TODO Auto-generated catch block
 	                e.printStackTrace();
                 }
+              } else {
+              	timerDefinition.setTimeDate(null);
               }
               
               String timeCycle = timeCycleText.getText();
-              if (timeCycle != null) {
+              if (StringUtils.isNotEmpty(timeCycle)) {
                 timerDefinition.setTimeCycle(timeCycle);
+              } else {
+              	timerDefinition.setTimeCycle(null);
               }
 						}
 					}, editingDomain, "Model Update");

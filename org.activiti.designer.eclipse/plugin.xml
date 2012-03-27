@@ -67,9 +67,9 @@
          class="org.activiti.designer.eclipse.editor.ActivitiDiagramEditor"
          contributorClass="org.eclipse.graphiti.ui.editor.DiagramEditorActionBarContributor"
          default="true"
-         extensions="activiti"
+         extensions="bpmn"
          icon="community_icon.png"
-         id="org.activiti.designer.editor.multiPageEditor"
+         id="org.activiti.designer.editor.diagramEditor"
          name="Activiti Diagram Editor">
       <contentTypeBinding
             contentTypeId="org.activiti.designer.editor.diagram.contenttype">
@@ -91,7 +91,7 @@
        point="org.eclipse.core.contenttype.contentTypes">
     <content-type
           base-type="org.eclipse.core.runtime.xml"
-          file-extensions="activiti"
+          file-extensions="bpmn"
           id="org.activiti.designer.editor.diagram.contenttype"
           name="Activiti Diagram Editor File"
           priority="normal">

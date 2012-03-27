@@ -81,22 +81,6 @@ public class AddSequenceFlowFeature extends AbstractAddFeature {
 		if(sourceAnchor == null || targetAnchor == null) {
 		  return null;
 		}
-		
-		boolean inSubProcess = false;
-		Object parentObject = null;
-		ContainerShape parentShape = null;
-    if(sourceAnchor.eContainer() instanceof ContainerShape) {
-      parentShape = (ContainerShape) sourceAnchor.eContainer().eContainer();
-      parentObject = getBusinessObjectForPictogramElement(parentShape.getGraphicsAlgorithm().getPictogramElement());
-      if(parentObject != null && parentObject instanceof SubProcess == false) {
-        parentShape = (ContainerShape) targetAnchor.eContainer().eContainer();
-        parentObject = getBusinessObjectForPictogramElement(parentShape.getGraphicsAlgorithm().getPictogramElement());
-      }
-    }
-    
-    if (parentObject != null && parentObject instanceof SubProcess) {
-      inSubProcess = true;
-    }
 
 		IPeCreateService peCreateService = Graphiti.getPeCreateService();
 		// CONNECTION WITH POLYLINE
@@ -119,14 +103,8 @@ public class AddSequenceFlowFeature extends AbstractAddFeature {
 		if(bendpointList != null && bendpointList.size() >= 0) {
 			for (GraphicInfo graphicInfo : bendpointList) {
 				Point bendPoint = StylesFactory.eINSTANCE.createPoint();
-				if(inSubProcess == true) {
-  				bendPoint.setX(parentShape.getGraphicsAlgorithm().getX() + graphicInfo.x);
-  				bendPoint.setY(parentShape.getGraphicsAlgorithm().getY() + graphicInfo.y);
-  				
-				} else {
-				  bendPoint.setX(graphicInfo.x);
-          bendPoint.setY(graphicInfo.y);
-				}
+				bendPoint.setX(graphicInfo.x);
+        bendPoint.setY(graphicInfo.y);
 				connection.getBendpoints().add(bendPoint);
       }
 			
@@ -147,14 +125,8 @@ public class AddSequenceFlowFeature extends AbstractAddFeature {
 					
 					if(addedSequenceFlow.getTargetRef() instanceof SubProcess == false || subProcessWithBendPoint == true) {
 						Point bendPoint = StylesFactory.eINSTANCE.createPoint();
-						if(inSubProcess == true) {
-		  				bendPoint.setX(parentShape.getGraphicsAlgorithm().getX() + sourceGraphics.getX() + 20);
-		  				bendPoint.setY(parentShape.getGraphicsAlgorithm().getY() + targetGraphics.getY() + (targetGraphics.getHeight() / 2));
-		  				
-						} else {
-						  bendPoint.setX(sourceGraphics.getX() + 20);
-		          bendPoint.setY(targetGraphics.getY() + (targetGraphics.getHeight() / 2));
-						}
+						bendPoint.setX(sourceGraphics.getX() + 20);
+		        bendPoint.setY(targetGraphics.getY() + (targetGraphics.getHeight() / 2));
 						connection.getBendpoints().add(bendPoint);
 					}
 				}
@@ -173,13 +145,8 @@ public class AddSequenceFlowFeature extends AbstractAddFeature {
 					
 					if(addedSequenceFlow.getSourceRef() instanceof SubProcess == false || subProcessWithBendPoint == true) {
 						Point bendPoint = StylesFactory.eINSTANCE.createPoint();
-						if(inSubProcess == true) {				
-		  				bendPoint.setX(parentShape.getGraphicsAlgorithm().getX() + targetGraphics.getX() + 20);
-		  				bendPoint.setY(parentShape.getGraphicsAlgorithm().getY() + sourceGraphics.getY() + (sourceGraphics.getHeight() / 2));
-						} else {
-						  bendPoint.setX(targetGraphics.getX() + 20);
-		          bendPoint.setY(sourceGraphics.getY() + (sourceGraphics.getHeight() / 2));
-						}
+						bendPoint.setX(targetGraphics.getX() + 20);
+		        bendPoint.setY(sourceGraphics.getY() + (sourceGraphics.getHeight() / 2));
 						connection.getBendpoints().add(bendPoint);
 					}
 				}
@@ -193,13 +160,8 @@ public class AddSequenceFlowFeature extends AbstractAddFeature {
 						(sourceGraphics.getX() + sourceGraphics.getWidth()) < targetGraphics.getX())) {
 					
 					Point bendPoint = StylesFactory.eINSTANCE.createPoint();
-					if(inSubProcess == true) {
-	  				bendPoint.setX(parentShape.getGraphicsAlgorithm().getX() + targetGraphics.getX() + (targetGraphics.getWidth() / 2));
-	  				bendPoint.setY(parentShape.getGraphicsAlgorithm().getY() + sourceGraphics.getY() + (sourceGraphics.getHeight() / 2));
-					} else {
-					  bendPoint.setX(targetGraphics.getX() + (targetGraphics.getWidth() / 2));
-	          bendPoint.setY(sourceGraphics.getY() + (sourceGraphics.getHeight() / 2));
-					}
+					bendPoint.setX(targetGraphics.getX() + (targetGraphics.getWidth() / 2));
+	        bendPoint.setY(sourceGraphics.getY() + (sourceGraphics.getHeight() / 2));
 					connection.getBendpoints().add(bendPoint);
 				}
 			}

@@ -9,13 +9,10 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
-import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.emf.common.util.URI;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.internal.core.PackageFragment;
@@ -131,33 +128,31 @@ public class CreateDefaultActivitiDiagramWizard extends BasicNewResourceWizard {
   @Override
   public boolean performFinish() {
 
-    final String diagramTypeId = "BPMNdiagram";
-
     final IFile diagramFile = getDiagramFile();
-    final String diagramName = getDiagramName();
-
-    URI uri = URI.createPlatformResourceURI(diagramFile.getFullPath().toString(), true);
-
-		final IResource container = diagramFile.getProject();
-
+    
+    String tempFileName = null;
+		if(initialContentPage.contentSourceTemplate.getSelection() == true &&
+        initialContentPage.templateTable.getSelectionIndex() >= 0) {
+			
+			tempFileName = this.getClass().getClassLoader().getResource("src/main/resources/templates/" + 
+          TemplateInfo.templateFilenames[initialContentPage.templateTable.getSelectionIndex()]).getPath();
+		}
+		
+		final String contentFileName = tempFileName;
+    
 		IRunnableWithProgress op = new IRunnableWithProgress() {
 			@Override
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
 				try {
-					IPath path = container.getFullPath().append(diagramName);
-					IFolder folder = null;
+					IPath path = diagramFile.getFullPath();
 					Bpmn2DiagramCreator factory = new Bpmn2DiagramCreator();
-
-					folder = Bpmn2DiagramCreator.getTempFolder(path);
-
-					factory.setDiagramFile(Bpmn2DiagramCreator.getTempFile(path,folder));
-
+					IFolder folder = Bpmn2DiagramCreator.getTempFolder(path);
+					factory.setDiagramFile(Bpmn2DiagramCreator.getTempFile(path, folder));
 					factory.setDiagramFolder(folder);
+					factory.createDiagram(true, contentFileName);
 
-					factory.createDiagram(true);
-
-				} catch (CoreException e) {
-					throw new InvocationTargetException(e);
+				} catch (Exception e) {
+					e.printStackTrace();
 				} finally {
 					monitor.done();
 				}

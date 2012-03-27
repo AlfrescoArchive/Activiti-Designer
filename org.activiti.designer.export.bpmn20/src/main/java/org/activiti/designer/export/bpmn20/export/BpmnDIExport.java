@@ -51,13 +51,13 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
     xtw.writeAttribute("bpmnElement", process.getId());
     xtw.writeAttribute("id", "BPMNPlane_" + process.getId());
 
-    loopThroughElements(process.getFlowElements(), null);
+    loopThroughElements(process.getFlowElements());
     
     xtw.writeEndElement();
     xtw.writeEndElement();
   }
   
-  private static void loopThroughElements(List<FlowElement> elementList, SubProcess parentSubProcess) throws Exception {
+  private static void loopThroughElements(List<FlowElement> elementList) throws Exception {
   	for (FlowElement element : elementList) {
 
       if (element instanceof FlowNode) {
@@ -65,7 +65,7 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
         writeBpmnElement(node);
         if(element instanceof SubProcess) {
         	SubProcess subProcess = (SubProcess) node;
-        	loopThroughElements(subProcess.getFlowElements(), subProcess);
+        	loopThroughElements(subProcess.getFlowElements());
         }
         if(element instanceof Activity) {
         	Activity activity = (Activity) node;
@@ -78,7 +78,7 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
   	
   	for (FlowElement element : elementList) {
       if (element instanceof SequenceFlow) {
-        writeBpmnEdge((SequenceFlow) element, parentSubProcess);
+        writeBpmnEdge((SequenceFlow) element);
       } 
     }
   }
@@ -105,7 +105,7 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
   	}
   }
   
-  private static void writeBpmnEdge(SequenceFlow sequenceFlow, SubProcess subProcess) throws Exception {
+  private static void writeBpmnEdge(SequenceFlow sequenceFlow) throws Exception {
   	Shape sourceElement = null;
   	Shape targetElement = null;
   	if(sequenceFlow.getSourceRef() != null && sequenceFlow.getSourceRef().getId() != null) {
@@ -127,26 +127,18 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
     xtw.writeAttribute("bpmnElement", sequenceFlow.getId());
     xtw.writeAttribute("id", "BPMNEdge_" + sequenceFlow.getId());
     
-    int subProcessX = 0;
-    int subProcessY = 0;
-    if(subProcess != null) {
-      /*GraphicsAlgorithm subProcessGraphics = diFlowNodeMap.get(subProcess.getId());
-      if(subProcessGraphics != null) {
-        subProcessX = subProcessGraphics.getX();
-        subProcessY = subProcessGraphics.getY();
-      }*/
-    }
-    
-    int sourceX = subProcessX + sourceElement.getGraphicsAlgorithm().getX();
-    int sourceY = subProcessY + sourceElement.getGraphicsAlgorithm().getY();
+    ILocation sourceLocation = Graphiti.getLayoutService().getLocationRelativeToDiagram(sourceElement);
+    int sourceX = sourceLocation.getX();
+    int sourceY = sourceLocation.getY();
     int sourceWidth = sourceElement.getGraphicsAlgorithm().getWidth();
     int sourceHeight = sourceElement.getGraphicsAlgorithm().getHeight();
     int sourceMiddleX = sourceX + (sourceWidth / 2);
     int sourceMiddleY = sourceY + (sourceHeight / 2);
     int sourceBottomY = sourceY + sourceHeight;
     
-    int targetX = subProcessX + targetElement.getGraphicsAlgorithm().getX();
-    int targetY = subProcessY + targetElement.getGraphicsAlgorithm().getY();
+    ILocation targetLocation = Graphiti.getLayoutService().getLocationRelativeToDiagram(targetElement);
+    int targetX = targetLocation.getX();
+    int targetY = targetLocation.getY();
     int targetWidth = targetElement.getGraphicsAlgorithm().getWidth();
     int targetHeight = targetElement.getGraphicsAlgorithm().getHeight();
     int targetMiddleX = targetX + (targetWidth / 2);

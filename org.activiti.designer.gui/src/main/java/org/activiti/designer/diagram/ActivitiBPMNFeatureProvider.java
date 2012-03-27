@@ -190,9 +190,9 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 
 	@Override
 	public ICreateFeature[] getCreateFeatures() {
-		return new ICreateFeature[] { new CreateStartEventFeature(this),
+		return new ICreateFeature[] { new CreateAlfrescoStartEventFeature(this),
+						new CreateStartEventFeature(this),
 						new CreateTimerStartEventFeature(this),
-		        new CreateAlfrescoStartEventFeature(this),
 		        new CreateEndEventFeature(this),
 		        new CreateErrorEndEventFeature(this),
 		        new CreateUserTaskFeature(this),

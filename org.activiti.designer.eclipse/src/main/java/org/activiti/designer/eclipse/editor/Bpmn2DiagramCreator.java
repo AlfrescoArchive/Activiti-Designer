@@ -1,5 +1,9 @@
 package org.activiti.designer.eclipse.editor;
 
+import java.io.FileOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
+
 import org.activiti.designer.eclipse.common.ActivitiBPMNDiagramConstants;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -10,6 +14,7 @@ import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -26,7 +31,7 @@ public class Bpmn2DiagramCreator {
 	private IFile diagramFile;
 	private URI uri;
 
-	public DiagramEditorInput createDiagram(boolean openEditor) throws CoreException {
+	public DiagramEditorInput createDiagram(boolean openEditor, String contentFileName) throws CoreException {
 		
 		if (diagramFolder != null && !diagramFolder.exists()) {
 			diagramFolder.create(false, true, null);
@@ -35,6 +40,27 @@ public class Bpmn2DiagramCreator {
 		final Diagram diagram = Graphiti.getPeCreateService().createDiagram(
 		    "BPMNdiagram", diagramFile.getFullPath().removeFileExtension().lastSegment(), true);
 		uri = URI.createPlatformResourceURI(diagramFile.getFullPath().toString(), true);
+		
+		if(contentFileName != null) {
+			InputStream in = this.getClass().getClassLoader().getResourceAsStream(contentFileName);
+			IFile modelFile = getModelFile(new Path(uri.trimFragment().toPlatformString(true)));
+			String filePath = modelFile.getLocationURI().getRawPath();
+			filePath = filePath.replaceAll("%20", " ");
+	    System.out.println("filePath " + filePath);
+			try {
+			  OutputStream out = new FileOutputStream(filePath);
+				
+				byte[] buf = new byte[1024];
+			  int len;
+			  while ((len = in.read(buf)) > 0){
+			  out.write(buf, 0, len);
+			  }
+			  in.close();
+			  out.close();
+			} catch(Exception e) {
+				e.printStackTrace();
+			}
+		}
 		
 		FileService.createEmfFileForDiagram(uri, diagram);
 
@@ -100,7 +126,7 @@ public class Bpmn2DiagramCreator {
 
 		String name = fullPath.getFileExtension();
 		if (name == null || name.length() == 0)
-			name = "activiti";
+			name = "bpmn";
 		IFolder folder = root.getProject(fullPath.segment(0)).getFolder("." + name);
 		if (!folder.exists()) {
 			folder.create(true, true, null);
@@ -154,11 +180,8 @@ public class Bpmn2DiagramCreator {
 	 * @return an IFile for the model file.
 	 */
 	public static IFile getModelFile(IPath fullPath) {
-		IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(fullPath);
-		IProject project = ResourcesPlugin.getWorkspace().getRoot()
-		    .getFile(fullPath).getProject();
-		int matchingSegments = project.getFullPath()
-		    .matchingFirstSegments(fullPath);
+		IProject project = ResourcesPlugin.getWorkspace().getRoot().getFile(fullPath).getProject();
+		int matchingSegments = project.getFullPath().matchingFirstSegments(fullPath);
 		int totalSegments = fullPath.segmentCount();
 		String ext = fullPath.getFileExtension();
 		// sanity check: make sure the fullPath is not the project

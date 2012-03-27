@@ -65,7 +65,7 @@ import org.eclipse.ui.PartInitException;
 
 public class ActivitiDiagramEditor extends DiagramEditor {
 
-	public final static String ID = "org.activiti.designer.diagmrameditor"; //$NON-NLS-1$
+	public final static String ID = "org.activiti.designer.editor.diagramEditor";
 	private static GraphicalViewer activeGraphicalViewer;
 
 	private IFile modelFile;
@@ -111,7 +111,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 		Bpmn2DiagramCreator creator = new Bpmn2DiagramCreator();
 		creator.setDiagramFile(diagramFile);
 
-		DiagramEditorInput input = creator.createDiagram(false);
+		DiagramEditorInput input = creator.createDiagram(false, null);
 		
 		return input;
 	}
@@ -145,7 +145,9 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 		Bpmn2MemoryModel model = new Bpmn2MemoryModel(getDiagramTypeProvider().getFeatureProvider(), "process1");
 		ModelHandler.addModel(EcoreUtil.getURI(getDiagramTypeProvider().getDiagram()), model);
 		
-		File bpmnFile = new File(modelFile.getLocationURI().getRawPath());
+		String filePath = modelFile.getLocationURI().getRawPath();
+		filePath = filePath.replaceAll("%20", " ");
+		File bpmnFile = new File(filePath);
     try {
     	if(bpmnFile.exists() == false) {
   			bpmnFile.createNewFile();
@@ -197,6 +199,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 		
 		final IFeatureProvider featureProvider = getDiagramTypeProvider().getFeatureProvider();
 		
+		List<FlowElement> noDIList = new ArrayList<FlowElement>();
 		for (FlowElement flowElement : elementList) {
 			
 			AddContext context = new AddContext(new AreaContext(), flowElement);
@@ -208,8 +211,12 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 			}
 			
 			GraphicInfo graphicInfo = locationMap.get(flowElement.getId());
-			if(graphicInfo != null) {
-
+			if(graphicInfo == null) {
+			
+				noDIList.add(flowElement);
+				
+			} else {
+				
 				context.setNewObject(flowElement);
 				context.setSize(graphicInfo.width, graphicInfo.height);
 				context.setTargetContainer(parentShape);
@@ -231,7 +238,6 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 					if (flowElement instanceof Activity) {
 						Activity activity = (Activity) flowElement;
 						for (BoundaryEvent boundaryEvent : activity.getBoundaryEvents()) {
-							System.out.println("found boundary event " + boundaryEvent);
 							AddContext boundaryContext = new AddContext(new AreaContext(), boundaryEvent);
 							IAddFeature boundaryAddFeature = featureProvider.getAddFeature(boundaryContext);
 							
@@ -241,7 +247,11 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 							}
 							
 							GraphicInfo boundaryGraphicInfo = locationMap.get(boundaryEvent.getId());
-							if(boundaryGraphicInfo != null) {
+							if(boundaryGraphicInfo == null) {
+								
+								noDIList.add(boundaryEvent);
+							
+							} else {
 
 								context.setNewObject(boundaryEvent);
 								context.setSize(boundaryGraphicInfo.width, boundaryGraphicInfo.height);
@@ -268,6 +278,14 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 				}
 			}
     }
+		
+		for (FlowElement flowElement : noDIList) {
+			if(flowElement instanceof BoundaryEvent) {
+				((BoundaryEvent) flowElement).getAttachedToRef().getBoundaryEvents().remove(flowElement);
+			} else {
+				elementList.remove(flowElement);
+			}
+		}
 	}
 	
 	private Point getLocation(ContainerShape containerShape) {
@@ -292,6 +310,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
       }
       sequenceFlow.setSourceRef(getFlowNode(sequenceFlowModel.sourceRef, model.getProcess().getFlowElements()));
       sequenceFlow.setTargetRef(getFlowNode(sequenceFlowModel.targetRef, model.getProcess().getFlowElements()));
+      
       if(sequenceFlow.getSourceRef() == null || sequenceFlow.getSourceRef().getId() == null || 
               sequenceFlow.getTargetRef() == null || sequenceFlow.getTargetRef().getId() == null) continue;
       if(sequenceFlowModel.conditionExpression != null) {
@@ -323,6 +342,9 @@ public class ActivitiDiagramEditor extends DiagramEditor {
       Anchor sourceAnchor = null;
       Anchor targetAnchor = null;
       ContainerShape sourceShape = (ContainerShape) getDiagramTypeProvider().getFeatureProvider().getPictogramElementForBusinessObject(sequenceFlow.getSourceRef());
+      
+      if(sourceShape == null) continue;
+      
       EList<Anchor> anchorList = sourceShape.getAnchors();
       for (Anchor anchor : anchorList) {
         if(anchor instanceof ChopboxAnchor) {
@@ -332,6 +354,9 @@ public class ActivitiDiagramEditor extends DiagramEditor {
       }
       
       ContainerShape targetShape = (ContainerShape) getDiagramTypeProvider().getFeatureProvider().getPictogramElementForBusinessObject(sequenceFlow.getTargetRef());
+      
+      if(targetShape == null) continue;
+      
       anchorList = targetShape.getAnchors();
       for (Anchor anchor : anchorList) {
         if(anchor instanceof ChopboxAnchor) {
@@ -371,6 +396,16 @@ public class ActivitiDiagramEditor extends DiagramEditor {
       
       if(flowElement instanceof SubProcess) {
       	flowNode = getFlowNode(elementid, ((SubProcess) flowElement).getFlowElements());
+      }
+      
+      if(flowElement instanceof Activity) {
+      	List<BoundaryEvent> eventList = ((Activity) flowElement).getBoundaryEvents();
+      	for (BoundaryEvent boundaryEvent : eventList) {
+	        if(boundaryEvent.getId().equalsIgnoreCase(elementid)) {
+	        	flowNode = boundaryEvent;
+	        	break;
+	        }
+        }
       }
     }
     return flowNode;

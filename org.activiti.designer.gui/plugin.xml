@@ -223,6 +223,12 @@
                id="org.activiti.designer.mainConfigTab.alfrescoMailtask"
                tab="org.activiti.designer.mainConfigTab">
          </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyErrorEndEventSection"
+               filter="org.activiti.designer.property.PropertyErrorEndEventFilter"
+               id="org.activiti.designer.mainConfigTab.errorendevent"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
       </propertySections>
    </extension>
    <extension
@@ -351,18 +357,6 @@
 </extension>
 <extension
       point="org.eclipse.ui.popupMenus">
-   <objectContribution
-         adaptable="false"
-         id="org.activiti.designer.gui.import"
-         objectClass="org.eclipse.jdt.core.IJavaProject">
-      <action
-            class="org.activiti.designer.popupmenus.ImportBpmnMenu"
-            icon="icons/type.service.png"
-            id="org.activiti.designer.gui.importAction"
-            label="Import BPMN 2.0 file"
-            menubarPath="Properties">
-      </action>
-   </objectContribution>
    <objectContribution
          adaptable="false"
          id="org.activiti.designer.gui.deployment"
