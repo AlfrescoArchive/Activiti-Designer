@@ -7,6 +7,7 @@ import org.activiti.designer.bpmn2.model.CallActivity;
 import org.activiti.designer.bpmn2.model.IOParameter;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.editor.ModelHandler;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -27,8 +28,8 @@ public class IOParameterEditor extends TableFieldEditor {
 	
   public IOParameterEditor(String key, Composite parent) {
     
-    super(key, "", new String[] {"Source", "Target"},
-        new int[] {300, 300}, parent);
+    super(key, "", new String[] {"Source", "Source expression", "Target", "Target expression"},
+        new int[] {150, 150, 150, 150}, parent);
     this.parent = parent;
   }
 
@@ -54,8 +55,14 @@ public class IOParameterEditor extends TableFieldEditor {
     
     if(table != null) {
       TableItem tableItem = new TableItem(table, SWT.NONE);
-      tableItem.setText(0, parameter.getSource());
-      tableItem.setText(1, parameter.getTarget());
+      String source = parameter.getSource() != null ? parameter.getSource() : "";
+      tableItem.setText(0, source);
+      String sourceExpression = parameter.getSourceExpression() != null ? parameter.getSourceExpression() : "";
+      tableItem.setText(1, sourceExpression);
+      String target = parameter.getTarget() != null ? parameter.getTarget() : "";
+      tableItem.setText(2, target);
+      String targetExpression = parameter.getTargetExpression() != null ? parameter.getTargetExpression() : "";
+      tableItem.setText(3, targetExpression);
     }
   }
 
@@ -63,9 +70,9 @@ public class IOParameterEditor extends TableFieldEditor {
   protected String[] getNewInputObject() {
     IOParameterDialog dialog = new IOParameterDialog(parent.getShell(), getItems());
     dialog.open();
-    if(dialog.source != null && dialog.source.length() > 0 &&
-            dialog.target != null && dialog.target.length() > 0) {
-      return new String[] { dialog.source, dialog.target};
+    if((StringUtils.isNotEmpty(dialog.source) || StringUtils.isNotEmpty(dialog.sourceExpression)) &&
+            (StringUtils.isNotEmpty(dialog.target) || StringUtils.isNotEmpty(dialog.targetExpression))) {
+      return new String[] { dialog.source, dialog.sourceExpression, dialog.target, dialog.targetExpression};
     } else {
       return null;
     }
@@ -74,11 +81,11 @@ public class IOParameterEditor extends TableFieldEditor {
   @Override
   protected String[] getChangedInputObject(TableItem item) {
     IOParameterDialog dialog = new IOParameterDialog(parent.getShell(), getItems(), 
-            item.getText(0), item.getText(1));
+            item.getText(0), item.getText(1), item.getText(2), item.getText(3));
     dialog.open();
-    if(dialog.source != null && dialog.source.length() > 0 &&
-            dialog.target != null && dialog.target.length() > 0) {
-      return new String[] { dialog.source, dialog.target};
+    if((StringUtils.isNotEmpty(dialog.source) || StringUtils.isNotEmpty(dialog.sourceExpression)) &&
+        (StringUtils.isNotEmpty(dialog.target) || StringUtils.isNotEmpty(dialog.targetExpression))) {
+    	return new String[] { dialog.source, dialog.sourceExpression, dialog.target, dialog.targetExpression};
     } else {
       return null;
     }
@@ -92,52 +99,34 @@ public class IOParameterEditor extends TableFieldEditor {
   @Override
   protected void selectionChanged() {
     super.selectionChanged();
-    saveFormProperties();
+    saveIOParameters();
   }
   
-  private void saveFormProperties() {
+  private void saveIOParameters() {
     if (pictogramElement != null) {
       final Object bo = ModelHandler.getModel(EcoreUtil.getURI(diagram)).getFeatureProvider().getBusinessObjectForPictogramElement(pictogramElement);
       if (bo == null) {
         return;
       }
-      List<IOParameter> parameterList = null;
-      if(isInputParameters == true) {
-        parameterList = ((CallActivity) bo).getInParameters();
-      } else {
-        parameterList = ((CallActivity) bo).getOutParameters();
-      }
-      if(parametersChanged(parameterList, getItems()) == false) {
-        return;
-      }
+      
       TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
       ActivitiUiUtil.runModelChange(new Runnable() {
         public void run() {
         	List<IOParameter> newParameterList = new ArrayList<IOParameter>();
-        	
-          List<IOParameter> parameterList = null;
-          if(isInputParameters == true) {
-            parameterList = ((CallActivity) bo).getInParameters();
-          } else {
-            parameterList = ((CallActivity) bo).getOutParameters();
-          }
           for (TableItem item : getItems()) {
             String source = item.getText(0);
-            String target = item.getText(1);
-            if(source != null && source.length() > 0 &&
-                    target != null && target.length() > 0) {
+            String sourceExpression = item.getText(1);
+            String target = item.getText(2);
+            String targetExpression = item.getText(3);
+            if((StringUtils.isNotEmpty(source) || StringUtils.isNotEmpty(sourceExpression)) &&
+                (StringUtils.isNotEmpty(target) || StringUtils.isNotEmpty(targetExpression))) {
               
-              IOParameter parameter = parameterExists(parameterList, source, target);
-              if(parameter != null) {
-                parameter.setSource(source);
-                parameter.setTarget(target);
-                newParameterList.add(parameter);
-              } else {
-                IOParameter newParameter = new IOParameter();
-                newParameter.setSource(source);
-                newParameter.setTarget(target);
-                newParameterList.add(newParameter);
-              }
+            	IOParameter newParameter = new IOParameter();
+            	newParameter.setSource(source);
+            	newParameter.setSourceExpression(sourceExpression);
+            	newParameter.setTarget(target);
+            	newParameter.setTargetExpression(targetExpression);
+              newParameterList.add(newParameter);
             }
           }
           if(isInputParameters == true) {
@@ -150,70 +139,5 @@ public class IOParameterEditor extends TableFieldEditor {
         }
       }, editingDomain, "Model Update");
     }
-  }
-  
-  private boolean parametersChanged(List<IOParameter> parameterList, TableItem[] items) {
-    boolean noPropertySaved = false;
-    boolean nothingInTable = false;
-    if(parameterList == null || parameterList.size() == 0) {
-      noPropertySaved = true;
-    }
-    if(items == null || items.length == 0) {
-      nothingInTable = true;
-    }
-    if(noPropertySaved && nothingInTable) {
-      return false;
-    } else if(noPropertySaved == false && nothingInTable == false) {
-      
-    	for(int i = 0; i < parameterList.size(); i++) {
-    		IOParameter parameter = parameterList.get(i);
-      
-        boolean found = false;
-        if(items.length > i) {
-        	TableItem item = items[i];
-          if(item.getText(0).equalsIgnoreCase(parameter.getSource()) &&
-                  item.getText(1).equalsIgnoreCase(parameter.getTarget())) {
-            
-            found = true;
-          }
-        }
-        if(found == false) {
-          return true;
-        }
-      }
-      
-    	for (int i = 0; i < items.length; i++) {
-      	TableItem item = items[i];
-        boolean found = false;
-        if(parameterList.size() > i) {
-        	IOParameter parameter = parameterList.get(i);
-      
-          if(item.getText(0).equalsIgnoreCase(parameter.getSource()) &&
-                  item.getText(1).equalsIgnoreCase(parameter.getTarget())) {
-            
-            found = true;
-          }
-        }
-        if(found == false) {
-          return true;
-        }
-      }
-      
-      return false;
-      
-    } else {
-      return true;
-    }
-  }
- 
-  private IOParameter parameterExists(List<IOParameter> parameterList, String source, String target) {
-    if(parameterList == null) return null;
-    for(IOParameter parameter : parameterList) {
-      if(source.equalsIgnoreCase(parameter.getSource()) &&
-              target.equalsIgnoreCase(parameter.getTarget())) {
-        return parameter;
-      }
-    }
-    return null;
   }
 }

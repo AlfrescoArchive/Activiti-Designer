@@ -13,7 +13,6 @@
 
 package org.activiti.designer.eclipse.bpmn;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -358,12 +357,7 @@ public class BpmnParser {
 		if ("timeDuration".equalsIgnoreCase(type)) {
 			eventDef.setTimeDuration(value);
 		} else if ("timeDate".equalsIgnoreCase(type)) {
-			try {
-	      eventDef.setTimeDate(new SimpleDateFormat().parse(value));
-      } catch (Exception e) {
-	      // TODO Auto-generated catch block
-	      e.printStackTrace();
-      }
+			eventDef.setTimeDate(value);
 		} else {
 			eventDef.setTimeCycle(value);
 		}
@@ -375,28 +369,34 @@ public class BpmnParser {
 	}
 
 	private void parseFormProperty(FormProperty property, XMLStreamReader xtr) {
-		if (xtr.getAttributeValue(null, "id") != null) {
+		if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, "id"))) {
 			property.setId(xtr.getAttributeValue(null, "id"));
 		}
-		if (xtr.getAttributeValue(null, "name") != null) {
+		if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, "name"))) {
 			property.setName(xtr.getAttributeValue(null, "name"));
 		}
-		if (xtr.getAttributeValue(null, "type") != null) {
+		if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, "type"))) {
 			property.setType(xtr.getAttributeValue(null, "type"));
 		}
-		if (xtr.getAttributeValue(null, "variable") != null) {
-			property.setValue(xtr.getAttributeValue(null, "variable"));
+		if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, "value"))) {
+			property.setValue(xtr.getAttributeValue(null, "value"));
 		}
-		if (xtr.getAttributeValue(null, "expression") != null) {
-			property.setValue(xtr.getAttributeValue(null, "expression"));
+		if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, "variable"))) {
+			property.setVariable(xtr.getAttributeValue(null, "variable"));
 		}
-		if (xtr.getAttributeValue(null, "required") != null) {
+		if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, "expression"))) {
+			property.setExpression(xtr.getAttributeValue(null, "expression"));
+		}
+		if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, "datePattern"))) {
+			property.setDatePattern(xtr.getAttributeValue(null, "datePattern"));
+		}
+		if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, "required"))) {
 			property.setRequired(Boolean.valueOf(xtr.getAttributeValue(null, "required")));
 		}
-		if (xtr.getAttributeValue(null, "readable") != null) {
+		if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, "readable"))) {
 			property.setReadable(Boolean.valueOf(xtr.getAttributeValue(null, "readable")));
 		}
-		if (xtr.getAttributeValue(null, "writable") != null) {
+		if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, "writable"))) {
 			property.setWriteable(Boolean.valueOf(xtr.getAttributeValue(null, "writable")));
 		}
 		
@@ -566,8 +566,7 @@ public class BpmnParser {
 			String[] formTypes = PreferencesUtil
 			    .getStringArray(Preferences.ALFRESCO_FORMTYPES_USERTASK);
 			for (String form : formTypes) {
-				if (form.equals(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE,
-				    "formKey"))) {
+				if (form.equals(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "formKey"))) {
 					userTask = new AlfrescoUserTask();
 				}
 			}
@@ -579,20 +578,15 @@ public class BpmnParser {
 		userTask.setName(xtr.getAttributeValue(null, "name"));
 		userTask.setAsynchronous(parseAsync(xtr));
 		
-		if (xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "dueDate") != null) {
-			try {
-	      userTask.setDueDate(new SimpleDateFormat().parse(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "dueDate")));
-      } catch (Exception e) {
-	      // TODO Auto-generated catch block
-	      e.printStackTrace();
-      }
+		if (StringUtils.isNotEmpty(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "dueDate"))) {
+			userTask.setDueDate(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "dueDate"));
 		}
 
-		if (xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "assignee") != null) {
+		if (StringUtils.isNotEmpty(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "assignee"))) {
 			String assignee = xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "assignee");
 			userTask.setAssignee(assignee);
 
-		} else if (xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "candidateUsers") != null) {
+		} else if (StringUtils.isNotEmpty(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "candidateUsers"))) {
 			String expression = xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "candidateUsers");
 			String[] expressionList = null;
 			if (expression.contains(";")) {
@@ -604,7 +598,7 @@ public class BpmnParser {
 				userTask.getCandidateUsers().add(user);
 			}
 
-		} else if (xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "candidateGroups") != null) {
+		} else if (StringUtils.isNotEmpty(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "candidateGroups"))) {
 			String expression = xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "candidateGroups");
 			String[] expressionList = null;
 			if (expression.contains(";")) {
@@ -617,11 +611,11 @@ public class BpmnParser {
 			}
 		}
 
-		if (xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "formKey") != null) {
+		if (StringUtils.isNotEmpty(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "formKey"))) {
 			userTask.setFormKey(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "formKey"));
 		}
 
-		if (xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "priority") != null) {
+		if (StringUtils.isNotEmpty(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "priority"))) {
 			Integer priorityValue = null;
 			try {
 				priorityValue = Integer.valueOf(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "priority"));
@@ -630,7 +624,7 @@ public class BpmnParser {
 			userTask.setPriority(priorityValue);
 		}
 
-		if (xtr.getAttributeValue(null, "default") != null) {
+		if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, "default"))) {
 			defaultFlowMap.put(userTask, xtr.getAttributeValue(null, "default"));
 		}
 
@@ -773,9 +767,9 @@ public class BpmnParser {
 			defaultFlowMap.put(mailTask, xtr.getAttributeValue(null, "default"));
 		}
 		mailTask.setAsynchronous(parseAsync(xtr));
-		boolean readyWithServiceTask = false;
+		boolean readyWithMailTask = false;
 		try {
-			while (readyWithServiceTask == false && xtr.hasNext()) {
+			while (readyWithMailTask == false && xtr.hasNext()) {
 				xtr.next();
 				if (xtr.isStartElement() && "extensionElements".equalsIgnoreCase(xtr.getLocalName())) {
 					fillExtensionsForMailTask(xtr, mailTask);
@@ -786,7 +780,7 @@ public class BpmnParser {
 					parseMultiInstanceDef(multiInstanceDef, xtr);
 
 				} else if (xtr.isEndElement() && "serviceTask".equalsIgnoreCase(xtr.getLocalName())) {
-					readyWithServiceTask = true;
+					readyWithMailTask = true;
 				}
 			}
 		} catch (Exception e) {
@@ -1069,10 +1063,11 @@ public class BpmnParser {
 		}
 	}
 
-	private static void fillExtensionsForMailTask(XMLStreamReader xtr,
-	    MailTask mailTask) {
+	private static void fillExtensionsForMailTask(XMLStreamReader xtr, MailTask mailTask) {
+		List<FieldExtension> extensionList = new ArrayList<FieldExtension>();
 		boolean readyWithExtensions = false;
 		try {
+			ActivitiListener listener = null;
 			while (readyWithExtensions == false && xtr.hasNext()) {
 				xtr.next();
 				if (xtr.isStartElement() && "field".equalsIgnoreCase(xtr.getLocalName())) {
@@ -1085,6 +1080,8 @@ public class BpmnParser {
 						mailTask.setCc(getFieldExtensionValue(xtr));
 					} else if ("bcc".equalsIgnoreCase(name)) {
 						mailTask.setBcc(getFieldExtensionValue(xtr));
+					} else if ("charset".equalsIgnoreCase(name)) {
+						mailTask.setCharset(getFieldExtensionValue(xtr));
 					} else if ("subject".equalsIgnoreCase(name)) {
 						mailTask.setSubject(getFieldExtensionValue(xtr));
 					} else if ("html".equalsIgnoreCase(name)) {
@@ -1092,6 +1089,19 @@ public class BpmnParser {
 					} else if ("text".equalsIgnoreCase(name)) {
 						mailTask.setText(getFieldExtensionValue(xtr));
 					}
+				} else if(xtr.isStartElement() && "field".equalsIgnoreCase(xtr.getLocalName())) {
+          FieldExtension extension = parseFieldExtension(xtr);
+          extensionList.add(extension);
+          
+        } else if(xtr.isStartElement() && "executionListener".equalsIgnoreCase(xtr.getLocalName())) {
+          listener = parseListener(xtr);
+          mailTask.getExecutionListeners().add(listener);
+          
+        } else if(xtr.isEndElement() && "executionListener".equalsIgnoreCase(xtr.getLocalName())) {
+          if(extensionList.size() > 0) {
+            listener.getFieldExtensions().addAll(extensionList);
+            extensionList = new ArrayList<FieldExtension>();
+          } 
 				} else if (xtr.isEndElement() && "extensionElements".equalsIgnoreCase(xtr.getLocalName())) {
 					readyWithExtensions = true;
 				}
@@ -1124,21 +1134,47 @@ public class BpmnParser {
         
         } else if(xtr.isStartElement() && "in".equalsIgnoreCase(xtr.getLocalName())) {
         	String source = xtr.getAttributeValue(null, "source");
+        	String sourceExpression = xtr.getAttributeValue(null, "sourceExpression");
         	String target = xtr.getAttributeValue(null, "target");
-        	if(source != null && target != null) {
+        	String targetExpression = xtr.getAttributeValue(null, "targetExpression");
+        	if((StringUtils.isNotEmpty(source) || StringUtils.isNotEmpty(sourceExpression)) && 
+        			(StringUtils.isNotEmpty(target) || StringUtils.isNotEmpty(targetExpression))) {
+        		
 	        	IOParameter parameter = new IOParameter();
-	        	parameter.setSource(source);
-	        	parameter.setTarget(target);
+	        	if(StringUtils.isNotEmpty(sourceExpression)) {
+	        		parameter.setSourceExpression(sourceExpression);
+	        	} else {
+	        		parameter.setSource(source);
+	        	}
+	        	
+	        	if(StringUtils.isNotEmpty(targetExpression)) {
+	        		parameter.setTargetExpression(targetExpression);
+	        	} else {
+	        		parameter.setTarget(target);
+	        	}
 	          callActivity.getInParameters().add(parameter);
         	}
         
         } else if(xtr.isStartElement() && "out".equalsIgnoreCase(xtr.getLocalName())) {
         	String source = xtr.getAttributeValue(null, "source");
+        	String sourceExpression = xtr.getAttributeValue(null, "sourceExpression");
         	String target = xtr.getAttributeValue(null, "target");
-        	if(source != null && target != null) {
+        	String targetExpression = xtr.getAttributeValue(null, "targetExpression");
+        	if((StringUtils.isNotEmpty(source) || StringUtils.isNotEmpty(sourceExpression)) && 
+        			(StringUtils.isNotEmpty(target) || StringUtils.isNotEmpty(targetExpression))) {
+        		
 	        	IOParameter parameter = new IOParameter();
-	        	parameter.setSource(source);
-	        	parameter.setTarget(target);
+	        	if(StringUtils.isNotEmpty(sourceExpression)) {
+	        		parameter.setSourceExpression(sourceExpression);
+	        	} else {
+	        		parameter.setSource(source);
+	        	}
+	        	
+	        	if(StringUtils.isNotEmpty(targetExpression)) {
+	        		parameter.setTargetExpression(targetExpression);
+	        	} else {
+	        		parameter.setTarget(target);
+	        	}
 	          callActivity.getOutParameters().add(parameter);
         	}  
           
@@ -1171,10 +1207,10 @@ public class BpmnParser {
 				while (readyWithFieldExtension == false && xtr.hasNext()) {
 					xtr.next();
 					if (xtr.isStartElement() && "string".equalsIgnoreCase(xtr.getLocalName())) {
-						return readStringWithLineBreak(xtr.getElementText());
+						return xtr.getElementText().trim();
 
 					} else if (xtr.isStartElement() && "expression".equalsIgnoreCase(xtr.getLocalName())) {
-						return readStringWithLineBreak(xtr.getElementText().trim());
+						return xtr.getElementText().trim();
 
 					} else if (xtr.isEndElement() && "field".equalsIgnoreCase(xtr.getLocalName())) {
 						return null;
@@ -1185,29 +1221,6 @@ public class BpmnParser {
 			}
 		}
 		return null;
-	}
-
-	private static String readStringWithLineBreak(String value) {
-		if (value == null)
-			return null;
-		List<String> lineList = new ArrayList<String>();
-		int startIndex = 0;
-		int endIndex = 0;
-		for (int i = 0; i < value.length(); i++) {
-			if (value.charAt(i) == '\n') {
-				endIndex = i;
-				lineList.add(value.substring(startIndex, endIndex).trim());
-				startIndex = i + 1;
-			}
-		}
-		StringBuilder lineBuilder = new StringBuilder();
-		for (String string : lineList) {
-			if (lineBuilder.length() > 0) {
-				lineBuilder.append("\n");
-			}
-			lineBuilder.append(string);
-		}
-		return lineBuilder.toString();
 	}
 
 	private static List<ActivitiListener> parseListeners(XMLStreamReader xtr) {
@@ -1261,12 +1274,15 @@ public class BpmnParser {
 
 	private static ActivitiListener parseListener(XMLStreamReader xtr) {
 		ActivitiListener listener = new ActivitiListener();
-		if (xtr.getAttributeValue(null, "class") != null) {
+		if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, "class"))) {
 			listener.setImplementation(xtr.getAttributeValue(null, "class"));
 			listener.setImplementationType(CLASS_TYPE);
-		} else if (xtr.getAttributeValue(null, "expression") != null) {
+		} else if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, "expression"))) {
 			listener.setImplementation(xtr.getAttributeValue(null, "expression"));
 			listener.setImplementationType(EXPRESSION_TYPE);
+		} else if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, "delegateExpression"))) {
+			listener.setImplementation(xtr.getAttributeValue(null, "delegateExpression"));
+			listener.setImplementationType(DELEGATE_EXPRESSION_TYPE);
 		}
 		listener.setEvent(xtr.getAttributeValue(null, "event"));
 		return listener;
@@ -1468,7 +1484,7 @@ public class BpmnParser {
 					break;
 
 				} else if (xtr.isStartElement() && "timeDate".equalsIgnoreCase(xtr.getLocalName())) {
-					((TimerEventDefinition) eventDefinition).setTimeDate(new SimpleDateFormat().parse(xtr.getElementText()));
+					((TimerEventDefinition) eventDefinition).setTimeDate(xtr.getElementText());
 					break;
 
 				} else if (xtr.isStartElement() && "timeCycle".equalsIgnoreCase(xtr.getLocalName())) {
@@ -1511,7 +1527,7 @@ public class BpmnParser {
 
 				} else if (xtr.isStartElement() && "timeDate".equalsIgnoreCase(xtr.getLocalName())) {
 					TimerEventDefinition eventDef = new TimerEventDefinition();
-					eventDef.setTimeDate(new SimpleDateFormat().parse(xtr.getElementText()));
+					eventDef.setTimeDate(xtr.getElementText());
 					catchEvent.getEventDefinitions().add(eventDef);
 					readyWithEvent = true;
 

@@ -4,8 +4,6 @@ import org.activiti.designer.ActivitiImageProvider;
 import org.activiti.designer.bpmn2.model.Activity;
 import org.activiti.designer.bpmn2.model.BoundaryEvent;
 import org.activiti.designer.bpmn2.model.FlowElement;
-import org.activiti.designer.bpmn2.model.SubProcess;
-import org.activiti.designer.bpmn2.model.Task;
 import org.activiti.designer.bpmn2.model.TimerEventDefinition;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
@@ -21,8 +19,7 @@ public class CreateBoundaryTimerFeature extends AbstractCreateBPMNFeature {
 
 	public boolean canCreate(ICreateContext context) {
 	  Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-    if (parentObject instanceof SubProcess == true ||
-            parentObject instanceof Task == true) {
+    if (parentObject instanceof Activity == true) {
       
       return true;
     }

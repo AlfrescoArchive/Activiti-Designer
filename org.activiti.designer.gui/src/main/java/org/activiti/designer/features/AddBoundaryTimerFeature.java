@@ -1,9 +1,8 @@
 package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
+import org.activiti.designer.bpmn2.model.Activity;
 import org.activiti.designer.bpmn2.model.BoundaryEvent;
-import org.activiti.designer.bpmn2.model.SubProcess;
-import org.activiti.designer.bpmn2.model.Task;
 import org.activiti.designer.util.style.StyleUtil;
 import org.eclipse.graphiti.datatypes.ILocation;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -94,7 +93,7 @@ public class AddBoundaryTimerFeature extends AbstractAddShapeFeature {
   @Override
   public boolean canAdd(IAddContext context) {
     Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-    if (parentObject instanceof SubProcess == false && parentObject instanceof Task == false) {
+    if (parentObject instanceof Activity == false) {
       return false;
     }
     if (context.getNewObject() instanceof BoundaryEvent == false) {

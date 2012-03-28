@@ -30,7 +30,6 @@ import org.eclipse.graphiti.mm.pictograms.Connection;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
 
 /**
@@ -77,39 +76,28 @@ public abstract class AbstractCreateBPMNFeature extends AbstractCreateFeature {
 		PictogramElement element = addGraphicalRepresentation(context, targetElement);
 		createConnectionIfNeeded(element, context);
 		
+		Anchor elementAnchor = null;
+    EList<Anchor> anchorList = ((ContainerShape) element).getAnchors();
+    for (Anchor anchor : anchorList) {
+      if(anchor instanceof ChopboxAnchor) {
+      	elementAnchor = anchor;
+        break;
+      }
+    }
+		
 		if(context.getProperty("org.activiti.designer.changetype.sourceflows") != null) {
   		List<SequenceFlow> sourceFlows = (List<SequenceFlow>) context.getProperty("org.activiti.designer.changetype.sourceflows");
   		for (SequenceFlow sourceFlow : sourceFlows) {
   			sourceFlow.setSourceRef((FlowNode) targetElement);
+  			Connection connection = (Connection) getFeatureProvider().getPictogramElementForBusinessObject(sourceFlow);
+  			connection.setStart(elementAnchor);
+      	elementAnchor.getOutgoingConnections().add(connection);
       }
   		List<SequenceFlow> targetFlows = (List<SequenceFlow>) context.getProperty("org.activiti.designer.changetype.targetflows");
   		for (SequenceFlow targetFlow : targetFlows) {
   			targetFlow.setTargetRef((FlowNode) targetElement);
-      }
-  		
-  		Anchor elementAnchor = null;
-      for (Shape shape : context.getTargetContainer().getChildren()) {
-        FlowNode flowNode = (FlowNode) getBusinessObjectForPictogramElement(shape.getGraphicsAlgorithm().getPictogramElement());
-        if(flowNode == null || flowNode.getId() == null) continue;
-        if(flowNode.getId().equals(targetElement.getId())) {
-          EList<Anchor> anchorList = ((ContainerShape) shape).getAnchors();
-          for (Anchor anchor : anchorList) {
-            if(anchor instanceof ChopboxAnchor) {
-            	elementAnchor = anchor;
-              break;
-            }
-          }
-        }
-      }
-      
-      List<Connection> sourceConnections = (List<Connection>) context.getProperty("org.activiti.designer.changetype.sourceconnections");
-      for (Connection connection : sourceConnections) {
-      	connection.setStart(elementAnchor);
-      	elementAnchor.getOutgoingConnections().add(connection);
-      }
-      List<Connection> targetConnections = (List<Connection>) context.getProperty("org.activiti.designer.changetype.targetconnections");
-      for (Connection connection : targetConnections) {
-      	connection.setEnd(elementAnchor);
+  			Connection connection = (Connection) getFeatureProvider().getPictogramElementForBusinessObject(targetFlow);
+  			connection.setEnd(elementAnchor);
       	elementAnchor.getIncomingConnections().add(connection);
       }
 		}

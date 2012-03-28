@@ -39,6 +39,9 @@ public class Bpmn2DiagramCreator {
 
 		final Diagram diagram = Graphiti.getPeCreateService().createDiagram(
 		    "BPMNdiagram", diagramFile.getFullPath().removeFileExtension().lastSegment(), true);
+		// permanently hide grid on diagram
+		//diagram.setGridUnit(0);
+		//diagram.setVerticalGridUnit(0);
 		uri = URI.createPlatformResourceURI(diagramFile.getFullPath().toString(), true);
 		
 		if(contentFileName != null) {

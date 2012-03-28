@@ -46,10 +46,6 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
  */
 public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
 
-  private static final int WORK_VALIDATION = 40;
-  private static final int WORK_EXPORT = 60;
-  private static final int WORK_TOTAL = WORK_VALIDATION + WORK_EXPORT;
-
   private Bpmn2MemoryModel model;
   private String modelFileName;
   private IFeatureProvider featureProvider;
@@ -98,13 +94,13 @@ public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
       xtw.writeStartElement("process");
       xtw.writeAttribute("id", model.getProcess().getId());
       xtw.writeAttribute("name", model.getProcess().getName());
-      ExecutionListenerExport.createExecutionListenerXML(model.getProcess().getExecutionListeners(), true, xtw);
       if (StringUtils.isNotEmpty(model.getProcess().getDocumentation())) {
 
         xtw.writeStartElement("documentation");
         xtw.writeCharacters(model.getProcess().getDocumentation());
         xtw.writeEndElement();
       }
+      ExecutionListenerExport.createExecutionListenerXML(model.getProcess().getExecutionListeners(), true, xtw);
       
       for (FlowElement flowElement : model.getProcess().getFlowElements()) {
       	PictogramElement picElement = featureProvider.getPictogramElementForBusinessObject(flowElement);

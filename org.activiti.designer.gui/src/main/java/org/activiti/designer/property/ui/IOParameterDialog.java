@@ -1,5 +1,6 @@
 package org.activiti.designer.property.ui;
 
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
@@ -21,21 +22,28 @@ import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 public class IOParameterDialog extends Dialog implements ITabbedPropertyConstants {
 	
 	public String source;
+	public String sourceExpression;
 	public String target;
+	public String targetExpression;
 	
 	protected String savedSource;
+	protected String savedSourceExpression;
 	protected String savedTarget;
+	protected String savedTargetExpression;
 
 	public IOParameterDialog(Shell parent, TableItem[] fieldList) {
 		// Pass the default styles here
 		this(parent, fieldList, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
 	}
 	
-	public IOParameterDialog(Shell parent, TableItem[] fieldList, String savedSource, String savedTarget) {
+	public IOParameterDialog(Shell parent, TableItem[] fieldList, String savedSource, String savedSourceExpression,
+			String savedTarget, String savedTargetExpression) {
     // Pass the default styles here
     this(parent, fieldList, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
     this.savedSource = savedSource;
+    this.savedSourceExpression = savedSourceExpression;
     this.savedTarget = savedTarget;
+    this.savedTargetExpression = savedTargetExpression;
   }
 
 	public IOParameterDialog(Shell parent, TableItem[] fieldList, int style) {
@@ -94,6 +102,18 @@ public class IOParameterDialog extends Dialog implements ITabbedPropertyConstant
     
     createLabel("Source", shell, sourceText);
     
+    final Text sourceExpressionText = new Text(shell, SWT.BORDER);
+	  if(savedSourceExpression != null) {
+	  	sourceExpressionText.setText(savedSourceExpression);
+	  }
+    data = new FormData();
+    data.left = new FormAttachment(0, 120);
+    data.right = new FormAttachment(70, 0);
+    data.top = new FormAttachment(sourceText, 10);
+    sourceExpressionText.setLayoutData(data);
+    
+    createLabel("Source expression", shell, sourceExpressionText);
+    
     final Text targetText = new Text(shell, SWT.BORDER);
     if(savedTarget != null) {
       targetText.setText(savedTarget);
@@ -101,10 +121,22 @@ public class IOParameterDialog extends Dialog implements ITabbedPropertyConstant
     data = new FormData();
     data.left = new FormAttachment(0, 120);
     data.right = new FormAttachment(70, 0);
-    data.top = new FormAttachment(sourceText, 10);
+    data.top = new FormAttachment(sourceExpressionText, 10);
     targetText.setLayoutData(data);
     
     createLabel("Target", shell, targetText);
+    
+    final Text targetExpressionText = new Text(shell, SWT.BORDER);
+    if(savedTargetExpression != null) {
+    	targetExpressionText.setText(savedTargetExpression);
+    }
+    data = new FormData();
+    data.left = new FormAttachment(0, 120);
+    data.right = new FormAttachment(70, 0);
+    data.top = new FormAttachment(targetText, 10);
+    targetExpressionText.setLayoutData(data);
+    
+    createLabel("Target expression", shell, targetExpressionText);
     
     // Create the cancel button and add a handler
     // so that pressing it will set input to null
@@ -113,7 +145,7 @@ public class IOParameterDialog extends Dialog implements ITabbedPropertyConstant
     data = new FormData();
     data.left = new FormAttachment(0, 120);
     data.right = new FormAttachment(50, 0);
-    data.top = new FormAttachment(targetText, 20);
+    data.top = new FormAttachment(targetExpressionText, 20);
     cancel.setLayoutData(data);
     cancel.addSelectionListener(new SelectionAdapter() {
       public void widgetSelected(SelectionEvent event) {
@@ -130,16 +162,18 @@ public class IOParameterDialog extends Dialog implements ITabbedPropertyConstant
 		ok.setLayoutData(data);
 		ok.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				if(sourceText.getText() == null || sourceText.getText().length() == 0) {
-					MessageDialog.openError(shell, "Validation error", "Source must be filled.");
+				if(StringUtils.isEmpty(sourceText.getText()) && StringUtils.isEmpty(sourceExpressionText.getText())) {
+					MessageDialog.openError(shell, "Validation error", "Source or source expression must be filled.");
 					return;
 				}
-				if(targetText.getText() == null || targetText.getText().length() == 0) {
-          MessageDialog.openError(shell, "Validation error", "Target must be filled.");
+				if(StringUtils.isEmpty(targetText.getText()) && StringUtils.isEmpty(targetExpressionText.getText())) {
+          MessageDialog.openError(shell, "Validation error", "Target or target expression must be filled.");
           return;
         }
 				source = sourceText.getText();
+				sourceExpression = sourceExpressionText.getText();
 				target = targetText.getText();
+				targetExpression = targetExpressionText.getText();
 				shell.close();
 			}
 		});

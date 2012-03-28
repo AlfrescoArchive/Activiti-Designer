@@ -1,5 +1,6 @@
 package org.activiti.designer.diagram;
 
+import org.activiti.designer.bpmn2.model.Activity;
 import org.activiti.designer.bpmn2.model.BoundaryEvent;
 import org.activiti.designer.bpmn2.model.BusinessRuleTask;
 import org.activiti.designer.bpmn2.model.CallActivity;
@@ -69,8 +70,10 @@ import org.activiti.designer.features.CreateUserTaskFeature;
 import org.activiti.designer.features.DeleteFlowElementFeature;
 import org.activiti.designer.features.DeleteSequenceFlowFeature;
 import org.activiti.designer.features.DirectEditFlowElementFeature;
+import org.activiti.designer.features.MoveActivityFeature;
 import org.activiti.designer.features.MoveBoundaryEventFeature;
 import org.activiti.designer.features.PasteFlowElementFeature;
+import org.activiti.designer.features.ReconnectSequenceFlowFeature;
 import org.activiti.designer.features.SaveBpmnModelFeature;
 import org.activiti.designer.features.SubProcessResizeFeature;
 import org.activiti.designer.features.TaskResizeFeature;
@@ -86,6 +89,7 @@ import org.eclipse.graphiti.features.IDirectEditingFeature;
 import org.eclipse.graphiti.features.IFeature;
 import org.eclipse.graphiti.features.IMoveShapeFeature;
 import org.eclipse.graphiti.features.IPasteFeature;
+import org.eclipse.graphiti.features.IReconnectionFeature;
 import org.eclipse.graphiti.features.IResizeShapeFeature;
 import org.eclipse.graphiti.features.IUpdateFeature;
 import org.eclipse.graphiti.features.context.IAddContext;
@@ -96,6 +100,7 @@ import org.eclipse.graphiti.features.context.IDirectEditingContext;
 import org.eclipse.graphiti.features.context.IMoveShapeContext;
 import org.eclipse.graphiti.features.context.IPasteContext;
 import org.eclipse.graphiti.features.context.IPictogramElementContext;
+import org.eclipse.graphiti.features.context.IReconnectionContext;
 import org.eclipse.graphiti.features.context.IResizeShapeContext;
 import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
@@ -237,6 +242,11 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 	}
 	
 	@Override
+	public IReconnectionFeature getReconnectionFeature(IReconnectionContext context) {
+	  return new ReconnectSequenceFlowFeature(this);
+	}
+	
+	@Override
 	public IUpdateFeature getUpdateFeature(IUpdateContext context) {
 		PictogramElement pictogramElement = context.getPictogramElement();
 		if (pictogramElement instanceof ContainerShape) {
@@ -282,6 +292,10 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
     Object bo = getBusinessObjectForPictogramElement(shape);
     if(bo instanceof BoundaryEvent) {
       return new MoveBoundaryEventFeature(this);
+    
+    } else if (bo instanceof Activity) {
+    	// in case an activity is moved, make sure, attached boundary events will move too
+    	return new MoveActivityFeature(this);
     }
     return super.getMoveShapeFeature(context);
   }

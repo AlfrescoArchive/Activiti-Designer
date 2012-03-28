@@ -84,7 +84,7 @@
                uri="xsd/BPMN20.xsd"/> 
          <uri
                name="http://activiti.org/bpmn" 
-               uri="xsd/activiti-bpmn-extensions-5.2.xsd"/> 
+               uri="xsd/activiti-bpmn-extensions-5.4.xsd"/> 
       </catalogContribution> 
  </extension>
  <extension

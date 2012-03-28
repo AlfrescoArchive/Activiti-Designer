@@ -1,7 +1,6 @@
 package org.activiti.designer.bpmn2.model;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 public class UserTask extends Task {
@@ -9,7 +8,7 @@ public class UserTask extends Task {
 	protected String assignee;
 	protected Integer priority;
 	protected String formKey;
-	protected Date dueDate;
+	protected String dueDate;
 	protected List<String> candidateUsers = new ArrayList<String>();
 	protected List<String> candidateGroups = new ArrayList<String>();
 	protected List<FormProperty> formProperties = new ArrayList<FormProperty>();
@@ -33,10 +32,10 @@ public class UserTask extends Task {
 	public void setFormKey(String formKey) {
   	this.formKey = formKey;
   }
-	public Date getDueDate() {
+	public String getDueDate() {
   	return dueDate;
   }
-	public void setDueDate(Date dueDate) {
+	public void setDueDate(String dueDate) {
   	this.dueDate = dueDate;
   }
 	public List<String> getCandidateUsers() {

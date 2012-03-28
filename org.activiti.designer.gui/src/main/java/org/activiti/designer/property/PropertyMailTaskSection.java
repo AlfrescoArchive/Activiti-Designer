@@ -25,6 +25,7 @@ public class PropertyMailTaskSection extends ActivitiPropertySection implements 
 	private Text subjectText;
 	private Text ccText;
 	private Text bccText;
+	private Text charsetText;
 	private Text htmlText;
 	private Text nonHtmlText;
 
@@ -45,7 +46,9 @@ public class PropertyMailTaskSection extends ActivitiPropertySection implements 
 		createLabel(composite, "Cc:", ccText); //$NON-NLS-1$
 		bccText = createControl(composite, ccText, false);
 		createLabel(composite, "Bcc:", bccText); //$NON-NLS-1$
-		htmlText = createControl(composite, bccText, true);
+		charsetText = createControl(composite, bccText, false);
+		createLabel(composite, "Charset:", charsetText); //$NON-NLS-1$
+		htmlText = createControl(composite, charsetText, true);
 		createLabel(composite, "Html text:", htmlText); //$NON-NLS-1$
 		nonHtmlText = createControl(composite, htmlText, true);
 		createLabel(composite, "Non-Html text:", nonHtmlText); //$NON-NLS-1$
@@ -93,6 +96,7 @@ public class PropertyMailTaskSection extends ActivitiPropertySection implements 
 			subjectText.removeFocusListener(listener);
 			ccText.removeFocusListener(listener);
 			bccText.removeFocusListener(listener);
+			charsetText.removeFocusListener(listener);
 			htmlText.removeFocusListener(listener);
 			nonHtmlText.removeFocusListener(listener);
 			Object bo = getBusinessObject(pe);
@@ -106,6 +110,7 @@ public class PropertyMailTaskSection extends ActivitiPropertySection implements 
 			subjectText.setText(mailTask.getSubject() == null ? "" : mailTask.getSubject());
 			ccText.setText(mailTask.getCc() == null ? "" : mailTask.getCc());
 			bccText.setText(mailTask.getBcc() == null ? "" : mailTask.getBcc());
+			charsetText.setText(mailTask.getCharset() == null ? "" : mailTask.getCharset());
 			htmlText.setText(mailTask.getHtml() == null ? "" : mailTask.getHtml());
 			nonHtmlText.setText(mailTask.getText() == null ? "" : mailTask.getText());
 			
@@ -114,6 +119,7 @@ public class PropertyMailTaskSection extends ActivitiPropertySection implements 
 			subjectText.addFocusListener(listener);
 			ccText.addFocusListener(listener);
 			bccText.addFocusListener(listener);
+			charsetText.addFocusListener(listener);
 			htmlText.addFocusListener(listener);
 			nonHtmlText.addFocusListener(listener);
 		}
@@ -134,27 +140,14 @@ public class PropertyMailTaskSection extends ActivitiPropertySection implements 
 					ActivitiUiUtil.runModelChange(new Runnable() {
 						public void run() {
 							MailTask mailTask = (MailTask)  bo;
-							if (toText.getText() != null) {
-								mailTask.setTo(toText.getText());
-							}
-							if (fromText.getText() != null) {
-								mailTask.setFrom(fromText.getText());
-							}
-							if (subjectText.getText() != null) {
-								mailTask.setSubject(subjectText.getText());
-							}
-							if (ccText.getText() != null) {
-								mailTask.setCc(ccText.getText());
-							}
-							if (bccText.getText() != null) {
-								mailTask.setBcc(bccText.getText());
-							}
-							if (htmlText.getText() != null) {
-								mailTask.setHtml(htmlText.getText());
-							}
-							if (nonHtmlText.getText() != null) {
-								mailTask.setText(nonHtmlText.getText());
-							}
+							mailTask.setTo(toText.getText());
+							mailTask.setFrom(fromText.getText());
+							mailTask.setSubject(subjectText.getText());
+							mailTask.setCc(ccText.getText());
+							mailTask.setBcc(bccText.getText());
+							mailTask.setCharset(charsetText.getText());
+							mailTask.setHtml(htmlText.getText());
+							mailTask.setText(nonHtmlText.getText());
 						}
 					}, editingDomain, "Model Update");
 				}

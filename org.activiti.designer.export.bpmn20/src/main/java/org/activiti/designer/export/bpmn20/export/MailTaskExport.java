@@ -127,25 +127,28 @@ public class MailTaskExport implements ActivitiNamespaceConstants {
     xtw.writeStartElement("extensionElements");
     ExecutionListenerExport.createExecutionListenerXML(mailTask.getExecutionListeners(), false, xtw);
 
-    if (mailTask.getTo() != null && mailTask.getTo().length() > 0) {
+    if (StringUtils.isNotEmpty(mailTask.getTo())) {
     	writeField("to", mailTask.getTo(), xtw);
     }
-    if (mailTask.getFrom() != null && mailTask.getFrom().length() > 0) {
+    if (StringUtils.isNotEmpty(mailTask.getFrom())) {
     	writeField("from", mailTask.getFrom(), xtw);
     }
-    if (mailTask.getSubject() != null && mailTask.getSubject().length() > 0) {
+    if (StringUtils.isNotEmpty(mailTask.getSubject())) {
     	writeField("subject", mailTask.getSubject(), xtw);
     }
-    if (mailTask.getCc() != null && mailTask.getCc().length() > 0) {
+    if (StringUtils.isNotEmpty(mailTask.getCc())) {
     	writeField("cc", mailTask.getCc(), xtw);
     }
-    if (mailTask.getBcc() != null && mailTask.getBcc().length() > 0) {
+    if (StringUtils.isNotEmpty(mailTask.getBcc())) {
     	writeField("bcc", mailTask.getBcc(), xtw);
     }
-    if (mailTask.getHtml() != null && mailTask.getHtml().length() > 0) {
+    if (StringUtils.isNotEmpty(mailTask.getCharset())) {
+    	writeField("charset", mailTask.getCharset(), xtw);
+    }
+    if (StringUtils.isNotEmpty(mailTask.getHtml())) {
     	writeCDataField("html", mailTask.getHtml(), xtw);
     }
-    if (mailTask.getText() != null && mailTask.getText().length() > 0) {
+    if (StringUtils.isNotEmpty(mailTask.getText())) {
     	writeCDataField("text", mailTask.getText(), xtw);
     }
     xtw.writeEndElement();

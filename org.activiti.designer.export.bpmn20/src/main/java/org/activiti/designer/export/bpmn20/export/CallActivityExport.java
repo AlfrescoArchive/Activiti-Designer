@@ -17,6 +17,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.activiti.designer.bpmn2.model.CallActivity;
 import org.activiti.designer.bpmn2.model.IOParameter;
+import org.apache.commons.lang.StringUtils;
 
 
 /**
@@ -76,14 +77,14 @@ public class CallActivityExport implements ActivitiNamespaceConstants {
   
   private static void writeParameter(IOParameter parameter, String name, XMLStreamWriter xtw) throws Exception {
     xtw.writeStartElement(ACTIVITI_EXTENSIONS_PREFIX, name, ACTIVITI_EXTENSIONS_NAMESPACE);
-    if(parameter.getSource().contains("${") == true) {
-      xtw.writeAttribute("sourceExpression", parameter.getSource());
-    } else {
+    if(StringUtils.isNotEmpty(parameter.getSourceExpression())) {
+      xtw.writeAttribute("sourceExpression", parameter.getSourceExpression());
+    } else if(StringUtils.isNotEmpty(parameter.getSource())){
       xtw.writeAttribute("source", parameter.getSource());
     }
-    if(parameter.getTarget().contains("${") == true) {
-      xtw.writeAttribute("targetExpression", parameter.getTarget());
-    } else {
+    if(StringUtils.isNotEmpty(parameter.getTargetExpression())) {
+      xtw.writeAttribute("targetExpression", parameter.getTargetExpression());
+    } else if(StringUtils.isNotEmpty(parameter.getTarget())){
       xtw.writeAttribute("target", parameter.getTarget());
     }
     xtw.writeEndElement();

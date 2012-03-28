@@ -175,12 +175,12 @@
     </annotation>
     <simpleType>
       <restriction base="string">
-        <enumeration value="mail"/>
+        <enumeration value="shell"/>
       </restriction>
     </simpleType>
   </attribute>
   
-  <attribute name="resultVariableName" type="string">
+  <attribute name="resultVariable" type="string">
     <annotation>
       <documentation>
         Attribute on Service and Script Task corresponding with a process variable name.
@@ -242,6 +242,15 @@
       <documentation>
         User Task attribute to set the human performer of a user task.
         Also supports expressions that evaluate to a String.
+      </documentation>
+    </annotation>
+  </attribute>
+  
+  <attribute name="dueDate" type="tns:tExpression">
+    <annotation>
+      <documentation>
+        User Task attribute to set the task due date.
+        The expression should resolve to a value of typejava.util.Date.
       </documentation>
     </annotation>
   </attribute>
@@ -399,5 +408,24 @@
     </complexType>
   </element>
   
+  <attribute name="collection" type="string">
+    <annotation>
+      <documentation>
+        To be used on the multiInstanceLoopCharacteristics element, referencing a collection.
+        For each element in the collection, an instance will be created. Can be an expression 
+        or reference to a process variable.
+      </documentation>
+    </annotation>
+  </attribute>
+  
+  <attribute name="elementVariable" type="string">
+    <annotation>
+      <documentation>
+        To be used on the multiInstanceLoopCharacteristics element, used in conjunction with
+        the activiti:collection attribute. Denotes the name of the process variable that
+        will be set on each created instance, containing an element of the specified collection.
+      </documentation>
+    </annotation>
+  </attribute>
   
 </schema>

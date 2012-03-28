@@ -1,7 +1,5 @@
 package org.activiti.designer.property;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
@@ -218,12 +216,8 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
               
               String dueDate = dueDateText.getText();
               if (StringUtils.isNotEmpty(dueDate)) {
-                try {
-	                userTask.setDueDate(new SimpleDateFormat().parse(dueDate));
-                } catch (ParseException e) {
-	                // TODO Auto-generated catch block
-	                e.printStackTrace();
-                }
+                userTask.setDueDate(dueDate);
+                
               } else {
                 userTask.setDueDate(null);
               }

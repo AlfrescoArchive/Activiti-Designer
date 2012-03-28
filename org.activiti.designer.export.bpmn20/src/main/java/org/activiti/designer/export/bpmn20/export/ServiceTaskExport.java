@@ -19,6 +19,7 @@ import org.activiti.designer.bpmn2.model.CustomProperty;
 import org.activiti.designer.bpmn2.model.FieldExtension;
 import org.activiti.designer.bpmn2.model.ServiceTask;
 import org.activiti.designer.util.eclipse.ExtensionConstants;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * @author Tijs Rademakers
@@ -30,14 +31,14 @@ public class ServiceTaskExport implements ActivitiNamespaceConstants {
     // start ServiceTask element
     xtw.writeStartElement("serviceTask");
     xtw.writeAttribute("id", serviceTask.getId());
-    if (serviceTask.getName() != null) {
+    if (StringUtils.isNotEmpty(serviceTask.getName())) {
       xtw.writeAttribute("name", serviceTask.getName());
     }
     DefaultFlowExport.createDefaultFlow(serviceTask, xtw);
     AsyncActivityExport.createAsyncAttribute(serviceTask, xtw);
     ImplementationValueExport.writeImplementationValue(xtw, EXECUTION_LISTENER, serviceTask.getImplementationType(), serviceTask.getImplementation(), true);
 
-    if (serviceTask.getResultVariableName() != null && serviceTask.getResultVariableName().length() > 0) {
+    if (StringUtils.isNotEmpty(serviceTask.getResultVariableName())) {
       xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "resultVariableName", serviceTask.getResultVariableName());
     }
 

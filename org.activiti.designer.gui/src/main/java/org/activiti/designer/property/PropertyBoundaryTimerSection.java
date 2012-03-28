@@ -1,6 +1,5 @@
 package org.activiti.designer.property;
 
-import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.List;
 
@@ -142,12 +141,8 @@ public class PropertyBoundaryTimerSection extends ActivitiPropertySection implem
 							
 							String timeDate = timeDateText.getText();
               if (StringUtils.isNotEmpty(timeDate)) {
-                try {
-	                timerDefinition.setTimeDate(new SimpleDateFormat().parse(timeDate));
-                } catch (Exception e) {
-	                // TODO Auto-generated catch block
-	                e.printStackTrace();
-                }
+                timerDefinition.setTimeDate(timeDate);
+                
               } else {
               	timerDefinition.setTimeDate(null);
               }

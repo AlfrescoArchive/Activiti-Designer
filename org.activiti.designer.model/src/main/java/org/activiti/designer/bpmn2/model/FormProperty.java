@@ -7,7 +7,10 @@ public class FormProperty extends BaseElement {
 
 	protected String name;
 	protected String value;
+	protected String expression;
+	protected String variable;
 	protected String type;
+	protected String datePattern;
 	protected Boolean readable;
 	protected Boolean writeable;
 	protected Boolean required;
@@ -25,11 +28,29 @@ public class FormProperty extends BaseElement {
 	public void setValue(String value) {
   	this.value = value;
   }
+	public String getExpression() {
+  	return expression;
+  }
+	public void setExpression(String expression) {
+  	this.expression = expression;
+  }
+	public String getVariable() {
+  	return variable;
+  }
+	public void setVariable(String variable) {
+  	this.variable = variable;
+  }
 	public String getType() {
   	return type;
   }
 	public void setType(String type) {
   	this.type = type;
+  }
+	public String getDatePattern() {
+  	return datePattern;
+  }
+	public void setDatePattern(String datePattern) {
+  	this.datePattern = datePattern;
   }
 	public Boolean getReadable() {
   	return readable;

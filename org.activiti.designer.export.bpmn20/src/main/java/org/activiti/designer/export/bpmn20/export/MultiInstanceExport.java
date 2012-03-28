@@ -39,30 +39,17 @@ public class MultiInstanceExport implements ActivitiNamespaceConstants {
 	    // start multiInstance element
 	    xtw.writeStartElement("multiInstanceLoopCharacteristics");
 	    xtw.writeAttribute("isSequential", "" + multiInstanceDef.isSequential());
-	    if(multiInstanceDef.getInputDataItem() != null && multiInstanceDef.getInputDataItem().contains("${")) {
+	    if(StringUtils.isNotEmpty(multiInstanceDef.getInputDataItem())) {
 	      xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "collection", multiInstanceDef.getInputDataItem());
-	      if(multiInstanceDef.getElementVariable() != null && multiInstanceDef.getElementVariable().length() > 0) {
-	        xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "elementVariable", multiInstanceDef.getElementVariable());
-	      }
 	    }
+	    if(StringUtils.isNotEmpty(multiInstanceDef.getElementVariable())) {
+	    	xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "elementVariable", multiInstanceDef.getElementVariable());
+	    }
+	    
 	    if (StringUtils.isNotEmpty(multiInstanceDef.getLoopCardinality())) {
 	      xtw.writeStartElement("loopCardinality");
 	      xtw.writeCharacters(multiInstanceDef.getLoopCardinality());
 	      xtw.writeEndElement();
-	    }
-	    
-	    if (StringUtils.isNotEmpty(multiInstanceDef.getInputDataItem()) &&
-	            multiInstanceDef.getInputDataItem().contains("${") == false) {
-	      
-	      xtw.writeStartElement("loopDataInputRef");
-	      xtw.writeCharacters(multiInstanceDef.getInputDataItem());
-	      xtw.writeEndElement();
-	      
-	      if(StringUtils.isNotEmpty(multiInstanceDef.getElementVariable())) {
-	        xtw.writeStartElement("inputDataItem");
-	        xtw.writeAttribute("name", multiInstanceDef.getElementVariable());
-	        xtw.writeEndElement();
-	      }
 	    }
 	    
 	    if(StringUtils.isNotEmpty(multiInstanceDef.getCompletionCondition())) {

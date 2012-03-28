@@ -9,6 +9,7 @@ public class MailTask extends Task {
 	protected String from;
 	protected String cc;
 	protected String bcc;
+	protected String charset;
 	
 	public String getTo() {
   	return to;
@@ -51,5 +52,11 @@ public class MailTask extends Task {
   }
 	public void setBcc(String bcc) {
   	this.bcc = bcc;
+  }
+	public String getCharset() {
+  	return charset;
+  }
+	public void setCharset(String charset) {
+  	this.charset = charset;
   }
 }

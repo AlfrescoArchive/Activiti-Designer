@@ -28,6 +28,8 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -60,6 +62,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IURIEditorInput;
 import org.eclipse.ui.PartInitException;
 
 
@@ -83,6 +86,12 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 			} else if (input instanceof DiagramEditorInput) {
 				getModelPathFromInput((DiagramEditorInput) input);
 				input = createNewDiagramEditorInput();
+			} else if (input instanceof IURIEditorInput) {
+				IWorkspaceRoot wsRoot = ResourcesPlugin.getWorkspace().getRoot();
+        java.net.URI uri= ((IURIEditorInput) input).getURI();
+        String path = uri.getPath();
+        modelFile = wsRoot.getFile(new Path(path));
+        input = createNewDiagramEditorInput();
 			}
 
 		} catch (CoreException e) {
@@ -418,9 +427,9 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 	@Override
 	public void createPartControl(Composite parent) {
 	  super.createPartControl(parent);
-	  GraphicalViewer graphicalViewer = (GraphicalViewer) getAdapter(GraphicalViewer.class);
-    if (graphicalViewer != null && graphicalViewer.getEditPartRegistry() != null) {
-      ScalableFreeformRootEditPart rootEditPart = (ScalableFreeformRootEditPart) graphicalViewer.getEditPartRegistry().get(LayerManager.ID);
+	  // hides grid on diagram, but you can reenable it
+    if (getGraphicalViewer() != null && getGraphicalViewer().getEditPartRegistry() != null) {
+      ScalableFreeformRootEditPart rootEditPart = (ScalableFreeformRootEditPart) getGraphicalViewer().getEditPartRegistry().get(LayerManager.ID);
       IFigure gridFigure = ((LayerManager) rootEditPart).getLayer(LayerConstants.GRID_LAYER);
       gridFigure.setVisible(false);
     }

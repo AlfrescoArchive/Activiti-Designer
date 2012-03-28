@@ -1,8 +1,5 @@
 package org.activiti.designer.property;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-
 import org.activiti.designer.bpmn2.model.StartEvent;
 import org.activiti.designer.bpmn2.model.TimerEventDefinition;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
@@ -36,7 +33,6 @@ public class PropertyTimerStartEventSection extends ActivitiPropertySection impl
 
 		TabbedPropertySheetWidgetFactory factory = getWidgetFactory();
 		Composite composite = factory.createFlatFormComposite(parent);
-		FormData data;
 		
 		timeDurationText = createText(composite, factory, null);
 		createLabel(composite, "Time duration", timeDurationText, factory); //$NON-NLS-1$
@@ -108,12 +104,7 @@ public class PropertyTimerStartEventSection extends ActivitiPropertySection impl
 							
 							String timeDate = timeDateText.getText();
               if (timeDate != null) {
-                try {
-	                timerDefinition.setTimeDate(new SimpleDateFormat().parse(timeDate));
-                } catch (ParseException e) {
-	                // TODO Auto-generated catch block
-	                e.printStackTrace();
-                }
+                timerDefinition.setTimeDate(timeDate);
               }
               
               String timeCycle = timeCycleText.getText();

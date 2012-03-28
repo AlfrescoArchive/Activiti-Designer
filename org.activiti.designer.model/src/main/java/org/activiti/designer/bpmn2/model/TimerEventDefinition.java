@@ -1,17 +1,16 @@
 package org.activiti.designer.bpmn2.model;
 
-import java.util.Date;
 
 public class TimerEventDefinition extends EventDefinition {
 
-	protected Date timeDate;
+	protected String timeDate;
 	protected String timeDuration;
 	protected String timeCycle;
 	
-	public Date getTimeDate() {
+	public String getTimeDate() {
   	return timeDate;
   }
-	public void setTimeDate(Date timeDate) {
+	public void setTimeDate(String timeDate) {
   	this.timeDate = timeDate;
   }
 	public String getTimeDuration() {
