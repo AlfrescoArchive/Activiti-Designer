@@ -173,18 +173,6 @@ public class PropertyCallActivitySection extends ActivitiPropertySection impleme
         if (!openBpmnFile) {
           IFileEditorInput input = new FileEditorInput(activitiFile);
           PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(input, ActivitiBPMNDiagramConstants.DIAGRAM_EDITOR_ID);
-        } else {
-          boolean userChoice = MessageDialog
-                  .openConfirm(
-                          Display.getCurrent().getActiveShell(),
-                          "No diagram file found",
-                          String.format(
-                                  "The process with id '%s' was found in the workspace, but its matching diagram file with name '%s' appears to be missing. Would you like to open the BPMN 2.0 XML Editor instead?",
-                                  callElementText.getText(), activitiFilePath.lastSegment()));
-          if (userChoice) {
-            IFileEditorInput input = new FileEditorInput(resource);
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(input, ActivitiBPMNDiagramConstants.BPMN_EDITOR_ID);
-          }
         }
       } catch (PartInitException e) {
         String error = "Error while opening editor";

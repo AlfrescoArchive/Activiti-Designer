@@ -586,7 +586,9 @@ public class BpmnParser {
 			String assignee = xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "assignee");
 			userTask.setAssignee(assignee);
 
-		} else if (StringUtils.isNotEmpty(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "candidateUsers"))) {
+		} 
+		
+		if (StringUtils.isNotEmpty(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "candidateUsers"))) {
 			String expression = xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "candidateUsers");
 			String[] expressionList = null;
 			if (expression.contains(";")) {
@@ -598,7 +600,9 @@ public class BpmnParser {
 				userTask.getCandidateUsers().add(user);
 			}
 
-		} else if (StringUtils.isNotEmpty(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "candidateGroups"))) {
+		} 
+		
+		if (StringUtils.isNotEmpty(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "candidateGroups"))) {
 			String expression = xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "candidateGroups");
 			String[] expressionList = null;
 			if (expression.contains(";")) {
@@ -717,12 +721,12 @@ public class BpmnParser {
 					userTask.setLoopCharacteristics(multiInstanceDef);
 					parseMultiInstanceDef(multiInstanceDef, xtr);
 
-				} else if (xtr.isEndElement()
-				    && "userTask".equalsIgnoreCase(xtr.getLocalName())) {
+				} else if (xtr.isEndElement() && "userTask".equalsIgnoreCase(xtr.getLocalName())) {
 					readyWithUserTask = true;
 				}
 			}
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
 		return userTask;
 	}

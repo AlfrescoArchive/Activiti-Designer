@@ -41,18 +41,20 @@ public class UserTaskExport implements ActivitiNamespaceConstants {
     DefaultFlowExport.createDefaultFlow(userTask, xtw);
     AsyncActivityExport.createAsyncAttribute(userTask, xtw);
 
-    // TODO revisit once the designer supports mixing these
-    // configurations as they are now exclusive
     if (userTask.getAssignee() != null && userTask.getAssignee().length() > 0) {
       xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "assignee", userTask.getAssignee());
-    } else if (userTask.getCandidateUsers() != null && userTask.getCandidateUsers().size() > 0) {
+    } 
+    
+    if (userTask.getCandidateUsers().size() > 0) {
       Iterator<String> candidateUserIterator = userTask.getCandidateUsers().iterator();
       String candidateUsers = candidateUserIterator.next();
       while (candidateUserIterator.hasNext()) {
         candidateUsers += ", " + candidateUserIterator.next();
       }
       xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "candidateUsers", candidateUsers);
-    } else if (userTask.getCandidateGroups() != null && userTask.getCandidateGroups().size() > 0) {
+    } 
+    
+    if (userTask.getCandidateGroups().size() > 0) {
       Iterator<String> candidateGroupIterator = userTask.getCandidateGroups().iterator();
       String candidateGroups = candidateGroupIterator.next();
       while (candidateGroupIterator.hasNext()) {

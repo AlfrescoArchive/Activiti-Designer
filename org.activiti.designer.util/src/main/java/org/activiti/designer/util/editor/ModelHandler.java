@@ -1,6 +1,8 @@
 package org.activiti.designer.util.editor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.eclipse.emf.common.util.URI;
@@ -15,5 +17,17 @@ public class ModelHandler {
 	
 	public static Bpmn2MemoryModel getModel(URI uri) {
 		return modelMap.get(uri);
+	}
+	
+	public static void removeModel(URI uri) {
+		modelMap.remove(uri);
+	}
+	
+	public static List<String> getModelURIList() {
+		List<String> modelURIList = new ArrayList<String>();
+		for(Bpmn2MemoryModel model : modelMap.values()) {
+			modelURIList.add(model.getModelFile().getRawLocationURI().toString());
+		}
+		return modelURIList;
 	}
 }

@@ -1,6 +1,5 @@
 package org.activiti.designer.property.ui;
 
-import java.util.Iterator;
 import java.util.List;
 
 import org.activiti.designer.bpmn2.model.ActivitiListener;
@@ -202,53 +201,14 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
 	}
 	
 	private void setFieldsInListener(ActivitiListener listener, List<FieldExtensionModel> fieldList) {
-	  if(fieldList == null || fieldList.size() == 0) {
-	    if(listener != null && listener.getFieldExtensions() != null && 
-	            listener.getFieldExtensions().size() > 0) {
-	      
-  	    removeFieldExtensionsNotInList(listener.getFieldExtensions(), null);
+	  if(listener != null) {
+  		listener.getFieldExtensions().clear();
+		  for (FieldExtensionModel fieldModel : fieldList) {
+		    FieldExtension fieldExtension = new FieldExtension();
+		    listener.getFieldExtensions().add(fieldExtension);
+		    fieldExtension.setFieldName(fieldModel.fieldName);
+		    fieldExtension.setExpression(fieldModel.expression);
 	    }
-	    return;
 	  }
-	  for (FieldExtensionModel fieldModel : fieldList) {
-	    FieldExtension fieldExtension = fieldExtensionExists(listener.getFieldExtensions(), fieldModel.fieldName);
-	    if(fieldExtension == null) {
-	      fieldExtension = new FieldExtension();
-	      listener.getFieldExtensions().add(fieldExtension);
-	    }
-	    fieldExtension.setFieldName(fieldModel.fieldName);
-	    fieldExtension.setExpression(fieldModel.expression);
-    }
-	  removeFieldExtensionsNotInList(listener.getFieldExtensions(), fieldList);
-	}
-	
-	private FieldExtension fieldExtensionExists(List<FieldExtension> fieldList, String fieldname) {
-	  if(fieldList == null) return null;
-	  for(FieldExtension fieldExtension : fieldList) {
-      if(fieldname.equalsIgnoreCase(fieldExtension.getFieldName())) {
-        return fieldExtension;
-      }
-    }
-    return null;
-	}
-	
-	private void removeFieldExtensionsNotInList(List<FieldExtension> fieldList, List<FieldExtensionModel> newfieldList) {
-	  Iterator<FieldExtension> entryIterator = fieldList.iterator();
-    while(entryIterator.hasNext()) {
-      FieldExtension fieldExtension = entryIterator.next();
-      boolean found = false;
-      if(newfieldList != null && newfieldList.size() > 0) {
-        for (FieldExtensionModel field : newfieldList) {
-          if(field.fieldName.equals(fieldExtension.getFieldName())) {
-            found = true;
-            break;
-          }
-        }
-      }
-      if(found == false) {
-        diagram.eResource().getContents().remove(fieldExtension);
-        entryIterator.remove();
-      }
-    }
 	}
 }

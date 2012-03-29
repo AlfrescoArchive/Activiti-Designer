@@ -20,6 +20,7 @@ import org.activiti.designer.bpmn2.model.ActivitiListener;
 import org.activiti.designer.bpmn2.model.Activity;
 import org.activiti.designer.bpmn2.model.Process;
 import org.activiti.designer.bpmn2.model.SequenceFlow;
+import org.activiti.designer.bpmn2.model.UserTask;
 import org.activiti.designer.model.FieldExtensionModel;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
@@ -46,7 +47,9 @@ public class BpmnBOUtil {
 
   public static List<ActivitiListener> getListeners(Object bo) {
     List<ActivitiListener> listenerList = null;
-    if(bo instanceof Activity) {
+    if(bo instanceof UserTask) {
+    	listenerList = ((UserTask) bo).getTaskListeners();
+    } else if(bo instanceof Activity) {
       listenerList = ((Activity) bo).getExecutionListeners();
     } else if(bo instanceof SequenceFlow) {
       listenerList = ((SequenceFlow) bo).getExecutionListeners();
@@ -57,7 +60,9 @@ public class BpmnBOUtil {
   }
   
   public static void addListener(Object bo, ActivitiListener listener) {
-    if(bo instanceof Activity) {
+  	if(bo instanceof UserTask) {
+    	((UserTask) bo).getTaskListeners().add(listener);
+    } else if(bo instanceof Activity) {
       ((Activity) bo).getExecutionListeners().add(listener);
     } else if(bo instanceof SequenceFlow) {
       ((SequenceFlow) bo).getExecutionListeners().add(listener);
@@ -67,7 +72,9 @@ public class BpmnBOUtil {
   }
   
   public static void setListener(Object bo, ActivitiListener listener, int index) {
-    if(bo instanceof Activity) {
+  	if(bo instanceof UserTask) {
+    	((UserTask) bo).getTaskListeners().set(index, listener);
+    } else if(bo instanceof Activity) {
       ((Activity) bo).getExecutionListeners().set(index, listener);
     } else if(bo instanceof SequenceFlow) {
       ((SequenceFlow) bo).getExecutionListeners().set(index, listener);
@@ -77,7 +84,9 @@ public class BpmnBOUtil {
   }
   
   public static void removeListener(Object bo, ActivitiListener listener) {
-    if(bo instanceof Activity) {
+  	if(bo instanceof UserTask) {
+    	((UserTask) bo).getTaskListeners().remove(listener);
+    } else if(bo instanceof Activity) {
       ((Activity) bo).getExecutionListeners().remove(listener);
     } else if(bo instanceof SequenceFlow) {
       ((SequenceFlow) bo).getExecutionListeners().remove(listener);

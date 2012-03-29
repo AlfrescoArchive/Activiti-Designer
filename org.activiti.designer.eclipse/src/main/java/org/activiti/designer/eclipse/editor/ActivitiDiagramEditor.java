@@ -3,6 +3,7 @@ package org.activiti.designer.eclipse.editor;
 import java.awt.Point;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.List;
@@ -90,12 +91,35 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 				IWorkspaceRoot wsRoot = ResourcesPlugin.getWorkspace().getRoot();
         java.net.URI uri= ((IURIEditorInput) input).getURI();
         String path = uri.getPath();
-        modelFile = wsRoot.getFile(new Path(path));
-        input = createNewDiagramEditorInput();
+        if(wsRoot.getProject("import").exists() == false) {
+        	wsRoot.getProject("import").create(null);
+        }
+        wsRoot.getProject("import").open(null);
+        try {
+        	InputStream inputStream = new FileInputStream(path);
+        	String fileName = null;
+        	if(path.contains("/")) {
+        		fileName = path.substring(path.lastIndexOf("/") + 1);
+        	} else {
+        		fileName = path.substring(path.lastIndexOf("\\") + 1);
+        	}
+        	
+        	if(wsRoot.getProject("import").getFile(fileName).exists()) {
+        		wsRoot.getProject("import").getFile(fileName).delete(true, null);
+        	}
+        	
+        	wsRoot.getProject("import").getFile(fileName).create(inputStream, true, null);
+        	modelFile = wsRoot.getProject("import").getFile(fileName);
+        	input = createNewDiagramEditorInput();
+        } catch(Exception e) {
+        	e.printStackTrace();
+        	return;
+        }
 			}
 
 		} catch (CoreException e) {
 			e.printStackTrace();
+			return;
 		}
 		
 		super.init(site, input);
@@ -131,7 +155,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 		
 		try {
 			
-			String diagramFileString = modelFile.getLocationURI().getRawPath();
+			String diagramFileString = modelFile.getLocationURI().getPath();
 			
 			BPMN20ExportMarshaller marshaller = new BPMN20ExportMarshaller();
 			marshaller.marshallDiagram(ModelHandler.getModel(EcoreUtil.getURI(getDiagramTypeProvider().getDiagram())), 
@@ -151,11 +175,10 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 	@Override
 	protected void setInput(IEditorInput input) {
 		super.setInput(input);
-		Bpmn2MemoryModel model = new Bpmn2MemoryModel(getDiagramTypeProvider().getFeatureProvider(), "process1");
+		Bpmn2MemoryModel model = new Bpmn2MemoryModel(getDiagramTypeProvider().getFeatureProvider(), "process1", modelFile);
 		ModelHandler.addModel(EcoreUtil.getURI(getDiagramTypeProvider().getDiagram()), model);
 		
-		String filePath = modelFile.getLocationURI().getRawPath();
-		filePath = filePath.replaceAll("%20", " ");
+		String filePath = modelFile.getLocationURI().getPath();
 		File bpmnFile = new File(filePath);
     try {
     	if(bpmnFile.exists() == false) {
@@ -435,11 +458,6 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     }
 	}
 
-	/*@Override
-	protected DefaultPersistencyBehavior createPersistencyBehavior() {
-	  return new ActivitiDiagramEditorPersistenceBehavior(this);
-	}*/
-
 	@Override
 	protected ContextMenuProvider createContextMenuProvider() {
 		return new ActivitiEditorContextMenuProvider(getGraphicalViewer(),
@@ -453,6 +471,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 	@Override
 	public void dispose() {
 		super.dispose();
+		ModelHandler.removeModel(EcoreUtil.getURI(getDiagramTypeProvider().getDiagram()));
 		Bpmn2DiagramCreator.dispose(diagramFile);
 	}
 }

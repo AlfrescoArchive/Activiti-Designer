@@ -139,7 +139,7 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 		data.left = new FormAttachment(0, 160);
 		data.right = new FormAttachment(70, 0);
 		data.top = new FormAttachment(radioTypeComposite, VSPACE);
-		classNameText.setEnabled(false);
+		classNameText.setEnabled(true);
 		classNameText.setLayoutData(data);
 
 		classSelectButton = factory.createButton(composite, "Select class", SWT.PUSH);

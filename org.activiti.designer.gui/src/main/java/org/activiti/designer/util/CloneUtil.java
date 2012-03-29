@@ -3,6 +3,11 @@
  */
 package org.activiti.designer.util;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.activiti.designer.bpmn2.model.ActivitiListener;
+import org.activiti.designer.bpmn2.model.Activity;
 import org.activiti.designer.bpmn2.model.ComplexDataType;
 import org.activiti.designer.bpmn2.model.CustomProperty;
 import org.activiti.designer.bpmn2.model.DataGrid;
@@ -10,7 +15,10 @@ import org.activiti.designer.bpmn2.model.DataGridField;
 import org.activiti.designer.bpmn2.model.DataGridRow;
 import org.activiti.designer.bpmn2.model.EndEvent;
 import org.activiti.designer.bpmn2.model.ExclusiveGateway;
+import org.activiti.designer.bpmn2.model.FieldExtension;
 import org.activiti.designer.bpmn2.model.FlowElement;
+import org.activiti.designer.bpmn2.model.FormProperty;
+import org.activiti.designer.bpmn2.model.FormValue;
 import org.activiti.designer.bpmn2.model.InclusiveGateway;
 import org.activiti.designer.bpmn2.model.MailTask;
 import org.activiti.designer.bpmn2.model.ManualTask;
@@ -52,31 +60,119 @@ public final class CloneUtil {
 
   public static FlowElement clone(final FlowElement element, final Diagram diagram) {
 
+  	FlowElement cloneElement = null;
+  	List<FormProperty> formProperties = null;
+  	
     if (element instanceof StartEvent) {
-      return clone((StartEvent) element, diagram);
+    	cloneElement = clone((StartEvent) element, diagram);
+    	formProperties = ((StartEvent) element).getFormProperties();
     } else if (element instanceof ServiceTask) {
-      return clone((ServiceTask) element, diagram);
+    	cloneElement = clone((ServiceTask) element, diagram);
     } else if (element instanceof EndEvent) {
-      return clone((EndEvent) element, diagram);
+    	cloneElement = clone((EndEvent) element, diagram);
     } else if (element instanceof ExclusiveGateway) {
-      return clone((ExclusiveGateway) element, diagram);
+    	cloneElement = clone((ExclusiveGateway) element, diagram);
     } else if (element instanceof InclusiveGateway) {
-      return clone((InclusiveGateway) element, diagram);
+    	cloneElement = clone((InclusiveGateway) element, diagram);
     } else if (element instanceof MailTask) {
-      return clone((MailTask) element, diagram);
+    	cloneElement = clone((MailTask) element, diagram);
     } else if (element instanceof ManualTask) {
-      return clone((ManualTask) element, diagram);
+    	cloneElement = clone((ManualTask) element, diagram);
     } else if (element instanceof ParallelGateway) {
-      return clone((ParallelGateway) element, diagram);
+    	cloneElement = clone((ParallelGateway) element, diagram);
     } else if (element instanceof ScriptTask) {
-      return clone((ScriptTask) element, diagram);
+    	cloneElement = clone((ScriptTask) element, diagram);
     } else if (element instanceof UserTask) {
-      return clone((UserTask) element, diagram);
+    	cloneElement = clone((UserTask) element, diagram);
+    	formProperties = ((UserTask) element).getFormProperties();
+    	
+    	List<ActivitiListener> resultListenerList = new ArrayList<ActivitiListener>();
+    	for (ActivitiListener listener : ((UserTask) element).getTaskListeners()) {
+    		resultListenerList.add(clone(listener));
+    	}
+    	((UserTask) cloneElement).setTaskListeners(resultListenerList);
+    }
+    
+    if (element instanceof Activity && element instanceof UserTask == false) {
+    	List<ActivitiListener> resultListenerList = new ArrayList<ActivitiListener>();
+    	for (ActivitiListener listener : ((Activity) element).getExecutionListeners()) {
+    		resultListenerList.add(clone(listener));
+    	}
+    	((Activity) cloneElement).setExecutionListeners(resultListenerList);
+    }
+    
+    if (element instanceof Activity) {
+    	((Activity) cloneElement).setAsynchronous(((Activity) element).isAsynchronous());
+    	((Activity) cloneElement).setDefaultFlow(((Activity) element).getDefaultFlow());
+    }
+    
+    if(formProperties != null) {
+    	List<FormProperty> resultPropertyList = new ArrayList<FormProperty>();
+  		for (FormProperty formProperty : formProperties) {
+	      resultPropertyList.add(clone(formProperty));
+      }
+  		if(cloneElement instanceof UserTask) {
+  			((UserTask) cloneElement).setFormProperties(resultPropertyList);
+  		} else {
+  			((StartEvent) cloneElement).setFormProperties(resultPropertyList);
+  		}
+  	}
+    
+    if(cloneElement != null) {
+    	cloneElement.setName(element.getName());
+    	ModelHandler.getModel(EcoreUtil.getURI(diagram)).addFlowElement(cloneElement);
     }
 
-    return null;
+    return cloneElement;
 
   }
+  
+  private static ActivitiListener clone(final ActivitiListener listener) {
+  	ActivitiListener result = new ActivitiListener();
+  	result.setId(listener.getId());
+  	result.setEvent(listener.getEvent());
+  	result.setImplementation(listener.getImplementation());
+  	result.setImplementationType(listener.getImplementationType());
+  	result.setRunAs(listener.getRunAs());
+  	result.setScriptProcessor(listener.getScriptProcessor());
+  	
+  	List<FieldExtension> fieldList = new ArrayList<FieldExtension>();
+  	for (FieldExtension fieldExtension : listener.getFieldExtensions()) {
+  		FieldExtension resultField = new FieldExtension();
+  		resultField.setExpression(fieldExtension.getExpression());
+  		resultField.setFieldName(fieldExtension.getFieldName());
+  		fieldList.add(resultField);
+  	}
+  	result.setFieldExtensions(fieldList);
+  	
+  	return result;
+  }
+  
+  private static FormProperty clone(final FormProperty formProperty) {
+  	FormProperty result = new FormProperty();
+  	result.setId(formProperty.getId());
+  	result.setName(formProperty.getName());
+  	result.setType(formProperty.getType());
+  	result.setValue(formProperty.getValue());
+  	result.setExpression(formProperty.getExpression());
+  	result.setVariable(formProperty.getVariable());
+  	result.setDatePattern(formProperty.getDatePattern());
+  	result.setReadable(formProperty.getReadable());
+  	result.setRequired(formProperty.getRequired());
+  	result.setWriteable(formProperty.getWriteable());
+  	
+  	List<FormValue> resultValueList = new ArrayList<FormValue>();
+  	for (FormValue formValue : formProperty.getFormValues()) {
+	    FormValue resultValue = new FormValue();
+	    resultValue.setId(formValue.getId());
+	    resultValue.setName(formValue.getName());
+	    resultValueList.add(resultValue);
+    }
+  	result.setFormValues(resultValueList);
+  	
+  	return result;
+  }
+  
 
   /**
    * Clones a {@link StartEvent}.
@@ -86,16 +182,9 @@ public final class CloneUtil {
    * @return a clone of the original object
    */
   private static final StartEvent clone(final StartEvent original, final Diagram diagram) {
-
     StartEvent result = new StartEvent();
-
     result.setId(ActivitiUiUtil.getNextId(result.getClass(), CreateStartEventFeature.FEATURE_ID_KEY, diagram));
-    result.setName(original.getName());
-
-    ModelHandler.getModel(EcoreUtil.getURI(diagram)).addFlowElement(result);
-
     return result;
-
   }
 
   /**
@@ -106,14 +195,8 @@ public final class CloneUtil {
    * @return a clone of the original object
    */
   private static final EndEvent clone(final EndEvent original, final Diagram diagram) {
-
     EndEvent result = new EndEvent();
-
     result.setId(ActivitiUiUtil.getNextId(result.getClass(), CreateEndEventFeature.FEATURE_ID_KEY, diagram));
-    result.setName(original.getName());
-
-    ModelHandler.getModel(EcoreUtil.getURI(diagram)).addFlowElement(result);
-
     return result;
 
   }
@@ -126,14 +209,8 @@ public final class CloneUtil {
    * @return a clone of the original object
    */
   private static final ExclusiveGateway clone(final ExclusiveGateway original, final Diagram diagram) {
-
     ExclusiveGateway result = new ExclusiveGateway();
-
     result.setId(ActivitiUiUtil.getNextId(result.getClass(), CreateExclusiveGatewayFeature.FEATURE_ID_KEY, diagram));
-    result.setName(original.getName());
-    
-    ModelHandler.getModel(EcoreUtil.getURI(diagram)).addFlowElement(result);
-
     return result;
 
   }
@@ -146,16 +223,9 @@ public final class CloneUtil {
    * @return a clone of the original object
    */
   private static final InclusiveGateway clone(final InclusiveGateway original, final Diagram diagram) {
-
     InclusiveGateway result = new InclusiveGateway();
-
     result.setId(ActivitiUiUtil.getNextId(result.getClass(), CreateInclusiveGatewayFeature.FEATURE_ID_KEY, diagram));
-    result.setName(original.getName());
-    
-    ModelHandler.getModel(EcoreUtil.getURI(diagram)).addFlowElement(result);
-
     return result;
-
   }
 
   /**
@@ -166,11 +236,9 @@ public final class CloneUtil {
    * @return a clone of the original object
    */
   private static final MailTask clone(final MailTask original, final Diagram diagram) {
-
     MailTask result = new MailTask();
 
     result.setId(ActivitiUiUtil.getNextId(result.getClass(), CreateMailTaskFeature.FEATURE_ID_KEY, diagram));
-    result.setName(original.getName());
     result.setBcc(original.getBcc());
     result.setCc(original.getCc());
     result.setFrom(original.getFrom());
@@ -179,10 +247,7 @@ public final class CloneUtil {
     result.setText(original.getText());
     result.setTo(original.getTo());
 
-    ModelHandler.getModel(EcoreUtil.getURI(diagram)).addFlowElement(result);
-
     return result;
-
   }
 
   /**
@@ -193,16 +258,9 @@ public final class CloneUtil {
    * @return a clone of the original object
    */
   private static final ManualTask clone(final ManualTask original, final Diagram diagram) {
-
     ManualTask result = new ManualTask();
-
     result.setId(ActivitiUiUtil.getNextId(result.getClass(), CreateMailTaskFeature.FEATURE_ID_KEY, diagram));
-    result.setName(original.getName());
-
-    ModelHandler.getModel(EcoreUtil.getURI(diagram)).addFlowElement(result);
-
     return result;
-
   }
 
   /**
@@ -213,16 +271,9 @@ public final class CloneUtil {
    * @return a clone of the original object
    */
   private static final ParallelGateway clone(final ParallelGateway original, final Diagram diagram) {
-
     ParallelGateway result = new ParallelGateway();
-
     result.setId(ActivitiUiUtil.getNextId(result.getClass(), CreateParallelGatewayFeature.FEATURE_ID_KEY, diagram));
-    result.setName(original.getName());
-    
-    ModelHandler.getModel(EcoreUtil.getURI(diagram)).addFlowElement(result);
-
     return result;
-
   }
 
   /**
@@ -233,15 +284,11 @@ public final class CloneUtil {
    * @return a clone of the original object
    */
   private static final ScriptTask clone(final ScriptTask original, final Diagram diagram) {
-
     ScriptTask result = new ScriptTask();
 
     result.setId(ActivitiUiUtil.getNextId(result.getClass(), CreateScriptTaskFeature.FEATURE_ID_KEY, diagram));
-    result.setName(original.getName());
     result.setScript(original.getScript());
     result.setScriptFormat(original.getScriptFormat());
-
-    ModelHandler.getModel(EcoreUtil.getURI(diagram)).addFlowElement(result);
 
     return result;
 
@@ -255,18 +302,15 @@ public final class CloneUtil {
    * @return a clone of the original object
    */
   private static final UserTask clone(final UserTask original, final Diagram diagram) {
-
     UserTask result = new UserTask();
 
     result.setId(ActivitiUiUtil.getNextId(result.getClass(), CreateUserTaskFeature.FEATURE_ID_KEY, diagram));
-    result.setName(original.getName());
     result.setAssignee(original.getAssignee());
     result.setFormKey(original.getFormKey());
+    result.setDueDate(original.getDueDate());
+    result.setPriority(original.getPriority());
     
-    ModelHandler.getModel(EcoreUtil.getURI(diagram)).addFlowElement(result);
-
     return result;
-
   }
 
   /**
@@ -281,8 +325,6 @@ public final class CloneUtil {
     ServiceTask result = new ServiceTask();
 
     result.setId(ActivitiUiUtil.getNextId(result.getClass(), CreateServiceTaskFeature.FEATURE_ID_KEY, diagram));
-    result.setName(original.getName());
-
     result.setImplementation(original.getImplementation());
 
     for (CustomProperty property : original.getCustomProperties()) {
@@ -292,10 +334,7 @@ public final class CloneUtil {
       result.getCustomProperties().add(clone);
     }
 
-    ModelHandler.getModel(EcoreUtil.getURI(diagram)).addFlowElement(result);
-
     return result;
-
   }
 
   /**
@@ -306,18 +345,14 @@ public final class CloneUtil {
    * @return a clone of the original object
    */
   private static final CustomProperty clone(final CustomProperty original, final Diagram diagram) {
-
     CustomProperty result = new CustomProperty();
-
     result.setId(original.getId());
     if (original.getComplexValue() != null) {
       result.setComplexValue(clone(original.getComplexValue()));
     }
     result.setName(original.getName());
     result.setSimpleValue(original.getSimpleValue());
-
     return result;
-
   }
 
   private static ComplexDataType clone(ComplexDataType complexValue) {

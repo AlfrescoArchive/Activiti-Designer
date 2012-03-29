@@ -38,9 +38,6 @@ public class ActivitiSavePreferencesPageInitializer extends AbstractPreferenceIn
     // BPMN 2 Validator
     store.setDefault(Preferences.VALIDATE_ACTIVITI_BPMN_FORMAT.getPreferenceId(), true);
 
-    // BPMN 2 Marshaller behavior for validation failures
-    store.setDefault(Preferences.SKIP_BPMN_MARSHALLER_ON_VALIDATION_FAILURE.getPreferenceId(), ActivitiBPMNDiagramConstants.BPMN_MARSHALLER_VALIDATION_SKIP);
-
     // Image Marshaller
     store.setDefault(PreferencesUtil.getExportMarshallerPreferenceId(ActivitiBPMNDiagramConstants.IMAGE_MARSHALLER_NAME), true);
 

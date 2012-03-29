@@ -27,9 +27,7 @@ public class PropertyBusinessRuleTaskSection extends ActivitiPropertySection imp
   private Button excludedButton;
   private Button nonExcludedButton;
   private Text resultVariableNameText;
-
-  private Text documentationText;
-
+  
   @Override
   public void createControls(Composite parent, TabbedPropertySheetPage tabbedPropertySheetPage) {
     super.createControls(parent, tabbedPropertySheetPage);

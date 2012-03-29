@@ -3,11 +3,18 @@
  */
 package org.activiti.designer.features;
 
+import java.util.List;
+
 import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.util.CloneUtil;
+import org.activiti.designer.util.editor.Bpmn2MemoryModel;
+import org.activiti.designer.util.editor.ModelHandler;
+import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IPasteContext;
 import org.eclipse.graphiti.features.context.impl.AddContext;
+import org.eclipse.graphiti.features.context.impl.AreaContext;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
@@ -36,18 +43,13 @@ public class PasteFlowElementFeature extends AbstractPasteFeature {
     if (pes.length != 1 || !isPasteableContext(pes)) {
       return false;
     }
-
-    // can paste, if all objects on the clipboard are Flow elements
-    Object[] fromClipboard = getFromClipboard();
-    if (fromClipboard == null || fromClipboard.length == 0) {
-      return false;
+    
+    List<FlowElement> copyList = ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getClipboard();
+    if(copyList.size() > 0) {
+    	return true;
+    } else {
+    	return false;
     }
-    for (Object object : fromClipboard) {
-      if (!(object instanceof FlowElement)) {
-        return false;
-      }
-    }
-    return true;
   }
 
   private boolean isPasteableContext(PictogramElement[] pes) {
@@ -56,28 +58,21 @@ public class PasteFlowElementFeature extends AbstractPasteFeature {
 
   public void paste(IPasteContext context) {
     // we already verified, that we paste directly in the diagram
-    PictogramElement[] pes = context.getPictogramElements();
+  	Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+  	List<FlowElement> copyList = model.getClipboard();
 
-    Diagram diagram = null;
-    if (pes[0] instanceof Diagram) {
-      diagram = (Diagram) pes[0];
-    } else if (pes[0] instanceof ContainerShape) {
-      ContainerShape shape = (ContainerShape) pes[0];
-      diagram = (Diagram) shape.eContainer();
-    }
-
-    // get the FlowElement from the clipboard without copying them
-    // (only copy the pictogram element, not the business object)
-    // then create new pictogram elements using the add feature
-    Object[] objects = getFromClipboard();
-    for (Object object : objects) {
-      AddContext ac = new AddContext();
-
-      FlowElement clone = CloneUtil.clone((FlowElement) object, diagram);
-
-      ac.setLocation(CopyFlowElementFeature.copyX + PASTE_OFFSET, CopyFlowElementFeature.copyY + PASTE_OFFSET);
-      ac.setTargetContainer(diagram);
-      addGraphicalRepresentation(ac, clone);
+    for (FlowElement element : copyList) {
+      FlowElement clone = CloneUtil.clone(element, getDiagram());
+      
+      AddContext addContext = new AddContext(new AreaContext(), clone);
+			IAddFeature addFeature = getFeatureProvider().getAddFeature(addContext);
+			PictogramElement pictogram = getFeatureProvider().getPictogramElementForBusinessObject(element);
+      addContext.setLocation(pictogram.getGraphicsAlgorithm().getX() + PASTE_OFFSET, pictogram.getGraphicsAlgorithm().getY() + PASTE_OFFSET);
+      addContext.setSize(pictogram.getGraphicsAlgorithm().getWidth(), pictogram.getGraphicsAlgorithm().getHeight());
+      addContext.setTargetContainer(getDiagram());
+      if(addFeature.canAdd(addContext)) {
+	      addFeature.add(addContext);
+      }
     }
   }
 }

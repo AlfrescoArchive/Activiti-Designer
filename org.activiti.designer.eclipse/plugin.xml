@@ -70,6 +70,7 @@
          extensions="bpmn"
          icon="community_icon.png"
          id="org.activiti.designer.editor.diagramEditor"
+         matchingStrategy="org.activiti.designer.eclipse.editor.ActivitiDiagramMatchingStrategy"
          name="Activiti Diagram Editor">
       <contentTypeBinding
             contentTypeId="org.activiti.designer.editor.diagram.contenttype">
@@ -126,7 +127,4 @@
             class="org.activiti.designer.eclipse.preferences.ActivitiSavePreferencesPageInitializer">
       </initializer>
    </extension>
- 	<extension 
-   		point="org.eclipse.ui.popupMenus">
-</extension>
 </plugin>

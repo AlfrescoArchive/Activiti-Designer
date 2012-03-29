@@ -49,7 +49,6 @@ public class Bpmn2DiagramCreator {
 			IFile modelFile = getModelFile(new Path(uri.trimFragment().toPlatformString(true)));
 			String filePath = modelFile.getLocationURI().getRawPath();
 			filePath = filePath.replaceAll("%20", " ");
-	    System.out.println("filePath " + filePath);
 			try {
 			  OutputStream out = new FileOutputStream(filePath);
 				
@@ -130,7 +129,9 @@ public class Bpmn2DiagramCreator {
 		String name = fullPath.getFileExtension();
 		if (name == null || name.length() == 0)
 			name = "bpmn";
-		IFolder folder = root.getProject(fullPath.segment(0)).getFolder("." + name);
+		
+		String dir = fullPath.segment(0);
+		IFolder folder = root.getProject(dir).getFolder("." + name);
 		if (!folder.exists()) {
 			folder.create(true, true, null);
 		}

@@ -12,7 +12,6 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.jface.preference.BooleanFieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.RadioGroupFieldEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Group;
@@ -34,15 +33,8 @@ public class ActivitiSavePreferencesPage extends FieldEditorPreferencePage imple
       group.setText("Activiti BPMN 2.0");
       group.setLayoutData(new GridData(SWT.FILL, SWT.NULL, true, false));
 
-      addField(new BooleanFieldEditor(PreferencesUtil.getPreferenceId(bpmnMarshaller), "Automatically save to Activiti &BPMN 2.0 format when saving diagrams",
-              group));
-
       addField(new BooleanFieldEditor(Preferences.VALIDATE_ACTIVITI_BPMN_FORMAT.getPreferenceId(),
               "&Validate diagram before saving to Activiti BPMN 2.0 format", group));
-
-      addField(new RadioGroupFieldEditor(Preferences.SKIP_BPMN_MARSHALLER_ON_VALIDATION_FAILURE.getPreferenceId(), "Handling validation failures", 1,
-              new String[][] { { "Skip saving to BPMN 2.0 format if validation fails", ActivitiBPMNDiagramConstants.BPMN_MARSHALLER_VALIDATION_SKIP },
-                  { "Attempt to save to BPMN 2.0 format anyway if validation fails", ActivitiBPMNDiagramConstants.BPMN_MARSHALLER_VALIDATION_ATTEMPT } }, group));
     }
 
     final Collection<ExportMarshaller> marshallers = ExtensionPointUtil.getExportMarshallers();

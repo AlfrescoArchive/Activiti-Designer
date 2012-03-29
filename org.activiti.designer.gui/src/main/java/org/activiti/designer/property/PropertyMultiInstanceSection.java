@@ -141,18 +141,26 @@ public class PropertyMultiInstanceSection extends ActivitiPropertySection implem
 	  
     if(multiInstanceDef.getLoopCardinality() != null) {
       loopCardinaltyText.setText(multiInstanceDef.getLoopCardinality());
+    } else {
+    	loopCardinaltyText.setText("");
     }
 		
     if(multiInstanceDef.getInputDataItem() != null) {
       collectionText.setText(multiInstanceDef.getInputDataItem());
+    } else {
+    	collectionText.setText("");
     }
     
     if(multiInstanceDef.getElementVariable() != null) {
       elementVariableText.setText(multiInstanceDef.getElementVariable());
+    } else {
+    	elementVariableText.setText("");
     }
     
     if(multiInstanceDef.getCompletionCondition() != null) {
       completionConditionText.setText(multiInstanceDef.getCompletionCondition());
+    } else {
+    	completionConditionText.setText("");
     }
     
 		loopCardinaltyText.addFocusListener(listener);

@@ -58,7 +58,7 @@ public class PropertyTaskListenerSection extends ActivitiPropertySection impleme
     PictogramElement pe = getSelectedPictogramElement();
     if (pe != null) {
       Object bo = getBusinessObject(pe);
-      if (bo == null && (bo instanceof UserTask == false))
+      if (bo == null || (bo instanceof UserTask == false))
         return;
       
       UserTask userTask = (UserTask) bo;
