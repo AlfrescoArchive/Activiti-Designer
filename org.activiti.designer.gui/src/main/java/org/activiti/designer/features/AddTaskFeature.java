@@ -1,8 +1,13 @@
 package org.activiti.designer.features;
 
+import java.util.List;
+
+import org.activiti.designer.bpmn2.model.ServiceTask;
 import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.bpmn2.model.Task;
+import org.activiti.designer.integration.servicetask.CustomServiceTask;
 import org.activiti.designer.integration.servicetask.DiagramBaseShape;
+import org.activiti.designer.property.extension.util.ExtensionUtil;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.platform.OSEnum;
 import org.activiti.designer.util.platform.OSUtil;
@@ -48,7 +53,7 @@ public abstract class AddTaskFeature extends AbstractAddShapeFeature {
 
     DiagramBaseShape baseShape = DiagramBaseShape.ACTIVITY;
 
-    /*if (ExtensionUtil.isCustomServiceTask(addedTask)) {
+    if (ExtensionUtil.isCustomServiceTask(addedTask)) {
       final ServiceTask serviceTask = (ServiceTask) addedTask;
       final List<CustomServiceTask> customServiceTasks = ExtensionUtil.getCustomServiceTasks(ActivitiUiUtil.getProjectFromDiagram(getDiagram()));
 
@@ -64,8 +69,7 @@ public abstract class AddTaskFeature extends AbstractAddShapeFeature {
       if (!DiagramBaseShape.ACTIVITY.equals(targetTask.getDiagramBaseShape())) {
         baseShape = targetTask.getDiagramBaseShape();
       }
-
-    }*/
+    }
 
     int width = 0;
     int height = 0;
