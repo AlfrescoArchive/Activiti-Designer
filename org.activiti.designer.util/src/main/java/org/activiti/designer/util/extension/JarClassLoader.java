@@ -1,4 +1,4 @@
-package org.activiti.designer.property.extension;
+package org.activiti.designer.util.extension;
 
 import java.io.DataInputStream;
 import java.io.IOException;

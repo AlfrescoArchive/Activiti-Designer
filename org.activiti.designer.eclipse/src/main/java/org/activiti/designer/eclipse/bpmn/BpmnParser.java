@@ -978,6 +978,7 @@ public class BpmnParser {
 		if (xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "class") != null) {
 			serviceTask.setImplementationType(CLASS_TYPE);
 			serviceTask.setImplementation(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "class"));
+			
 		} else if (xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "expression") != null) {
 			serviceTask.setImplementationType(EXPRESSION_TYPE);
 			serviceTask.setImplementation(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "expression"));

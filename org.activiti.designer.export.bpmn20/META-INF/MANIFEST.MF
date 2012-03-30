@@ -17,7 +17,4 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: org.activiti.designer.export.bpmn20.export
-Bundle-ClassPath: .,
- jdi.jar,
- jdimodel.jar,
- junit.jar
+Bundle-ClassPath: .

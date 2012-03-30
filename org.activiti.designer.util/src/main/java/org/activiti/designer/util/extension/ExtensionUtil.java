@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.activiti.designer.property.extension.util;
+package org.activiti.designer.util.extension;
 
 import java.io.InputStream;
 import java.lang.reflect.Modifier;
@@ -13,15 +13,11 @@ import java.util.jar.Manifest;
 
 import org.activiti.designer.bpmn2.model.CustomProperty;
 import org.activiti.designer.bpmn2.model.ServiceTask;
-import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.integration.palette.AbstractDefaultPaletteCustomizer;
 import org.activiti.designer.integration.palette.DefaultPaletteCustomizer;
 import org.activiti.designer.integration.palette.PaletteEntry;
 import org.activiti.designer.integration.servicetask.AbstractCustomServiceTask;
 import org.activiti.designer.integration.servicetask.CustomServiceTask;
-import org.activiti.designer.property.extension.CustomServiceTaskContext;
-import org.activiti.designer.property.extension.CustomServiceTaskContextImpl;
-import org.activiti.designer.property.extension.JarClassLoader;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.eclipse.ExtensionConstants;
 import org.apache.commons.lang.StringUtils;
@@ -54,6 +50,10 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
  */
 public final class ExtensionUtil {
 
+	public static final String USER_LIBRARY_NAME_EXTENSIONS = "Activiti Designer Extensions";
+
+  public static final String DESIGNER_EXTENSIONS_USER_LIB_PATH = "org.eclipse.jdt.USER_LIBRARY/" + USER_LIBRARY_NAME_EXTENSIONS;
+	
   private ExtensionUtil() {
 
   }
@@ -77,7 +77,7 @@ public final class ExtensionUtil {
         // Get the container for the designer extensions. This is the
         // predefined user library linking to the extension libraries
         final IClasspathContainer userLibraryContainer = JavaCore
-                .getClasspathContainer(new Path(ActivitiPlugin.DESIGNER_EXTENSIONS_USER_LIB_PATH), javaProject);
+                .getClasspathContainer(new Path(DESIGNER_EXTENSIONS_USER_LIB_PATH), javaProject);
 
         // Get a list of the classpath entries in the container. Each of
         // these represents one jar containing zero or more designer
@@ -429,7 +429,7 @@ public final class ExtensionUtil {
         // Get the container for the designer extensions. This is the
         // predefined user library linking to the extension libraries
         final IClasspathContainer userLibraryContainer = JavaCore
-                .getClasspathContainer(new Path(ActivitiPlugin.DESIGNER_EXTENSIONS_USER_LIB_PATH), javaProject);
+                .getClasspathContainer(new Path(DESIGNER_EXTENSIONS_USER_LIB_PATH), javaProject);
 
         // Get a list of the classpath entries in the container. Each of
         // these represents one jar containing zero or more designer

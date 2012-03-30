@@ -36,9 +36,9 @@ import org.activiti.designer.features.CreateScriptTaskFeature;
 import org.activiti.designer.features.CreateServiceTaskFeature;
 import org.activiti.designer.features.CreateStartEventFeature;
 import org.activiti.designer.features.CreateUserTaskFeature;
-import org.activiti.designer.property.extension.util.ExtensionUtil;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.editor.ModelHandler;
+import org.activiti.designer.util.extension.ExtensionUtil;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 

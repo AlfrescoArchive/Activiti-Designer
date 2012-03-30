@@ -28,7 +28,7 @@ import org.activiti.designer.integration.servicetask.annotation.Property;
 import org.activiti.designer.integration.servicetask.validator.FieldValidator;
 import org.activiti.designer.integration.servicetask.validator.ValidationException;
 import org.activiti.designer.property.PropertyCustomServiceTaskSection;
-import org.activiti.designer.property.extension.util.ExtensionUtil;
+import org.activiti.designer.util.extension.ExtensionUtil;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.graphics.Color;

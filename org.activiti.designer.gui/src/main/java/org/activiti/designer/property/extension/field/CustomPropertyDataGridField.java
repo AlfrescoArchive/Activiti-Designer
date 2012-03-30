@@ -34,7 +34,7 @@ import org.activiti.designer.integration.servicetask.validator.RequiredFieldVali
 import org.activiti.designer.property.PropertyCustomServiceTaskSection;
 import org.activiti.designer.property.custom.MultilineTextDialog;
 import org.activiti.designer.property.custom.PeriodDialog;
-import org.activiti.designer.property.extension.FormToolTip;
+import org.activiti.designer.util.extension.FormToolTip;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.emf.common.util.ECollections;

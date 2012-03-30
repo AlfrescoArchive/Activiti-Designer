@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.activiti.designer.property.extension;
+package org.activiti.designer.util.extension;
 
 import java.io.InputStream;
 

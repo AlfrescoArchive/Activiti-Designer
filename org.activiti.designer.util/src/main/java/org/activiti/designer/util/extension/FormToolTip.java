@@ -1,4 +1,4 @@
-package org.activiti.designer.property.extension;
+package org.activiti.designer.util.extension;
 
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.jface.window.ToolTip;

@@ -14,17 +14,24 @@ import javax.xml.stream.XMLStreamReader;
 
 import org.activiti.designer.bpmn2.model.Activity;
 import org.activiti.designer.bpmn2.model.BoundaryEvent;
+import org.activiti.designer.bpmn2.model.CustomProperty;
+import org.activiti.designer.bpmn2.model.FieldExtension;
 import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.FlowNode;
 import org.activiti.designer.bpmn2.model.SequenceFlow;
+import org.activiti.designer.bpmn2.model.ServiceTask;
 import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.eclipse.bpmn.BpmnParser;
 import org.activiti.designer.eclipse.bpmn.SequenceFlowModel;
 import org.activiti.designer.eclipse.ui.ActivitiEditorContextMenuProvider;
 import org.activiti.designer.export.bpmn20.export.BPMN20ExportMarshaller;
+import org.activiti.designer.integration.servicetask.CustomServiceTask;
+import org.activiti.designer.util.eclipse.ActivitiUiUtil;
+import org.activiti.designer.util.eclipse.ExtensionConstants;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.GraphicInfo;
 import org.activiti.designer.util.editor.ModelHandler;
+import org.activiti.designer.util.extension.ExtensionUtil;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -257,6 +264,41 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 					context.setLocation(graphicInfo.x - location.x, graphicInfo.y - location.y);
 				} else {
 					context.setLocation(graphicInfo.x, graphicInfo.y);
+				}
+				
+				if(flowElement instanceof ServiceTask) {
+					// Customize the name displayed by default
+		      final List<CustomServiceTask> customServiceTasks = ExtensionUtil.getCustomServiceTasks(
+		      		ActivitiUiUtil.getProjectFromDiagram(getDiagramTypeProvider().getDiagram()));
+
+		      ServiceTask serviceTask = (ServiceTask) flowElement;
+		      CustomServiceTask targetTask = null;
+
+		      for (final CustomServiceTask customServiceTask : customServiceTasks) {
+		        if (serviceTask.getImplementation().equals(customServiceTask.getRuntimeClassname())) {
+		          targetTask = customServiceTask;
+		          break;
+		        }
+		      }
+		      
+		      if(targetTask != null) {
+		      	CustomProperty customServiceTaskProperty = new CustomProperty();
+
+		        customServiceTaskProperty.setId(ExtensionUtil.wrapCustomPropertyId(serviceTask, ExtensionConstants.PROPERTY_ID_CUSTOM_SERVICE_TASK));
+		        customServiceTaskProperty.setName(ExtensionConstants.PROPERTY_ID_CUSTOM_SERVICE_TASK);
+		        customServiceTaskProperty.setSimpleValue(targetTask.getId());
+
+		        serviceTask.getCustomProperties().add(customServiceTaskProperty);
+		        
+		        for (FieldExtension field : serviceTask.getFieldExtensions()) {
+		        	CustomProperty customFieldProperty = new CustomProperty();
+		        	customFieldProperty.setName(field.getFieldName());
+		        	customFieldProperty.setSimpleValue(field.getExpression());
+		        	serviceTask.getCustomProperties().add(customFieldProperty);
+            }
+		        
+		        serviceTask.getFieldExtensions().clear();
+		      }
 				}
 				
 				if (addFeature.canAdd(context)) {

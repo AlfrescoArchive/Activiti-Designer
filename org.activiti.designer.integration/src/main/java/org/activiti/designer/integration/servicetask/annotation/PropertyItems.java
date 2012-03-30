@@ -18,8 +18,6 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface PropertyItems {
 
-  public static final String[] DEFAULT_VALUE = new String[] {};
-
   /**
    * The items.
    */

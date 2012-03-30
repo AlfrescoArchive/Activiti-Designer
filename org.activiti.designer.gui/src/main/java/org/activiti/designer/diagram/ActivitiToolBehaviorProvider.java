@@ -1,9 +1,13 @@
 package org.activiti.designer.diagram;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 import org.activiti.designer.ActivitiImageProvider;
 import org.activiti.designer.bpmn2.model.BusinessRuleTask;
@@ -32,6 +36,7 @@ import org.activiti.designer.features.CreateBoundaryErrorFeature;
 import org.activiti.designer.features.CreateBoundaryTimerFeature;
 import org.activiti.designer.features.CreateBusinessRuleTaskFeature;
 import org.activiti.designer.features.CreateCallActivityFeature;
+import org.activiti.designer.features.CreateCustomServiceTaskFeature;
 import org.activiti.designer.features.CreateEmbeddedSubProcessFeature;
 import org.activiti.designer.features.CreateEndEventFeature;
 import org.activiti.designer.features.CreateErrorEndEventFeature;
@@ -50,6 +55,8 @@ import org.activiti.designer.features.CreateUserTaskFeature;
 import org.activiti.designer.features.DeleteSequenceFlowFeature;
 import org.activiti.designer.integration.palette.PaletteEntry;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
+import org.activiti.designer.util.extension.CustomServiceTaskContext;
+import org.activiti.designer.util.extension.ExtensionUtil;
 import org.activiti.designer.util.preferences.Preferences;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFile;
@@ -59,6 +66,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
@@ -79,6 +87,7 @@ import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.palette.IPaletteCompartmentEntry;
 import org.eclipse.graphiti.palette.IToolEntry;
+import org.eclipse.graphiti.palette.impl.ObjectCreationToolEntry;
 import org.eclipse.graphiti.palette.impl.PaletteCompartmentEntry;
 import org.eclipse.graphiti.platform.IPlatformImageConstants;
 import org.eclipse.graphiti.services.Graphiti;
@@ -89,7 +98,11 @@ import org.eclipse.graphiti.tb.IContextButtonPadData;
 import org.eclipse.graphiti.tb.IContextMenuEntry;
 import org.eclipse.graphiti.tb.IDecorator;
 import org.eclipse.graphiti.tb.ImageDecorator;
+import org.eclipse.graphiti.ui.internal.GraphitiUIPlugin;
 import org.eclipse.graphiti.ui.internal.services.GraphitiUiInternal;
+import org.eclipse.jface.resource.ImageRegistry;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.PlatformUI;
 
 import com.alfresco.designer.gui.features.CreateAlfrescoMailTaskFeature;
 import com.alfresco.designer.gui.features.CreateAlfrescoScriptTaskFeature;
@@ -462,6 +475,51 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
       
       ret.add(alfrescoCompartmentEntry);
     }
+    
+    final Map<String, List<CustomServiceTaskContext>> tasksInDrawers = new HashMap<String, List<CustomServiceTaskContext>>();
+
+    final List<CustomServiceTaskContext> customServiceTaskContexts = ExtensionUtil.getCustomServiceTaskContexts(project);
+
+    final ImageRegistry reg = GraphitiUIPlugin.getDefault().getImageRegistry();
+    for (final CustomServiceTaskContext taskContext : customServiceTaskContexts) {
+      if (reg.get(taskContext.getSmallImageKey()) == null) {
+        reg.put(taskContext.getSmallImageKey(),
+                new Image(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().getDisplay(), taskContext.getSmallIconStream()));
+      }
+      if (reg.get(taskContext.getLargeImageKey()) == null) {
+        reg.put(taskContext.getLargeImageKey(),
+                new Image(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().getDisplay(), taskContext.getLargeIconStream()));
+      }
+      if (reg.get(taskContext.getShapeImageKey()) == null) {
+        reg.put(taskContext.getShapeImageKey(),
+                new Image(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().getDisplay(), taskContext.getShapeIconStream()));
+      }
+    }
+
+    for (final CustomServiceTaskContext taskContext : customServiceTaskContexts) {
+      if (!tasksInDrawers.containsKey(taskContext.getServiceTask().contributeToPaletteDrawer())) {
+        tasksInDrawers.put(taskContext.getServiceTask().contributeToPaletteDrawer(), new ArrayList<CustomServiceTaskContext>());
+      }
+      tasksInDrawers.get(taskContext.getServiceTask().contributeToPaletteDrawer()).add(taskContext);
+    }
+
+    for (final Entry<String, List<CustomServiceTaskContext>> drawer : tasksInDrawers.entrySet()) {
+
+      // Sort the list
+      Collections.sort(drawer.getValue());
+
+      final IPaletteCompartmentEntry paletteCompartmentEntry = new PaletteCompartmentEntry(drawer.getKey(), null);
+
+      for (final CustomServiceTaskContext currentDrawerItem : drawer.getValue()) {
+        final CreateCustomServiceTaskFeature feature = new CreateCustomServiceTaskFeature(getFeatureProvider(), currentDrawerItem.getServiceTask().getName(),
+                currentDrawerItem.getServiceTask().getDescription(), currentDrawerItem.getServiceTask().getClass().getCanonicalName());
+        System.out.println(currentDrawerItem.getServiceTask().getClass().getCanonicalName());
+        final IToolEntry entry = new ObjectCreationToolEntry(currentDrawerItem.getServiceTask().getName(), currentDrawerItem.getServiceTask().getDescription(),
+                currentDrawerItem.getSmallImageKey(), null, feature);
+        paletteCompartmentEntry.getToolEntries().add(entry);
+      }
+      ret.add(paletteCompartmentEntry);
+    }
 
     return ret.toArray(new IPaletteCompartmentEntry[ret.size()]);
   }
@@ -475,7 +533,30 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
    */
   private void pruneDisabledPaletteEntries(final IProject project, final IPaletteCompartmentEntry entry) {
 
-    
+  	final Set<PaletteEntry> disabledPaletteEntries = ExtensionUtil.getDisabledPaletteEntries(project);
+
+    if (!disabledPaletteEntries.isEmpty()) {
+
+      final Iterator<IToolEntry> entryIterator = entry.getToolEntries().iterator();
+
+      while (entryIterator.hasNext()) {
+
+        final IToolEntry toolEntry = entryIterator.next();
+
+        if (disabledPaletteEntries.contains(PaletteEntry.ALL)) {
+          entryIterator.remove();
+        } else {
+          if (toolEntry instanceof ObjectCreationToolEntry) {
+            final ObjectCreationToolEntry objToolEntry = (ObjectCreationToolEntry) toolEntry;
+            if (toolMapping.containsKey(objToolEntry.getCreateFeature().getClass())) {
+              if (disabledPaletteEntries.contains(toolMapping.get(objToolEntry.getCreateFeature().getClass()))) {
+                entryIterator.remove();
+              }
+            }
+          }
+        }
+      }
+    }
   }
 
   @Override
@@ -497,7 +578,52 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
         imageRenderingDecorator.setMessage("This subprocess does not have a diagram model yet");//$NON-NLS-1$
         return new IDecorator[] { imageRenderingDecorator };
       }*/
-    } 
+    } else if (bo instanceof ServiceTask && bo instanceof EObject && ExtensionUtil.isCustomServiceTask((EObject) bo)) {
+
+      final Resource resource = pe.getLink().eResource();
+      final IResource res = ResourcesPlugin.getWorkspace().getRoot().findMember(resource.getURI().toPlatformString(true));
+
+      final List<IMarker> markers = getMarkers(res, (ServiceTask) bo);
+
+      if (markers.size() > 0) {
+
+        int maximumSeverity = 0;
+
+        try {
+          for (final IMarker marker : markers) {
+            final Object severity = marker.getAttribute(IMarker.SEVERITY);
+            if (severity != null && severity instanceof Integer) {
+              maximumSeverity = Math.max(maximumSeverity, (Integer) severity);
+            }
+          }
+        } catch (CoreException e) {
+          e.printStackTrace();
+        }
+
+        String decoratorImagePath = null;
+
+        switch (maximumSeverity) {
+        case IMarker.SEVERITY_INFO:
+          decoratorImagePath = IPlatformImageConstants.IMG_ECLIPSE_INFORMATION_TSK;
+          break;
+        case IMarker.SEVERITY_WARNING:
+          decoratorImagePath = IPlatformImageConstants.IMG_ECLIPSE_WARNING_TSK;
+          break;
+        default:
+          decoratorImagePath = IPlatformImageConstants.IMG_ECLIPSE_ERROR_TSK;
+        }
+
+        final ImageDecorator imageRenderingDecorator = new ImageDecorator(decoratorImagePath);
+        imageRenderingDecorator.setMessage("There are validation markers for the properties of this node");//$NON-NLS-1$ 
+        imageRenderingDecorator.setX(pe.getGraphicsAlgorithm().getWidth() / 2 - 10);
+        imageRenderingDecorator.setY(4);
+
+        return new IDecorator[] { imageRenderingDecorator };
+
+      } else {
+        return new IDecorator[] {};
+      }
+    }
     return super.getDecorators(pe);
   }
   protected List<IMarker> getMarkers(IResource resource, ServiceTask serviceTask) {

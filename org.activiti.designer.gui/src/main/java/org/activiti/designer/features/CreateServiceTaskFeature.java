@@ -8,9 +8,9 @@ import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.ServiceTask;
 import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.integration.servicetask.CustomServiceTask;
-import org.activiti.designer.property.extension.util.ExtensionUtil;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.eclipse.ExtensionConstants;
+import org.activiti.designer.util.extension.ExtensionUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -39,7 +39,7 @@ public class CreateServiceTaskFeature extends AbstractCreateFastBPMNFeature {
   @Override
   public Object[] create(ICreateContext context) {
     ServiceTask newServiceTask = new ServiceTask();
-    addObjectToContainer(context, newServiceTask, "Service Task");
+    newServiceTask.setName("Service Task");
 
     // Process custom service tasks
     if (this.customServiceTaskId != null) {
@@ -70,6 +70,8 @@ public class CreateServiceTaskFeature extends AbstractCreateFastBPMNFeature {
       }
 
     }
+    
+    addObjectToContainer(context, newServiceTask, newServiceTask.getName());
     
     return new Object[] { newServiceTask };
   }

@@ -3,9 +3,9 @@ package org.activiti.designer.features;
 import java.util.List;
 
 import org.activiti.designer.ActivitiImageProvider;
-import org.activiti.designer.property.extension.CustomServiceTaskContext;
-import org.activiti.designer.property.extension.util.ExtensionUtil;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
+import org.activiti.designer.util.extension.CustomServiceTaskContext;
+import org.activiti.designer.util.extension.ExtensionUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 
 public class AddServiceTaskFeature extends AddTaskFeature {
