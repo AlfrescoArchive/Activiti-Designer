@@ -1,10 +1,8 @@
 package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
+import org.activiti.designer.bpmn2.model.Activity;
 import org.activiti.designer.bpmn2.model.BoundaryEvent;
-import org.activiti.designer.bpmn2.model.CallActivity;
-import org.activiti.designer.bpmn2.model.ServiceTask;
-import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.util.style.StyleUtil;
 import org.eclipse.graphiti.datatypes.ILocation;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -19,11 +17,12 @@ import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
 
-public class AddBoundaryErrorFeature extends AbstractAddShapeFeature {
+public class AddBoundarySignalFeature extends AbstractAddShapeFeature {
   
-  private static final int IMAGE_SIZE = 30;
+  private static final int IMAGE_SIZE = 20;
+  private static final int EVENT_SIZE = 30;
 	
-	public AddBoundaryErrorFeature(IFeatureProvider fp) {
+	public AddBoundarySignalFeature(IFeatureProvider fp) {
 		super(fp);
 	}
 
@@ -39,15 +38,15 @@ public class AddBoundaryErrorFeature extends AbstractAddShapeFeature {
     y += shapeLocation.getY();
     
     parent = getDiagram();
-
+    
     // CONTAINER SHAPE WITH CIRCLE
     final IPeCreateService peCreateService = Graphiti.getPeCreateService();
     final ContainerShape containerShape = peCreateService.createContainerShape(parent, true);
 
     // check whether the context has a size (e.g. from a create feature)
     // otherwise define a default size for the shape
-    final int width = context.getWidth() <= 0 ? IMAGE_SIZE : context.getWidth();
-    final int height = context.getHeight() <= 0 ? IMAGE_SIZE : context.getHeight();
+    final int width = context.getWidth() <= 0 ? EVENT_SIZE : context.getWidth();
+    final int height = context.getHeight() <= 0 ? EVENT_SIZE : context.getHeight();
 
     final IGaService gaService = Graphiti.getGaService();
 
@@ -77,7 +76,9 @@ public class AddBoundaryErrorFeature extends AbstractAddShapeFeature {
 
     {
       final Shape shape = peCreateService.createShape(containerShape, false);
-      final Image image = gaService.createImage(shape, ActivitiImageProvider.IMG_ENDEVENT_ERROR);
+      final Image image = gaService.createImage(shape, ActivitiImageProvider.IMG_BOUNDARY_SIGNAL);
+      image.setWidth(IMAGE_SIZE);
+      image.setHeight(IMAGE_SIZE);
       
       gaService.setLocationAndSize(image, (width - IMAGE_SIZE) / 2, (height - IMAGE_SIZE) / 2, IMAGE_SIZE, IMAGE_SIZE);
     }
@@ -92,7 +93,7 @@ public class AddBoundaryErrorFeature extends AbstractAddShapeFeature {
   @Override
   public boolean canAdd(IAddContext context) {
     Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-    if (parentObject instanceof SubProcess == false && parentObject instanceof CallActivity == false && parentObject instanceof ServiceTask == false) {
+    if (parentObject instanceof Activity == false) {
       return false;
     }
     if (context.getNewObject() instanceof BoundaryEvent == false) {

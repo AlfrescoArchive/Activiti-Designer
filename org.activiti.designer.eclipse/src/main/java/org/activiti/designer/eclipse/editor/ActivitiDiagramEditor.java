@@ -276,7 +276,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 		      CustomServiceTask targetTask = null;
 
 		      for (final CustomServiceTask customServiceTask : customServiceTasks) {
-		        if (serviceTask.getImplementation().equals(customServiceTask.getRuntimeClassname())) {
+		        if (customServiceTask.getRuntimeClassname().equals(serviceTask.getImplementation())) {
 		          targetTask = customServiceTask;
 		          break;
 		        }

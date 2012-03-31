@@ -5,6 +5,7 @@ import org.activiti.designer.bpmn2.model.EndEvent;
 import org.activiti.designer.bpmn2.model.Event;
 import org.activiti.designer.bpmn2.model.StartEvent;
 import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.designer.bpmn2.model.TimerEventDefinition;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.style.StyleUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -80,8 +81,14 @@ public class AddEventFeature extends AbstractAddShapeFeature {
 		
 		if (addedEvent instanceof StartEvent && ((StartEvent) addedEvent).getEventDefinitions().size() > 0) {
 			
+			StartEvent startEvent = (StartEvent) addedEvent;
 			final Shape shape = peCreateService.createShape(containerShape, false);
-      final Image image = gaService.createImage(shape, ActivitiImageProvider.IMG_BOUNDARY_TIMER);
+			Image image = null;
+			if(startEvent.getEventDefinitions().get(0) instanceof TimerEventDefinition) {
+				image = gaService.createImage(shape, ActivitiImageProvider.IMG_BOUNDARY_TIMER);
+			} else {
+				image = gaService.createImage(shape, ActivitiImageProvider.IMG_BOUNDARY_ERROR);
+			}
       image.setWidth(IMAGE_SIZE);
       image.setHeight(IMAGE_SIZE);
       

@@ -20,6 +20,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.activiti.designer.bpmn2.model.BoundaryEvent;
 import org.activiti.designer.bpmn2.model.ErrorEventDefinition;
 import org.activiti.designer.bpmn2.model.EventDefinition;
+import org.activiti.designer.bpmn2.model.SignalEventDefinition;
 import org.activiti.designer.bpmn2.model.TimerEventDefinition;
 import org.apache.commons.lang.StringUtils;
 
@@ -82,6 +83,17 @@ public class BoundaryEventExport implements ActivitiNamespaceConstants {
         
         if(StringUtils.isNotEmpty(errorDef.getErrorCode())) {
           xtw.writeAttribute("errorRef", errorDef.getErrorCode());
+        }
+        
+        xtw.writeEndElement();
+        
+      } else if(eventDefinitionList.get(0) instanceof SignalEventDefinition) {
+      	SignalEventDefinition signalDef = (SignalEventDefinition) eventDefinitionList.get(0);
+        
+        xtw.writeStartElement("signalEventDefinition");
+        
+        if(StringUtils.isNotEmpty(signalDef.getSignalRef())) {
+          xtw.writeAttribute("signalRef", signalDef.getSignalRef());
         }
         
         xtw.writeEndElement();

@@ -29,6 +29,7 @@ import org.activiti.designer.bpmn2.model.CallActivity;
 import org.activiti.designer.bpmn2.model.EndEvent;
 import org.activiti.designer.bpmn2.model.ErrorEventDefinition;
 import org.activiti.designer.bpmn2.model.EventDefinition;
+import org.activiti.designer.bpmn2.model.EventSubProcess;
 import org.activiti.designer.bpmn2.model.ExclusiveGateway;
 import org.activiti.designer.bpmn2.model.FieldExtension;
 import org.activiti.designer.bpmn2.model.FlowElement;
@@ -45,9 +46,13 @@ import org.activiti.designer.bpmn2.model.ParallelGateway;
 import org.activiti.designer.bpmn2.model.ReceiveTask;
 import org.activiti.designer.bpmn2.model.ScriptTask;
 import org.activiti.designer.bpmn2.model.ServiceTask;
+import org.activiti.designer.bpmn2.model.Signal;
+import org.activiti.designer.bpmn2.model.SignalEventDefinition;
 import org.activiti.designer.bpmn2.model.StartEvent;
 import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.bpmn2.model.Task;
+import org.activiti.designer.bpmn2.model.ThrowEvent;
+import org.activiti.designer.bpmn2.model.ThrowSignalEvent;
 import org.activiti.designer.bpmn2.model.TimerEventDefinition;
 import org.activiti.designer.bpmn2.model.UserTask;
 import org.activiti.designer.bpmn2.model.alfresco.AlfrescoMailTask;
@@ -100,6 +105,18 @@ public class BpmnParser {
 
 					if (xtr.getAttributeValue(null, "targetNamespace") != null) {
 						model.getProcess().setNamespace(xtr.getAttributeValue(null, "targetNamespace"));
+					}
+				
+				} else if (xtr.isStartElement() && "signal".equalsIgnoreCase(xtr.getLocalName())) {
+					
+					if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, "id"))) {
+						Signal signal = new Signal();
+						signal.setId(xtr.getAttributeValue(null, "id"));
+						signal.setName(xtr.getAttributeValue(null, "name"));
+						model.getProcess().getSignals().add(signal);
+					}
+					if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, "name"))) {
+						model.getProcess().setName(xtr.getAttributeValue(null, "name"));
 					}
 
 				} else if (xtr.isStartElement() && "process".equalsIgnoreCase(xtr.getLocalName())) {
@@ -157,13 +174,17 @@ public class BpmnParser {
 					} else if (xtr.isStartElement() && "serviceTask".equalsIgnoreCase(xtr.getLocalName())) {
 						
 						if ("mail".equalsIgnoreCase(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "type"))) {
-							currentActivity = parseMailTask(xtr);
+							currentActivity = parseMailTask(xtr, "serviceTask");
 						} else if ("org.alfresco.repo.workflow.activiti.script.AlfrescoScriptDelegate".equalsIgnoreCase(
 								xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "class"))) {
 							currentActivity = parseAlfrescoScriptTask(xtr);
 						} else {
 							currentActivity = parseServiceTask(xtr);
 						}
+					
+					} else if (xtr.isStartElement() && "sendTask".equalsIgnoreCase(xtr.getLocalName())) {
+						
+						currentActivity = parseMailTask(xtr, "sendTask");
 					
 					} else if (xtr.isStartElement() && "task".equalsIgnoreCase(xtr.getLocalName())) {
 						currentActivity = parseTask(xtr);
@@ -188,6 +209,9 @@ public class BpmnParser {
 					
 					} else if (xtr.isStartElement() && "intermediateCatchEvent".equalsIgnoreCase(xtr.getLocalName())) {
 						currentActivity = parseIntermediateCatchEvent(xtr);
+					
+					} else if (xtr.isStartElement() && "intermediateThrowEvent".equalsIgnoreCase(xtr.getLocalName())) {
+						currentActivity = parseIntermediateThrowEvent(xtr);
 
 					} else if (xtr.isStartElement() && "exclusiveGateway".equalsIgnoreCase(xtr.getLocalName())) {
 						currentActivity = parseExclusiveGateway(xtr);
@@ -329,6 +353,13 @@ public class BpmnParser {
 					FormProperty property = new FormProperty();
 					startEvent.getFormProperties().add(property);
 					parseFormProperty(property, xtr);
+				
+				} else if (xtr.isStartElement() && "errorEventDefinition".equalsIgnoreCase(xtr.getLocalName())) {
+						ErrorEventDefinition errorDef = new ErrorEventDefinition();
+						startEvent.getEventDefinitions().add(errorDef);
+						if (xtr.getAttributeValue(null, "errorRef") != null) {
+							errorDef.setErrorCode(xtr.getAttributeValue(null, "errorRef"));
+						}
 
 				} else if (xtr.isStartElement()
 				    && "timeDuration".equalsIgnoreCase(xtr.getLocalName())) {
@@ -482,7 +513,12 @@ public class BpmnParser {
 	}
 
 	private SubProcess parseSubProcess(XMLStreamReader xtr) {
-		SubProcess subProcess = new SubProcess();
+		SubProcess subProcess = null;
+		if(StringUtils.isNotEmpty(xtr.getAttributeValue(null, "triggeredByEvent"))) {
+			subProcess = new EventSubProcess();
+		} else {
+			subProcess = new SubProcess();
+		}
 		String name = xtr.getAttributeValue(null, "name");
 		if (name != null) {
 			subProcess.setName(name);
@@ -764,7 +800,7 @@ public class BpmnParser {
 		return scriptTask;
 	}
 
-	private MailTask parseMailTask(XMLStreamReader xtr) {
+	private MailTask parseMailTask(XMLStreamReader xtr, String taskType) {
 		MailTask mailTask = new MailTask();
 		mailTask.setName(xtr.getAttributeValue(null, "name"));
 		if (xtr.getAttributeValue(null, "default") != null) {
@@ -783,7 +819,7 @@ public class BpmnParser {
 					mailTask.setLoopCharacteristics(multiInstanceDef);
 					parseMultiInstanceDef(multiInstanceDef, xtr);
 
-				} else if (xtr.isEndElement() && "serviceTask".equalsIgnoreCase(xtr.getLocalName())) {
+				} else if (xtr.isEndElement() && taskType.equalsIgnoreCase(xtr.getLocalName())) {
 					readyWithMailTask = true;
 				}
 			}
@@ -1479,8 +1515,17 @@ public class BpmnParser {
 					model.type = BoundaryEventModel.ERROREVENT;
 					eventDefinition = new ErrorEventDefinition();
 					boundaryEvent.getEventDefinitions().add(eventDefinition);
-					if (xtr.getAttributeValue(null, "errorRef") != null) {
+					if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, "errorRef"))) {
 						((ErrorEventDefinition) eventDefinition).setErrorCode(xtr.getAttributeValue(null, "errorRef"));
+					}
+					break;
+					
+				} else if (xtr.isStartElement() && "signalEventDefinition".equalsIgnoreCase(xtr.getLocalName())) {
+					model.type = BoundaryEventModel.SIGNALEVENT;
+					eventDefinition = new SignalEventDefinition();
+					boundaryEvent.getEventDefinitions().add(eventDefinition);
+					if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, "signalRef"))) {
+						((SignalEventDefinition) eventDefinition).setSignalRef(xtr.getAttributeValue(null, "signalRef"));
 					}
 					break;
 
@@ -1520,35 +1565,67 @@ public class BpmnParser {
 		IntermediateCatchEvent catchEvent = new IntermediateCatchEvent();
 		catchEvent.setName(xtr.getAttributeValue(null, "name"));
 		
-		boolean readyWithEvent = false;
 		try {
-			while (readyWithEvent == false && xtr.hasNext()) {
+			while (xtr.hasNext()) {
 				xtr.next();
 				if (xtr.isStartElement() && "timeDuration".equalsIgnoreCase(xtr.getLocalName())) {
 					TimerEventDefinition eventDef = new TimerEventDefinition();
 					eventDef.setTimeDuration(xtr.getElementText());
 					catchEvent.getEventDefinitions().add(eventDef);
-					readyWithEvent = true;
+					break;
 
 				} else if (xtr.isStartElement() && "timeDate".equalsIgnoreCase(xtr.getLocalName())) {
 					TimerEventDefinition eventDef = new TimerEventDefinition();
 					eventDef.setTimeDate(xtr.getElementText());
 					catchEvent.getEventDefinitions().add(eventDef);
-					readyWithEvent = true;
+					break;
 
 				} else if (xtr.isStartElement() && "timeCycle".equalsIgnoreCase(xtr.getLocalName())) {
 					TimerEventDefinition eventDef = new TimerEventDefinition();
 					eventDef.setTimeCycle(xtr.getElementText());
 					catchEvent.getEventDefinitions().add(eventDef);
-					readyWithEvent = true;
+					break;
+					
+				} else if (xtr.isStartElement() && "signalEventDefinition".equalsIgnoreCase(xtr.getLocalName())) {
+					SignalEventDefinition eventDefinition = new SignalEventDefinition();
+					if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, "signalRef"))) {
+						eventDefinition.setSignalRef(xtr.getAttributeValue(null, "signalRef"));
+					}
+					catchEvent.getEventDefinitions().add(eventDefinition);
+					break;
 
 				} else if (xtr.isEndElement() && "intermediateCatchEvent".equalsIgnoreCase(xtr.getLocalName())) {
-					readyWithEvent = true;
+					break;
 				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return catchEvent;
+	}
+	
+	private ThrowEvent parseIntermediateThrowEvent(XMLStreamReader xtr) {
+		ThrowEvent throwEvent = new ThrowSignalEvent();
+		throwEvent.setName(xtr.getAttributeValue(null, "name"));
+		
+		try {
+			while (xtr.hasNext()) {
+				xtr.next();
+				if (xtr.isStartElement() && "signalEventDefinition".equalsIgnoreCase(xtr.getLocalName())) {
+					SignalEventDefinition eventDefinition = new SignalEventDefinition();
+					if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, "signalRef"))) {
+						eventDefinition.setSignalRef(xtr.getAttributeValue(null, "signalRef"));
+					}
+					throwEvent.getEventDefinitions().add(eventDefinition);
+					break;
+
+				} else if (xtr.isEndElement() && "intermediateThrowEvent".equalsIgnoreCase(xtr.getLocalName())) {
+					break;
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return throwEvent;
 	}
 }

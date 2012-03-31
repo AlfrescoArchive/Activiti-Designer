@@ -17,6 +17,7 @@ import org.activiti.designer.bpmn2.model.BusinessRuleTask;
 import org.activiti.designer.bpmn2.model.CallActivity;
 import org.activiti.designer.bpmn2.model.EndEvent;
 import org.activiti.designer.bpmn2.model.ErrorEventDefinition;
+import org.activiti.designer.bpmn2.model.EventSubProcess;
 import org.activiti.designer.bpmn2.model.ExclusiveGateway;
 import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.InclusiveGateway;
@@ -28,8 +29,10 @@ import org.activiti.designer.bpmn2.model.ReceiveTask;
 import org.activiti.designer.bpmn2.model.ScriptTask;
 import org.activiti.designer.bpmn2.model.SequenceFlow;
 import org.activiti.designer.bpmn2.model.ServiceTask;
+import org.activiti.designer.bpmn2.model.Signal;
 import org.activiti.designer.bpmn2.model.StartEvent;
 import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.designer.bpmn2.model.ThrowEvent;
 import org.activiti.designer.bpmn2.model.TimerEventDefinition;
 import org.activiti.designer.bpmn2.model.UserTask;
 import org.activiti.designer.bpmn2.model.alfresco.AlfrescoScriptTask;
@@ -89,6 +92,15 @@ public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
       } else {
         xtw.writeAttribute("targetNamespace", PROCESS_NAMESPACE);
       }
+      
+      if(model.getProcess().getSignals().size() > 0) {
+      	for (Signal signal : model.getProcess().getSignals()) {
+          xtw.writeStartElement("signal");
+          xtw.writeAttribute("id", signal.getId());
+          xtw.writeAttribute("name", signal.getName());
+          xtw.writeEndElement();
+        }
+      }
 
       // start process element
       xtw.writeStartElement("process");
@@ -144,7 +156,7 @@ public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
         xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "initiator", startEvent.getInitiator());
       }
 
-      if (startEvent.getEventDefinitions().size() > 0) {
+      if (startEvent.getEventDefinitions().size() > 0 && startEvent.getEventDefinitions().get(0) instanceof TimerEventDefinition) {
 
         TimerEventDefinition timerDef = (TimerEventDefinition) startEvent.getEventDefinitions().get(0);
 
@@ -167,6 +179,19 @@ public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
           xtw.writeStartElement("timeCycle");
           xtw.writeCharacters(timerDef.getTimeCycle());
           xtw.writeEndElement();
+        }
+
+        xtw.writeEndElement();
+      }
+      
+      if (startEvent.getEventDefinitions().size() > 0 && startEvent.getEventDefinitions().get(0) instanceof ErrorEventDefinition) {
+
+      	ErrorEventDefinition errorDef = (ErrorEventDefinition) startEvent.getEventDefinitions().get(0);
+
+        xtw.writeStartElement("errorEventDefinition");
+
+        if(StringUtils.isNotEmpty(errorDef.getErrorCode())) {
+        	xtw.writeAttribute("errorRef", errorDef.getErrorCode());
         }
 
         xtw.writeEndElement();
@@ -270,6 +295,9 @@ public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
     
     } else if (object instanceof IntermediateCatchEvent) {
     	IntermediateCatchEventExport.createIntermediateEvent(object, xtw);
+    
+    } else if (object instanceof ThrowEvent) {
+    	IntermediateThrowEventExport.createIntermediateEvent(object, xtw);
 
     } else if (object instanceof SubProcess) {
       SubProcess subProcess = (SubProcess) object;
@@ -279,6 +307,10 @@ public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
       xtw.writeAttribute("id", subProcess.getId());
       if (subProcess.getName() != null) {
         xtw.writeAttribute("name", subProcess.getName());
+      }
+      
+      if (subProcess instanceof EventSubProcess) {
+      	xtw.writeAttribute("triggeredByEvent", "true");
       }
       
       DefaultFlowExport.createDefaultFlow(object, xtw);

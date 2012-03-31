@@ -48,11 +48,15 @@ public class ActivitiImageProvider extends AbstractImageProvider {
   // Sub process icons
   public static final String IMG_SUBPROCESS_COLLAPSED = PREFIX + "subprocess.collapsed"; //$NON-NLS-1$
   public static final String IMG_SUBPROCESS_EXPANDED = PREFIX + "subprocess.expanded"; //$NON-NLS-1$
+  public static final String IMG_EVENT_SUBPROCESS = PREFIX + "event.subprocess"; //$NON-NLS-1$
 
   public static final String IMG_ACTION_ZOOM = PREFIX + "action.magnifier"; //$NON-NLS-1$
   
   public static final String IMG_BOUNDARY_TIMER = PREFIX + "boundary.timer"; //$NON-NLS-1$
   public static final String IMG_BOUNDARY_ERROR = PREFIX + "boundary.error"; //$NON-NLS-1$
+  public static final String IMG_BOUNDARY_SIGNAL = PREFIX + "boundary.signal"; //$NON-NLS-1$
+  
+  public static final String IMG_THROW_SIGNAL = PREFIX + "throw.signal"; //$NON-NLS-1$
   
   public static final String IMG_ALFRESCO_LOGO = PREFIX + "alfresco.logo"; //$NON-NLS-1$
   
@@ -79,9 +83,12 @@ public class ActivitiImageProvider extends AbstractImageProvider {
     addImageFilePath(IMG_CALLACTIVITY, "icons/callactivity.png"); //$NON-NLS-1$
     addImageFilePath(IMG_SUBPROCESS_COLLAPSED, "icons/type.subprocess.collapsed.png"); //$NON-NLS-1$
     addImageFilePath(IMG_SUBPROCESS_EXPANDED, "icons/type.subprocess.expanded.png"); //$NON-NLS-1$
+    addImageFilePath(IMG_EVENT_SUBPROCESS, "icons/type.event.subprocess.png"); //$NON-NLS-1$
     addImageFilePath(IMG_ACTION_ZOOM, "icons/action.magnifier.png"); //$NON-NLS-1$
     addImageFilePath(IMG_BOUNDARY_TIMER, "icons/timer.png"); //$NON-NLS-1$
     addImageFilePath(IMG_BOUNDARY_ERROR, "icons/error.png"); //$NON-NLS-1$
+    addImageFilePath(IMG_BOUNDARY_SIGNAL, "icons/signal.png"); //$NON-NLS-1$
+    addImageFilePath(IMG_THROW_SIGNAL, "icons/throw.signal.png"); //$NON-NLS-1$
     addImageFilePath(IMG_ALFRESCO_LOGO, "icons/alfresco.png"); //$NON-NLS-1$
     addImageFilePath(EDIT_ICON, "icons/edit.png"); //$NON-NLS-1$
     addImageFilePath(NEW_ICON, "icons/new.png"); //$NON-NLS-1$

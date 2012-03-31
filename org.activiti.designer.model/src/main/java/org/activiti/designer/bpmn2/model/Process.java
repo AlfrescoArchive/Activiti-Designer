@@ -10,6 +10,7 @@ public class Process extends FlowElementsContainer {
 	protected String namespace;
 	protected String documentation;
 	protected List<ActivitiListener> executionListeners = new ArrayList<ActivitiListener>();
+	protected List<Signal> signals = new ArrayList<Signal>();
 	
 	public String getDocumentation() {
   	return documentation;
@@ -40,5 +41,11 @@ public class Process extends FlowElementsContainer {
   }
 	public void setExecutionListeners(List<ActivitiListener> executionListeners) {
   	this.executionListeners = executionListeners;
+  }
+	public List<Signal> getSignals() {
+  	return signals;
+  }
+	public void setSignals(List<Signal> signals) {
+  	this.signals = signals;
   }
 }

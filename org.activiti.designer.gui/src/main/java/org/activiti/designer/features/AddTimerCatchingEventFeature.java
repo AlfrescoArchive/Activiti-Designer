@@ -61,13 +61,9 @@ public class AddTimerCatchingEventFeature extends AddEventFeature {
     {
       final Shape shape = peCreateService.createShape(containerShape, false);
       final Image image = gaService.createImage(shape, ActivitiImageProvider.IMG_BOUNDARY_TIMER);
-      
-      image.setStretchH(true);
-      image.setStretchV(true);
-      image.setWidth(33);
-      image.setHeight(33);
-      
-      gaService.setLocationAndSize(image, 1, 1, 33, 33);
+      image.setWidth(20);
+      image.setHeight(20);
+      gaService.setLocationAndSize(image, (width - 20) / 2, (height - 20) / 2, 20, 20);
     }
 
     // add a chopbox anchor to the shape

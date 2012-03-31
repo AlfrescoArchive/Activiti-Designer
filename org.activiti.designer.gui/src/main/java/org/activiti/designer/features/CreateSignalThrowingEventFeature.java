@@ -1,45 +1,43 @@
 package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
-import org.activiti.designer.bpmn2.model.EventSubProcess;
 import org.activiti.designer.bpmn2.model.FlowElement;
-import org.activiti.designer.bpmn2.model.StartEvent;
+import org.activiti.designer.bpmn2.model.SignalEventDefinition;
 import org.activiti.designer.bpmn2.model.SubProcess;
-import org.activiti.designer.bpmn2.model.TimerEventDefinition;
+import org.activiti.designer.bpmn2.model.ThrowSignalEvent;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 
-public class CreateTimerStartEventFeature extends AbstractCreateBPMNFeature {
+public class CreateSignalThrowingEventFeature extends AbstractCreateFastBPMNFeature {
 	
-	public static final String FEATURE_ID_KEY = "timerstartevent";
+	public static final String FEATURE_ID_KEY = "signalintermediatethrowevent";
 
-	public CreateTimerStartEventFeature(IFeatureProvider fp) {
+	public CreateSignalThrowingEventFeature(IFeatureProvider fp) {
 		// set name and description of the creation feature
-		super(fp, "TimerStartEvent", "Add timer start event");
+		super(fp, "SignalThrowingEvent", "Add signal intermediate throwing event");
 	}
 
 	public boolean canCreate(ICreateContext context) {
 	  Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-	  if(parentObject instanceof EventSubProcess) return false;
     return (context.getTargetContainer() instanceof Diagram || parentObject instanceof SubProcess);
 	}
 
 	public Object[] create(ICreateContext context) {
-		StartEvent startEvent = new StartEvent();
-		TimerEventDefinition timerEvent = new TimerEventDefinition();
-		startEvent.getEventDefinitions().add(timerEvent);
-		addObjectToContainer(context, startEvent, "Timer start");
+		ThrowSignalEvent throwEvent = new ThrowSignalEvent();
+		SignalEventDefinition eventDef = new SignalEventDefinition();
+		throwEvent.getEventDefinitions().add(eventDef);
+		addObjectToContainer(context, throwEvent, "SignalThrowEvent");
 		
 		// return newly created business object(s)
-		return new Object[] { startEvent };
+		return new Object[] { throwEvent };
 	}
 	
 	@Override
 	public String getCreateImageId() {
-		return ActivitiImageProvider.IMG_BOUNDARY_TIMER;
+		return ActivitiImageProvider.IMG_THROW_SIGNAL;
 	}
-	
+
 	@Override
 	protected String getFeatureIdKey() {
 		return FEATURE_ID_KEY;
@@ -47,7 +45,7 @@ public class CreateTimerStartEventFeature extends AbstractCreateBPMNFeature {
 
 	@Override
 	protected Class<? extends FlowElement> getFeatureClass() {
-		return new StartEvent().getClass();
+		return new ThrowSignalEvent().getClass();
 	}
 
 }

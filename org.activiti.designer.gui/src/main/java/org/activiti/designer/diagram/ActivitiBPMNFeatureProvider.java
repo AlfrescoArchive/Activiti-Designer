@@ -7,6 +7,7 @@ import org.activiti.designer.bpmn2.model.CallActivity;
 import org.activiti.designer.bpmn2.model.EndEvent;
 import org.activiti.designer.bpmn2.model.ErrorEventDefinition;
 import org.activiti.designer.bpmn2.model.EventDefinition;
+import org.activiti.designer.bpmn2.model.EventSubProcess;
 import org.activiti.designer.bpmn2.model.ExclusiveGateway;
 import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.InclusiveGateway;
@@ -18,20 +19,26 @@ import org.activiti.designer.bpmn2.model.ReceiveTask;
 import org.activiti.designer.bpmn2.model.ScriptTask;
 import org.activiti.designer.bpmn2.model.SequenceFlow;
 import org.activiti.designer.bpmn2.model.ServiceTask;
+import org.activiti.designer.bpmn2.model.SignalEventDefinition;
 import org.activiti.designer.bpmn2.model.StartEvent;
 import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.bpmn2.model.Task;
+import org.activiti.designer.bpmn2.model.ThrowSignalEvent;
+import org.activiti.designer.bpmn2.model.TimerEventDefinition;
 import org.activiti.designer.bpmn2.model.UserTask;
 import org.activiti.designer.bpmn2.model.alfresco.AlfrescoScriptTask;
 import org.activiti.designer.bpmn2.model.alfresco.AlfrescoStartEvent;
 import org.activiti.designer.bpmn2.model.alfresco.AlfrescoUserTask;
 import org.activiti.designer.features.AddBoundaryErrorFeature;
+import org.activiti.designer.features.AddBoundarySignalFeature;
 import org.activiti.designer.features.AddBoundaryTimerFeature;
 import org.activiti.designer.features.AddBusinessRuleTaskFeature;
 import org.activiti.designer.features.AddCallActivityFeature;
 import org.activiti.designer.features.AddEmbeddedSubProcessFeature;
 import org.activiti.designer.features.AddEndEventFeature;
 import org.activiti.designer.features.AddErrorEndEventFeature;
+import org.activiti.designer.features.AddErrorStartEventFeature;
+import org.activiti.designer.features.AddEventSubProcessFeature;
 import org.activiti.designer.features.AddExclusiveGatewayFeature;
 import org.activiti.designer.features.AddInclusiveGatewayFeature;
 import org.activiti.designer.features.AddMailTaskFeature;
@@ -41,6 +48,8 @@ import org.activiti.designer.features.AddReceiveTaskFeature;
 import org.activiti.designer.features.AddScriptTaskFeature;
 import org.activiti.designer.features.AddSequenceFlowFeature;
 import org.activiti.designer.features.AddServiceTaskFeature;
+import org.activiti.designer.features.AddSignalCatchingEventFeature;
+import org.activiti.designer.features.AddSignalThrowingEventFeature;
 import org.activiti.designer.features.AddStartEventFeature;
 import org.activiti.designer.features.AddTimerCatchingEventFeature;
 import org.activiti.designer.features.AddTimerStartEventFeature;
@@ -48,12 +57,15 @@ import org.activiti.designer.features.AddUserTaskFeature;
 import org.activiti.designer.features.ChangeElementTypeFeature;
 import org.activiti.designer.features.CopyFlowElementFeature;
 import org.activiti.designer.features.CreateBoundaryErrorFeature;
+import org.activiti.designer.features.CreateBoundarySignalFeature;
 import org.activiti.designer.features.CreateBoundaryTimerFeature;
 import org.activiti.designer.features.CreateBusinessRuleTaskFeature;
 import org.activiti.designer.features.CreateCallActivityFeature;
 import org.activiti.designer.features.CreateEmbeddedSubProcessFeature;
 import org.activiti.designer.features.CreateEndEventFeature;
 import org.activiti.designer.features.CreateErrorEndEventFeature;
+import org.activiti.designer.features.CreateErrorStartEventFeature;
+import org.activiti.designer.features.CreateEventSubProcessFeature;
 import org.activiti.designer.features.CreateExclusiveGatewayFeature;
 import org.activiti.designer.features.CreateInclusiveGatewayFeature;
 import org.activiti.designer.features.CreateMailTaskFeature;
@@ -63,6 +75,8 @@ import org.activiti.designer.features.CreateReceiveTaskFeature;
 import org.activiti.designer.features.CreateScriptTaskFeature;
 import org.activiti.designer.features.CreateSequenceFlowFeature;
 import org.activiti.designer.features.CreateServiceTaskFeature;
+import org.activiti.designer.features.CreateSignalCatchingEventFeature;
+import org.activiti.designer.features.CreateSignalThrowingEventFeature;
 import org.activiti.designer.features.CreateStartEventFeature;
 import org.activiti.designer.features.CreateTimerCatchingEventFeature;
 import org.activiti.designer.features.CreateTimerStartEventFeature;
@@ -135,7 +149,11 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 		    return new AddAlfrescoStartEventFeature(this);
 		  } else {
 		  	if(((StartEvent) context.getNewObject()).getEventDefinitions().size() > 0) {
-		  		return new AddTimerStartEventFeature(this);
+		  		if(((StartEvent) context.getNewObject()).getEventDefinitions().get(0) instanceof TimerEventDefinition) {
+		  			return new AddTimerStartEventFeature(this);
+		  		} else {
+		  			return new AddErrorStartEventFeature(this);
+		  		}
 		  	} else {
 		  		return new AddStartEventFeature(this);
 		  	}
@@ -177,12 +195,25 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 		    EventDefinition definition = ((BoundaryEvent) context.getNewObject()).getEventDefinitions().get(0);
 		    if(definition instanceof ErrorEventDefinition) {
 		      return new AddBoundaryErrorFeature(this);
+		    } else if(definition instanceof SignalEventDefinition) {
+		    	return new AddBoundarySignalFeature(this);
 		    } else {
 		      return new AddBoundaryTimerFeature(this);
 		    }
 		  }
 		} else if (context.getNewObject() instanceof IntermediateCatchEvent) {
-			return new AddTimerCatchingEventFeature(this);
+			if(((IntermediateCatchEvent) context.getNewObject()).getEventDefinitions().size() > 0) {
+		    EventDefinition definition = ((IntermediateCatchEvent) context.getNewObject()).getEventDefinitions().get(0);
+		    if(definition instanceof SignalEventDefinition) {
+		    	return new AddSignalCatchingEventFeature(this);
+		    } else {
+		      return new AddTimerCatchingEventFeature(this);
+		    }
+		  }
+		} else if (context.getNewObject() instanceof ThrowSignalEvent) {
+			return new AddSignalThrowingEventFeature(this);
+		} else if (context.getNewObject() instanceof EventSubProcess) {
+      return new AddEventSubProcessFeature(this);
 		} else if (context.getNewObject() instanceof SubProcess) {
       return new AddEmbeddedSubProcessFeature(this);
 		} else if (context.getNewObject() instanceof CallActivity) {
@@ -198,6 +229,7 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 		return new ICreateFeature[] { new CreateAlfrescoStartEventFeature(this),
 						new CreateStartEventFeature(this),
 						new CreateTimerStartEventFeature(this),
+						new CreateErrorStartEventFeature(this),
 		        new CreateEndEventFeature(this),
 		        new CreateErrorEndEventFeature(this),
 		        new CreateUserTaskFeature(this),
@@ -213,7 +245,11 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 		        new CreateInclusiveGatewayFeature(this), 
 		        new CreateBoundaryTimerFeature(this),
 		        new CreateBoundaryErrorFeature(this),
+		        new CreateBoundarySignalFeature(this),
 		        new CreateTimerCatchingEventFeature(this),
+		        new CreateSignalCatchingEventFeature(this),
+		        new CreateSignalThrowingEventFeature(this),
+		        new CreateEventSubProcessFeature(this), 
 		        new CreateEmbeddedSubProcessFeature(this), 
 		        new CreateCallActivityFeature(this),
 		        new CreateAlfrescoScriptTaskFeature(this),

@@ -3,28 +3,24 @@ package org.activiti.designer.features;
 import org.activiti.designer.ActivitiImageProvider;
 import org.activiti.designer.bpmn2.model.Activity;
 import org.activiti.designer.bpmn2.model.BoundaryEvent;
-import org.activiti.designer.bpmn2.model.CallActivity;
-import org.activiti.designer.bpmn2.model.ErrorEventDefinition;
 import org.activiti.designer.bpmn2.model.FlowElement;
-import org.activiti.designer.bpmn2.model.ServiceTask;
-import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.designer.bpmn2.model.SignalEventDefinition;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 
-public class CreateBoundaryErrorFeature extends AbstractCreateBPMNFeature {
+public class CreateBoundarySignalFeature extends AbstractCreateBPMNFeature {
 	
-	public static final String FEATURE_ID_KEY = "boundaryerror";
+	public static final String FEATURE_ID_KEY = "boundarysignal";
 
-	public CreateBoundaryErrorFeature(IFeatureProvider fp) {
+	public CreateBoundarySignalFeature(IFeatureProvider fp) {
 		// set name and description of the creation feature
-		super(fp, "ErrorBoundaryEvent", "Add error boundary event");
+		super(fp, "SignalBoundaryEvent", "Add signal boundary event");
 	}
 
 	public boolean canCreate(ICreateContext context) {
 	  Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-    if (parentObject instanceof SubProcess == true ||
-        parentObject instanceof CallActivity == true ||
-        parentObject instanceof ServiceTask == true) {
+    if (parentObject instanceof Activity == true) {
+      
       return true;
     }
     return false;
@@ -32,15 +28,15 @@ public class CreateBoundaryErrorFeature extends AbstractCreateBPMNFeature {
 
 	public Object[] create(ICreateContext context) {
 	  BoundaryEvent boundaryEvent = new BoundaryEvent();
-		ErrorEventDefinition errorEvent = new ErrorEventDefinition();
-		boundaryEvent.getEventDefinitions().add(errorEvent);
+		SignalEventDefinition signalEvent = new SignalEventDefinition();
+		boundaryEvent.getEventDefinitions().add(signalEvent);
 		
 		boundaryEvent.setId(getNextId());
 		
 		Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
     ((Activity) parentObject).getBoundaryEvents().add(boundaryEvent);
     boundaryEvent.setAttachedToRef((Activity) parentObject);
-
+    
 		// do the add
 		addGraphicalRepresentation(context, boundaryEvent);
 		
@@ -50,7 +46,7 @@ public class CreateBoundaryErrorFeature extends AbstractCreateBPMNFeature {
 	
 	@Override
 	public String getCreateImageId() {
-		return ActivitiImageProvider.IMG_ENDEVENT_ERROR;
+		return ActivitiImageProvider.IMG_BOUNDARY_SIGNAL;
 	}
 
 	@Override

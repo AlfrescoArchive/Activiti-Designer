@@ -33,6 +33,7 @@ import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.features.AbstractCreateBPMNFeature;
 import org.activiti.designer.features.ChangeElementTypeFeature;
 import org.activiti.designer.features.CreateBoundaryErrorFeature;
+import org.activiti.designer.features.CreateBoundarySignalFeature;
 import org.activiti.designer.features.CreateBoundaryTimerFeature;
 import org.activiti.designer.features.CreateBusinessRuleTaskFeature;
 import org.activiti.designer.features.CreateCallActivityFeature;
@@ -40,6 +41,8 @@ import org.activiti.designer.features.CreateCustomServiceTaskFeature;
 import org.activiti.designer.features.CreateEmbeddedSubProcessFeature;
 import org.activiti.designer.features.CreateEndEventFeature;
 import org.activiti.designer.features.CreateErrorEndEventFeature;
+import org.activiti.designer.features.CreateErrorStartEventFeature;
+import org.activiti.designer.features.CreateEventSubProcessFeature;
 import org.activiti.designer.features.CreateExclusiveGatewayFeature;
 import org.activiti.designer.features.CreateInclusiveGatewayFeature;
 import org.activiti.designer.features.CreateMailTaskFeature;
@@ -48,6 +51,7 @@ import org.activiti.designer.features.CreateParallelGatewayFeature;
 import org.activiti.designer.features.CreateReceiveTaskFeature;
 import org.activiti.designer.features.CreateScriptTaskFeature;
 import org.activiti.designer.features.CreateServiceTaskFeature;
+import org.activiti.designer.features.CreateSignalCatchingEventFeature;
 import org.activiti.designer.features.CreateStartEventFeature;
 import org.activiti.designer.features.CreateTimerCatchingEventFeature;
 import org.activiti.designer.features.CreateTimerStartEventFeature;
@@ -119,6 +123,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     // Setup tool mappings to palette entries
     toolMapping.put(CreateStartEventFeature.class, PaletteEntry.START_EVENT);
     toolMapping.put(CreateTimerStartEventFeature.class, PaletteEntry.TIMER_START_EVENT);
+    toolMapping.put(CreateErrorStartEventFeature.class, PaletteEntry.ERROR_START_EVENT);
     toolMapping.put(CreateAlfrescoStartEventFeature.class, PaletteEntry.ALFRESCO_START_EVENT);
     toolMapping.put(CreateEndEventFeature.class, PaletteEntry.END_EVENT);
     toolMapping.put(CreateErrorEndEventFeature.class, PaletteEntry.ERROR_END_EVENT);
@@ -132,11 +137,14 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     toolMapping.put(CreateServiceTaskFeature.class, PaletteEntry.SERVICE_TASK);
     toolMapping.put(CreateCallActivityFeature.class, PaletteEntry.CALL_ACTIVITY);
     toolMapping.put(CreateEmbeddedSubProcessFeature.class, PaletteEntry.SUBPROCESS);
+    toolMapping.put(CreateEventSubProcessFeature.class, PaletteEntry.EVENT_SUBPROCESS);
     toolMapping.put(CreateUserTaskFeature.class, PaletteEntry.USER_TASK);
     toolMapping.put(CreateAlfrescoUserTaskFeature.class, PaletteEntry.ALFRESCO_USER_TASK);
     toolMapping.put(CreateBoundaryTimerFeature.class, PaletteEntry.BOUNDARY_TIMER);
     toolMapping.put(CreateBoundaryErrorFeature.class, PaletteEntry.ERROR_END_EVENT);
+    toolMapping.put(CreateBoundarySignalFeature.class, PaletteEntry.BOUNDARY_SIGNAL);
     toolMapping.put(CreateTimerCatchingEventFeature.class, PaletteEntry.BOUNDARY_TIMER);
+    toolMapping.put(CreateSignalCatchingEventFeature.class, PaletteEntry.BOUNDARY_SIGNAL);
     toolMapping.put(CreateBusinessRuleTaskFeature.class, PaletteEntry.BUSINESSRULE_TASK);
     toolMapping.put(CreateAlfrescoScriptTaskFeature.class, PaletteEntry.ALFRESCO_SCRIPT_TASK);
     toolMapping.put(CreateAlfrescoMailTaskFeature.class, PaletteEntry.ALFRESCO_MAIL_TASK);
@@ -407,6 +415,8 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
           eventCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("timerstartevent".equalsIgnoreCase(toolEntry.getLabel())) {
           eventCompartmentEntry.getToolEntries().add(toolEntry);
+        } else if ("errorstartevent".equalsIgnoreCase(toolEntry.getLabel())) {
+          eventCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("endevent".equalsIgnoreCase(toolEntry.getLabel())) {
           eventCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("errorendevent".equalsIgnoreCase(toolEntry.getLabel())) {
@@ -429,7 +439,13 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
           boundaryEventCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("errorboundaryevent".equalsIgnoreCase(toolEntry.getLabel())) {
           boundaryEventCompartmentEntry.getToolEntries().add(toolEntry);
+        } else if ("signalboundaryevent".equalsIgnoreCase(toolEntry.getLabel())) {
+          boundaryEventCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("timercatchingevent".equalsIgnoreCase(toolEntry.getLabel())) {
+          intermediateEventCompartmentEntry.getToolEntries().add(toolEntry);
+        } else if ("signalcatchingevent".equalsIgnoreCase(toolEntry.getLabel())) {
+          intermediateEventCompartmentEntry.getToolEntries().add(toolEntry);
+        } else if ("signalthrowingevent".equalsIgnoreCase(toolEntry.getLabel())) {
           intermediateEventCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("parallelgateway".equalsIgnoreCase(toolEntry.getLabel())) {
           gatewayCompartmentEntry.getToolEntries().add(toolEntry);
@@ -438,6 +454,8 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
         } else if ("inclusivegateway".equalsIgnoreCase(toolEntry.getLabel())) {
           gatewayCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("subprocess".equalsIgnoreCase(toolEntry.getLabel())) {
+          taskCompartmentEntry.getToolEntries().add(toolEntry);
+        } else if ("eventsubprocess".equalsIgnoreCase(toolEntry.getLabel())) {
           taskCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("callactivity".equalsIgnoreCase(toolEntry.getLabel())) {
           taskCompartmentEntry.getToolEntries().add(toolEntry);

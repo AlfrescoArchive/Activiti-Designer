@@ -72,6 +72,12 @@
                id="org.activiti.designer.multiInstanceTab"
                label="Multi instance">
          </propertyTab>
+         <propertyTab
+               afterTab="org.activiti.designer.listenerTab"
+               category="Activiti"
+               id="org.activiti.designer.signalTab"
+               label="Signals">
+         </propertyTab>
       </propertyTabs>
    </extension>
    <extension
@@ -163,6 +169,12 @@
                tab="org.activiti.designer.mainConfigTab">
          </propertySection>
          <propertySection
+               class="org.activiti.designer.property.PropertyBoundarySignalSection"
+               filter="org.activiti.designer.property.PropertyBoundarySignalFilter"
+               id="org.activiti.designer.mainConfigTab.signalboundaryevent"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <propertySection
                class="org.activiti.designer.property.PropertyCallActivitySection"
                filter="org.activiti.designer.property.PropertyCallActivityFilter"
                id="org.activiti.designer.mainConfigTab.callactivity"
@@ -200,6 +212,18 @@
                tab="org.activiti.designer.mainConfigTab">
          </propertySection>
          <propertySection
+               class="org.activiti.designer.property.PropertyIntermediateCatchSignalSection"
+               filter="org.activiti.designer.property.PropertyIntermediateCatchSignalFilter"
+               id="org.activiti.designer.mainConfigTab.signalintermediatecatchevent"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyIntermediateThrowSignalSection"
+               filter="org.activiti.designer.property.PropertyIntermediateThrowSignalFilter"
+               id="org.activiti.designer.mainConfigTab.timerintermediatethrowevent"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <propertySection
                class="com.alfresco.designer.gui.property.PropertyAlfrescoUserTaskSection"
                filter="com.alfresco.designer.gui.property.PropertyAlfrescoUserTaskFilter"
                id="org.activiti.designer.mainConfigTab.alfrescoUsertask"
@@ -228,6 +252,18 @@
                filter="org.activiti.designer.property.PropertyErrorEndEventFilter"
                id="org.activiti.designer.mainConfigTab.errorendevent"
                tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyErrorStartEventSection"
+               filter="org.activiti.designer.property.PropertyErrorStartEventFilter"
+               id="org.activiti.designer.mainConfigTab.errorstartevent"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertySignalSection"
+               filter="org.activiti.designer.property.PropertyDiagramFilter"
+               id="org.activiti.designer.signalTab.signals"
+               tab="org.activiti.designer.signalTab">
          </propertySection>
       </propertySections>
    </extension>

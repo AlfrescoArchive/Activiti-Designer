@@ -1,6 +1,7 @@
 package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
+import org.activiti.designer.bpmn2.model.EventSubProcess;
 import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.StartEvent;
 import org.activiti.designer.bpmn2.model.SubProcess;
@@ -19,6 +20,7 @@ public class CreateStartEventFeature extends AbstractCreateBPMNFeature {
 
 	public boolean canCreate(ICreateContext context) {
 	  Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
+	  if(parentObject instanceof EventSubProcess) return false;
     return (context.getTargetContainer() instanceof Diagram || parentObject instanceof SubProcess);
 	}
 
