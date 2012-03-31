@@ -298,7 +298,7 @@
       <objectContribution
             adaptable="false"
             id="org.activiti.designer.gui.unitTestContribution"
-            nameFilter="*.bpmn20.xml"
+            nameFilter="*.bpmn"
             objectClass="org.eclipse.core.resources.IFile">
          <menu
                id="org.activiti.designer.gui.menu1"
