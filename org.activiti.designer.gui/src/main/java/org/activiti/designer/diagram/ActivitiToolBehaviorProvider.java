@@ -513,7 +513,6 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
       for (final CustomServiceTaskContext currentDrawerItem : drawer.getValue()) {
         final CreateCustomServiceTaskFeature feature = new CreateCustomServiceTaskFeature(getFeatureProvider(), currentDrawerItem.getServiceTask().getName(),
                 currentDrawerItem.getServiceTask().getDescription(), currentDrawerItem.getServiceTask().getClass().getCanonicalName());
-        System.out.println(currentDrawerItem.getServiceTask().getClass().getCanonicalName());
         final IToolEntry entry = new ObjectCreationToolEntry(currentDrawerItem.getServiceTask().getName(), currentDrawerItem.getServiceTask().getDescription(),
                 currentDrawerItem.getSmallImageKey(), null, feature);
         paletteCompartmentEntry.getToolEntries().add(entry);

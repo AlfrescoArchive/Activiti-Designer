@@ -69,5 +69,4 @@ public class CreateDefaultActivitiDiagramNameWizardPage extends WizardNewFileCre
     }
     return null;
   }
-
 }

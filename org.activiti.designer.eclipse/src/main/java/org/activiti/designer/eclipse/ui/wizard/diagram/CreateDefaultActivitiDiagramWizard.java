@@ -2,21 +2,15 @@ package org.activiti.designer.eclipse.ui.wizard.diagram;
 
 import java.lang.reflect.InvocationTargetException;
 
-import org.activiti.designer.eclipse.common.ActivitiBPMNDiagramConstants;
-import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.eclipse.editor.Bpmn2DiagramCreator;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
-import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.internal.core.PackageFragment;
-import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -31,12 +25,14 @@ import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 public class CreateDefaultActivitiDiagramWizard extends BasicNewResourceWizard {
 
   private Diagram diagram;
+  private CreateDefaultActivitiDiagramNameWizardPage namePage;
   private CreateDefaultActivitiDiagramInitialContentPage initialContentPage;
 
   @Override
   public void addPages() {
     super.addPages();
-    addPage(new CreateDefaultActivitiDiagramNameWizardPage(super.getSelection()));
+    namePage = new CreateDefaultActivitiDiagramNameWizardPage(super.getSelection());
+    addPage(namePage);
     initialContentPage = new CreateDefaultActivitiDiagramInitialContentPage();
     addPage(initialContentPage);
   }
@@ -61,43 +57,13 @@ public class CreateDefaultActivitiDiagramWizard extends BasicNewResourceWizard {
       return null;
     }
 
-    IProject project = null;
-    IFolder diagramFolder = null;
-
-    // Added check on IJavaProject
-    // Kept IProject check for future facet implementation
-    Object element = getSelection().getFirstElement();
-    if (element instanceof IProject) {
-      project = (IProject) element;
-    } else if (element instanceof IJavaProject) {
-      IJavaProject javaProject = (IJavaProject) element;
-      project = javaProject.getProject();
-    } else if (element instanceof IFolder) {
-      diagramFolder = (IFolder) element;
-      project = diagramFolder.getProject();
-    } else if (element instanceof PackageFragment) { // access is
-      // discouraged, but
-      // inevitable when
-      // the selection is
-      // the diagrams
-      // package itself
-      PackageFragment fragment = (PackageFragment) element;
-      project = fragment.getJavaProject().getProject();
+    IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+    if(namePage.getContainerFullPath().segmentCount() == 1) {
+    	return root.getProject(namePage.getContainerFullPath().lastSegment()).getFile(diagramName);
+    } else {
+	    IFolder diagramFolder = root.getFolder(namePage.getContainerFullPath());
+	    return diagramFolder.getFile(diagramName);
     }
-
-    if (project == null || !project.isAccessible()) {
-      String error = "No open project was found for the current selection. Select a project and restart the wizard.";
-      IStatus status = new Status(IStatus.ERROR, ActivitiPlugin.getID(), error);
-      ErrorDialog.openError(getShell(), "No Project Found", null, status);
-      return null;
-    }
-
-    if (diagramFolder == null) {
-      diagramFolder = project.getFolder(ActivitiBPMNDiagramConstants.DIAGRAM_FOLDER);
-    }
-
-    return diagramFolder.getFile(diagramName);
-
   }
 
   /*

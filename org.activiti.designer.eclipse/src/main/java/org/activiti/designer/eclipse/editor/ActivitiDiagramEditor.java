@@ -191,32 +191,33 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     	if(bpmnFile.exists() == false) {
   			bpmnFile.createNewFile();
   			modelFile.refreshLocal(IResource.DEPTH_INFINITE, null);
+  		} else {
+	    	FileInputStream fileStream = new FileInputStream(bpmnFile);
+	      XMLInputFactory xif = XMLInputFactory.newInstance();
+	      InputStreamReader in = new InputStreamReader(fileStream, "UTF-8");
+	      XMLStreamReader xtr = xif.createXMLStreamReader(in);
+	      parser = new BpmnParser();
+	      parser.parseBpmn(xtr, model);
+	      
+	      BasicCommandStack basicCommandStack = (BasicCommandStack) getEditingDomain().getCommandStack();
+	
+	  		if (input instanceof DiagramEditorInput) {
+	
+	  			basicCommandStack.execute(new RecordingCommand(getEditingDomain()) {
+	
+	  				@Override
+	  				protected void doExecute() {
+	  					importDiagram();
+	  				}
+	  			});
+	  		}
+	  		basicCommandStack.saveIsDone();
+	  		basicCommandStack.flush();
   		}
-    	FileInputStream fileStream = new FileInputStream(bpmnFile);
-      XMLInputFactory xif = XMLInputFactory.newInstance();
-      InputStreamReader in = new InputStreamReader(fileStream, "UTF-8");
-      XMLStreamReader xtr = xif.createXMLStreamReader(in);
-      parser = new BpmnParser();
-      parser.parseBpmn(xtr, model);
       
     } catch(Exception e) {
       e.printStackTrace();
     }
-		
-		BasicCommandStack basicCommandStack = (BasicCommandStack) getEditingDomain().getCommandStack();
-
-		if (input instanceof DiagramEditorInput) {
-
-			basicCommandStack.execute(new RecordingCommand(getEditingDomain()) {
-
-				@Override
-				protected void doExecute() {
-					importDiagram();
-				}
-			});
-		}
-		basicCommandStack.saveIsDone();
-		basicCommandStack.flush();
 	}
 	
 	private void importDiagram() {
