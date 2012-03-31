@@ -84,7 +84,7 @@ This Agreement is governed by the laws of the State of New York and the intellec
       <import plugin="org.eclipse.jdt.launching" version="3.5.100" match="greaterOrEqual"/>
       <import plugin="org.eclipse.jdt.junit.core" version="3.6.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.graphiti.pattern" version="0.9.0" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.ui.navigator" version="3.5.101" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.ui.navigator" version="3.5.100" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.ide" version="3.7.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.emf.ecore"/>
       <import plugin="org.eclipse.emf.ecore.xmi"/>
