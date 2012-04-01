@@ -86,6 +86,7 @@ public class DeploymentMenu implements org.eclipse.ui.IObjectActionDelegate{
             String processName = "";
             memberList = new ArrayList<IFile>();
             getMembersWithFilter(project, ".bpmn");
+            getMembersWithFilter(project, ".bpmn20.xml");
             if(memberList.size() > 0) {
               for (IFile bpmnResource : memberList) {
                 String bpmnFilename = bpmnResource.getName();
@@ -93,7 +94,9 @@ public class DeploymentMenu implements org.eclipse.ui.IObjectActionDelegate{
                   processName = bpmnFilename.substring(0, bpmnFilename.indexOf("."));
                 
                 //TODO temp fix because .bpmn files are not parsed by the Activiti Engine version 5.9. This is fixed for 5.10
-                bpmnFilename = bpmnFilename.substring(0, bpmnFilename.lastIndexOf(".")) + ".bpmn20.xml";
+                if(bpmnFilename.endsWith(".bpmn")) {
+                	bpmnFilename = bpmnFilename.substring(0, bpmnFilename.lastIndexOf(".")) + ".bpmn20.xml";
+                }
                 
                 bpmnResource.copy(tempbarFolder.getFile(bpmnFilename).getFullPath(), true, new NullProgressMonitor());
               }
@@ -141,6 +144,9 @@ public class DeploymentMenu implements org.eclipse.ui.IObjectActionDelegate{
                 }
                 compressPackage(deploymentFolder, tempclassesFolder, processName + ".jar");
               }
+              
+              tempbarFolder.delete(true, null);
+              tempclassesFolder.delete(true, null);
           
               // refresh the output folder to reflect changes
               deploymentFolder.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
