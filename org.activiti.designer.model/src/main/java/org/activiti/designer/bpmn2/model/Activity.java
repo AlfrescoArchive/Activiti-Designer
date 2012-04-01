@@ -5,41 +5,40 @@ import java.util.List;
 
 public class Activity extends FlowNode {
 
-	protected boolean asynchronous;
-	protected SequenceFlow defaultFlow;
-	protected MultiInstanceLoopCharacteristics loopCharacteristics;
-	protected List<BoundaryEvent> boundaryEvents = new ArrayList<BoundaryEvent>();
-	protected List<ActivitiListener> executionListeners = new ArrayList<ActivitiListener>();
-	
-	public boolean isAsynchronous() {
-  	return asynchronous;
+  protected boolean asynchronous;
+  protected SequenceFlow defaultFlow;
+  protected MultiInstanceLoopCharacteristics loopCharacteristics;
+  protected List<BoundaryEvent> boundaryEvents = new ArrayList<BoundaryEvent>();
+  protected List<ActivitiListener> executionListeners = new ArrayList<ActivitiListener>();
+
+  public boolean isAsynchronous() {
+    return asynchronous;
   }
-	public void setAsynchronous(boolean asynchronous) {
-  	this.asynchronous = asynchronous;
-	}
-	public List<BoundaryEvent> getBoundaryEvents() {
-  	return boundaryEvents;
+  public void setAsynchronous(boolean asynchronous) {
+    this.asynchronous = asynchronous;
   }
-	public void setBoundaryEvents(List<BoundaryEvent> boundaryEvents) {
-  	this.boundaryEvents = boundaryEvents;
+  public List<BoundaryEvent> getBoundaryEvents() {
+    return boundaryEvents;
   }
-	public SequenceFlow getDefaultFlow() {
-  	return defaultFlow;
+  public void setBoundaryEvents(List<BoundaryEvent> boundaryEvents) {
+    this.boundaryEvents = boundaryEvents;
   }
-	public void setDefaultFlow(SequenceFlow defaultFlow) {
-  	this.defaultFlow = defaultFlow;
+  public SequenceFlow getDefaultFlow() {
+    return defaultFlow;
   }
-	public List<ActivitiListener> getExecutionListeners() {
-  	return executionListeners;
+  public void setDefaultFlow(SequenceFlow defaultFlow) {
+    this.defaultFlow = defaultFlow;
   }
-	public void setExecutionListeners(List<ActivitiListener> executionListeners) {
-  	this.executionListeners = executionListeners;
+  public List<ActivitiListener> getExecutionListeners() {
+    return executionListeners;
   }
-	public MultiInstanceLoopCharacteristics getLoopCharacteristics() {
-  	return loopCharacteristics;
+  public void setExecutionListeners(List<ActivitiListener> executionListeners) {
+    this.executionListeners = executionListeners;
   }
-	public void setLoopCharacteristics(
-      MultiInstanceLoopCharacteristics loopCharacteristics) {
-  	this.loopCharacteristics = loopCharacteristics;
+  public MultiInstanceLoopCharacteristics getLoopCharacteristics() {
+    return loopCharacteristics;
+  }
+  public void setLoopCharacteristics(MultiInstanceLoopCharacteristics loopCharacteristics) {
+    this.loopCharacteristics = loopCharacteristics;
   }
 }

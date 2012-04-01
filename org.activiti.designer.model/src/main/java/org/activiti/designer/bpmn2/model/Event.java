@@ -5,13 +5,13 @@ import java.util.List;
 
 public class Event extends FlowNode {
 
-	protected List<EventDefinition> eventDefinitions = new ArrayList<EventDefinition>();
+  protected List<EventDefinition> eventDefinitions = new ArrayList<EventDefinition>();
 
-	public List<EventDefinition> getEventDefinitions() {
-  	return eventDefinitions;
+  public List<EventDefinition> getEventDefinitions() {
+    return eventDefinitions;
   }
 
-	public void setEventDefinitions(List<EventDefinition> eventDefinitions) {
-  	this.eventDefinitions = eventDefinitions;
+  public void setEventDefinitions(List<EventDefinition> eventDefinitions) {
+    this.eventDefinitions = eventDefinitions;
   }
 }

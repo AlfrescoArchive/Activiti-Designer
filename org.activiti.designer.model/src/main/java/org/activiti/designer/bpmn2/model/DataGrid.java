@@ -5,13 +5,13 @@ import java.util.List;
 
 public class DataGrid implements ComplexDataType {
 
-	protected List<DataGridRow> rows = new ArrayList<DataGridRow>();
+  protected List<DataGridRow> rows = new ArrayList<DataGridRow>();
 
-	public List<DataGridRow> getRows() {
-  	return rows;
+  public List<DataGridRow> getRows() {
+    return rows;
   }
 
-	public void setRows(List<DataGridRow> rows) {
-  	this.rows = rows;
+  public void setRows(List<DataGridRow> rows) {
+    this.rows = rows;
   }
 }
