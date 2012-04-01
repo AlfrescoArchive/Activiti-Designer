@@ -21,7 +21,6 @@
 		<module>../org.activiti.designer.updatesite</module>
 		<module>../org.activiti.designer.integration</module>
 		<module>../org.activiti.designer.export.bpmn20</module>
-		<module>../org.activiti.designer.export.image</module>
 		<module>../org.activiti.designer.validation.bpmn20</module>
 	</modules>
 

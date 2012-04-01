@@ -3,11 +3,8 @@
  */
 package org.acme.servicetasks;
 
-import java.util.List;
-
 import org.activiti.designer.integration.servicetask.AbstractCustomServiceTask;
 import org.activiti.designer.integration.servicetask.PropertyType;
-import org.activiti.designer.integration.servicetask.annotation.DataGridProperty;
 import org.activiti.designer.integration.servicetask.annotation.DatePickerProperty;
 import org.activiti.designer.integration.servicetask.annotation.Help;
 import org.activiti.designer.integration.servicetask.annotation.Property;
@@ -63,11 +60,6 @@ public class AcmeMoneyTask extends AbstractCustomServiceTask {
   @Property(type = PropertyType.PERIOD, displayName = "Processing Time", required = true, defaultValue = "0y 0mo 2w 0d 0h 0m 0s")
   @Help(displayHelpShort = "The maximum allowed time for processing", displayHelpLong = "Processing must take no longer than the period you specify here.")
   private String maximumProcessingTime;
-
-  @Property(type = PropertyType.DATA_GRID, displayName = "Account managers")
-  @DataGridProperty(itemClass = AccountManager.class, orderable = true)
-  @Help(displayHelpShort = "People authorized for this account", displayHelpLong = "Specify the details of people allowed to manage this account.")
-  private List<AccountManager> accountManagers;
 
   @Property(type = PropertyType.BOOLEAN_CHOICE, displayName = "VIP Customer", defaultValue = "false")
   @Help(displayHelpShort = "Is the customer a VIP?", displayHelpLong = "VIP customers enjoy special privileges. Check this field to indicate the customer is a VIP.")

@@ -48,12 +48,6 @@ public enum PropertyType {
   /**
    * Property type for boolean properties to be displayed as a checkbox.
    */
-  BOOLEAN_CHOICE,
-
-  /**
-   * Property type for properties to be displayed as a grid of items that can be
-   * edited in rows.
-   */
-  DATA_GRID;
+  BOOLEAN_CHOICE;
 
 }
