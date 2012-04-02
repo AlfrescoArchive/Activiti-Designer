@@ -514,7 +514,9 @@ public class BpmnParser {
 
 	private SubProcess parseSubProcess(XMLStreamReader xtr) {
 		SubProcess subProcess = null;
-		if(StringUtils.isNotEmpty(xtr.getAttributeValue(null, "triggeredByEvent"))) {
+		if(StringUtils.isNotEmpty(xtr.getAttributeValue(null, "triggeredByEvent")) && 
+		        "true".equalsIgnoreCase(xtr.getAttributeValue(null, "triggeredByEvent"))) {
+		  
 			subProcess = new EventSubProcess();
 		} else {
 			subProcess = new SubProcess();
