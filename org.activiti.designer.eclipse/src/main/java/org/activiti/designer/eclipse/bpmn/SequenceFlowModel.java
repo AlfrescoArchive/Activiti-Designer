@@ -26,6 +26,7 @@ import org.activiti.designer.bpmn2.model.ActivitiListener;
 public class SequenceFlowModel {
   
   public String id;
+  public String name;
   public String sourceRef;
   public String targetRef;
   public String conditionExpression;

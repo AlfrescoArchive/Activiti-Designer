@@ -570,6 +570,7 @@ public class BpmnParser {
 		sequenceFlow.sourceRef = xtr.getAttributeValue(null, "sourceRef");
 		sequenceFlow.targetRef = xtr.getAttributeValue(null, "targetRef");
 		sequenceFlow.id = xtr.getAttributeValue(null, "id");
+		sequenceFlow.name = xtr.getAttributeValue(null, "name");
 		sequenceFlow.conditionExpression = parseSequenceFlowCondition(xtr, sequenceFlow);;
 		return sequenceFlow;
 	}

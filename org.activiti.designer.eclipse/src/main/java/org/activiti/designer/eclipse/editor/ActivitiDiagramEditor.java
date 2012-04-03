@@ -383,6 +383,11 @@ public class ActivitiDiagramEditor extends DiagramEditor {
       } else {
       	sequenceFlow.setId(sequenceFlowModel.id);
       }
+      
+      if(StringUtils.isNotEmpty(sequenceFlowModel.name)) {
+        sequenceFlow.setName(sequenceFlowModel.name);
+      }
+      
       sequenceFlow.setSourceRef(getFlowNode(sequenceFlowModel.sourceRef, model.getProcess().getFlowElements()));
       sequenceFlow.setTargetRef(getFlowNode(sequenceFlowModel.targetRef, model.getProcess().getFlowElements()));
       
