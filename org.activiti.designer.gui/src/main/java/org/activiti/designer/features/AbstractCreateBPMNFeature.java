@@ -56,7 +56,7 @@ public abstract class AbstractCreateBPMNFeature extends AbstractCreateFeature {
   
   protected void addObjectToContainer(ICreateContext context, FlowNode flowNode, String name) {
   	flowNode.setId(getNextId());
-  	flowNode.setName(name);
+  	setName(flowNode.getName(), flowNode, context);
   	ContainerShape targetContainer = context.getTargetContainer();
 		if(targetContainer instanceof Diagram) {
 			ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).addFlowElement(flowNode);

@@ -55,6 +55,7 @@ public class ChangeElementTypeFeature extends AbstractCustomFeature {
 	  taskContext.putProperty("org.activiti.designer.changetype.targetflows", targetList);
 	  taskContext.putProperty("org.activiti.designer.changetype.name", oldObject.getName());
 	  
+	  targetContainer.getChildren().remove(element);
 	  ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getProcess().getFlowElements().remove(oldObject);
 	  
 	  if("servicetask".equals(newType)) {
