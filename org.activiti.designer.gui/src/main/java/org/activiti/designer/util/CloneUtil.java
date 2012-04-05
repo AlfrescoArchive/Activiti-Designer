@@ -156,6 +156,7 @@ public final class CloneUtil {
   	result.setValue(formProperty.getValue());
   	result.setExpression(formProperty.getExpression());
   	result.setVariable(formProperty.getVariable());
+  	result.setDefaultExpression(formProperty.getDefaultExpression());
   	result.setDatePattern(formProperty.getDatePattern());
   	result.setReadable(formProperty.getReadable());
   	result.setRequired(formProperty.getRequired());

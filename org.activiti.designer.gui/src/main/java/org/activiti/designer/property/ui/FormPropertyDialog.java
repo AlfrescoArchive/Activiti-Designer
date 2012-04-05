@@ -29,6 +29,7 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
 	public String value;
 	public String expression;
 	public String variable;
+	public String defaultExpression;
 	public String datePattern;
 	public String required;
 	public String readable;
@@ -41,6 +42,7 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
 	protected String savedValue;
 	protected String savedExpression;
 	protected String savedVariable;
+	protected String savedDefaultExpression;
 	protected String savedDatePattern;
 	protected String savedRequired;
 	protected String savedReadable;
@@ -54,7 +56,7 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
 	
 	public FormPropertyDialog(Shell parent, TableItem[] fieldList, String savedId, 
 	        String savedName, String savedType, String savedValue, 
-	        String savedExpression, String savedVariable, String savedDatePattern,
+	        String savedExpression, String savedVariable, String savedDefaultExpression, String savedDatePattern,
 	        String savedRequired, String savedReadable, String savedWriteable, String savedFormValues) {
     // Pass the default styles here
     this(parent, fieldList, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
@@ -64,6 +66,7 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
     this.savedValue = savedValue;
     this.savedExpression = savedExpression;
     this.savedVariable = savedVariable;
+    this.savedDefaultExpression = savedDefaultExpression;
     this.savedDatePattern = savedDatePattern;
     this.savedRequired = savedRequired;
     this.savedReadable = savedReadable;
@@ -133,7 +136,10 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
     final Text variableText = createText(savedVariable, shell, expressionText);
     createLabel("Variable", shell, variableText);
     
-    final Text patternText = createText(savedDatePattern, shell, variableText);
+    final Text defaultText = createText(savedDefaultExpression, shell, variableText);
+    createLabel("Default", shell, defaultText);
+    
+    final Text patternText = createText(savedDatePattern, shell, defaultText);
     createLabel("Date pattern", shell, patternText);
     
     final Combo readableDropDown = new Combo(shell, SWT.DROP_DOWN | SWT.BORDER);
@@ -244,6 +250,7 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
 				value = valueText.getText();
 				expression = expressionText.getText();
 				variable = variableText.getText();
+				defaultExpression = defaultText.getText(); 
 				datePattern = patternText.getText();
 				readable = readableDropDown.getText();
 				writeable = writeableDropDown.getText();

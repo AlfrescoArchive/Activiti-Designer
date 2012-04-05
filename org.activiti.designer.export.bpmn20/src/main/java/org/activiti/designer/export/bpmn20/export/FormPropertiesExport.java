@@ -46,6 +46,9 @@ public class FormPropertiesExport implements ActivitiNamespaceConstants {
       if(StringUtils.isNotEmpty(formProperty.getVariable())) {
       	xtw.writeAttribute("variable", formProperty.getVariable());
       }
+      if(StringUtils.isNotEmpty(formProperty.getDefaultExpression())) {
+        xtw.writeAttribute("default", formProperty.getDefaultExpression());
+      }
       if(StringUtils.isNotEmpty(formProperty.getDatePattern())) {
       	xtw.writeAttribute("datePattern", formProperty.getDatePattern());
       }

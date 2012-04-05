@@ -418,6 +418,9 @@ public class BpmnParser {
 		if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, "expression"))) {
 			property.setExpression(xtr.getAttributeValue(null, "expression"));
 		}
+		if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, "default"))) {
+      property.setDefaultExpression(xtr.getAttributeValue(null, "default"));
+    }
 		if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, "datePattern"))) {
 			property.setDatePattern(xtr.getAttributeValue(null, "datePattern"));
 		}

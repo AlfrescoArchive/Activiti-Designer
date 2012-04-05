@@ -29,8 +29,8 @@ public class FormPropertyEditor extends TableFieldEditor {
 	
   public FormPropertyEditor(String key, Composite parent) {
     
-    super(key, "", new String[] {"Id", "Name", "Type", "Value", "Expression", "Variable", "Pattern", "Required", "Readable", "Writeable", "Form values"},
-        new int[] {60, 100, 60, 80, 100, 80, 60, 60, 60, 60, 200}, parent);
+    super(key, "", new String[] {"Id", "Name", "Type", "Value", "Expression", "Variable", "Default", "Pattern", "Required", "Readable", "Writeable", "Form values"},
+        new int[] {60, 100, 60, 80, 100, 80, 80, 60, 60, 60, 60, 120}, parent);
     this.parent = parent;
   }
 
@@ -62,10 +62,11 @@ public class FormPropertyEditor extends TableFieldEditor {
       tableItem.setText(3, formProperty.getValue() != null ? formProperty.getValue() : "");
       tableItem.setText(4, formProperty.getExpression() != null ? formProperty.getExpression() : "");
       tableItem.setText(5, formProperty.getVariable() != null ? formProperty.getVariable() : "");
-      tableItem.setText(6, formProperty.getDatePattern() != null ? formProperty.getDatePattern() : "");
-      tableItem.setText(7, formProperty.getRequired() != null ? formProperty.getRequired().toString().toLowerCase() : "");
-      tableItem.setText(8, formProperty.getReadable() != null ? formProperty.getReadable().toString().toLowerCase() : "");
-      tableItem.setText(9, formProperty.getWriteable() != null ? formProperty.getWriteable().toString().toLowerCase() : "");
+      tableItem.setText(6, formProperty.getDefaultExpression() != null ? formProperty.getDefaultExpression() : "");
+      tableItem.setText(7, formProperty.getDatePattern() != null ? formProperty.getDatePattern() : "");
+      tableItem.setText(8, formProperty.getRequired() != null ? formProperty.getRequired().toString().toLowerCase() : "");
+      tableItem.setText(9, formProperty.getReadable() != null ? formProperty.getReadable().toString().toLowerCase() : "");
+      tableItem.setText(10, formProperty.getWriteable() != null ? formProperty.getWriteable().toString().toLowerCase() : "");
       
       String formValuesString = "";
       for(int i = 0; i < formProperty.getFormValues().size(); i++) {
@@ -75,7 +76,7 @@ public class FormPropertyEditor extends TableFieldEditor {
       	}
       	formValuesString += formValue.getId() + ":" + formValue.getName();
       }
-      tableItem.setText(10, formValuesString);
+      tableItem.setText(11, formValuesString);
     }
   }
 
@@ -85,7 +86,7 @@ public class FormPropertyEditor extends TableFieldEditor {
     dialog.open();
     if(dialog.id != null && dialog.id.length() > 0) {
       return new String[] { dialog.id, dialog.name, dialog.type, dialog.value,
-      				dialog.expression, dialog.variable, dialog.datePattern,
+      				dialog.expression, dialog.variable, dialog.defaultExpression, dialog.datePattern,
               dialog.required.toLowerCase(), dialog.readable.toLowerCase(), 
               dialog.writeable.toLowerCase(), dialog.formValues};
     } else {
@@ -97,11 +98,11 @@ public class FormPropertyEditor extends TableFieldEditor {
   protected String[] getChangedInputObject(TableItem item) {
     FormPropertyDialog dialog = new FormPropertyDialog(parent.getShell(), getItems(), 
     				item.getText(0), item.getText(1), item.getText(2), item.getText(3), item.getText(4),
-            item.getText(5), item.getText(6), item.getText(7), item.getText(8), item.getText(9), item.getText(10));
+            item.getText(5), item.getText(6), item.getText(7), item.getText(8), item.getText(9), item.getText(10), item.getText(11));
     dialog.open();
     if(dialog.id != null && dialog.id.length() > 0) {      
       return new String[] {dialog.id, dialog.name, dialog.type, dialog.value,
-      				dialog.expression, dialog.variable, dialog.datePattern,
+      				dialog.expression, dialog.variable, dialog.defaultExpression, dialog.datePattern,
               dialog.required.toLowerCase(), dialog.readable.toLowerCase(), 
               dialog.writeable.toLowerCase(), dialog.formValues};
     } else {
@@ -160,11 +161,12 @@ public class FormPropertyEditor extends TableFieldEditor {
             String value = item.getText(3);
             String expression = item.getText(4);
             String variable = item.getText(5);
-            String datePattern = item.getText(6);
-            String required = item.getText(7);
-            String readable = item.getText(8);
-            String writeable = item.getText(9);
-            String formValues = item.getText(10);
+            String defaultExpression = item.getText(6);
+            String datePattern = item.getText(7);
+            String required = item.getText(8);
+            String readable = item.getText(9);
+            String writeable = item.getText(10);
+            String formValues = item.getText(11);
             if(id != null && id.length() > 0) {
               
               FormProperty newFormProperty = new FormProperty();
@@ -174,6 +176,7 @@ public class FormPropertyEditor extends TableFieldEditor {
               newFormProperty.setValue(value);
               newFormProperty.setExpression(expression);
               newFormProperty.setVariable(variable);
+              newFormProperty.setDefaultExpression(defaultExpression);
               newFormProperty.setDatePattern(datePattern);
               if(StringUtils.isNotEmpty(required)) {
                 newFormProperty.setRequired(Boolean.valueOf(required.toLowerCase()));

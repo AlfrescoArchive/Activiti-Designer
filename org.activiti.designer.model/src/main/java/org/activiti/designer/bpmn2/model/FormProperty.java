@@ -10,6 +10,7 @@ public class FormProperty extends BaseElement {
   protected String expression;
   protected String variable;
   protected String type;
+  protected String defaultExpression;
   protected String datePattern;
   protected Boolean readable;
   protected Boolean writeable;
@@ -42,6 +43,12 @@ public class FormProperty extends BaseElement {
   }
   public String getType() {
     return type;
+  }
+  public String getDefaultExpression() {
+    return defaultExpression;
+  }
+  public void setDefaultExpression(String defaultExpression) {
+    this.defaultExpression = defaultExpression;
   }
   public void setType(String type) {
     this.type = type;
