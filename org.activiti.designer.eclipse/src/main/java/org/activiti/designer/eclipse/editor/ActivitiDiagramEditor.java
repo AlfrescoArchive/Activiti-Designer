@@ -88,13 +88,13 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 	public void init(IEditorSite site, IEditorInput input) throws PartInitException {
 		
 		try {
-			if (input instanceof IFileEditorInput) {
+			if (input instanceof IFileEditorInput) { // Opened from the Open with... menu
 				modelFile = ((IFileEditorInput) input).getFile();
 				input = createNewDiagramEditorInput();
-			} else if (input instanceof DiagramEditorInput) {
+			} else if (input instanceof DiagramEditorInput) { // Opened by the default associated file extension .bpmn
 				getModelPathFromInput((DiagramEditorInput) input);
 				input = createNewDiagramEditorInput();
-			} else if (input instanceof IURIEditorInput) {
+			} else if (input instanceof IURIEditorInput) { // Opened external to Eclipse
 				IWorkspaceRoot wsRoot = ResourcesPlugin.getWorkspace().getRoot();
         java.net.URI uri= ((IURIEditorInput) input).getURI();
         String path = uri.getPath();
