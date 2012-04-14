@@ -1585,6 +1585,10 @@ public class BpmnParser {
 		try {
 			while (xtr.hasNext()) {
 				xtr.next();
+				if (xtr.isStartElement() && "timerEventDefinition".equalsIgnoreCase(xtr.getLocalName())) {
+				  TimerEventDefinition eventDef = new TimerEventDefinition();
+				  catchEvent.getEventDefinitions().add(eventDef);
+				}
 				if (xtr.isStartElement() && "timeDuration".equalsIgnoreCase(xtr.getLocalName())) {
 					TimerEventDefinition eventDef = new TimerEventDefinition();
 					eventDef.setTimeDuration(xtr.getElementText());
