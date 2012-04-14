@@ -324,7 +324,7 @@ public class BpmnParser {
 
 	private StartEvent parseStartEvent(XMLStreamReader xtr) {
 		StartEvent startEvent = null;
-		if (xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "formKey") != null) {
+		if (StringUtils.isNotEmpty(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "formKey"))) {
 			String[] formTypes = PreferencesUtil.getStringArray(Preferences.ALFRESCO_FORMTYPES_STARTEVENT);
 			for (String form : formTypes) {
 				if (form.equals(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "formKey"))) {
@@ -335,14 +335,20 @@ public class BpmnParser {
 		if (startEvent == null) {
 			startEvent = new StartEvent();
 		}
-		if (xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "initiator") != null) {
+		
+		if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, "name"))) {
+      startEvent.setName(xtr.getAttributeValue(null, "name"));
+    } else {
+      startEvent.setName("Start");
+    }
+		
+		if (StringUtils.isNotEmpty(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "initiator"))) {
 			startEvent.setInitiator(xtr.getAttributeValue(
 			    ACTIVITI_EXTENSIONS_NAMESPACE, "initiator"));
 		}
-		startEvent.setName("Start");
-		if (xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "formKey") != null) {
-			startEvent.setFormKey(xtr.getAttributeValue(
-			    ACTIVITI_EXTENSIONS_NAMESPACE, "formKey"));
+		
+		if (StringUtils.isNotEmpty(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "formKey"))) {
+			startEvent.setFormKey(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "formKey"));
 		}
 		boolean readyWithStartEvent = false;
 		try {
@@ -494,7 +500,12 @@ public class BpmnParser {
 
 	private EndEvent parseEndEvent(XMLStreamReader xtr) {
 		EndEvent endEvent = new EndEvent();
-		endEvent.setName("End");
+		if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, "name"))) {
+		  endEvent.setName(xtr.getAttributeValue(null, "name"));
+    } else {
+      endEvent.setName("End");
+    }
+		
 		boolean readyWithEndEvent = false;
 		try {
 			while (readyWithEndEvent == false && xtr.hasNext()) {
@@ -502,7 +513,7 @@ public class BpmnParser {
 				if (xtr.isStartElement() && "errorEventDefinition".equalsIgnoreCase(xtr.getLocalName())) {
 					ErrorEventDefinition errorDef = new ErrorEventDefinition();
 					endEvent.getEventDefinitions().add(errorDef);
-					if (xtr.getAttributeValue(null, "errorRef") != null) {
+					if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, "errorRef"))) {
 						errorDef.setErrorCode(xtr.getAttributeValue(null, "errorRef"));
 					}
 
