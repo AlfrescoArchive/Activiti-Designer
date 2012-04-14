@@ -26,9 +26,14 @@ import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.eclipse.graphiti.features.IUpdateFeature;
+import org.eclipse.graphiti.features.context.impl.UpdateContext;
+import org.eclipse.graphiti.mm.algorithms.MultiText;
 import org.eclipse.graphiti.mm.pictograms.ConnectionDecorator;
+import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.FreeFormConnection;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
+import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
@@ -239,7 +244,7 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
     }
 
     public void focusLost(final FocusEvent e) {
-      PictogramElement pe = getSelectedPictogramElement();
+      final PictogramElement pe = getSelectedPictogramElement();
       if (pe == null)
         return;
       final Object bo = getBusinessObject(pe);
@@ -257,6 +262,24 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
           
           String name = nameText.getText();
           ((FlowElement) bo).setName(name);
+          
+          UpdateContext updateContext = new UpdateContext(pe);
+          IUpdateFeature updateFeature = getFeatureProvider(pe).getUpdateFeature(updateContext);
+          updateFeature.update(updateContext);
+          
+          if (pe instanceof ContainerShape) {
+            ContainerShape cs = (ContainerShape) pe;
+            for (Shape shape : cs.getChildren()) {
+              if (shape.getGraphicsAlgorithm() instanceof Text) {
+                org.eclipse.graphiti.mm.algorithms.Text text = (org.eclipse.graphiti.mm.algorithms.Text) shape.getGraphicsAlgorithm();
+                text.setValue(name);
+              }
+              if (shape.getGraphicsAlgorithm() instanceof MultiText) {
+                MultiText text = (MultiText) shape.getGraphicsAlgorithm();
+                text.setValue(name);
+              }
+            }
+          }
           
           if((bo instanceof Activity || bo instanceof ExclusiveGateway || 
                   bo instanceof InclusiveGateway)

@@ -19,12 +19,11 @@ public class UpdateFlowElementFeature extends AbstractUpdateFeature {
 	}
 
 	public boolean canUpdate(IUpdateContext context) {
-		// return true, if linked business object is an EClass
-		Object bo = getBusinessObjectForPictogramElement(context.getPictogramElement());
-		return (bo instanceof FlowElement);
+	  Object bo = getBusinessObjectForPictogramElement(context.getPictogramElement());
+    return (bo instanceof FlowElement);
 	}
 
-	public IReason updateNeeded(IUpdateContext context) {
+  public IReason updateNeeded(IUpdateContext context) {
 		// retrieve name from pictogram model
 		String pictogramName = null;
 		PictogramElement pictogramElement = context.getPictogramElement();
@@ -49,6 +48,7 @@ public class UpdateFlowElementFeature extends AbstractUpdateFeature {
 		// update needed, if names are different
 		boolean updateNameNeeded = ((pictogramName == null && businessName != null) || 
 				(pictogramName != null && !pictogramName.equals(businessName)));
+		
 		if (updateNameNeeded) {
 			return Reason.createTrueReason(); //$NON-NLS-1$
 		} else {
