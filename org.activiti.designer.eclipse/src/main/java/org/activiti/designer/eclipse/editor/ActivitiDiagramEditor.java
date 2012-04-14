@@ -475,7 +475,11 @@ public class ActivitiDiagramEditor extends DiagramEditor {
       }
       
       if(flowElement instanceof SubProcess) {
-      	flowNode = getFlowNode(elementid, ((SubProcess) flowElement).getFlowElements());
+        FlowNode subFlowNode = getFlowNode(elementid, ((SubProcess) flowElement).getFlowElements());
+        if(subFlowNode != null) {
+          flowNode = subFlowNode;
+          break;
+        }
       }
       
       if(flowElement instanceof Activity) {
