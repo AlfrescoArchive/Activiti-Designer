@@ -2,9 +2,9 @@ package org.activiti.designer.property;
 
 import java.util.List;
 
-import org.activiti.designer.bpmn2.model.Process;
 import org.activiti.designer.bpmn2.model.Signal;
 import org.activiti.designer.property.ui.SignalEditor;
+import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -55,13 +55,12 @@ public class PropertySignalSection extends ActivitiPropertySection implements IT
 	
 	@Override
   public void refresh() {
-    
-		final Process process = ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getProcess();
-    if (process == null) {
+		final Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+    if (model == null) {
       return;
     }
     
-    List<Signal> signalList = process.getSignals();
+    List<Signal> signalList = model.getSignals();
     
     signalEditor.diagramEditor = getDiagramEditor();
     signalEditor.diagram = getDiagram();

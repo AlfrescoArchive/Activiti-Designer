@@ -34,6 +34,7 @@ public class ActivitiImageProvider extends AbstractImageProvider {
   public static final String IMG_GATEWAY_PARALLEL = PREFIX + "gateway.parallel"; //$NON-NLS-1$
   public static final String IMG_GATEWAY_EXCLUSIVE = PREFIX + "gateway.exclusive"; //$NON-NLS-1$
   public static final String IMG_GATEWAY_INCLUSIVE = PREFIX + "gateway.inclusive"; //$NON-NLS-1$
+  public static final String IMG_GATEWAY_EVENT = PREFIX + "gateway.event"; //$NON-NLS-1$
 
   // Task image icons
   public static final String IMG_USERTASK = PREFIX + "usertask"; //$NON-NLS-1$
@@ -45,10 +46,12 @@ public class ActivitiImageProvider extends AbstractImageProvider {
   public static final String IMG_BUSINESSRULETASK = PREFIX + "businessrule"; //$NON-NLS-1$
   public static final String IMG_CALLACTIVITY = PREFIX + "callactivity"; //$NON-NLS-1$
 
-  // Sub process icons
+  // Container icons
   public static final String IMG_SUBPROCESS_COLLAPSED = PREFIX + "subprocess.collapsed"; //$NON-NLS-1$
   public static final String IMG_SUBPROCESS_EXPANDED = PREFIX + "subprocess.expanded"; //$NON-NLS-1$
   public static final String IMG_EVENT_SUBPROCESS = PREFIX + "event.subprocess"; //$NON-NLS-1$
+  public static final String IMG_POOL = PREFIX + "pool"; //$NON-NLS-1$
+  public static final String IMG_LANE = PREFIX + "lane"; //$NON-NLS-1$
 
   public static final String IMG_ACTION_ZOOM = PREFIX + "action.magnifier"; //$NON-NLS-1$
   
@@ -57,6 +60,7 @@ public class ActivitiImageProvider extends AbstractImageProvider {
   public static final String IMG_BOUNDARY_SIGNAL = PREFIX + "boundary.signal"; //$NON-NLS-1$
   
   public static final String IMG_THROW_SIGNAL = PREFIX + "throw.signal"; //$NON-NLS-1$
+  public static final String IMG_THROW_NONE = PREFIX + "throw.none"; //$NON-NLS-1$
   
   public static final String IMG_ALFRESCO_LOGO = PREFIX + "alfresco.logo"; //$NON-NLS-1$
   
@@ -73,6 +77,7 @@ public class ActivitiImageProvider extends AbstractImageProvider {
     addImageFilePath(IMG_GATEWAY_PARALLEL, "icons/type.gateway.parallel.png"); //$NON-NLS-1$
     addImageFilePath(IMG_GATEWAY_EXCLUSIVE, "icons/type.gateway.exclusive.png"); //$NON-NLS-1$
     addImageFilePath(IMG_GATEWAY_INCLUSIVE, "icons/type.gateway.inclusive.png"); //$NON-NLS-1$
+    addImageFilePath(IMG_GATEWAY_EVENT, "icons/type.gateway.event.png"); //$NON-NLS-1$
     addImageFilePath(IMG_USERTASK, "icons/type.user.png"); //$NON-NLS-1$
     addImageFilePath(IMG_SCRIPTTASK, "icons/type.script.png"); //$NON-NLS-1$
     addImageFilePath(IMG_SERVICETASK, "icons/type.service.png"); //$NON-NLS-1$
@@ -84,11 +89,14 @@ public class ActivitiImageProvider extends AbstractImageProvider {
     addImageFilePath(IMG_SUBPROCESS_COLLAPSED, "icons/type.subprocess.collapsed.png"); //$NON-NLS-1$
     addImageFilePath(IMG_SUBPROCESS_EXPANDED, "icons/type.subprocess.expanded.png"); //$NON-NLS-1$
     addImageFilePath(IMG_EVENT_SUBPROCESS, "icons/type.event.subprocess.png"); //$NON-NLS-1$
+    addImageFilePath(IMG_POOL, "icons/pool.png"); //$NON-NLS-1$
+    addImageFilePath(IMG_LANE, "icons/lane.png"); //$NON-NLS-1$
     addImageFilePath(IMG_ACTION_ZOOM, "icons/action.magnifier.png"); //$NON-NLS-1$
     addImageFilePath(IMG_BOUNDARY_TIMER, "icons/timer.png"); //$NON-NLS-1$
     addImageFilePath(IMG_BOUNDARY_ERROR, "icons/error.png"); //$NON-NLS-1$
     addImageFilePath(IMG_BOUNDARY_SIGNAL, "icons/signal.png"); //$NON-NLS-1$
     addImageFilePath(IMG_THROW_SIGNAL, "icons/throw.signal.png"); //$NON-NLS-1$
+    addImageFilePath(IMG_THROW_NONE, "icons/throw.none.png"); //$NON-NLS-1$
     addImageFilePath(IMG_ALFRESCO_LOGO, "icons/alfresco.png"); //$NON-NLS-1$
     addImageFilePath(EDIT_ICON, "icons/edit.png"); //$NON-NLS-1$
     addImageFilePath(NEW_ICON, "icons/new.png"); //$NON-NLS-1$

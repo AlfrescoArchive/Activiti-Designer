@@ -5,10 +5,16 @@ import java.util.List;
 import org.activiti.designer.bpmn2.model.Activity;
 import org.activiti.designer.bpmn2.model.BoundaryEvent;
 import org.activiti.designer.bpmn2.model.FlowElement;
+import org.activiti.designer.bpmn2.model.Lane;
+import org.activiti.designer.bpmn2.model.SequenceFlow;
 import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.designer.util.editor.Bpmn2MemoryModel;
+import org.activiti.designer.util.editor.ModelHandler;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IMoveShapeContext;
 import org.eclipse.graphiti.features.impl.DefaultMoveShapeFeature;
+import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
@@ -26,8 +32,15 @@ public class MoveActivityFeature extends DefaultMoveShapeFeature {
 	public MoveActivityFeature(IFeatureProvider fp) {
 		super(fp);
 	}
+	
+	
 
-	/**
+	@Override
+  public boolean canMoveShape(IMoveShapeContext context) {
+    return true;
+  }
+
+  /**
 	 * Makes sure attached boundary events will be moved too, in case the shape itself is moved. 
 	 * Determines the amount of pixels the shape moved, finds out all boundary events of the shape 
 	 * and moves them the same delta.
@@ -45,6 +58,56 @@ public class MoveActivityFeature extends DefaultMoveShapeFeature {
 		// get the activity itself to determine its boundary events
 		final Activity activity = (Activity) getBusinessObjectForPictogramElement(shape);
 		moveActivityChilds(activity, deltaX, deltaY);
+		
+		Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+		
+		if (context.getSourceContainer() != context.getTargetContainer()) {
+		  if (context.getSourceContainer() instanceof Diagram == false) {
+		    Object containerBo = getFeatureProvider().getBusinessObjectForPictogramElement(context.getSourceContainer());
+		    if (containerBo instanceof SubProcess) {
+		      SubProcess subProcess = (SubProcess) containerBo;
+		      subProcess.getFlowElements().remove(activity);
+		      for (SequenceFlow flow : activity.getOutgoing()) {
+		        subProcess.getFlowElements().remove(flow);
+		      }
+		    } else if (containerBo instanceof Lane) {
+		      Lane lane = (Lane) containerBo;
+          lane.getFlowReferences().remove(activity.getId());
+          lane.getParentProcess().getFlowElements().remove(activity);
+          for (SequenceFlow flow : activity.getOutgoing()) {
+            lane.getParentProcess().getFlowElements().remove(flow);
+          }
+        }
+		  } else {
+		    model.getMainProcess().getFlowElements().remove(activity);
+		    for (SequenceFlow flow : activity.getOutgoing()) {
+		      model.getMainProcess().getFlowElements().remove(flow);
+        }
+		  }
+		  
+		  if (context.getTargetContainer() instanceof Diagram == false) {
+        Object containerBo = getFeatureProvider().getBusinessObjectForPictogramElement(context.getTargetContainer());
+        if (containerBo instanceof SubProcess) {
+          SubProcess subProcess = (SubProcess) containerBo;
+          subProcess.getFlowElements().add(activity);
+          for (SequenceFlow flow : activity.getOutgoing()) {
+            subProcess.getFlowElements().add(flow);
+          }
+        } else if (containerBo instanceof Lane) {
+          Lane lane = (Lane) containerBo;
+          lane.getFlowReferences().add(activity.getId());
+          lane.getParentProcess().getFlowElements().add(activity);
+          for (SequenceFlow flow : activity.getOutgoing()) {
+            lane.getParentProcess().getFlowElements().add(flow);
+          }
+        }
+      } else {
+        model.getMainProcess().getFlowElements().add(activity);
+        for (SequenceFlow flow : activity.getOutgoing()) {
+          model.getMainProcess().getFlowElements().add(flow);
+        }
+      }
+		}
 	}
 	
 	private void moveActivityChilds(Activity activity, int deltaX, int deltaY) {

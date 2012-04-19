@@ -2,7 +2,6 @@ package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
 import org.activiti.designer.bpmn2.model.EventSubProcess;
-import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.SubProcess;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
@@ -46,10 +45,4 @@ public class CreateEventSubProcessFeature extends AbstractCreateBPMNFeature {
 	protected String getFeatureIdKey() {
 		return FEATURE_ID_KEY;
 	}
-
-	@Override
-	protected Class<? extends FlowElement> getFeatureClass() {
-		return new EventSubProcess().getClass();
-	}
-
 }

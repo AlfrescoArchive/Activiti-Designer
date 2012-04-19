@@ -2,13 +2,13 @@ package org.activiti.designer.bpmn2.model;
 
 public class Gateway extends FlowNode {
 
-  protected SequenceFlow defaultFlow;
+  protected String defaultFlow;
 
-  public SequenceFlow getDefaultFlow() {
+  public String getDefaultFlow() {
     return defaultFlow;
   }
 
-  public void setDefaultFlow(SequenceFlow defaultFlow) {
+  public void setDefaultFlow(String defaultFlow) {
     this.defaultFlow = defaultFlow;
   }
 }

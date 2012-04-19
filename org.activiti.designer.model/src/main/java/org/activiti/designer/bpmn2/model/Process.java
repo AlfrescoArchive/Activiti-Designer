@@ -7,10 +7,9 @@ public class Process extends FlowElementsContainer {
 
   protected String name;
   protected boolean executable;
-  protected String namespace;
   protected String documentation;
   protected List<ActivitiListener> executionListeners = new ArrayList<ActivitiListener>();
-  protected List<Signal> signals = new ArrayList<Signal>();
+  protected List<Lane> lanes = new ArrayList<Lane>();
 
   public String getDocumentation() {
     return documentation;
@@ -24,12 +23,6 @@ public class Process extends FlowElementsContainer {
   public void setName(String name) {
     this.name = name;
   }
-  public String getNamespace() {
-    return namespace;
-  }
-  public void setNamespace(String namespace) {
-    this.namespace = namespace;
-  }
   public boolean isExecutable() {
     return executable;
   }
@@ -42,10 +35,10 @@ public class Process extends FlowElementsContainer {
   public void setExecutionListeners(List<ActivitiListener> executionListeners) {
     this.executionListeners = executionListeners;
   }
-  public List<Signal> getSignals() {
-    return signals;
+  public List<Lane> getLanes() {
+    return lanes;
   }
-  public void setSignals(List<Signal> signals) {
-    this.signals = signals;
+  public void setLanes(List<Lane> lanes) {
+    this.lanes = lanes;
   }
 }

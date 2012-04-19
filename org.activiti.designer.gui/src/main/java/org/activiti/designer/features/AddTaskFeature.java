@@ -2,6 +2,7 @@ package org.activiti.designer.features;
 
 import java.util.List;
 
+import org.activiti.designer.bpmn2.model.Lane;
 import org.activiti.designer.bpmn2.model.ServiceTask;
 import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.bpmn2.model.Task;
@@ -230,7 +231,9 @@ public abstract class AddTaskFeature extends AbstractAddShapeFeature {
       
       Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
       
-      if (context.getTargetContainer() instanceof Diagram || parentObject instanceof SubProcess) {
+      if (context.getTargetContainer() instanceof Diagram || 
+              parentObject instanceof SubProcess || parentObject instanceof Lane) {
+        
         return true;
       }
     }

@@ -4,6 +4,7 @@ import org.activiti.designer.ActivitiImageProvider;
 import org.activiti.designer.bpmn2.model.EndEvent;
 import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.FlowNode;
+import org.activiti.designer.bpmn2.model.Lane;
 import org.activiti.designer.bpmn2.model.SequenceFlow;
 import org.activiti.designer.bpmn2.model.StartEvent;
 import org.activiti.designer.bpmn2.model.SubProcess;
@@ -102,13 +103,17 @@ public class CreateSequenceFlowFeature extends AbstractCreateBPMNConnectionFeatu
 		ContainerShape targetContainer = (ContainerShape) context.getSourcePictogramElement();
 		ContainerShape parentContainer = targetContainer.getContainer();
 		if(parentContainer instanceof Diagram) {
-			ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).addFlowElement(sequenceFlow);
+			ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getMainProcess().getFlowElements().add(sequenceFlow);
 		
 		} else {
 			Object parentObject = getBusinessObjectForPictogramElement(parentContainer);
 			if(parentObject instanceof SubProcess) {
 				((SubProcess) parentObject).getFlowElements().add(sequenceFlow);
-			}
+				
+			} else if(parentObject instanceof Lane) {
+			  Lane lane = (Lane) parentObject;
+        lane.getParentProcess().getFlowElements().add(sequenceFlow);
+      }
 		}
 
 		source.getOutgoing().add(sequenceFlow);

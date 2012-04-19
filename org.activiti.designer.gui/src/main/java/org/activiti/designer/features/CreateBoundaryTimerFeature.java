@@ -3,7 +3,6 @@ package org.activiti.designer.features;
 import org.activiti.designer.ActivitiImageProvider;
 import org.activiti.designer.bpmn2.model.Activity;
 import org.activiti.designer.bpmn2.model.BoundaryEvent;
-import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.TimerEventDefinition;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
@@ -31,7 +30,7 @@ public class CreateBoundaryTimerFeature extends AbstractCreateBPMNFeature {
 		TimerEventDefinition timerEvent = new TimerEventDefinition();
 		boundaryEvent.getEventDefinitions().add(timerEvent);
 		
-		boundaryEvent.setId(getNextId());
+		boundaryEvent.setId(getNextId(boundaryEvent));
 		
 		Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
     ((Activity) parentObject).getBoundaryEvents().add(boundaryEvent);
@@ -53,10 +52,4 @@ public class CreateBoundaryTimerFeature extends AbstractCreateBPMNFeature {
 	protected String getFeatureIdKey() {
 		return FEATURE_ID_KEY;
 	}
-
-	@Override
-	protected Class<? extends FlowElement> getFeatureClass() {
-		return new BoundaryEvent().getClass();
-	}
-
 }

@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.activiti.designer.bpmn2.model.ActivitiListener;
+import org.activiti.designer.bpmn2.model.Process;
 
 
 
@@ -31,4 +32,5 @@ public class SequenceFlowModel {
   public String targetRef;
   public String conditionExpression;
   public List<ActivitiListener> listenerList = new ArrayList<ActivitiListener>();
+  public Process parentProcess;
 }

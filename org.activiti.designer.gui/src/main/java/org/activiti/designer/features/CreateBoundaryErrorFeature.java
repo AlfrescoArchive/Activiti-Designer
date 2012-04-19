@@ -5,7 +5,6 @@ import org.activiti.designer.bpmn2.model.Activity;
 import org.activiti.designer.bpmn2.model.BoundaryEvent;
 import org.activiti.designer.bpmn2.model.CallActivity;
 import org.activiti.designer.bpmn2.model.ErrorEventDefinition;
-import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.ServiceTask;
 import org.activiti.designer.bpmn2.model.SubProcess;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -35,7 +34,7 @@ public class CreateBoundaryErrorFeature extends AbstractCreateBPMNFeature {
 		ErrorEventDefinition errorEvent = new ErrorEventDefinition();
 		boundaryEvent.getEventDefinitions().add(errorEvent);
 		
-		boundaryEvent.setId(getNextId());
+		boundaryEvent.setId(getNextId(boundaryEvent));
 		
 		Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
     ((Activity) parentObject).getBoundaryEvents().add(boundaryEvent);
@@ -57,10 +56,4 @@ public class CreateBoundaryErrorFeature extends AbstractCreateBPMNFeature {
 	protected String getFeatureIdKey() {
 		return FEATURE_ID_KEY;
 	}
-
-	@Override
-	protected Class<? extends FlowElement> getFeatureClass() {
-		return new BoundaryEvent().getClass();
-	}
-
 }

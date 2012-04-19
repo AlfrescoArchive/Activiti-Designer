@@ -1,10 +1,10 @@
 package org.activiti.designer.property;
 
-import org.activiti.designer.bpmn2.model.Process;
 import org.activiti.designer.bpmn2.model.Signal;
 import org.activiti.designer.bpmn2.model.SignalEventDefinition;
-import org.activiti.designer.bpmn2.model.ThrowSignalEvent;
+import org.activiti.designer.bpmn2.model.ThrowEvent;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
+import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.apache.commons.lang.StringUtils;
@@ -58,14 +58,14 @@ public class PropertyIntermediateThrowSignalSection extends ActivitiPropertySect
 			if (bo == null)
 				return;
 			
-			final Process process = ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getProcess();
-	    if (process == null) {
+			final Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+	    if (model == null) {
 	      return;
 	    }
 			
 			String signalRef = null;
-			if(bo instanceof ThrowSignalEvent) {
-				ThrowSignalEvent throwEvent = (ThrowSignalEvent) bo;
+			if(bo instanceof ThrowEvent) {
+			  ThrowEvent throwEvent = (ThrowEvent) bo;
   			if(throwEvent.getEventDefinitions().get(0) != null) {
   			  SignalEventDefinition signalDefinition = (SignalEventDefinition) throwEvent.getEventDefinitions().get(0);
           if(StringUtils.isNotEmpty(signalDefinition.getSignalRef())) {
@@ -74,10 +74,10 @@ public class PropertyIntermediateThrowSignalSection extends ActivitiPropertySect
   			}
 			}
 			
-			String[] items = new String[process.getSignals().size()];
+			String[] items = new String[model.getSignals().size()];
 			int counter = 0;
 			int selectedCounter = 0;
-			for (Signal signal : process.getSignals()) {
+			for (Signal signal : model.getSignals()) {
 	      items[counter] = signal.getId() + " / " + signal.getName();
 	      if(signal.getId().equals(signalRef)) {
 	      	selectedCounter = counter;
@@ -97,22 +97,24 @@ public class PropertyIntermediateThrowSignalSection extends ActivitiPropertySect
 		}
 
 		public void focusLost(final FocusEvent e) {
-			final Process process = ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getProcess();
-	    if (process == null) {
+			final Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+	    if (model == null) {
 	      return;
 	    }
 	    
 			PictogramElement pe = getSelectedPictogramElement();
 			if (pe != null) {
 				final Object bo = getBusinessObject(pe);
-				if (bo instanceof ThrowSignalEvent) {
+				if (bo instanceof ThrowEvent) {
 					DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
 					TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
 					ActivitiUiUtil.runModelChange(new Runnable() {
 						public void run() {
 							
-							SignalEventDefinition signalDefinition = (SignalEventDefinition) ((ThrowSignalEvent) bo).getEventDefinitions().get(0);
-							signalDefinition.setSignalRef(process.getSignals().get(signalCombo.getSelectionIndex()).getId());
+							SignalEventDefinition signalDefinition = (SignalEventDefinition) ((ThrowEvent) bo).getEventDefinitions().get(0);
+							if(signalCombo.getSelectionIndex() >= 0 && model.getSignals().size() > signalCombo.getSelectionIndex()) {
+							  signalDefinition.setSignalRef(model.getSignals().get(signalCombo.getSelectionIndex()).getId());
+							}
 						}
 					}, editingDomain, "Model Update");
 				}

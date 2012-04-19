@@ -1,6 +1,5 @@
 package com.alfresco.designer.gui.features;
 
-import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.bpmn2.model.alfresco.AlfrescoMailTask;
 import org.activiti.designer.features.AbstractCreateFastBPMNFeature;
@@ -28,14 +27,14 @@ public class CreateAlfrescoMailTaskFeature extends AbstractCreateFastBPMNFeature
 	public Object[] create(ICreateContext context) {
 		AlfrescoMailTask newMailTask = new AlfrescoMailTask();
 
-		newMailTask.setId(getNextId());
+		newMailTask.setId(getNextId(newMailTask));
 		newMailTask.setName("Alfresco Mail Task");
 
 		Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
     if (parentObject instanceof SubProcess) {
       ((SubProcess) parentObject).getFlowElements().add(newMailTask);
     } else {
-    	ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).addFlowElement(newMailTask);
+    	ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getMainProcess().getFlowElements().add(newMailTask);
     }
 
     addGraphicalContent(context, newMailTask);
@@ -55,10 +54,4 @@ public class CreateAlfrescoMailTaskFeature extends AbstractCreateFastBPMNFeature
 	protected String getFeatureIdKey() {
 		return FEATURE_ID_KEY;
 	}
-
-	@Override
-	protected Class<? extends FlowElement> getFeatureClass() {
-		return new AlfrescoMailTask().getClass();
-	}
-
 }

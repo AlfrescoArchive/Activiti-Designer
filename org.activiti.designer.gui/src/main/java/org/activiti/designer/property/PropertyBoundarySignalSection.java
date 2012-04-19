@@ -4,10 +4,10 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.activiti.designer.bpmn2.model.BoundaryEvent;
-import org.activiti.designer.bpmn2.model.Process;
 import org.activiti.designer.bpmn2.model.Signal;
 import org.activiti.designer.bpmn2.model.SignalEventDefinition;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
+import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.apache.commons.lang.StringUtils;
@@ -75,8 +75,8 @@ public class PropertyBoundarySignalSection extends ActivitiPropertySection imple
 			if (bo == null)
 				return;
 			
-			final Process process = ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getProcess();
-	    if (process == null) {
+			final Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+	    if (model == null) {
 	      return;
 	    }
 			
@@ -99,10 +99,10 @@ public class PropertyBoundarySignalSection extends ActivitiPropertySection imple
   			}
 			}
 			
-			String[] items = new String[process.getSignals().size()];
+			String[] items = new String[model.getSignals().size()];
 			int counter = 0;
 			int selectedCounter = 0;
-			for (Signal signal : process.getSignals()) {
+			for (Signal signal : model.getSignals()) {
 	      items[counter] = signal.getId() + " / " + signal.getName();
 	      if(signal.getId().equals(signalRef)) {
 	      	selectedCounter = counter;
@@ -123,8 +123,8 @@ public class PropertyBoundarySignalSection extends ActivitiPropertySection imple
 		}
 
 		public void focusLost(final FocusEvent e) {
-			final Process process = ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getProcess();
-	    if (process == null) {
+			final Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+	    if (model == null) {
 	      return;
 	    }
 	    
@@ -148,7 +148,7 @@ public class PropertyBoundarySignalSection extends ActivitiPropertySection imple
   							}
   							
   							SignalEventDefinition signalDefinition = (SignalEventDefinition) boundaryEvent.getEventDefinitions().get(0);
-  							signalDefinition.setSignalRef(process.getSignals().get(signalCombo.getSelectionIndex()).getId());
+  							signalDefinition.setSignalRef(model.getSignals().get(signalCombo.getSelectionIndex()).getId());
 							}
 						}
 					}, editingDomain, "Model Update");

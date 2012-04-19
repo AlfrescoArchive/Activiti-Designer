@@ -18,9 +18,13 @@ package org.activiti.designer.property;
 import java.util.List;
 
 import org.activiti.designer.bpmn2.model.Activity;
+import org.activiti.designer.bpmn2.model.BaseElement;
 import org.activiti.designer.bpmn2.model.ExclusiveGateway;
 import org.activiti.designer.bpmn2.model.FlowElement;
+import org.activiti.designer.bpmn2.model.Gateway;
 import org.activiti.designer.bpmn2.model.InclusiveGateway;
+import org.activiti.designer.bpmn2.model.Lane;
+import org.activiti.designer.bpmn2.model.Pool;
 import org.activiti.designer.bpmn2.model.SequenceFlow;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
@@ -114,8 +118,16 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
       // the filter assured, that it is a EClass
       if (bo == null)
         return;
-      String name = ((FlowElement) bo).getName();
-      String id = ((FlowElement) bo).getId();
+      
+      String name = null;
+      if (bo instanceof FlowElement) {
+        name = ((FlowElement) bo).getName();
+      } else if (bo instanceof Pool) {
+        name = ((Pool) bo).getName();
+      } else if (bo instanceof Lane) {
+        name = ((Lane) bo).getName();
+      }
+      String id = ((BaseElement) bo).getId();
       nameText.setText(name == null ? "" : name);
       idText.setText(id == null ? "" : id);
       
@@ -159,16 +171,15 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
             defaultCombo.add(flow.getId());
           }
           
-          SequenceFlow defaultFlow;
+          String defaultFlow = null;
           if(bo instanceof Activity) {
             defaultFlow = ((Activity) bo).getDefaultFlow();
-          } else if(bo instanceof ExclusiveGateway) {
-            defaultFlow = ((ExclusiveGateway) bo).getDefaultFlow();
-          } else {
-            defaultFlow = ((InclusiveGateway) bo).getDefaultFlow();
+          } else if(bo instanceof Gateway) {
+            defaultFlow = ((Gateway) bo).getDefaultFlow();
           }
+          
           if(defaultFlow != null) {
-            defaultCombo.select(defaultCombo.indexOf(defaultFlow.getId()));
+            defaultCombo.select(defaultCombo.indexOf(defaultFlow));
           }
           disableDefault = false;
         }
@@ -249,7 +260,7 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
         return;
       final Object bo = getBusinessObject(pe);
 
-      if (!(bo instanceof FlowElement))
+      if (!(bo instanceof BaseElement))
         return;
 
       DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
@@ -258,14 +269,22 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
 
         public void run() {
           String id = idText.getText();
-          ((FlowElement) bo).setId(id);
+          ((BaseElement) bo).setId(id);
           
           String name = nameText.getText();
-          ((FlowElement) bo).setName(name);
+          if (bo instanceof FlowElement) {
+            ((FlowElement) bo).setName(name);
+          } else if (bo instanceof Pool) {
+            ((Pool) bo).setName(name);
+          } else if (bo instanceof Lane) {
+            ((Lane) bo).setName(name);
+          }
           
           UpdateContext updateContext = new UpdateContext(pe);
           IUpdateFeature updateFeature = getFeatureProvider(pe).getUpdateFeature(updateContext);
-          updateFeature.update(updateContext);
+          if(updateFeature != null) {
+            updateFeature.update(updateContext);
+          }
           
           if (pe instanceof ContainerShape) {
             ContainerShape cs = (ContainerShape) pe;
@@ -281,33 +300,14 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
             }
           }
           
-          if((bo instanceof Activity || bo instanceof ExclusiveGateway || 
-                  bo instanceof InclusiveGateway)
+          if((bo instanceof Activity || bo instanceof ExclusiveGateway || bo instanceof InclusiveGateway)
                   && defaultCombo != null && defaultCombo.isVisible() == true) {
             
             String defaultValue = defaultCombo.getText();
-            SequenceFlow defaultFlow = null;
-            if(defaultValue != null && defaultValue.length() > 0) {
-              List<SequenceFlow> flowList = null;
-              if(bo instanceof Activity) {
-                flowList = ((Activity) bo).getOutgoing();
-              } else if(bo instanceof ExclusiveGateway) {
-                flowList = ((ExclusiveGateway) bo).getOutgoing();
-              } else {
-                flowList = ((InclusiveGateway) bo).getOutgoing();
-              }
-              for (SequenceFlow flow : flowList) {
-                if(flow.getId().equals(defaultValue)) {
-                  defaultFlow = flow;
-                }
-              }
-            }
             if(bo instanceof Activity) {
-              ((Activity) bo).setDefaultFlow(defaultFlow);
-            } else if(bo instanceof ExclusiveGateway) {
-              ((ExclusiveGateway) bo).setDefaultFlow(defaultFlow);
-            } else {
-              ((InclusiveGateway) bo).setDefaultFlow(defaultFlow);
+              ((Activity) bo).setDefaultFlow(defaultValue);
+            } else if(bo instanceof Gateway) {
+              ((Gateway) bo).setDefaultFlow(defaultValue);
             }
           }
           

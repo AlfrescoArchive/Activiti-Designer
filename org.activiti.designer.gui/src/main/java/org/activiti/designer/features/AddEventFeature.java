@@ -3,6 +3,7 @@ package org.activiti.designer.features;
 import org.activiti.designer.ActivitiImageProvider;
 import org.activiti.designer.bpmn2.model.EndEvent;
 import org.activiti.designer.bpmn2.model.Event;
+import org.activiti.designer.bpmn2.model.Lane;
 import org.activiti.designer.bpmn2.model.StartEvent;
 import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.bpmn2.model.TimerEventDefinition;
@@ -106,7 +107,9 @@ public class AddEventFeature extends AbstractAddShapeFeature {
 		  
 		  Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
       
-      if (context.getTargetContainer() instanceof Diagram || parentObject instanceof SubProcess) {
+      if (context.getTargetContainer() instanceof Diagram || 
+              parentObject instanceof SubProcess || parentObject instanceof Lane) {
+        
         return true;
       }
 		}

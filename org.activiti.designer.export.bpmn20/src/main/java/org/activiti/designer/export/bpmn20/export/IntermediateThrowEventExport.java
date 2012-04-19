@@ -19,7 +19,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.activiti.designer.bpmn2.model.EventDefinition;
 import org.activiti.designer.bpmn2.model.SignalEventDefinition;
-import org.activiti.designer.bpmn2.model.ThrowSignalEvent;
+import org.activiti.designer.bpmn2.model.ThrowEvent;
 import org.apache.commons.lang.StringUtils;
 
 
@@ -29,18 +29,19 @@ import org.apache.commons.lang.StringUtils;
 public class IntermediateThrowEventExport implements ActivitiNamespaceConstants {
 
   public static void createIntermediateEvent(Object object, XMLStreamWriter xtw) throws Exception {
-  	ThrowSignalEvent throwEvent = (ThrowSignalEvent) object;
+  	ThrowEvent throwEvent = (ThrowEvent) object;
+  	
+  	// start IntermediateThrowEvent element
+    xtw.writeStartElement("intermediateThrowEvent");
+    xtw.writeAttribute("id", throwEvent.getId());
+    if (throwEvent.getName() != null) {
+      xtw.writeAttribute("name", throwEvent.getName());
+    }
+  	
     List<EventDefinition> eventDefinitionList = throwEvent.getEventDefinitions();
     if(eventDefinitionList.size() == 1) {
       if(eventDefinitionList.get(0) instanceof SignalEventDefinition) {
       	SignalEventDefinition signalDef = (SignalEventDefinition) eventDefinitionList.get(0);
-          
-        // start SignalIntermediateThrowEvent element
-        xtw.writeStartElement("intermediateThrowEvent");
-        xtw.writeAttribute("id", throwEvent.getId());
-        if (throwEvent.getName() != null) {
-          xtw.writeAttribute("name", throwEvent.getName());
-        }
         
         xtw.writeStartElement("signalEventDefinition");
         
@@ -49,10 +50,10 @@ public class IntermediateThrowEventExport implements ActivitiNamespaceConstants 
         }
         
         xtw.writeEndElement();
-
-        // end SignalIntermediateThrowEvent element
-        xtw.writeEndElement();
       } 
     }
+    
+    // end IntermediateThrowEvent element
+    xtw.writeEndElement();
   }
 }

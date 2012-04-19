@@ -1,6 +1,11 @@
 package org.activiti.designer.features;
 
+import java.util.List;
+
+import org.activiti.designer.bpmn2.model.FlowElement;
+import org.activiti.designer.bpmn2.model.Process;
 import org.activiti.designer.bpmn2.model.SequenceFlow;
+import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -54,7 +59,22 @@ public class DeleteSequenceFlowFeature extends AbstractCustomFeature {
         if(sequenceFlow.getTargetRef() != null) {
           sequenceFlow.getTargetRef().getIncoming().remove(sequenceFlow);
         }
-        ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getProcess().getFlowElements().remove(sequenceFlow);
+        
+        List<Process> processes = ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getProcesses();
+        for (Process process : processes) {
+          process.getFlowElements().remove(sequenceFlow);
+          removeFlow(sequenceFlow, process.getFlowElements());
+        }
+      }
+    }
+  }
+  
+  private void removeFlow(SequenceFlow sequenceFlow, List<FlowElement> elementList) {
+    for (FlowElement flowElement : elementList) {
+      if(flowElement instanceof SubProcess) {
+        SubProcess subProcess = (SubProcess) flowElement;
+        subProcess.getFlowElements().remove(sequenceFlow);
+        removeFlow(sequenceFlow, subProcess.getFlowElements());
       }
     }
   }

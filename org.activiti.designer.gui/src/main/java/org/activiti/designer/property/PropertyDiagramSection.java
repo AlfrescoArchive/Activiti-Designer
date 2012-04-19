@@ -15,11 +15,16 @@
  *******************************************************************************/
 package org.activiti.designer.property;
 
+import org.activiti.designer.bpmn2.model.Pool;
 import org.activiti.designer.bpmn2.model.Process;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
+import org.activiti.designer.util.editor.Bpmn2MemoryModel;
+import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
@@ -75,11 +80,25 @@ public class PropertyDiagramSection extends ActivitiPropertySection implements I
 		nameText.removeFocusListener(listener);
 		namespaceText.removeFocusListener(listener);
 		documentationText.removeFocusListener(listener);
-		Process process = ActivitiUiUtil.getProcessObject(getDiagram());
+		
+		Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+		Process process = null;
+		if(getSelectedPictogramElement() instanceof Diagram) {
+		  process = model.getMainProcess();
+		
+		} else {
+		  Pool pool = ((Pool) getBusinessObject(getSelectedPictogramElement()));
+		  process = model.getProcess(pool.getId());
+		}
+		
 		idText.setText(process.getId());
-		nameText.setText(process.getName());
-		if(StringUtils.isNotEmpty(process.getNamespace())) {
-			namespaceText.setText(process.getNamespace());
+		if(StringUtils.isNotEmpty(process.getName())) {
+		  nameText.setText(process.getName());
+		} else {
+		  nameText.setText("");
+		}
+		if(StringUtils.isNotEmpty(model.getTargetNamespace())) {
+			namespaceText.setText(model.getTargetNamespace());
 		} else {
 			namespaceText.setText("http://www.activiti.org/test");
 		}
@@ -105,37 +124,46 @@ public class PropertyDiagramSection extends ActivitiPropertySection implements I
 			TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
 			ActivitiUiUtil.runModelChange(new Runnable() {
 				public void run() {
-					Process process = ActivitiUiUtil.getProcessObject(getDiagram());
-					if (process == null) {
+				  Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+					if (model == null) {
 						return;
 					}
+					
+			    Process process = null;
+			    if(getSelectedPictogramElement() instanceof Diagram) {
+			      process = model.getMainProcess();
+			    
+			    } else {
+			      Pool pool = ((Pool) getBusinessObject(getSelectedPictogramElement()));
+			      process = model.getProcess(pool.getId());
+			    }
 					
 					String id = idText.getText();
 					if (id != null) {
 					  process.setId(id);
 					} else {
-						process.setId("");
+					  process.setId("");
 					}
 					
 					String name = nameText.getText();
 					if (name != null) {
-						process.setName(name);
+					  process.setName(name);
 					} else {
-						process.setName("");
+					  process.setName("");
 					}
 					
 					String namespace = namespaceText.getText();
 					if (namespace != null) {
-						process.setNamespace(namespace);
+						model.setTargetNamespace(namespace);
 					} else {
-						process.setNamespace("");
+					  model.setTargetNamespace("");
 					}
 					
 					String documentation = documentationText.getText();
 					if (documentation != null) {
-						process.setDocumentation(documentation);
+					  process.setDocumentation(documentation);
 					} else {
-						process.setDocumentation("");
+					  process.setDocumentation("");
 					}
 				}
 			}, editingDomain, "Model Update");

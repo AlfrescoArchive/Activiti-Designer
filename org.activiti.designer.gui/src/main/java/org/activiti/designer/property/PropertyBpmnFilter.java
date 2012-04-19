@@ -15,7 +15,8 @@
  *******************************************************************************/
 package org.activiti.designer.property;
 
-import org.activiti.designer.bpmn2.model.FlowElement;
+import org.activiti.designer.bpmn2.model.BaseElement;
+import org.activiti.designer.util.extension.ExtensionUtil;
 import org.activiti.designer.util.property.ActivitiPropertyFilter;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 
@@ -24,8 +25,9 @@ public class PropertyBpmnFilter extends ActivitiPropertyFilter {
   @Override
   protected boolean accept(PictogramElement pe) {
   	Object bo = getBusinessObject(pe);
-  	if(bo != null && bo instanceof FlowElement) {
-  		// && !ExtensionUtil.isCustomServiceTask(bo)
+  	if(bo != null && bo instanceof BaseElement && 
+  	        ExtensionUtil.isCustomServiceTask(bo) == false) {
+  	  
       return true;
   	}
     return false;

@@ -51,6 +51,12 @@
          <propertyTab
                afterTab="org.activiti.designer.generalTab"
                category="Activiti"
+               id="org.activiti.designer.processTab"
+               label="Process">
+         </propertyTab>
+         <propertyTab
+               afterTab="org.activiti.designer.generalTab"
+               category="Activiti"
                id="org.activiti.designer.mainConfigTab"
                label="Main config">
          </propertyTab>
@@ -87,8 +93,8 @@
          <propertySection
                class="org.activiti.designer.property.PropertyDiagramSection"
                filter="org.activiti.designer.property.PropertyDiagramFilter"
-               id="org.activiti.designer.generalTab.diagram"
-               tab="org.activiti.designer.generalTab">
+               id="org.activiti.designer.processTab.diagram"
+               tab="org.activiti.designer.processTab">
          </propertySection>
          <propertySection
                class="org.activiti.designer.property.PropertySequenceFlowSection"

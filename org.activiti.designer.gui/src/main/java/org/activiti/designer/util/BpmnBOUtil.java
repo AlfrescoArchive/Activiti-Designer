@@ -18,6 +18,7 @@ import java.util.List;
 
 import org.activiti.designer.bpmn2.model.ActivitiListener;
 import org.activiti.designer.bpmn2.model.Activity;
+import org.activiti.designer.bpmn2.model.Pool;
 import org.activiti.designer.bpmn2.model.Process;
 import org.activiti.designer.bpmn2.model.SequenceFlow;
 import org.activiti.designer.bpmn2.model.UserTask;
@@ -38,14 +39,14 @@ public class BpmnBOUtil {
   	Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(diagram));
     Object bo = null;
     if(pe instanceof Diagram) {
-      bo = model.getProcess();
+      bo = model.getMainProcess();
     } else {
       bo = model.getFeatureProvider().getBusinessObjectForPictogramElement(pe);
     }
     return bo;
   }
 
-  public static List<ActivitiListener> getListeners(Object bo) {
+  public static List<ActivitiListener> getListeners(Object bo, Diagram diagram) {
     List<ActivitiListener> listenerList = null;
     if(bo instanceof UserTask) {
     	listenerList = ((UserTask) bo).getTaskListeners();
@@ -55,11 +56,15 @@ public class BpmnBOUtil {
       listenerList = ((SequenceFlow) bo).getExecutionListeners();
     } else if(bo instanceof Process) {
       listenerList = ((Process) bo).getExecutionListeners();
+    } else if(bo instanceof Pool) {
+      Pool pool = ((Pool) bo);
+      Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(diagram));
+      listenerList = model.getProcess(pool.getId()).getExecutionListeners();
     }
     return listenerList;
   }
   
-  public static void addListener(Object bo, ActivitiListener listener) {
+  public static void addListener(Object bo, ActivitiListener listener, Diagram diagram) {
   	if(bo instanceof UserTask) {
     	((UserTask) bo).getTaskListeners().add(listener);
     } else if(bo instanceof Activity) {
@@ -68,10 +73,14 @@ public class BpmnBOUtil {
       ((SequenceFlow) bo).getExecutionListeners().add(listener);
     } else if(bo instanceof Process) {
       ((Process) bo).getExecutionListeners().add(listener);
+    } else if(bo instanceof Pool) {
+      Pool pool = ((Pool) bo);
+      Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(diagram));
+      model.getProcess(pool.getId()).getExecutionListeners().add(listener);
     }
   }
   
-  public static void setListener(Object bo, ActivitiListener listener, int index) {
+  public static void setListener(Object bo, ActivitiListener listener, int index, Diagram diagram) {
   	if(bo instanceof UserTask) {
     	((UserTask) bo).getTaskListeners().set(index, listener);
     } else if(bo instanceof Activity) {
@@ -80,10 +89,14 @@ public class BpmnBOUtil {
       ((SequenceFlow) bo).getExecutionListeners().set(index, listener);
     } else if(bo instanceof Process) {
       ((Process) bo).getExecutionListeners().set(index, listener);
+    } else if(bo instanceof Pool) {
+      Pool pool = ((Pool) bo);
+      Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(diagram));
+      model.getProcess(pool.getId()).getExecutionListeners().set(index, listener);
     }
   }
   
-  public static void removeListener(Object bo, ActivitiListener listener) {
+  public static void removeListener(Object bo, ActivitiListener listener, Diagram diagram) {
   	if(bo instanceof UserTask) {
     	((UserTask) bo).getTaskListeners().remove(listener);
     } else if(bo instanceof Activity) {
@@ -92,6 +105,10 @@ public class BpmnBOUtil {
       ((SequenceFlow) bo).getExecutionListeners().remove(listener);
     } else if(bo instanceof Process) {
       ((Process) bo).getExecutionListeners().remove(listener);
+    } else if(bo instanceof Pool) {
+      Pool pool = ((Pool) bo);
+      Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(diagram));
+      model.getProcess(pool.getId()).getExecutionListeners().remove(listener);
     }
   }
   

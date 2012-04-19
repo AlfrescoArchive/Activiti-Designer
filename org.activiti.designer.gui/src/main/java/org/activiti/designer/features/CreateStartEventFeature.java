@@ -2,12 +2,9 @@ package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
 import org.activiti.designer.bpmn2.model.EventSubProcess;
-import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.StartEvent;
-import org.activiti.designer.bpmn2.model.SubProcess;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
-import org.eclipse.graphiti.mm.pictograms.Diagram;
 
 public class CreateStartEventFeature extends AbstractCreateBPMNFeature {
 	
@@ -21,7 +18,7 @@ public class CreateStartEventFeature extends AbstractCreateBPMNFeature {
 	public boolean canCreate(ICreateContext context) {
 	  Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
 	  if(parentObject instanceof EventSubProcess) return false;
-    return (context.getTargetContainer() instanceof Diagram || parentObject instanceof SubProcess);
+	  return super.canCreate(context);
 	}
 
 	public Object[] create(ICreateContext context) {
@@ -41,10 +38,4 @@ public class CreateStartEventFeature extends AbstractCreateBPMNFeature {
 	protected String getFeatureIdKey() {
 		return FEATURE_ID_KEY;
 	}
-
-	@Override
-	protected Class<? extends FlowElement> getFeatureClass() {
-		return new StartEvent().getClass();
-	}
-
 }

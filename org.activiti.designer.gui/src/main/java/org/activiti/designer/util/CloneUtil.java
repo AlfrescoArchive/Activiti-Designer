@@ -120,7 +120,7 @@ public final class CloneUtil {
     
     if(cloneElement != null) {
     	cloneElement.setName(element.getName());
-    	ModelHandler.getModel(EcoreUtil.getURI(diagram)).addFlowElement(cloneElement);
+    	ModelHandler.getModel(EcoreUtil.getURI(diagram)).getMainProcess().getFlowElements().add(cloneElement);
     }
 
     return cloneElement;

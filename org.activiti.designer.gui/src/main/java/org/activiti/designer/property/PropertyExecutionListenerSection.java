@@ -62,7 +62,7 @@ public class PropertyExecutionListenerSection extends ActivitiPropertySection im
       if (bo == null)
         return;
       
-      List<ActivitiListener> executionListenerList = BpmnBOUtil.getListeners(bo);
+      List<ActivitiListener> executionListenerList = BpmnBOUtil.getListeners(bo, getDiagram());
       
       listenerEditor.pictogramElement = pe;
       listenerEditor.diagramEditor = getDiagramEditor();

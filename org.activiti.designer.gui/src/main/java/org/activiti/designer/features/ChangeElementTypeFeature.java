@@ -2,8 +2,11 @@ package org.activiti.designer.features;
 
 import java.util.List;
 
+import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.FlowNode;
+import org.activiti.designer.bpmn2.model.Process;
 import org.activiti.designer.bpmn2.model.SequenceFlow;
+import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -12,7 +15,7 @@ import org.eclipse.graphiti.features.context.impl.CreateContext;
 import org.eclipse.graphiti.features.custom.AbstractCustomFeature;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
-import org.eclipse.graphiti.mm.pictograms.PictogramElement;
+import org.eclipse.graphiti.mm.pictograms.Shape;
 
 public class ChangeElementTypeFeature extends AbstractCustomFeature {
 	
@@ -34,13 +37,13 @@ public class ChangeElementTypeFeature extends AbstractCustomFeature {
 
 	@Override
   public void execute(ICustomContext context) {
-	  PictogramElement element = (PictogramElement) context.getProperty("org.activiti.designer.changetype.pictogram");
+	  Shape element = (Shape) context.getProperty("org.activiti.designer.changetype.pictogram");
 	  GraphicsAlgorithm elementGraphics = element.getGraphicsAlgorithm();
 	  int x = elementGraphics.getX();
 	  int y = elementGraphics.getY();
 	  
 	  CreateContext taskContext = new CreateContext();
-	  ContainerShape targetContainer = (ContainerShape) element.eContainer();
+	  ContainerShape targetContainer = (ContainerShape) element.getContainer();
   	taskContext.setTargetContainer(targetContainer);
   	taskContext.setLocation(x, y);
   	taskContext.setHeight(elementGraphics.getHeight());
@@ -56,7 +59,11 @@ public class ChangeElementTypeFeature extends AbstractCustomFeature {
 	  taskContext.putProperty("org.activiti.designer.changetype.name", oldObject.getName());
 	  
 	  targetContainer.getChildren().remove(element);
-	  ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getProcess().getFlowElements().remove(oldObject);
+	  List<Process> processes = ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getProcesses();
+    for (Process process : processes) {
+      process.getFlowElements().remove(oldObject);
+      removeElement(oldObject, process.getFlowElements());
+    }
 	  
 	  if("servicetask".equals(newType)) {
 	  	new CreateServiceTaskFeature(getFeatureProvider()).create(taskContext);
@@ -88,5 +95,15 @@ public class ChangeElementTypeFeature extends AbstractCustomFeature {
     } else if("parallelgateway".equals(newType)) {
 	  	new CreateParallelGatewayFeature(getFeatureProvider()).create(taskContext);
 	  }
+  }
+	
+	private void removeElement(FlowElement element, List<FlowElement> elementList) {
+    for (FlowElement flowElement : elementList) {
+      if(flowElement instanceof SubProcess) {
+        SubProcess subProcess = (SubProcess) flowElement;
+        subProcess.getFlowElements().remove(element);
+        removeElement(element, subProcess.getFlowElements());
+      }
+    }
   }
 }

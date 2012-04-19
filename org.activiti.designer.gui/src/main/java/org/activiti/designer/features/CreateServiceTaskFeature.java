@@ -4,16 +4,13 @@ import java.util.List;
 
 import org.activiti.designer.ActivitiImageProvider;
 import org.activiti.designer.bpmn2.model.CustomProperty;
-import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.ServiceTask;
-import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.integration.servicetask.CustomServiceTask;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.eclipse.ExtensionConstants;
 import org.activiti.designer.util.extension.ExtensionUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
-import org.eclipse.graphiti.mm.pictograms.Diagram;
 
 public class CreateServiceTaskFeature extends AbstractCreateFastBPMNFeature {
 
@@ -28,12 +25,6 @@ public class CreateServiceTaskFeature extends AbstractCreateFastBPMNFeature {
   public CreateServiceTaskFeature(IFeatureProvider fp, String name, String description, String customServiceTaskId) {
     super(fp, name, description);
     this.customServiceTaskId = customServiceTaskId;
-  }
-
-  @Override
-  public boolean canCreate(ICreateContext context) {
-    Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-    return (context.getTargetContainer() instanceof Diagram || parentObject instanceof SubProcess);
   }
 
   @Override
@@ -85,10 +76,4 @@ public class CreateServiceTaskFeature extends AbstractCreateFastBPMNFeature {
   protected String getFeatureIdKey() {
     return FEATURE_ID_KEY;
   }
-
-  @Override
-  protected Class<? extends FlowElement> getFeatureClass() {
-    return new ServiceTask().getClass();
-  }
-
 }

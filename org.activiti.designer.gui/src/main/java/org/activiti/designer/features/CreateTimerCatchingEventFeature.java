@@ -1,13 +1,10 @@
 package org.activiti.designer.features;
 
 import org.activiti.designer.ActivitiImageProvider;
-import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.IntermediateCatchEvent;
-import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.bpmn2.model.TimerEventDefinition;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
-import org.eclipse.graphiti.mm.pictograms.Diagram;
 
 public class CreateTimerCatchingEventFeature extends AbstractCreateFastBPMNFeature {
 	
@@ -16,11 +13,6 @@ public class CreateTimerCatchingEventFeature extends AbstractCreateFastBPMNFeatu
 	public CreateTimerCatchingEventFeature(IFeatureProvider fp) {
 		// set name and description of the creation feature
 		super(fp, "TimerCatchingEvent", "Add timer intermediate catching event");
-	}
-
-	public boolean canCreate(ICreateContext context) {
-	  Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-    return (context.getTargetContainer() instanceof Diagram || parentObject instanceof SubProcess);
 	}
 
 	public Object[] create(ICreateContext context) {
@@ -42,10 +34,4 @@ public class CreateTimerCatchingEventFeature extends AbstractCreateFastBPMNFeatu
 	protected String getFeatureIdKey() {
 		return FEATURE_ID_KEY;
 	}
-
-	@Override
-	protected Class<? extends FlowElement> getFeatureClass() {
-		return new IntermediateCatchEvent().getClass();
-	}
-
 }

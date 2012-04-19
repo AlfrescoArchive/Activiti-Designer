@@ -10,6 +10,7 @@ import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.util.editor.GraphicInfo;
 import org.activiti.designer.util.style.StyleUtil;
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.graphiti.datatypes.ILocation;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddConnectionContext;
 import org.eclipse.graphiti.features.context.IAddContext;
@@ -110,6 +111,16 @@ public class AddSequenceFlowFeature extends AbstractAddFeature {
 			
 		} else {
 			
+		  Shape sourceShape = (Shape) getPictogramElement(addedSequenceFlow.getSourceRef());
+		  ILocation sourceShapeLocation = Graphiti.getLayoutService().getLocationRelativeToDiagram(sourceShape);
+		  int sourceX = sourceShapeLocation.getX();
+      int sourceY = sourceShapeLocation.getY();
+		  
+      Shape targetShape = (Shape) getPictogramElement(addedSequenceFlow.getTargetRef());
+      ILocation targetShapeLocation = Graphiti.getLayoutService().getLocationRelativeToDiagram(targetShape);
+		  int targetX = targetShapeLocation.getX();
+      int targetY = targetShapeLocation.getY();
+      
 			if (addedSequenceFlow.getSourceRef() instanceof Gateway && addedSequenceFlow.getTargetRef() instanceof Gateway == false) {
 				if (((sourceGraphics.getY() + 10) < targetGraphics.getY()
 						|| (sourceGraphics.getY() - 10) > targetGraphics.getY())  && 
@@ -125,8 +136,8 @@ public class AddSequenceFlowFeature extends AbstractAddFeature {
 					
 					if(addedSequenceFlow.getTargetRef() instanceof SubProcess == false || subProcessWithBendPoint == true) {
 						Point bendPoint = StylesFactory.eINSTANCE.createPoint();
-						bendPoint.setX(sourceGraphics.getX() + 20);
-		        bendPoint.setY(targetGraphics.getY() + (targetGraphics.getHeight() / 2));
+						bendPoint.setX(sourceX + 20);
+		        bendPoint.setY(targetY + (targetGraphics.getHeight() / 2));
 						connection.getBendpoints().add(bendPoint);
 					}
 				}
@@ -145,8 +156,8 @@ public class AddSequenceFlowFeature extends AbstractAddFeature {
 					
 					if(addedSequenceFlow.getSourceRef() instanceof SubProcess == false || subProcessWithBendPoint == true) {
 						Point bendPoint = StylesFactory.eINSTANCE.createPoint();
-						bendPoint.setX(targetGraphics.getX() + 20);
-		        bendPoint.setY(sourceGraphics.getY() + (sourceGraphics.getHeight() / 2));
+						bendPoint.setX(targetX + 20);
+		        bendPoint.setY(sourceY + (sourceGraphics.getHeight() / 2));
 						connection.getBendpoints().add(bendPoint);
 					}
 				}
@@ -160,8 +171,8 @@ public class AddSequenceFlowFeature extends AbstractAddFeature {
 						(sourceGraphics.getX() + sourceGraphics.getWidth()) < targetGraphics.getX())) {
 					
 					Point bendPoint = StylesFactory.eINSTANCE.createPoint();
-					bendPoint.setX(targetGraphics.getX() + (targetGraphics.getWidth() / 2));
-	        bendPoint.setY(sourceGraphics.getY() + (sourceGraphics.getHeight() / 2));
+					bendPoint.setX(targetX + (targetGraphics.getWidth() / 2));
+	        bendPoint.setY(sourceY + (sourceGraphics.getHeight() / 2));
 					connection.getBendpoints().add(bendPoint);
 				}
 			}

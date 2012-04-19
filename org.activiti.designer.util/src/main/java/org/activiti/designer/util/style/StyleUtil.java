@@ -53,6 +53,20 @@ public class StyleUtil {
     return style;
   }
 	
+	public static Style getStyleForPool(Diagram diagram) {
+    final String styleId = "POOL"; //$NON-NLS-1$
+
+    Style style = findStyle(diagram, styleId);
+    if (style == null) { // style not found - create new style
+      IGaService gaService = Graphiti.getGaService();
+      style = gaService.createStyle(diagram, styleId);
+      style.setForeground(gaService.manageColor(diagram, BPMN_CLASS_FOREGROUND));
+      style.setBackground(gaService.manageColor(diagram, ColorConstant.WHITE));
+      style.setLineWidth(20);
+    }
+    return style;
+  }
+	
 	public static Style getStyleForEvent(Diagram diagram) {
     final String styleId = "EVENT"; //$NON-NLS-1$
 

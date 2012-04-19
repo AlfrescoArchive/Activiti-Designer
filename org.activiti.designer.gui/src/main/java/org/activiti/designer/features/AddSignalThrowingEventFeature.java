@@ -3,6 +3,7 @@ package org.activiti.designer.features;
 import org.activiti.designer.ActivitiImageProvider;
 import org.activiti.designer.bpmn2.model.EndEvent;
 import org.activiti.designer.bpmn2.model.Event;
+import org.activiti.designer.bpmn2.model.Lane;
 import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.style.StyleUtil;
@@ -89,7 +90,9 @@ public class AddSignalThrowingEventFeature extends AddEventFeature {
       
     	Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
       
-      if (context.getTargetContainer() instanceof Diagram || parentObject instanceof SubProcess) {
+      if (context.getTargetContainer() instanceof Diagram || 
+              parentObject instanceof SubProcess || parentObject instanceof Lane) {
+        
         return true;
       }
     }

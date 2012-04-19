@@ -14,6 +14,7 @@
 package org.activiti.designer.eclipse.bpmn;
 
 import org.activiti.designer.bpmn2.model.BoundaryEvent;
+import org.activiti.designer.bpmn2.model.Process;
 
 
 /**
@@ -28,4 +29,5 @@ public class BoundaryEventModel {
   public BoundaryEvent boundaryEvent;
   public String attachedRef;
   public String type;
+  public Process parentProcess;
 }

@@ -6,7 +6,7 @@ import java.util.List;
 public class Activity extends FlowNode {
 
   protected boolean asynchronous;
-  protected SequenceFlow defaultFlow;
+  protected String defaultFlow;
   protected MultiInstanceLoopCharacteristics loopCharacteristics;
   protected List<BoundaryEvent> boundaryEvents = new ArrayList<BoundaryEvent>();
   protected List<ActivitiListener> executionListeners = new ArrayList<ActivitiListener>();
@@ -23,10 +23,10 @@ public class Activity extends FlowNode {
   public void setBoundaryEvents(List<BoundaryEvent> boundaryEvents) {
     this.boundaryEvents = boundaryEvents;
   }
-  public SequenceFlow getDefaultFlow() {
+  public String getDefaultFlow() {
     return defaultFlow;
   }
-  public void setDefaultFlow(SequenceFlow defaultFlow) {
+  public void setDefaultFlow(String defaultFlow) {
     this.defaultFlow = defaultFlow;
   }
   public List<ActivitiListener> getExecutionListeners() {

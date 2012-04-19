@@ -1,4 +1,4 @@
-/**
+ /**
  * 
  */
 package org.activiti.designer.features;
@@ -11,6 +11,7 @@ import org.activiti.designer.bpmn2.model.Event;
 import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.FlowNode;
 import org.activiti.designer.bpmn2.model.Gateway;
+import org.activiti.designer.bpmn2.model.Lane;
 import org.activiti.designer.bpmn2.model.SequenceFlow;
 import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.bpmn2.model.Task;
@@ -48,23 +49,36 @@ public abstract class AbstractCreateBPMNFeature extends AbstractCreateFeature {
 
   protected abstract String getFeatureIdKey();
 
-  protected abstract Class<? extends FlowElement> getFeatureClass();
-
-  protected String getNextId() {
-    return ActivitiUiUtil.getNextId(getFeatureClass(), getFeatureIdKey(), getDiagram());
+  protected String getNextId(BaseElement element) {
+    return ActivitiUiUtil.getNextId(element.getClass(), getFeatureIdKey(), getDiagram());
+  }
+  
+  protected String getNextId(BaseElement element, String featureIdKey) {
+    return ActivitiUiUtil.getNextId(element.getClass(), featureIdKey, getDiagram());
+  }
+  
+  public boolean canCreate(ICreateContext context) {
+    Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
+    return (context.getTargetContainer() instanceof Diagram || 
+            parentObject instanceof SubProcess || parentObject instanceof Lane);
   }
   
   protected void addObjectToContainer(ICreateContext context, FlowNode flowNode, String name) {
-  	flowNode.setId(getNextId());
-  	setName(flowNode.getName(), flowNode, context);
+  	flowNode.setId(getNextId(flowNode));
+  	setName(name, flowNode, context);
   	ContainerShape targetContainer = context.getTargetContainer();
 		if(targetContainer instanceof Diagram) {
-			ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).addFlowElement(flowNode);
+			ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getMainProcess().getFlowElements().add(flowNode);
 		
 		} else {
 			Object parentObject = getBusinessObjectForPictogramElement(targetContainer);
 			if(parentObject instanceof SubProcess) {
 				((SubProcess) parentObject).getFlowElements().add(flowNode);
+			
+			} else if(parentObject instanceof Lane) {
+			  Lane lane = (Lane) parentObject;
+			  lane.getFlowReferences().add(flowNode.getId());
+			  lane.getParentProcess().getFlowElements().add(flowNode);
 			}
 		}
 		addGraphicalContent(context, flowNode);

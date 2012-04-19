@@ -12,12 +12,14 @@ import java.util.Set;
 import org.activiti.designer.ActivitiImageProvider;
 import org.activiti.designer.bpmn2.model.BusinessRuleTask;
 import org.activiti.designer.bpmn2.model.CallActivity;
+import org.activiti.designer.bpmn2.model.EventGateway;
 import org.activiti.designer.bpmn2.model.ExclusiveGateway;
 import org.activiti.designer.bpmn2.model.Gateway;
 import org.activiti.designer.bpmn2.model.InclusiveGateway;
 import org.activiti.designer.bpmn2.model.MailTask;
 import org.activiti.designer.bpmn2.model.ManualTask;
 import org.activiti.designer.bpmn2.model.ParallelGateway;
+import org.activiti.designer.bpmn2.model.Pool;
 import org.activiti.designer.bpmn2.model.ReceiveTask;
 import org.activiti.designer.bpmn2.model.ScriptTask;
 import org.activiti.designer.bpmn2.model.SequenceFlow;
@@ -42,20 +44,26 @@ import org.activiti.designer.features.CreateEmbeddedSubProcessFeature;
 import org.activiti.designer.features.CreateEndEventFeature;
 import org.activiti.designer.features.CreateErrorEndEventFeature;
 import org.activiti.designer.features.CreateErrorStartEventFeature;
+import org.activiti.designer.features.CreateEventGatewayFeature;
 import org.activiti.designer.features.CreateEventSubProcessFeature;
 import org.activiti.designer.features.CreateExclusiveGatewayFeature;
 import org.activiti.designer.features.CreateInclusiveGatewayFeature;
+import org.activiti.designer.features.CreateLaneFeature;
 import org.activiti.designer.features.CreateMailTaskFeature;
 import org.activiti.designer.features.CreateManualTaskFeature;
+import org.activiti.designer.features.CreateNoneThrowingEventFeature;
 import org.activiti.designer.features.CreateParallelGatewayFeature;
+import org.activiti.designer.features.CreatePoolFeature;
 import org.activiti.designer.features.CreateReceiveTaskFeature;
 import org.activiti.designer.features.CreateScriptTaskFeature;
 import org.activiti.designer.features.CreateServiceTaskFeature;
 import org.activiti.designer.features.CreateSignalCatchingEventFeature;
+import org.activiti.designer.features.CreateSignalThrowingEventFeature;
 import org.activiti.designer.features.CreateStartEventFeature;
 import org.activiti.designer.features.CreateTimerCatchingEventFeature;
 import org.activiti.designer.features.CreateTimerStartEventFeature;
 import org.activiti.designer.features.CreateUserTaskFeature;
+import org.activiti.designer.features.DeletePoolFeature;
 import org.activiti.designer.features.DeleteSequenceFlowFeature;
 import org.activiti.designer.integration.palette.PaletteEntry;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
@@ -129,6 +137,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     toolMapping.put(CreateErrorEndEventFeature.class, PaletteEntry.ERROR_END_EVENT);
     toolMapping.put(CreateExclusiveGatewayFeature.class, PaletteEntry.EXCLUSIVE_GATEWAY);
     toolMapping.put(CreateInclusiveGatewayFeature.class, PaletteEntry.INCLUSIVE_GATEWAY);
+    toolMapping.put(CreateEventGatewayFeature.class, PaletteEntry.EVENT_GATEWAY);
     toolMapping.put(CreateMailTaskFeature.class, PaletteEntry.MAIL_TASK);
     toolMapping.put(CreateManualTaskFeature.class, PaletteEntry.MANUAL_TASK);
     toolMapping.put(CreateReceiveTaskFeature.class, PaletteEntry.RECEIVE_TASK);
@@ -137,6 +146,8 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     toolMapping.put(CreateServiceTaskFeature.class, PaletteEntry.SERVICE_TASK);
     toolMapping.put(CreateCallActivityFeature.class, PaletteEntry.CALL_ACTIVITY);
     toolMapping.put(CreateEmbeddedSubProcessFeature.class, PaletteEntry.SUBPROCESS);
+    toolMapping.put(CreatePoolFeature.class, PaletteEntry.POOL);
+    toolMapping.put(CreateLaneFeature.class, PaletteEntry.LANE);
     toolMapping.put(CreateEventSubProcessFeature.class, PaletteEntry.EVENT_SUBPROCESS);
     toolMapping.put(CreateUserTaskFeature.class, PaletteEntry.USER_TASK);
     toolMapping.put(CreateAlfrescoUserTaskFeature.class, PaletteEntry.ALFRESCO_USER_TASK);
@@ -145,6 +156,8 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     toolMapping.put(CreateBoundarySignalFeature.class, PaletteEntry.BOUNDARY_SIGNAL);
     toolMapping.put(CreateTimerCatchingEventFeature.class, PaletteEntry.BOUNDARY_TIMER);
     toolMapping.put(CreateSignalCatchingEventFeature.class, PaletteEntry.BOUNDARY_SIGNAL);
+    toolMapping.put(CreateSignalThrowingEventFeature.class, PaletteEntry.THROW_SIGNAL);
+    toolMapping.put(CreateNoneThrowingEventFeature.class, PaletteEntry.THROW_NONE);
     toolMapping.put(CreateBusinessRuleTaskFeature.class, PaletteEntry.BUSINESSRULE_TASK);
     toolMapping.put(CreateAlfrescoScriptTaskFeature.class, PaletteEntry.ALFRESCO_SCRIPT_TASK);
     toolMapping.put(CreateAlfrescoMailTaskFeature.class, PaletteEntry.ALFRESCO_MAIL_TASK);
@@ -306,6 +319,10 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
 	    addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "parallelgateway"), customContext, 
 	    		"Change to parallel gateway", "Change to a parallel gateway", ActivitiImageProvider.IMG_GATEWAY_PARALLEL);
   	}
+  	if(notGateway == null || !(notGateway instanceof EventGateway)) {
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "eventgateway"), customContext, 
+          "Change to event gateway", "Change to a event gateway", ActivitiImageProvider.IMG_GATEWAY_EVENT);
+    }
   }
   
   private void addTaskButtons(ContextButtonEntry otherElementButton, Task notTask, CustomContext customContext) {
@@ -372,6 +389,11 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
           subMenuDelete.setText("Delete sequence flow"); //$NON-NLS-1$
           subMenuDelete.setSubmenu(false);
           menuList.add(subMenuDelete);
+        } else if (object instanceof Pool) {
+          ContextMenuEntry subMenuDelete = new ContextMenuEntry(new DeletePoolFeature(getFeatureProvider()), context);
+          subMenuDelete.setText("Delete pool"); //$NON-NLS-1$
+          subMenuDelete.setSubmenu(false);
+          menuList.add(subMenuDelete);
         }
       }
     }
@@ -393,6 +415,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     IPaletteCompartmentEntry eventCompartmentEntry = new PaletteCompartmentEntry("Event", null);
     IPaletteCompartmentEntry taskCompartmentEntry = new PaletteCompartmentEntry("Task", null);
     IPaletteCompartmentEntry gatewayCompartmentEntry = new PaletteCompartmentEntry("Gateway", null);
+    IPaletteCompartmentEntry containerCompartmentEntry = new PaletteCompartmentEntry("Container", null);
     IPaletteCompartmentEntry boundaryEventCompartmentEntry = new PaletteCompartmentEntry("Boundary event", null);
     IPaletteCompartmentEntry intermediateEventCompartmentEntry = new PaletteCompartmentEntry("Intermediate event", null);
     IPaletteCompartmentEntry alfrescoCompartmentEntry = new PaletteCompartmentEntry("Alfresco", ActivitiImageProvider.IMG_ALFRESCO_LOGO);
@@ -447,16 +470,24 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
           intermediateEventCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("signalthrowingevent".equalsIgnoreCase(toolEntry.getLabel())) {
           intermediateEventCompartmentEntry.getToolEntries().add(toolEntry);
+        } else if ("nonethrowingevent".equalsIgnoreCase(toolEntry.getLabel())) {
+          intermediateEventCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("parallelgateway".equalsIgnoreCase(toolEntry.getLabel())) {
           gatewayCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("exclusivegateway".equalsIgnoreCase(toolEntry.getLabel())) {
           gatewayCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("inclusivegateway".equalsIgnoreCase(toolEntry.getLabel())) {
           gatewayCompartmentEntry.getToolEntries().add(toolEntry);
+        } else if ("eventgateway".equalsIgnoreCase(toolEntry.getLabel())) {
+          gatewayCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("subprocess".equalsIgnoreCase(toolEntry.getLabel())) {
-          taskCompartmentEntry.getToolEntries().add(toolEntry);
+          containerCompartmentEntry.getToolEntries().add(toolEntry);
+        } else if ("pool".equalsIgnoreCase(toolEntry.getLabel())) {
+          containerCompartmentEntry.getToolEntries().add(toolEntry);
+        } else if ("lane".equalsIgnoreCase(toolEntry.getLabel())) {
+          containerCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("eventsubprocess".equalsIgnoreCase(toolEntry.getLabel())) {
-          taskCompartmentEntry.getToolEntries().add(toolEntry);
+          containerCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("callactivity".equalsIgnoreCase(toolEntry.getLabel())) {
           taskCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("alfrescousertask".equalsIgnoreCase(toolEntry.getLabel())) {
@@ -478,6 +509,9 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     }
     if (taskCompartmentEntry.getToolEntries().size() > 0) {
       ret.add(taskCompartmentEntry);
+    }
+    if (containerCompartmentEntry.getToolEntries().size() > 0) {
+      ret.add(containerCompartmentEntry);
     }
     if (gatewayCompartmentEntry.getToolEntries().size() > 0) {
       ret.add(gatewayCompartmentEntry);

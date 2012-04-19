@@ -121,7 +121,7 @@ public class AddEventSubProcessFeature extends AbstractAddShapeFeature {
 	@Override
 	public boolean canAdd(IAddContext context) {
 		if (context.getNewObject() instanceof EventSubProcess) {
-			// TODO: lanes & pools
+			
 			if (context.getTargetContainer() instanceof Diagram) {
 				return false;
 			}

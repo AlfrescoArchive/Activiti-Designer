@@ -1,6 +1,5 @@
 package com.alfresco.designer.gui.features;
 
-import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.StartEvent;
 import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.bpmn2.model.alfresco.AlfrescoStartEvent;
@@ -28,14 +27,14 @@ public class CreateAlfrescoStartEventFeature extends AbstractCreateBPMNFeature {
 	public Object[] create(ICreateContext context) {
 		StartEvent startEvent = new AlfrescoStartEvent();
 		
-		startEvent.setId(getNextId());
+		startEvent.setId(getNextId(startEvent));
 		startEvent.setName("Alfresco start");
 		
 		Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
     if (parentObject instanceof SubProcess) {
       ((SubProcess) parentObject).getFlowElements().add(startEvent);
     } else {
-    	ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).addFlowElement(startEvent);
+    	ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getMainProcess().getFlowElements().add(startEvent);
     }
     
 		addGraphicalRepresentation(context, startEvent);
@@ -53,10 +52,4 @@ public class CreateAlfrescoStartEventFeature extends AbstractCreateBPMNFeature {
 	protected String getFeatureIdKey() {
 		return FEATURE_ID_KEY;
 	}
-
-	@Override
-	protected Class<? extends FlowElement> getFeatureClass() {
-		return new AlfrescoStartEvent().getClass();
-	}
-
 }

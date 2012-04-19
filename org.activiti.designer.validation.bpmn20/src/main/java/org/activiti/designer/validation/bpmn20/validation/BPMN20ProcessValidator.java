@@ -66,7 +66,7 @@ public class BPMN20ProcessValidator extends AbstractProcessValidator {
     // Clear problems for this diagram first
     clearMarkers(getResource(diagram.eResource().getURI()));
 
-    final Map<String, List<Object>> processNodes = extractProcessConstructs(ModelHandler.getModel(EcoreUtil.getURI(diagram)).getProcess().getFlowElements(), 
+    final Map<String, List<Object>> processNodes = extractProcessConstructs(ModelHandler.getModel(EcoreUtil.getURI(diagram)).getMainProcess().getFlowElements(), 
     		new SubProgressMonitor(monitor, PluginConstants.WORK_EXTRACT_CONSTRUCTS));
 
     final List<ProcessValidationWorkerInfo> workers = getWorkers();

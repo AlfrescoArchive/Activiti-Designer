@@ -15,10 +15,8 @@ package org.activiti.designer.export.bpmn20.export;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.activiti.designer.bpmn2.model.Activity;
-import org.activiti.designer.bpmn2.model.ExclusiveGateway;
 import org.activiti.designer.bpmn2.model.FlowElement;
-import org.activiti.designer.bpmn2.model.InclusiveGateway;
-import org.activiti.designer.bpmn2.model.SequenceFlow;
+import org.activiti.designer.bpmn2.model.Gateway;
 
 
 /**
@@ -27,20 +25,17 @@ import org.activiti.designer.bpmn2.model.SequenceFlow;
 public class DefaultFlowExport {
 
   public static void createDefaultFlow(FlowElement object, XMLStreamWriter xtw) throws Exception {
-    SequenceFlow defaultFlow = null;
+    String defaultFlow = null;
     if(object instanceof Activity) {
       defaultFlow = ((Activity) object).getDefaultFlow();
-    } else if(object instanceof ExclusiveGateway) {
-      defaultFlow = ((ExclusiveGateway) object).getDefaultFlow();
-    } else if(object instanceof InclusiveGateway) {
-      defaultFlow = ((InclusiveGateway) object).getDefaultFlow();
-    }
-    else {
-        throw new Exception("Invalid default flow chosen.  Expected 'Activity', " +
-        		"'ExclusiveGateway', 'InclusiveGateway', but got: '" + defaultFlow);
+    } else if(object instanceof Gateway) {
+      defaultFlow = ((Gateway) object).getDefaultFlow();
+    } else {
+        throw new Exception("Invalid element for default flow.  Expected 'Activity', " +
+        		"'ExclusiveGateway', 'InclusiveGateway', but got: '" + object.getClass());
     }
     if(defaultFlow != null) {
-      xtw.writeAttribute("default", defaultFlow.getId());
+      xtw.writeAttribute("default", defaultFlow);
     }
   }
 }

@@ -1,6 +1,5 @@
 package com.alfresco.designer.gui.features;
 
-import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.bpmn2.model.alfresco.AlfrescoScriptTask;
 import org.activiti.designer.features.AbstractCreateFastBPMNFeature;
@@ -28,14 +27,14 @@ public class CreateAlfrescoScriptTaskFeature extends AbstractCreateFastBPMNFeatu
 	public Object[] create(ICreateContext context) {
 		AlfrescoScriptTask newScriptTask = new AlfrescoScriptTask();
 
-		newScriptTask.setId(getNextId());
+		newScriptTask.setId(getNextId(newScriptTask));
 		newScriptTask.setName("Alfresco Script Task");
 
 		Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
     if (parentObject instanceof SubProcess) {
       ((SubProcess) parentObject).getFlowElements().add(newScriptTask);
     } else {
-    	ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).addFlowElement(newScriptTask);
+    	ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getMainProcess().getFlowElements().add(newScriptTask);
     }
 
     addGraphicalContent(context, newScriptTask);
@@ -55,10 +54,4 @@ public class CreateAlfrescoScriptTaskFeature extends AbstractCreateFastBPMNFeatu
 	protected String getFeatureIdKey() {
 		return FEATURE_ID_KEY;
 	}
-
-	@Override
-	protected Class<? extends FlowElement> getFeatureClass() {
-		return new AlfrescoScriptTask().getClass();
-	}
-
 }

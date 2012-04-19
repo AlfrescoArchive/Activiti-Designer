@@ -4,12 +4,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.activiti.designer.bpmn2.model.Activity;
+import org.activiti.designer.bpmn2.model.BaseElement;
 import org.activiti.designer.bpmn2.model.BoundaryEvent;
 import org.activiti.designer.bpmn2.model.CallActivity;
 import org.activiti.designer.bpmn2.model.Event;
 import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.FlowNode;
 import org.activiti.designer.bpmn2.model.Gateway;
+import org.activiti.designer.bpmn2.model.Process;
 import org.activiti.designer.bpmn2.model.SequenceFlow;
 import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.bpmn2.model.Task;
@@ -27,7 +29,6 @@ public class DeleteFlowElementFeature extends DefaultDeleteFeature {
 	}
 
 	protected void deleteBusinessObject(Object bo) {
-		Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
 		if (bo instanceof Task || bo instanceof Gateway || bo instanceof Event || bo instanceof SubProcess || bo instanceof CallActivity) {
 		  deleteSequenceFlows((FlowNode) bo);
 		}
@@ -35,7 +36,7 @@ public class DeleteFlowElementFeature extends DefaultDeleteFeature {
 		if (bo instanceof SubProcess || bo instanceof Task) {
 		  if(((Activity) bo).getBoundaryEvents() != null) {
 		    for (BoundaryEvent boundaryEvent : ((Activity) bo).getBoundaryEvents()) {
-		    	model.getProcess().getFlowElements().remove(boundaryEvent);
+		      removeElement(boundaryEvent);
         }
 		  }
 		}
@@ -50,16 +51,33 @@ public class DeleteFlowElementFeature extends DefaultDeleteFeature {
 		    if(subFlowElement instanceof FlowNode) {
           deleteSequenceFlows((FlowNode) subFlowElement);
         }
-		    model.getProcess().getFlowElements().remove(subFlowElement);
+		    removeElement(subFlowElement);
       }
 		  subProcess.getFlowElements().clear();
 		}
 
-		model.getProcess().getFlowElements().remove(bo);
+		removeElement((BaseElement) bo);
 	}
 	
+	private void removeElement(BaseElement element) {
+  	List<Process> processes = ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getProcesses();
+    for (Process process : processes) {
+      process.getFlowElements().remove(element);
+      removeElementInProcess(element, process.getFlowElements());
+    }
+	}
+	
+	private void removeElementInProcess(BaseElement element, List<FlowElement> elementList) {
+    for (FlowElement flowElement : elementList) {
+      if(flowElement instanceof SubProcess) {
+        SubProcess subProcess = (SubProcess) flowElement;
+        subProcess.getFlowElements().remove(element);
+        removeElementInProcess(element, subProcess.getFlowElements());
+      }
+    }
+  }
+	
 	private void deleteSequenceFlows(FlowNode flowNode) {
-		Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
 	  List<SequenceFlow> toDeleteSequenceFlows = new ArrayList<SequenceFlow>();
     for (SequenceFlow incomingSequenceFlow : flowNode.getIncoming()) {
       SequenceFlow toDeleteObject = (SequenceFlow) getFlowElement(incomingSequenceFlow);
@@ -75,7 +93,7 @@ public class DeleteFlowElementFeature extends DefaultDeleteFeature {
     }
     for (SequenceFlow deleteObject : toDeleteSequenceFlows) {
       deletedConnectingFlows(deleteObject);
-      model.getProcess().getFlowElements().remove(deleteObject);
+      removeElement(deleteObject);
     }
 	}
 	
@@ -105,21 +123,27 @@ public class DeleteFlowElementFeature extends DefaultDeleteFeature {
 	}
 
 	private FlowElement getFlowElement(FlowElement flowElement) {
-		for (FlowElement element : ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getProcess().getFlowElements()) {
-		  
-			if (element.getId().equals(flowElement.getId())) {
-				return element;
-			}
-			
-			if (element instanceof SubProcess) {
-			  for (FlowElement subFlowElement : ((SubProcess) element).getFlowElements()) {
-			    if (subFlowElement.getId().equals(flowElement.getId())) {
-	          return subFlowElement;
-	        }
-        }
-			}
-		}
+	  Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+	  for (Process process : model.getProcesses()) {
+	    FlowElement processElement = getFlowElementInProcess(flowElement, process.getFlowElements());
+	    if(processElement != null) return processElement;
+    }
 		return null;
+	}
+	
+	private FlowElement getFlowElementInProcess(FlowElement flowElement, List<FlowElement> elementList) {
+	  for (FlowElement element : elementList) {
+      
+      if (element.getId().equals(flowElement.getId())) {
+        return element;
+      }
+      
+      if (element instanceof SubProcess) {
+        FlowElement subFlowElement = getFlowElementInProcess(flowElement, ((SubProcess) element).getFlowElements());
+        if(subFlowElement != null) return subFlowElement;
+      }
+    }
+	  return null;
 	}
 
 }

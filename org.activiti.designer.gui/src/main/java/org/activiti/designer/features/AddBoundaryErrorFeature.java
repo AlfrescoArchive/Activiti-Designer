@@ -92,7 +92,9 @@ public class AddBoundaryErrorFeature extends AbstractAddShapeFeature {
   @Override
   public boolean canAdd(IAddContext context) {
     Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-    if (parentObject instanceof SubProcess == false && parentObject instanceof CallActivity == false && parentObject instanceof ServiceTask == false) {
+    if (parentObject instanceof SubProcess == false && parentObject instanceof CallActivity == false 
+            && parentObject instanceof ServiceTask == false) {
+      
       return false;
     }
     if (context.getNewObject() instanceof BoundaryEvent == false) {

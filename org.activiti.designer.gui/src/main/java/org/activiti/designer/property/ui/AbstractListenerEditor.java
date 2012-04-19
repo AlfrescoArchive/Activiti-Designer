@@ -152,7 +152,7 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
 				  	newListener.setScriptProcessor(dialog.scriptProcessor);
 				  }
 				  setFieldsInListener(newListener, dialog.fieldExtensionList);
-				  BpmnBOUtil.addListener(bo, newListener);
+				  BpmnBOUtil.addListener(bo, newListener, diagram);
 				}
 			}, editingDomain, "Model Update");
 		}
@@ -177,7 +177,7 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
 					  	listener.setScriptProcessor(dialog.scriptProcessor);
 					  }
 					  setFieldsInListener(listener, dialog.fieldExtensionList);
-					  BpmnBOUtil.setListener(bo, listener, index);
+					  BpmnBOUtil.setListener(bo, listener, index, diagram);
 					}
 					
 				}
@@ -194,7 +194,7 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
 			TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
 			ActivitiUiUtil.runModelChange(new Runnable() {
 				public void run() {
-					BpmnBOUtil.removeListener(bo, listener);
+					BpmnBOUtil.removeListener(bo, listener, diagram);
 				}
 			}, editingDomain, "Model Update");
 		}

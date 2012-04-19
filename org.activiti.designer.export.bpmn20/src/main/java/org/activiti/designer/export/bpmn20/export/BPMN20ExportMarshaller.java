@@ -17,14 +17,18 @@ import org.activiti.designer.bpmn2.model.BusinessRuleTask;
 import org.activiti.designer.bpmn2.model.CallActivity;
 import org.activiti.designer.bpmn2.model.EndEvent;
 import org.activiti.designer.bpmn2.model.ErrorEventDefinition;
+import org.activiti.designer.bpmn2.model.EventGateway;
 import org.activiti.designer.bpmn2.model.EventSubProcess;
 import org.activiti.designer.bpmn2.model.ExclusiveGateway;
 import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.InclusiveGateway;
 import org.activiti.designer.bpmn2.model.IntermediateCatchEvent;
+import org.activiti.designer.bpmn2.model.Lane;
 import org.activiti.designer.bpmn2.model.MailTask;
 import org.activiti.designer.bpmn2.model.ManualTask;
 import org.activiti.designer.bpmn2.model.ParallelGateway;
+import org.activiti.designer.bpmn2.model.Pool;
+import org.activiti.designer.bpmn2.model.Process;
 import org.activiti.designer.bpmn2.model.ReceiveTask;
 import org.activiti.designer.bpmn2.model.ScriptTask;
 import org.activiti.designer.bpmn2.model.SequenceFlow;
@@ -41,12 +45,6 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 
-/**
- * @author Tiese Barrell
- * @since 0.5.1
- * @version 2
- * 
- */
 public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
 
   private Bpmn2MemoryModel model;
@@ -87,44 +85,87 @@ public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
       xtw.writeNamespace(OMGDI_PREFIX, OMGDI_NAMESPACE);
       xtw.writeAttribute("typeLanguage", SCHEMA_NAMESPACE);
       xtw.writeAttribute("expressionLanguage", XPATH_NAMESPACE);
-      if (model.getProcess() != null && StringUtils.isNotEmpty(model.getProcess().getNamespace())) {
-        xtw.writeAttribute("targetNamespace", model.getProcess().getNamespace());
+      if (StringUtils.isNotEmpty(model.getTargetNamespace())) {
+        xtw.writeAttribute("targetNamespace", model.getTargetNamespace());
       } else {
         xtw.writeAttribute("targetNamespace", PROCESS_NAMESPACE);
       }
       
-      if(model.getProcess().getSignals().size() > 0) {
-      	for (Signal signal : model.getProcess().getSignals()) {
-          xtw.writeStartElement("signal");
-          xtw.writeAttribute("id", signal.getId());
-          xtw.writeAttribute("name", signal.getName());
-          xtw.writeEndElement();
-        }
-      }
-
-      // start process element
-      xtw.writeStartElement("process");
-      xtw.writeAttribute("id", model.getProcess().getId());
-      xtw.writeAttribute("name", model.getProcess().getName());
-      if (StringUtils.isNotEmpty(model.getProcess().getDocumentation())) {
-
-        xtw.writeStartElement("documentation");
-        xtw.writeCharacters(model.getProcess().getDocumentation());
+      for (Signal signal : model.getSignals()) {
+        xtw.writeStartElement("signal");
+        xtw.writeAttribute("id", signal.getId());
+        xtw.writeAttribute("name", signal.getName());
         xtw.writeEndElement();
       }
-      ExecutionListenerExport.createExecutionListenerXML(model.getProcess().getExecutionListeners(), true, xtw);
       
-      for (FlowElement flowElement : model.getProcess().getFlowElements()) {
-      	PictogramElement picElement = featureProvider.getPictogramElementForBusinessObject(flowElement);
-      	if(picElement == null) continue;
-      	
-	      createXML(flowElement);
+      if(model.getPools().size() > 0) {
+        xtw.writeStartElement("collaboration");
+        xtw.writeAttribute("id", "Collaboration");
+        for (Pool pool : model.getPools()) {
+          xtw.writeStartElement("participant");
+          xtw.writeAttribute("id", pool.getId());
+          if(StringUtils.isNotEmpty(pool.getName())) {
+            xtw.writeAttribute("name", pool.getName());
+          }
+          xtw.writeAttribute("processRef", pool.getProcessRef());
+          xtw.writeEndElement();
+        }
+        xtw.writeEndElement();
+      }
+      
+      for (Process process : model.getProcesses()) {
+      
+        if(process.getFlowElements().size() == 0 && process.getLanes().size() == 0) {
+          // empty process, ignore it 
+          continue;
+        }
+        
+        // start process element
+        xtw.writeStartElement("process");
+        xtw.writeAttribute("id", process.getId());
+        xtw.writeAttribute("name", process.getName());
+        if (StringUtils.isNotEmpty(process.getDocumentation())) {
+  
+          xtw.writeStartElement("documentation");
+          xtw.writeCharacters(process.getDocumentation());
+          xtw.writeEndElement();
+        }
+        
+        if(process.getLanes().size() > 0) {
+          xtw.writeStartElement("laneSet");
+          xtw.writeAttribute("id", "laneSet_" + process.getId());
+          for (Lane lane : process.getLanes()) {
+            xtw.writeStartElement("lane");
+            xtw.writeAttribute("id", lane.getId());
+            if(StringUtils.isNotEmpty(lane.getName())) {
+              xtw.writeAttribute("name", lane.getName());
+            }
+            
+            for (String flowNodeRef : lane.getFlowReferences()) {
+              xtw.writeStartElement("flowNodeRef");
+              xtw.writeCharacters(flowNodeRef);
+              xtw.writeEndElement();
+            }
+            
+            xtw.writeEndElement();
+          }
+          xtw.writeEndElement();
+        }
+        
+        ExecutionListenerExport.createExecutionListenerXML(process.getExecutionListeners(), true, xtw);
+        
+        for (FlowElement flowElement : process.getFlowElements()) {
+        	PictogramElement picElement = featureProvider.getPictogramElementForBusinessObject(flowElement);
+        	if(picElement == null) continue;
+        	
+  	      createXML(flowElement);
+        }
+  
+        // end process element
+        xtw.writeEndElement();
       }
 
-      // end process element
-      xtw.writeEndElement();
-
-      BpmnDIExport.createDIXML(model.getProcess(), featureProvider, xtw);
+      BpmnDIExport.createDIXML(model, featureProvider, xtw);
 
       // end definitions root element
       xtw.writeEndElement();
@@ -291,6 +332,18 @@ public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
       DefaultFlowExport.createDefaultFlow(object, xtw);
 
       // end InclusiveGateway element
+      xtw.writeEndElement();
+      
+    } else if (object instanceof EventGateway) {
+      EventGateway eventGateway = (EventGateway) object;
+      // start EventGateway element
+      xtw.writeStartElement("eventGateway");
+      xtw.writeAttribute("id", eventGateway.getId());
+      if (eventGateway.getName() != null) {
+        xtw.writeAttribute("name", eventGateway.getName());
+      }
+      
+      // end EventGateway element
       xtw.writeEndElement();
     
     } else if (object instanceof IntermediateCatchEvent) {

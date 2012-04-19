@@ -18,12 +18,16 @@ import java.util.List;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.activiti.designer.bpmn2.model.Activity;
+import org.activiti.designer.bpmn2.model.BaseElement;
 import org.activiti.designer.bpmn2.model.BoundaryEvent;
 import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.FlowNode;
+import org.activiti.designer.bpmn2.model.Lane;
+import org.activiti.designer.bpmn2.model.Pool;
 import org.activiti.designer.bpmn2.model.Process;
 import org.activiti.designer.bpmn2.model.SequenceFlow;
 import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.eclipse.graphiti.datatypes.ILocation;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.mm.algorithms.styles.Point;
@@ -41,36 +45,53 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
   private static XMLStreamWriter xtw;
   private static IFeatureProvider featureProvider;
 
-  public static void createDIXML(Process process, IFeatureProvider inputFeatureProvider, XMLStreamWriter inputXtw) throws Exception {
+  public static void createDIXML(Bpmn2MemoryModel model, IFeatureProvider inputFeatureProvider, XMLStreamWriter inputXtw) throws Exception {
   	featureProvider = inputFeatureProvider;
     xtw = inputXtw;
     xtw.writeStartElement(BPMNDI_PREFIX, "BPMNDiagram", BPMNDI_NAMESPACE);
-    xtw.writeAttribute("id", "BPMNDiagram_" + process.getId());
+    xtw.writeAttribute("id", "BPMNDiagram_" + model.getMainProcess().getId());
 
     xtw.writeStartElement(BPMNDI_PREFIX, "BPMNPlane", BPMNDI_NAMESPACE);
-    xtw.writeAttribute("bpmnElement", process.getId());
-    xtw.writeAttribute("id", "BPMNPlane_" + process.getId());
+    xtw.writeAttribute("bpmnElement", model.getMainProcess().getId());
+    xtw.writeAttribute("id", "BPMNPlane_" + model.getMainProcess().getId());
 
-    loopThroughElements(process.getFlowElements());
+    for (Pool pool : model.getPools()) {
+      PictogramElement picElement = featureProvider.getPictogramElementForBusinessObject(pool);
+      writeBpmnElement(pool, picElement);
+      
+      Process process = model.getProcess(pool.getId());
+      if(process != null) {
+        for (Lane lane : process.getLanes()) {
+          PictogramElement laneElement = featureProvider.getPictogramElementForBusinessObject(lane);
+          writeBpmnElement(lane, laneElement);
+        }
+      }
+    }
+    
+    for (Process process : model.getProcesses()) {   
+      loopThroughElements(process.getFlowElements());
+    }
     
     xtw.writeEndElement();
     xtw.writeEndElement();
   }
   
+  
+  
   private static void loopThroughElements(List<FlowElement> elementList) throws Exception {
   	for (FlowElement element : elementList) {
-
       if (element instanceof FlowNode) {
-      	FlowNode node = (FlowNode) element;
-        writeBpmnElement(node);
+      	PictogramElement picElement = featureProvider.getPictogramElementForBusinessObject(element);
+        writeBpmnElement(element, picElement);
         if(element instanceof SubProcess) {
-        	SubProcess subProcess = (SubProcess) node;
+        	SubProcess subProcess = (SubProcess) element;
         	loopThroughElements(subProcess.getFlowElements());
         }
         if(element instanceof Activity) {
-        	Activity activity = (Activity) node;
+        	Activity activity = (Activity) element;
         	for (BoundaryEvent boundaryEvent : activity.getBoundaryEvents()) {
-        		writeBpmnElement(boundaryEvent);
+        	  PictogramElement boundaryElement = featureProvider.getPictogramElementForBusinessObject(boundaryEvent);
+        		writeBpmnElement(boundaryEvent, boundaryElement);
           }
         }
       }
@@ -83,17 +104,18 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
     }
   }
   
-  private static void writeBpmnElement(FlowNode flowNode) throws Exception {
-  	
-  	PictogramElement picElement = featureProvider.getPictogramElementForBusinessObject(flowNode);
+  private static void writeBpmnElement(BaseElement baseElement, PictogramElement picElement) throws Exception {
   	if(picElement instanceof Shape) {
   		Shape shape = (Shape) picElement;
   		xtw.writeStartElement(BPMNDI_PREFIX, "BPMNShape", BPMNDI_NAMESPACE);
-      xtw.writeAttribute("bpmnElement", flowNode.getId());
-      xtw.writeAttribute("id", "BPMNShape_" + flowNode.getId());
-      if(flowNode instanceof SubProcess) {
+      xtw.writeAttribute("bpmnElement", baseElement.getId());
+      xtw.writeAttribute("id", "BPMNShape_" + baseElement.getId());
+      if(baseElement instanceof SubProcess) {
       	xtw.writeAttribute("isExpanded", "true");
+      } else if(baseElement instanceof Pool || baseElement instanceof Lane) {
+        xtw.writeAttribute("isHorizontal", "true");
       }
+      
       xtw.writeStartElement(OMGDC_PREFIX, "Bounds", OMGDC_NAMESPACE);
       xtw.writeAttribute("height", "" + shape.getGraphicsAlgorithm().getHeight());
       xtw.writeAttribute("width", "" + shape.getGraphicsAlgorithm().getWidth());
