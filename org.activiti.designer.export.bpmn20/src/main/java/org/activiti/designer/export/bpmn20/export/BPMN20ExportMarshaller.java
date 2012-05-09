@@ -123,7 +123,9 @@ public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
         // start process element
         xtw.writeStartElement("process");
         xtw.writeAttribute("id", process.getId());
-        xtw.writeAttribute("name", process.getName());
+        if(StringUtils.isNotEmpty(process.getName())) {
+          xtw.writeAttribute("name", process.getName());
+        }
         if (StringUtils.isNotEmpty(process.getDocumentation())) {
   
           xtw.writeStartElement("documentation");
@@ -187,7 +189,10 @@ public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
       // start StartEvent element
       xtw.writeStartElement("startEvent");
       xtw.writeAttribute("id", startEvent.getId());
-      xtw.writeAttribute("name", startEvent.getName());
+      
+      if(StringUtils.isNotEmpty(startEvent.getName())) {
+        xtw.writeAttribute("name", startEvent.getName());
+      }
 
       if (startEvent.getFormKey() != null && startEvent.getFormKey().length() > 0) {
         xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "formKey", startEvent.getFormKey());
@@ -252,7 +257,9 @@ public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
       // start EndEvent element
       xtw.writeStartElement("endEvent");
       xtw.writeAttribute("id", endEvent.getId());
-      xtw.writeAttribute("name", endEvent.getName());
+      if(StringUtils.isNotEmpty(endEvent.getName())) {
+        xtw.writeAttribute("name", endEvent.getName());
+      }
 
       if (endEvent.getEventDefinitions().size() > 0) {
         ErrorEventDefinition errorDef = (ErrorEventDefinition) endEvent.getEventDefinitions().get(0);
