@@ -337,7 +337,7 @@ public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
     } else if (object instanceof EventGateway) {
       EventGateway eventGateway = (EventGateway) object;
       // start EventGateway element
-      xtw.writeStartElement("eventGateway");
+      xtw.writeStartElement("eventBasedGateway");
       xtw.writeAttribute("id", eventGateway.getId());
       if (eventGateway.getName() != null) {
         xtw.writeAttribute("name", eventGateway.getName());

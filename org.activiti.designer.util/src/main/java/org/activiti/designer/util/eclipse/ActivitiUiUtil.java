@@ -219,7 +219,8 @@ public class ActivitiUiUtil {
       List<Pool> poolList, final String featureIdKey) {
     
     for (Pool pool : poolList) {
-      determinedId = getId(pool.getId(), determinedId);
+      String contentObjectId = pool.getId().replace(featureIdKey, "");
+      determinedId = getId(contentObjectId, determinedId);
     }
     return determinedId;
   }

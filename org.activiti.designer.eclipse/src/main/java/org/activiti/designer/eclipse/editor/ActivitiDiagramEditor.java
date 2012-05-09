@@ -52,6 +52,7 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.transaction.RecordingCommand;
+import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.gef.ContextMenuProvider;
 import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.LayerConstants;
@@ -182,6 +183,16 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 		((BasicCommandStack) getEditingDomain().getCommandStack()).saveIsDone();
 		updateDirtyState();
 	}
+	
+	@Override
+  public boolean isDirty() {
+    TransactionalEditingDomain editingDomain = getEditingDomain();
+    // Check that the editor is not yet disposed
+    if (editingDomain != null && editingDomain.getCommandStack() != null) {
+      return ((BasicCommandStack) editingDomain.getCommandStack()).isSaveNeeded();
+    }
+    return false;
+  }
 
 	@Override
 	protected void setInput(IEditorInput input) {

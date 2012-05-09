@@ -250,7 +250,7 @@ public class BpmnParser {
           } else if (xtr.isStartElement() && "parallelGateway".equalsIgnoreCase(xtr.getLocalName())) {
           	currentActivity = parseParallelGateway(xtr);
           	
-          } else if (xtr.isStartElement() && "eventGateway".equalsIgnoreCase(xtr.getLocalName())) {
+          } else if (xtr.isStartElement() && "eventBasedGateway".equalsIgnoreCase(xtr.getLocalName())) {
             currentActivity = parseEventGateway(xtr);
 
 					} else if (xtr.isStartElement() && "boundaryEvent".equalsIgnoreCase(xtr.getLocalName())) {
