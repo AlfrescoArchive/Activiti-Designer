@@ -334,5 +334,13 @@
       </action>
    </objectContribution>
    </extension>
+   <extension
+         id="org.activiti.designer.iconProvider"
+         name="Activiti Designer GUI Icon Provider"
+         point="org.activiti.designer.eclipse.extension.IconProvider">
+      <ImageProvider
+            class="org.activiti.designer.diagram.DefaultIconProvider">
+      </ImageProvider>
+   </extension>
 
 </plugin>

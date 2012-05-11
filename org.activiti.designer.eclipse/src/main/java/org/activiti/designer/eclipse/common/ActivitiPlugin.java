@@ -17,6 +17,8 @@ public class ActivitiPlugin extends AbstractUIPlugin {
 
   public static final String PLUGIN_ID = "org.activiti.designer.eclipse"; //$NON-NLS-1$
 
+  public static final String GUI_PLUGIN_ID = "org.activiti.designer.gui"; //$NON-NLS-1$
+
   /**
    * The name used for the user library that contains extensions for the
    * Activiti Designer.
@@ -28,6 +30,8 @@ public class ActivitiPlugin extends AbstractUIPlugin {
   public static final String EXPORT_MARSHALLER_EXTENSIONPOINT_ID = "org.activiti.designer.eclipse.extension.export.ExportMarshaller";
 
   public static final String PROCESS_VALIDATOR_EXTENSIONPOINT_ID = "org.activiti.designer.eclipse.extension.validation.ProcessValidator";
+
+  public static final String ICON_PROVIDER_EXTENSIONPOINT_ID = "org.activiti.designer.eclipse.extension.IconProvider";
 
   private static ActivitiPlugin _plugin;
 
@@ -142,7 +146,7 @@ public class ActivitiPlugin extends AbstractUIPlugin {
   }
 
   /**
-   * Gets an image from this plugin.
+   * Gets an image from this plugin and serves it from the {@link ImageCache}.
    * 
    * @param pluginImage
    *          the PluginImage to get the image for
@@ -151,6 +155,18 @@ public class ActivitiPlugin extends AbstractUIPlugin {
    */
   public static Image getImage(PluginImage pluginImage) {
     return imageCache.getImage(pluginImage);
+  }
+
+  /**
+   * Gets an image from this plugin and serves it from the {@link ImageCache}.
+   * 
+   * @param imageDescriptor
+   *          the ImageDescriptor to get the image for
+   * 
+   * @return an Image if the image was found, null otherwise
+   */
+  public static Image getImage(ImageDescriptor imageDescriptor) {
+    return ImageCache.getImage(imageDescriptor);
   }
 
   /**

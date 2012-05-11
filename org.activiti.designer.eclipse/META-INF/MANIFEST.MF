@@ -32,6 +32,7 @@ Export-Package:
  org.activiti.designer.eclipse.editor,
  org.activiti.designer.eclipse.extension,
  org.activiti.designer.eclipse.extension.export,
+ org.activiti.designer.eclipse.extension.icon,
  org.activiti.designer.eclipse.extension.validation,
  org.activiti.designer.eclipse.perspective,
  org.activiti.designer.eclipse.preferences,
@@ -40,7 +41,3 @@ Export-Package:
  org.activiti.designer.eclipse.util
 Bundle-Activator: org.activiti.designer.eclipse.common.ActivitiPlugin
 Import-Package: org.activiti.designer.eclipse.bpmn
-Bundle-ClassPath: .,
- jdi.jar,
- jdimodel.jar,
- junit.jar

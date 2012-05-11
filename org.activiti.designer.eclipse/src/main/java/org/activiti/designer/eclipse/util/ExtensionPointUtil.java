@@ -15,17 +15,22 @@ package org.activiti.designer.eclipse.util;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.eclipse.extension.export.ExportMarshaller;
+import org.activiti.designer.eclipse.extension.icon.IconProvider;
 import org.activiti.designer.eclipse.extension.validation.ProcessValidator;
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
+import org.eclipse.swt.graphics.Image;
 
 /**
  * Utility class for extension point references.
@@ -79,6 +84,53 @@ public final class ExtensionPointUtil {
     return getProcessValidatorsAndIds().values();
   }
 
+  public static final Image getIconFromIconProviders(final Object context) {
+
+    Image result = null;
+
+    final List<IconProvider> providers = getPrioritizedIconProviders();
+
+    for (final IconProvider provider : providers) {
+      try {
+        result = provider.getIcon(context);
+      } catch (RuntimeException e) {
+        // no-op, provider has no support for this context
+      }
+
+      if (result != null) {
+        break;
+      }
+
+    }
+
+    return result;
+
+  }
+  private static final List<IconProvider> getPrioritizedIconProviders() {
+
+    final List<IconProvider> result = new ArrayList<IconProvider>();
+
+    final IConfigurationElement[] providerConfiguration = Platform.getExtensionRegistry().getConfigurationElementsFor(
+            ActivitiPlugin.ICON_PROVIDER_EXTENSIONPOINT_ID);
+
+    for (final IConfigurationElement element : providerConfiguration) {
+      Object o;
+      try {
+        o = element.createExecutableExtension("class");
+        if (o instanceof IconProvider) {
+          final IconProvider iconProvider = (IconProvider) o;
+          result.add(iconProvider);
+        }
+      } catch (CoreException e1) {
+        e1.printStackTrace();
+      }
+    }
+
+    Collections.sort(result, new IconProviderComparator());
+
+    return result;
+  }
+
   private static final Map<String, ExportMarshaller> getExportMarshallersAndNames() {
 
     final Map<String, ExportMarshaller> result = new HashMap<String, ExportMarshaller>();
@@ -123,6 +175,15 @@ public final class ExtensionPointUtil {
       }
     }
     return result;
+  }
+
+  private static class IconProviderComparator implements Comparator<IconProvider> {
+
+    @Override
+    public int compare(final IconProvider iconProvider1, final IconProvider iconProvider2) {
+      return iconProvider2.getPriority().compareTo(iconProvider1.getPriority());
+    }
+
   }
 
 }

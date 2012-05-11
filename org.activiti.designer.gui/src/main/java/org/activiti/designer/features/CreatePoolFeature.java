@@ -1,6 +1,6 @@
 package org.activiti.designer.features;
 
-import org.activiti.designer.ActivitiImageProvider;
+import org.activiti.designer.PluginImage;
 import org.activiti.designer.bpmn2.model.Lane;
 import org.activiti.designer.bpmn2.model.Pool;
 import org.activiti.designer.bpmn2.model.Process;
@@ -18,42 +18,43 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 
 public class CreatePoolFeature extends AbstractCreateBPMNFeature {
 
-	public static final String FEATURE_ID_KEY = "pool";
+  public static final String FEATURE_ID_KEY = "pool";
 
-	public CreatePoolFeature(IFeatureProvider fp) {
-		super(fp, "Pool", "Add pool");
-	}
+  public CreatePoolFeature(IFeatureProvider fp) {
+    super(fp, "Pool", "Add pool");
+  }
 
-	@Override
-	public boolean canCreate(ICreateContext context) {
-		if(context.getTargetContainer() instanceof Diagram) return true;
-		
+  @Override
+  public boolean canCreate(ICreateContext context) {
+    if (context.getTargetContainer() instanceof Diagram)
+      return true;
+
     return false;
-	}
+  }
 
-	@Override
-	public Object[] create(ICreateContext context) {
-	  Pool newPool = new Pool();
+  @Override
+  public Object[] create(ICreateContext context) {
+    Pool newPool = new Pool();
     newPool.setId(getNextId(newPool));
     newPool.setName("Pool");
-	  
-	  Process newProcess = new Process();
-	  newProcess.setId("process_" + newPool.getId());
-	  newProcess.setName(newProcess.getId());
-	  
-	  newPool.setProcessRef(newProcess.getId());
-		
-	  Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+
+    Process newProcess = new Process();
+    newProcess.setId("process_" + newPool.getId());
+    newProcess.setName(newProcess.getId());
+
+    newPool.setProcessRef(newProcess.getId());
+
+    Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
     model.getPools().add(newPool);
     model.addProcess(newProcess);
-    
+
     PictogramElement poolElement = addGraphicalRepresentation(context, newPool);
-    
+
     Lane lane = new Lane();
     lane.setId(getNextId(lane, "lane"));
     lane.setParentProcess(newProcess);
     newProcess.getLanes().add(lane);
-    
+
     AddContext laneContext = new AddContext(new AreaContext(), lane);
     IAddFeature addFeature = getFeatureProvider().getAddFeature(laneContext);
     laneContext.setNewObject(lane);
@@ -65,17 +66,17 @@ public class CreatePoolFeature extends AbstractCreateBPMNFeature {
       getFeatureProvider().link(laneContainer, new Object[] { lane });
     }
 
-		// return newly created business object(s)
-		return new Object[] { newPool };
-	}
+    // return newly created business object(s)
+    return new Object[] { newPool };
+  }
 
-	@Override
-	public String getCreateImageId() {
-		return ActivitiImageProvider.IMG_POOL;
-	}
+  @Override
+  public String getCreateImageId() {
+    return PluginImage.IMG_POOL.getImageKey();
+  }
 
-	@Override
-	protected String getFeatureIdKey() {
-		return FEATURE_ID_KEY;
-	}
+  @Override
+  protected String getFeatureIdKey() {
+    return FEATURE_ID_KEY;
+  }
 }

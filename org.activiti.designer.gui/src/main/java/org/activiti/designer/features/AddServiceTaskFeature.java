@@ -2,7 +2,7 @@ package org.activiti.designer.features;
 
 import java.util.List;
 
-import org.activiti.designer.ActivitiImageProvider;
+import org.activiti.designer.PluginImage;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.extension.CustomServiceTaskContext;
 import org.activiti.designer.util.extension.ExtensionUtil;
@@ -25,6 +25,6 @@ public class AddServiceTaskFeature extends AddTaskFeature {
         }
       }
     }
-    return ActivitiImageProvider.IMG_SERVICETASK;
+    return PluginImage.IMG_SERVICETASK.getImageKey();
   }
 }

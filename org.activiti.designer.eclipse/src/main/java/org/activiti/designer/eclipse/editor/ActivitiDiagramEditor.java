@@ -609,9 +609,10 @@ public class ActivitiDiagramEditor extends DiagramEditor {
       IFigure gridFigure = ((LayerManager) rootEditPart).getLayer(LayerConstants.GRID_LAYER);
       gridFigure.setVisible(false);
     }
+   // setPartName("MyDiagram2");
 	}
-
-	@Override
+	
+  @Override
 	protected ContextMenuProvider createContextMenuProvider() {
 		return new ActivitiEditorContextMenuProvider(getGraphicalViewer(),
 				getActionRegistry(), getDiagramTypeProvider());

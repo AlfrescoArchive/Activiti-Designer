@@ -1,6 +1,6 @@
 package org.activiti.designer.features;
 
-import org.activiti.designer.ActivitiImageProvider;
+import org.activiti.designer.PluginImage;
 import org.activiti.designer.bpmn2.model.EndEvent;
 import org.activiti.designer.bpmn2.model.Event;
 import org.activiti.designer.bpmn2.model.Lane;
@@ -21,7 +21,7 @@ import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
 
 public class AddSignalThrowingEventFeature extends AddEventFeature {
-	
+
   public AddSignalThrowingEventFeature(IFeatureProvider fp) {
     super(fp);
   }
@@ -58,10 +58,10 @@ public class AddSignalThrowingEventFeature extends AddEventFeature {
       // create link and wire it
       link(containerShape, addedEvent);
     }
-    
+
     {
       final Shape shape = peCreateService.createShape(containerShape, false);
-      final Image image = gaService.createImage(shape, ActivitiImageProvider.IMG_THROW_SIGNAL);
+      final Image image = gaService.createImage(shape, PluginImage.IMG_THROW_SIGNAL.getImageKey());
       image.setWidth(20);
       image.setHeight(20);
       gaService.setLocationAndSize(image, (width - 20) / 2, (height - 20) / 2, 20, 20);
@@ -87,12 +87,11 @@ public class AddSignalThrowingEventFeature extends AddEventFeature {
   @Override
   public boolean canAdd(IAddContext context) {
     if (context.getNewObject() instanceof Event) {
-      
-    	Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-      
-      if (context.getTargetContainer() instanceof Diagram || 
-              parentObject instanceof SubProcess || parentObject instanceof Lane) {
-        
+
+      Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
+
+      if (context.getTargetContainer() instanceof Diagram || parentObject instanceof SubProcess || parentObject instanceof Lane) {
+
         return true;
       }
     }

@@ -1,15 +1,15 @@
 package org.activiti.designer.features;
 
-import org.activiti.designer.ActivitiImageProvider;
+import org.activiti.designer.PluginImage;
 import org.eclipse.graphiti.features.IFeatureProvider;
 
 public class AddReceiveTaskFeature extends AddTaskFeature {
 
-	public AddReceiveTaskFeature(IFeatureProvider fp) {
-		super(fp);
-	}
+  public AddReceiveTaskFeature(IFeatureProvider fp) {
+    super(fp);
+  }
 
-	protected String getIcon(Object bo) {
-		return ActivitiImageProvider.IMG_RECEIVETASK;
-	}
+  protected String getIcon(Object bo) {
+    return PluginImage.IMG_RECEIVETASK.getImageKey();
+  }
 }

@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.activiti.designer.ActivitiImageProvider;
+import org.activiti.designer.PluginImage;
 import org.activiti.designer.bpmn2.model.BusinessRuleTask;
 import org.activiti.designer.bpmn2.model.CallActivity;
 import org.activiti.designer.bpmn2.model.EventGateway;
@@ -165,10 +165,11 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
 
   @Override
   public ICustomFeature getDoubleClickFeature(IDoubleClickContext context) {
-    /*ICustomFeature customFeature = new ExpandCollapseSubProcessFeature(getFeatureProvider());
-    if (customFeature.canExecute(context)) {
-      return customFeature;
-    }*/
+    /*
+     * ICustomFeature customFeature = new
+     * ExpandCollapseSubProcessFeature(getFeatureProvider()); if
+     * (customFeature.canExecute(context)) { return customFeature; }
+     */
     return super.getDoubleClickFeature(context);
   }
 
@@ -180,47 +181,48 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     setGenericContextButtons(data, pe, CONTEXT_BUTTON_DELETE);
 
     Object bo = getFeatureProvider().getBusinessObjectForPictogramElement(pe);
-    
+
     CreateConnectionContext connectionContext = new CreateConnectionContext();
-  	connectionContext.setSourcePictogramElement(pe);
+    connectionContext.setSourcePictogramElement(pe);
     Anchor connectionAnchor = null;
     if (pe instanceof Anchor) {
-    	connectionAnchor = (Anchor) pe;
+      connectionAnchor = (Anchor) pe;
     } else if (pe instanceof AnchorContainer) {
-    	connectionAnchor = Graphiti.getPeService().getChopboxAnchor((AnchorContainer) pe);
+      connectionAnchor = Graphiti.getPeService().getChopboxAnchor((AnchorContainer) pe);
     }
     connectionContext.setSourceAnchor(connectionAnchor);
-    
-    if(pe.eContainer() instanceof ContainerShape == false) return data;
-    
+
+    if (pe.eContainer() instanceof ContainerShape == false)
+      return data;
+
     CreateContext taskContext = new CreateContext();
-  	taskContext.setTargetContainer((ContainerShape) pe.eContainer());
-  	taskContext.putProperty("org.activiti.designer.connectionContext", connectionContext);
-    
-  	if (bo instanceof StartEvent || bo instanceof Task || bo instanceof CallActivity || bo instanceof Gateway) {
-    	
-    	CreateUserTaskFeature userTaskfeature = new CreateUserTaskFeature(getFeatureProvider());
+    taskContext.setTargetContainer((ContainerShape) pe.eContainer());
+    taskContext.putProperty("org.activiti.designer.connectionContext", connectionContext);
+
+    if (bo instanceof StartEvent || bo instanceof Task || bo instanceof CallActivity || bo instanceof Gateway) {
+
+      CreateUserTaskFeature userTaskfeature = new CreateUserTaskFeature(getFeatureProvider());
       ContextButtonEntry newUserTaskButton = new ContextButtonEntry(userTaskfeature, taskContext);
       newUserTaskButton.setText("new user task"); //$NON-NLS-1$
       newUserTaskButton.setDescription("Create a new task"); //$NON-NLS-1$
-      newUserTaskButton.setIconId(ActivitiImageProvider.IMG_USERTASK);
+      newUserTaskButton.setIconId(PluginImage.IMG_USERTASK.getImageKey());
       data.getDomainSpecificContextButtons().add(newUserTaskButton);
-      
+
       CreateExclusiveGatewayFeature exclusiveGatewayFeature = new CreateExclusiveGatewayFeature(getFeatureProvider());
       ContextButtonEntry newExclusiveGatewayButton = new ContextButtonEntry(exclusiveGatewayFeature, taskContext);
       newExclusiveGatewayButton.setText("new exclusive gateway"); //$NON-NLS-1$
       newExclusiveGatewayButton.setDescription("Create a new exclusive gateway"); //$NON-NLS-1$
-      newExclusiveGatewayButton.setIconId(ActivitiImageProvider.IMG_GATEWAY_EXCLUSIVE);
+      newExclusiveGatewayButton.setIconId(PluginImage.IMG_GATEWAY_EXCLUSIVE.getImageKey());
       data.getDomainSpecificContextButtons().add(newExclusiveGatewayButton);
-      
+
       CreateEndEventFeature endFeature = new CreateEndEventFeature(getFeatureProvider());
       ContextButtonEntry newEndButton = new ContextButtonEntry(endFeature, taskContext);
       newEndButton.setText("new end event"); //$NON-NLS-1$
       newEndButton.setDescription("Create a new end event"); //$NON-NLS-1$
-      newEndButton.setIconId(ActivitiImageProvider.IMG_ENDEVENT_NONE);
+      newEndButton.setIconId(PluginImage.IMG_ENDEVENT_NONE.getImageKey());
       data.getDomainSpecificContextButtons().add(newEndButton);
     }
-  	
+
     CreateConnectionContext ccc = new CreateConnectionContext();
     ccc.setSourcePictogramElement(pe);
     Anchor anchor = null;
@@ -233,7 +235,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
 
     ContextButtonEntry button = new ContextButtonEntry(null, context);
     button.setText("Create connection"); //$NON-NLS-1$
-    button.setIconId(ActivitiImageProvider.IMG_EREFERENCE);
+    button.setIconId(PluginImage.IMG_EREFERENCE.getImageKey());
     ICreateConnectionFeature[] features = getFeatureProvider().getCreateConnectionFeatures();
     for (ICreateConnectionFeature feature : features) {
       if (feature.isAvailable(ccc) && feature.canStartConnection(ccc))
@@ -243,148 +245,150 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     if (button.getDragAndDropFeatures().size() > 0) {
       data.getDomainSpecificContextButtons().add(button);
     }
-    
+
     if (bo instanceof StartEvent || bo instanceof Task || bo instanceof CallActivity || bo instanceof Gateway) {
-      
+
       ContextButtonEntry otherElementButton = new ContextButtonEntry(null, null);
       otherElementButton.setText("new element"); //$NON-NLS-1$
       otherElementButton.setDescription("Create a new element"); //$NON-NLS-1$
-      otherElementButton.setIconId(ActivitiImageProvider.NEW_ICON);
+      otherElementButton.setIconId(PluginImage.NEW_ICON.getImageKey());
       data.getDomainSpecificContextButtons().add(otherElementButton);
-      
-      addContextButton(otherElementButton, new CreateServiceTaskFeature(getFeatureProvider()), taskContext, 
-      		"Create service task", "Create a new service task", ActivitiImageProvider.IMG_SERVICETASK);
-      addContextButton(otherElementButton, new CreateScriptTaskFeature(getFeatureProvider()), taskContext, 
-      		"Create script task", "Create a new script task", ActivitiImageProvider.IMG_SCRIPTTASK);
-      addContextButton(otherElementButton, new CreateUserTaskFeature(getFeatureProvider()), taskContext, 
-      		"Create user task", "Create a new user task", ActivitiImageProvider.IMG_USERTASK);
-      addContextButton(otherElementButton, new CreateMailTaskFeature(getFeatureProvider()), taskContext, 
-      		"Create mail task", "Create a new mail task", ActivitiImageProvider.IMG_MAILTASK);
-      addContextButton(otherElementButton, new CreateBusinessRuleTaskFeature(getFeatureProvider()), taskContext, 
-      		"Create business rule task", "Create a new business rule task", ActivitiImageProvider.IMG_BUSINESSRULETASK);
-      addContextButton(otherElementButton, new CreateManualTaskFeature(getFeatureProvider()), taskContext, 
-      		"Create manual task", "Create a new manual task", ActivitiImageProvider.IMG_MANUALTASK);
-      addContextButton(otherElementButton, new CreateReceiveTaskFeature(getFeatureProvider()), taskContext, 
-      		"Create receive task", "Create a new receive task", ActivitiImageProvider.IMG_RECEIVETASK);
-      addContextButton(otherElementButton, new CreateCallActivityFeature(getFeatureProvider()), taskContext, 
-      		"Create call activity", "Create a new call activiti", ActivitiImageProvider.IMG_CALLACTIVITY);
-      addContextButton(otherElementButton, new CreateExclusiveGatewayFeature(getFeatureProvider()), taskContext, 
-      		"Create exclusive gateway", "Create a new exclusive gateway", ActivitiImageProvider.IMG_GATEWAY_EXCLUSIVE);
-      addContextButton(otherElementButton, new CreateInclusiveGatewayFeature(getFeatureProvider()), taskContext, 
-          "Create inclusive gateway", "Create a new inclusive gateway", ActivitiImageProvider.IMG_GATEWAY_INCLUSIVE);
-      addContextButton(otherElementButton, new CreateParallelGatewayFeature(getFeatureProvider()), taskContext, 
-      		"Create parallel gateway", "Create a new parallel gateway", ActivitiImageProvider.IMG_GATEWAY_PARALLEL);
-      addContextButton(otherElementButton, new CreateEndEventFeature(getFeatureProvider()), taskContext, 
-      		"Create end event", "Create a new end event", ActivitiImageProvider.IMG_ENDEVENT_NONE);
-      addContextButton(otherElementButton, new CreateErrorEndEventFeature(getFeatureProvider()), taskContext, 
-      		"Create error end event", "Create a new error end event", ActivitiImageProvider.IMG_ENDEVENT_ERROR);
-      addContextButton(otherElementButton, new CreateAlfrescoScriptTaskFeature(getFeatureProvider()), taskContext, 
-      		"Create alfresco script task", "Create a new alfresco script task", ActivitiImageProvider.IMG_SERVICETASK);
-      addContextButton(otherElementButton, new CreateAlfrescoUserTaskFeature(getFeatureProvider()), taskContext, 
-      		"Create alfresco user task", "Create a new alfresco user task", ActivitiImageProvider.IMG_USERTASK);
-      addContextButton(otherElementButton, new CreateAlfrescoMailTaskFeature(getFeatureProvider()), taskContext, 
-      		"Create alfresco mail task", "Create a new alfresco mail task", ActivitiImageProvider.IMG_MAILTASK);
-      
+
+      addContextButton(otherElementButton, new CreateServiceTaskFeature(getFeatureProvider()), taskContext, "Create service task", "Create a new service task",
+              PluginImage.IMG_SERVICETASK);
+      addContextButton(otherElementButton, new CreateScriptTaskFeature(getFeatureProvider()), taskContext, "Create script task", "Create a new script task",
+              PluginImage.IMG_SCRIPTTASK);
+      addContextButton(otherElementButton, new CreateUserTaskFeature(getFeatureProvider()), taskContext, "Create user task", "Create a new user task",
+              PluginImage.IMG_USERTASK);
+      addContextButton(otherElementButton, new CreateMailTaskFeature(getFeatureProvider()), taskContext, "Create mail task", "Create a new mail task",
+              PluginImage.IMG_MAILTASK);
+      addContextButton(otherElementButton, new CreateBusinessRuleTaskFeature(getFeatureProvider()), taskContext, "Create business rule task",
+              "Create a new business rule task", PluginImage.IMG_BUSINESSRULETASK);
+      addContextButton(otherElementButton, new CreateManualTaskFeature(getFeatureProvider()), taskContext, "Create manual task", "Create a new manual task",
+              PluginImage.IMG_MANUALTASK);
+      addContextButton(otherElementButton, new CreateReceiveTaskFeature(getFeatureProvider()), taskContext, "Create receive task", "Create a new receive task",
+              PluginImage.IMG_RECEIVETASK);
+      addContextButton(otherElementButton, new CreateCallActivityFeature(getFeatureProvider()), taskContext, "Create call activity",
+              "Create a new call activiti", PluginImage.IMG_CALLACTIVITY);
+      addContextButton(otherElementButton, new CreateExclusiveGatewayFeature(getFeatureProvider()), taskContext, "Create exclusive gateway",
+              "Create a new exclusive gateway", PluginImage.IMG_GATEWAY_EXCLUSIVE);
+      addContextButton(otherElementButton, new CreateInclusiveGatewayFeature(getFeatureProvider()), taskContext, "Create inclusive gateway",
+              "Create a new inclusive gateway", PluginImage.IMG_GATEWAY_INCLUSIVE);
+      addContextButton(otherElementButton, new CreateParallelGatewayFeature(getFeatureProvider()), taskContext, "Create parallel gateway",
+              "Create a new parallel gateway", PluginImage.IMG_GATEWAY_PARALLEL);
+      addContextButton(otherElementButton, new CreateEndEventFeature(getFeatureProvider()), taskContext, "Create end event", "Create a new end event",
+              PluginImage.IMG_ENDEVENT_NONE);
+      addContextButton(otherElementButton, new CreateErrorEndEventFeature(getFeatureProvider()), taskContext, "Create error end event",
+              "Create a new error end event", PluginImage.IMG_ENDEVENT_ERROR);
+      addContextButton(otherElementButton, new CreateAlfrescoScriptTaskFeature(getFeatureProvider()), taskContext, "Create alfresco script task",
+              "Create a new alfresco script task", PluginImage.IMG_SERVICETASK);
+      addContextButton(otherElementButton, new CreateAlfrescoUserTaskFeature(getFeatureProvider()), taskContext, "Create alfresco user task",
+              "Create a new alfresco user task", PluginImage.IMG_USERTASK);
+      addContextButton(otherElementButton, new CreateAlfrescoMailTaskFeature(getFeatureProvider()), taskContext, "Create alfresco mail task",
+              "Create a new alfresco mail task", PluginImage.IMG_MAILTASK);
+
       ContextButtonEntry editElementButton = new ContextButtonEntry(null, null);
       editElementButton.setText("change element type"); //$NON-NLS-1$
       editElementButton.setDescription("Change the element type to another type"); //$NON-NLS-1$
-      editElementButton.setIconId(ActivitiImageProvider.EDIT_ICON);
+      editElementButton.setIconId(PluginImage.EDIT_ICON.getImageKey());
       data.getDomainSpecificContextButtons().add(editElementButton);
-      
+
       CustomContext customContext = new CustomContext();
       customContext.putProperty("org.activiti.designer.changetype.pictogram", pe);
-      
-      if(bo instanceof Task) {
-      	addTaskButtons(editElementButton, (Task) bo, customContext);
-      
-      } else if(bo instanceof Gateway) {
-      	addGatewayButtons(editElementButton, (Gateway) bo, customContext);
+
+      if (bo instanceof Task) {
+        addTaskButtons(editElementButton, (Task) bo, customContext);
+
+      } else if (bo instanceof Gateway) {
+        addGatewayButtons(editElementButton, (Gateway) bo, customContext);
       }
-      
+
     }
 
     return data;
   }
-  
+
   private void addGatewayButtons(ContextButtonEntry otherElementButton, Gateway notGateway, CustomContext customContext) {
-  	if(notGateway == null || !(notGateway instanceof ExclusiveGateway)) {
-	  	addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "exclusivegateway"), customContext, 
-	    		"Change to exclusive gateway", "Change to an exclusive gateway", ActivitiImageProvider.IMG_GATEWAY_EXCLUSIVE);
-  	}
-    if(notGateway == null || !(notGateway instanceof InclusiveGateway)) {
-      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "inclusivegateway"), customContext, 
-      		"Change to inclusive gateway", "Change to an inclusive gateway", ActivitiImageProvider.IMG_GATEWAY_INCLUSIVE);
+    if (notGateway == null || !(notGateway instanceof ExclusiveGateway)) {
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "exclusivegateway"), customContext,
+              "Change to exclusive gateway", "Change to an exclusive gateway", PluginImage.IMG_GATEWAY_EXCLUSIVE);
     }
-  	if(notGateway == null || !(notGateway instanceof ParallelGateway)) {
-	    addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "parallelgateway"), customContext, 
-	    		"Change to parallel gateway", "Change to a parallel gateway", ActivitiImageProvider.IMG_GATEWAY_PARALLEL);
-  	}
-  	if(notGateway == null || !(notGateway instanceof EventGateway)) {
-      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "eventgateway"), customContext, 
-          "Change to event gateway", "Change to a event gateway", ActivitiImageProvider.IMG_GATEWAY_EVENT);
+    if (notGateway == null || !(notGateway instanceof InclusiveGateway)) {
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "inclusivegateway"), customContext,
+              "Change to inclusive gateway", "Change to an inclusive gateway", PluginImage.IMG_GATEWAY_INCLUSIVE);
+    }
+    if (notGateway == null || !(notGateway instanceof ParallelGateway)) {
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "parallelgateway"), customContext, "Change to parallel gateway",
+              "Change to a parallel gateway", PluginImage.IMG_GATEWAY_PARALLEL);
+    }
+    if (notGateway == null || !(notGateway instanceof EventGateway)) {
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "eventgateway"), customContext, "Change to event gateway",
+              "Change to a event gateway", PluginImage.IMG_GATEWAY_EVENT);
     }
   }
-  
+
   private void addTaskButtons(ContextButtonEntry otherElementButton, Task notTask, CustomContext customContext) {
-  	if(notTask == null || notTask instanceof ServiceTask == false) {
-	  	addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "servicetask"), customContext, 
-	    		"Change to service task", "Change to a service task", ActivitiImageProvider.IMG_SERVICETASK);
-  	}
-  	if(notTask == null || notTask instanceof ScriptTask == false) {
-	    addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "scripttask"), customContext, 
-	    		"Change to script task", "Change to a script task", ActivitiImageProvider.IMG_SCRIPTTASK);
-  	}
-    if(notTask == null || notTask instanceof UserTask == false) {
-	    addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "usertask"), customContext, 
-	    		"Change to user task", "Change to a user task", ActivitiImageProvider.IMG_USERTASK);
+    if (notTask == null || notTask instanceof ServiceTask == false) {
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "servicetask"), customContext, "Change to service task",
+              "Change to a service task", PluginImage.IMG_SERVICETASK);
     }
-    if(notTask == null || notTask instanceof MailTask == false) {;
-	    addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "mailtask"), customContext, 
-	    		"Change to mail task", "Change to a mail task", ActivitiImageProvider.IMG_MAILTASK);
+    if (notTask == null || notTask instanceof ScriptTask == false) {
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "scripttask"), customContext, "Change to script task",
+              "Change to a script task", PluginImage.IMG_SCRIPTTASK);
     }
-    if(notTask == null || notTask instanceof BusinessRuleTask == false) {
-	    addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "businessruletask"), customContext, 
-	    		"Change to business rule task", "Change to a business rule task", ActivitiImageProvider.IMG_BUSINESSRULETASK);
+    if (notTask == null || notTask instanceof UserTask == false) {
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "usertask"), customContext, "Change to user task",
+              "Change to a user task", PluginImage.IMG_USERTASK);
     }
-    if(notTask == null || notTask instanceof ManualTask == false) {
-	    addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "manualtask"), customContext, 
-	    		"Change to manual task", "Change to a manual task", ActivitiImageProvider.IMG_MANUALTASK);
+    if (notTask == null || notTask instanceof MailTask == false) {
+      ;
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "mailtask"), customContext, "Change to mail task",
+              "Change to a mail task", PluginImage.IMG_MAILTASK);
     }
-    if(notTask == null || notTask instanceof ReceiveTask == false) {
-	    addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "receivetask"), customContext, 
-	    		"Change to receive task", "Change to a receive task", ActivitiImageProvider.IMG_RECEIVETASK);
+    if (notTask == null || notTask instanceof BusinessRuleTask == false) {
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "businessruletask"), customContext,
+              "Change to business rule task", "Change to a business rule task", PluginImage.IMG_BUSINESSRULETASK);
+    }
+    if (notTask == null || notTask instanceof ManualTask == false) {
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "manualtask"), customContext, "Change to manual task",
+              "Change to a manual task", PluginImage.IMG_MANUALTASK);
+    }
+    if (notTask == null || notTask instanceof ReceiveTask == false) {
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "receivetask"), customContext, "Change to receive task",
+              "Change to a receive task", PluginImage.IMG_RECEIVETASK);
     }
   }
-  
-  private void addContextButton(ContextButtonEntry button, ChangeElementTypeFeature feature, 
-  		CustomContext customContext, String text, String description, String image) {
-  	
-  	ContextButtonEntry newButton = new ContextButtonEntry(feature, customContext);
-  	newButton.setText(text); //$NON-NLS-1$
-  	newButton.setDescription(description); //$NON-NLS-1$
-  	newButton.setIconId(image);
-  	button.getContextButtonMenuEntries().add(newButton);
+
+  private void addContextButton(ContextButtonEntry button, ChangeElementTypeFeature feature, CustomContext customContext, String text, String description,
+          PluginImage image) {
+
+    ContextButtonEntry newButton = new ContextButtonEntry(feature, customContext);
+    newButton.setText(text); //$NON-NLS-1$
+    newButton.setDescription(description); //$NON-NLS-1$
+    newButton.setIconId(image.getImageKey());
+    button.getContextButtonMenuEntries().add(newButton);
   }
-  
-  private void addContextButton(ContextButtonEntry button, AbstractCreateBPMNFeature feature, 
-  		CreateContext context, String text, String description, String image) {
-  	
-  	ContextButtonEntry newButton = new ContextButtonEntry(feature, context);
-  	newButton.setText(text); //$NON-NLS-1$
-  	newButton.setDescription(description); //$NON-NLS-1$
-  	newButton.setIconId(image);
-  	button.getContextButtonMenuEntries().add(newButton);
+
+  private void addContextButton(ContextButtonEntry button, AbstractCreateBPMNFeature feature, CreateContext context, String text, String description,
+          PluginImage image) {
+
+    ContextButtonEntry newButton = new ContextButtonEntry(feature, context);
+    newButton.setText(text); //$NON-NLS-1$
+    newButton.setDescription(description); //$NON-NLS-1$
+    newButton.setIconId(image.getImageKey());
+    button.getContextButtonMenuEntries().add(newButton);
   }
 
   @Override
   public IContextMenuEntry[] getContextMenu(ICustomContext context) {
     List<IContextMenuEntry> menuList = new ArrayList<IContextMenuEntry>();
-    
-    if(context.getPictogramElements() != null) {
+
+    if (context.getPictogramElements() != null) {
       for (PictogramElement pictogramElement : context.getPictogramElements()) {
-        if(getFeatureProvider().getBusinessObjectForPictogramElement(pictogramElement) == null) continue;
+        if (getFeatureProvider().getBusinessObjectForPictogramElement(pictogramElement) == null)
+          continue;
         Object object = getFeatureProvider().getBusinessObjectForPictogramElement(pictogramElement);
-        if(object instanceof SequenceFlow) {
+        if (object instanceof SequenceFlow) {
           ContextMenuEntry subMenuDelete = new ContextMenuEntry(new DeleteSequenceFlowFeature(getFeatureProvider()), context);
           subMenuDelete.setText("Delete sequence flow"); //$NON-NLS-1$
           subMenuDelete.setSubmenu(false);
@@ -418,7 +422,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     IPaletteCompartmentEntry containerCompartmentEntry = new PaletteCompartmentEntry("Container", null);
     IPaletteCompartmentEntry boundaryEventCompartmentEntry = new PaletteCompartmentEntry("Boundary event", null);
     IPaletteCompartmentEntry intermediateEventCompartmentEntry = new PaletteCompartmentEntry("Intermediate event", null);
-    IPaletteCompartmentEntry alfrescoCompartmentEntry = new PaletteCompartmentEntry("Alfresco", ActivitiImageProvider.IMG_ALFRESCO_LOGO);
+    IPaletteCompartmentEntry alfrescoCompartmentEntry = new PaletteCompartmentEntry("Alfresco", PluginImage.IMG_ALFRESCO_LOGO.getImageKey());
 
     for (int i = 0; i < superCompartments.length; i++) {
 
@@ -520,14 +524,13 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
       ret.add(boundaryEventCompartmentEntry);
     }
     if (intermediateEventCompartmentEntry.getToolEntries().size() > 0) {
-    	ret.add(intermediateEventCompartmentEntry);
+      ret.add(intermediateEventCompartmentEntry);
     }
-    if (PreferencesUtil.getBooleanPreference(Preferences.ALFRESCO_ENABLE) && 
-            alfrescoCompartmentEntry.getToolEntries().size() > 0) {
-      
+    if (PreferencesUtil.getBooleanPreference(Preferences.ALFRESCO_ENABLE) && alfrescoCompartmentEntry.getToolEntries().size() > 0) {
+
       ret.add(alfrescoCompartmentEntry);
     }
-    
+
     final Map<String, List<CustomServiceTaskContext>> tasksInDrawers = new HashMap<String, List<CustomServiceTaskContext>>();
 
     final List<CustomServiceTaskContext> customServiceTaskContexts = ExtensionUtil.getCustomServiceTaskContexts(project);
@@ -584,7 +587,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
    */
   private void pruneDisabledPaletteEntries(final IProject project, final IPaletteCompartmentEntry entry) {
 
-  	final Set<PaletteEntry> disabledPaletteEntries = ExtensionUtil.getDisabledPaletteEntries(project);
+    final Set<PaletteEntry> disabledPaletteEntries = ExtensionUtil.getDisabledPaletteEntries(project);
 
     if (!disabledPaletteEntries.isEmpty()) {
 
@@ -621,14 +624,17 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
         imageRenderingDecorator.setMessage("A start event should have exactly one outgoing sequence flow"); //$NON-NLS-1$
         return new IDecorator[] { imageRenderingDecorator };
       }
-    /*} else if (bo instanceof SubProcess) {
-      SubProcess subProcess = (SubProcess) bo;
-
-      if (!subProcessDiagramExists(subProcess)) {
-        IDecorator imageRenderingDecorator = new ImageDecorator(IPlatformImageConstants.IMG_ECLIPSE_INFORMATION_TSK);
-        imageRenderingDecorator.setMessage("This subprocess does not have a diagram model yet");//$NON-NLS-1$
-        return new IDecorator[] { imageRenderingDecorator };
-      }*/
+      /*
+       * } else if (bo instanceof SubProcess) { SubProcess subProcess =
+       * (SubProcess) bo;
+       * 
+       * if (!subProcessDiagramExists(subProcess)) { IDecorator
+       * imageRenderingDecorator = new
+       * ImageDecorator(IPlatformImageConstants.IMG_ECLIPSE_INFORMATION_TSK);
+       * imageRenderingDecorator
+       * .setMessage("This subprocess does not have a diagram model yet"
+       * );//$NON-NLS-1$ return new IDecorator[] { imageRenderingDecorator }; }
+       */
     } else if (bo instanceof ServiceTask && bo instanceof EObject && ExtensionUtil.isCustomServiceTask((EObject) bo)) {
 
       final Resource resource = pe.getLink().eResource();
@@ -698,7 +704,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
 
     return result;
   }
-  
+
   private boolean subProcessDiagramExists(SubProcess subProcess) {
     Resource resource = getDiagramTypeProvider().getDiagram().eResource();
 

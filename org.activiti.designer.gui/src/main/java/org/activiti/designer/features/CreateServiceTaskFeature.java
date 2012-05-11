@@ -2,7 +2,7 @@ package org.activiti.designer.features;
 
 import java.util.List;
 
-import org.activiti.designer.ActivitiImageProvider;
+import org.activiti.designer.PluginImage;
 import org.activiti.designer.bpmn2.model.CustomProperty;
 import org.activiti.designer.bpmn2.model.ServiceTask;
 import org.activiti.designer.integration.servicetask.CustomServiceTask;
@@ -61,15 +61,15 @@ public class CreateServiceTaskFeature extends AbstractCreateFastBPMNFeature {
       }
 
     }
-    
+
     addObjectToContainer(context, newServiceTask, newServiceTask.getName());
-    
+
     return new Object[] { newServiceTask };
   }
 
   @Override
   public String getCreateImageId() {
-    return ActivitiImageProvider.IMG_SERVICETASK;
+    return PluginImage.IMG_SERVICETASK.getImageKey();
   }
 
   @Override

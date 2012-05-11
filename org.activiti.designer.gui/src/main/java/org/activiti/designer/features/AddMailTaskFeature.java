@@ -1,15 +1,15 @@
 package org.activiti.designer.features;
 
-import org.activiti.designer.ActivitiImageProvider;
+import org.activiti.designer.PluginImage;
 import org.eclipse.graphiti.features.IFeatureProvider;
 
 public class AddMailTaskFeature extends AddTaskFeature {
 
-	public AddMailTaskFeature(IFeatureProvider fp) {
-		super(fp);
-	}
+  public AddMailTaskFeature(IFeatureProvider fp) {
+    super(fp);
+  }
 
-	protected String getIcon(Object bo) {
-		return ActivitiImageProvider.IMG_MAILTASK;
-	}
+  protected String getIcon(Object bo) {
+    return PluginImage.IMG_MAILTASK.getImageKey();
+  }
 }

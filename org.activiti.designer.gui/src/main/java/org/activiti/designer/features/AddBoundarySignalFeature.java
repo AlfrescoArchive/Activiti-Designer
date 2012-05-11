@@ -1,6 +1,6 @@
 package org.activiti.designer.features;
 
-import org.activiti.designer.ActivitiImageProvider;
+import org.activiti.designer.PluginImage;
 import org.activiti.designer.bpmn2.model.Activity;
 import org.activiti.designer.bpmn2.model.BoundaryEvent;
 import org.activiti.designer.util.style.StyleUtil;
@@ -18,27 +18,27 @@ import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
 
 public class AddBoundarySignalFeature extends AbstractAddShapeFeature {
-  
+
   private static final int IMAGE_SIZE = 20;
   private static final int EVENT_SIZE = 30;
-	
-	public AddBoundarySignalFeature(IFeatureProvider fp) {
-		super(fp);
-	}
 
-	@Override
+  public AddBoundarySignalFeature(IFeatureProvider fp) {
+    super(fp);
+  }
+
+  @Override
   public PictogramElement add(IAddContext context) {
     final BoundaryEvent addedEvent = (BoundaryEvent) context.getNewObject();
     ContainerShape parent = context.getTargetContainer();
     int x = context.getX();
     int y = context.getY();
-    
+
     ILocation shapeLocation = Graphiti.getLayoutService().getLocationRelativeToDiagram(parent);
     x += shapeLocation.getX();
     y += shapeLocation.getY();
-    
+
     parent = getDiagram();
-    
+
     // CONTAINER SHAPE WITH CIRCLE
     final IPeCreateService peCreateService = Graphiti.getPeCreateService();
     final ContainerShape containerShape = peCreateService.createContainerShape(parent, true);
@@ -66,7 +66,7 @@ public class AddBoundarySignalFeature extends AbstractAddShapeFeature {
       // create link and wire it
       link(containerShape, addedEvent);
     }
-    
+
     {
       Ellipse secondCircle = gaService.createEllipse(circle);
       secondCircle.setParentGraphicsAlgorithm(circle);
@@ -76,13 +76,13 @@ public class AddBoundarySignalFeature extends AbstractAddShapeFeature {
 
     {
       final Shape shape = peCreateService.createShape(containerShape, false);
-      final Image image = gaService.createImage(shape, ActivitiImageProvider.IMG_BOUNDARY_SIGNAL);
+      final Image image = gaService.createImage(shape, PluginImage.IMG_BOUNDARY_SIGNAL.getImageKey());
       image.setWidth(IMAGE_SIZE);
       image.setHeight(IMAGE_SIZE);
-      
+
       gaService.setLocationAndSize(image, (width - IMAGE_SIZE) / 2, (height - IMAGE_SIZE) / 2, IMAGE_SIZE, IMAGE_SIZE);
     }
-    
+
     // add a chopbox anchor to the shape
     peCreateService.createChopboxAnchor(containerShape);
     layoutPictogramElement(containerShape);

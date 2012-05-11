@@ -30,7 +30,3 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: org.activiti.designer
 Bundle-Vendor: Eclipse Modeling Project
 Bundle-Activator: org.activiti.designer.Activator
-Bundle-ClassPath: .,
- jdi.jar,
- jdimodel.jar,
- junit.jar
