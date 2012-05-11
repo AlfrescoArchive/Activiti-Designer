@@ -12,6 +12,13 @@
 		<activiti.designer.version>5.9.1</activiti.designer.version>
 	</properties>
 
+	<repositories>
+		<repository>
+			<id>Activiti</id>
+			<url>http://maven.alfresco.com/nexus/content/repositories/activiti/</url>
+		</repository>
+	</repositories>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.activiti.designer</groupId>
