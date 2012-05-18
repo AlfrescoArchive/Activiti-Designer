@@ -2,7 +2,7 @@
 <feature
       id="org.activiti.designer.feature"
       label="Activiti Eclipse BPMN 2.0 Designer"
-      version="5.9.1"
+      version="5.9.2"
       provider-name="Activiti">
 
    <description url="http://www.activiti.org">
@@ -94,56 +94,56 @@ This Agreement is governed by the laws of the State of New York and the intellec
          id="org.activiti.designer.gui"
          download-size="0"
          install-size="0"
-         version="5.9.1"
+         version="5.9.2"
          unpack="false"/>
 
    <plugin
          id="org.activiti.designer.eclipse"
          download-size="0"
          install-size="0"
-         version="5.9.1"
+         version="5.9.2"
          unpack="false"/>
 
    <plugin
          id="org.activiti.designer.model"
          download-size="0"
          install-size="0"
-         version="5.9.1"
+         version="5.9.2"
          unpack="false"/>
 
    <plugin
          id="org.activiti.designer.integration"
          download-size="0"
          install-size="0"
-         version="5.9.1"
+         version="5.9.2"
          unpack="false"/>
 
    <plugin
          id="org.activiti.designer.help"
          download-size="0"
          install-size="0"
-         version="5.9.1"
+         version="5.9.2"
          unpack="false"/>
 
    <plugin
          id="org.activiti.designer.export.bpmn20"
          download-size="0"
          install-size="0"
-         version="5.9.1"
+         version="5.9.2"
          unpack="false"/>
 
    <plugin
          id="org.activiti.designer.validation.bpmn20"
          download-size="0"
          install-size="0"
-         version="5.9.1"
+         version="5.9.2"
          unpack="false"/>
 
    <plugin
          id="org.activiti.designer.util"
          download-size="0"
          install-size="0"
-         version="5.9.1"
+         version="5.9.2"
          unpack="false"/>
 
 </feature>

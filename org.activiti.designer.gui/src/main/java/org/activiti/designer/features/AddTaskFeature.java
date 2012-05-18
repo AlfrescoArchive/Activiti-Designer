@@ -168,7 +168,7 @@ public abstract class AddTaskFeature extends AbstractAddShapeFeature {
 
       switch (baseShape) {
       case ACTIVITY:
-        gaService.setLocationAndSize(text, 0, 20, width, 30);
+        gaService.setLocationAndSize(text, 0, 20, width, height - 25);
         break;
       case GATEWAY:
         gaService.setLocationAndSize(text, 0, height + 5, width, 40);

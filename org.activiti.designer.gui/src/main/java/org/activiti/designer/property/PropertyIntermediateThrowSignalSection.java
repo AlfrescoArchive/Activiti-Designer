@@ -74,8 +74,9 @@ public class PropertyIntermediateThrowSignalSection extends ActivitiPropertySect
   			}
 			}
 			
-			String[] items = new String[model.getSignals().size()];
-			int counter = 0;
+			String[] items = new String[model.getSignals().size() + 1];
+			items[0] = "";
+			int counter = 1;
 			int selectedCounter = 0;
 			for (Signal signal : model.getSignals()) {
 	      items[counter] = signal.getId() + " / " + signal.getName();
@@ -112,9 +113,11 @@ public class PropertyIntermediateThrowSignalSection extends ActivitiPropertySect
 						public void run() {
 							
 							SignalEventDefinition signalDefinition = (SignalEventDefinition) ((ThrowEvent) bo).getEventDefinitions().get(0);
-							if(signalCombo.getSelectionIndex() >= 0 && model.getSignals().size() > signalCombo.getSelectionIndex()) {
-							  signalDefinition.setSignalRef(model.getSignals().get(signalCombo.getSelectionIndex()).getId());
-							}
+							if(signalCombo.getSelectionIndex() > 0) {
+                signalDefinition.setSignalRef(model.getSignals().get(signalCombo.getSelectionIndex() - 1).getId());
+              } else {
+                signalDefinition.setSignalRef("");
+              }
 						}
 					}, editingDomain, "Model Update");
 				}

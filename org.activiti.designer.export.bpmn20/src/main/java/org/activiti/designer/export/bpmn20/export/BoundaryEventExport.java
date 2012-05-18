@@ -61,10 +61,10 @@ public class BoundaryEventExport implements ActivitiNamespaceConstants {
           xtw.writeCharacters(timerDef.getTimeDuration());
           xtw.writeEndElement();
         
-        } else if(timerDef.getTimeDate() != null) {
+        } else if(StringUtils.isNotEmpty(timerDef.getTimeDate())) {
           
           xtw.writeStartElement("timeDate");
-          xtw.writeCharacters(timerDef.getTimeDate().toString());
+          xtw.writeCharacters(timerDef.getTimeDate());
           xtw.writeEndElement();
         
         } else if(StringUtils.isNotEmpty(timerDef.getTimeCycle())) {

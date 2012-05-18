@@ -3,6 +3,7 @@
  */
 package org.activiti.designer.export.bpmn20.export;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
@@ -42,8 +43,22 @@ import org.activiti.designer.bpmn2.model.UserTask;
 import org.activiti.designer.bpmn2.model.alfresco.AlfrescoScriptTask;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.draw2d.IFigure;
+import org.eclipse.draw2d.SWTGraphics;
+import org.eclipse.draw2d.geometry.Rectangle;
+import org.eclipse.gef.GraphicalViewer;
+import org.eclipse.gef.LayerConstants;
+import org.eclipse.gef.editparts.LayerManager;
+import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
+import org.eclipse.graphiti.ui.editor.DiagramEditor;
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.GC;
+import org.eclipse.swt.graphics.Image;
+import org.eclipse.swt.graphics.ImageData;
+import org.eclipse.swt.graphics.ImageLoader;
+import org.eclipse.swt.widgets.Display;
 
 public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
 
@@ -51,6 +66,7 @@ public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
   private String modelFileName;
   private IFeatureProvider featureProvider;
   private IndentingXMLStreamWriter xtw;
+  private boolean saveImage;
 
   public void marshallDiagram(Bpmn2MemoryModel model, String modelFileName, IFeatureProvider featureProvider) {
     this.model = model;
@@ -181,6 +197,10 @@ public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
     } catch (Exception e) {
       e.printStackTrace();
     }
+    
+    if(saveImage) {
+      marshallImage(model, modelFileName);
+    }
   }
 
   private void createXML(FlowElement object) throws Exception {
@@ -214,10 +234,10 @@ public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
           xtw.writeCharacters(timerDef.getTimeDuration());
           xtw.writeEndElement();
 
-        } else if (timerDef.getTimeDate() != null) {
+        } else if (StringUtils.isNotEmpty(timerDef.getTimeDate())) {
 
           xtw.writeStartElement("timeDate");
-          xtw.writeCharacters(timerDef.getTimeDate().toString());
+          xtw.writeCharacters(timerDef.getTimeDate());
           xtw.writeEndElement();
 
         } else if (StringUtils.isNotEmpty(timerDef.getTimeCycle())) {
@@ -395,5 +415,77 @@ public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
     	}
     }
   }
+  
+  private void marshallImage(Bpmn2MemoryModel model, String modelFileName) {
+    try {
+      final GraphicalViewer graphicalViewer =  (GraphicalViewer) ((DiagramEditor) model.getFeatureProvider()
+              .getDiagramTypeProvider().getDiagramEditor()).getAdapter(GraphicalViewer.class);
 
+      if (graphicalViewer == null || graphicalViewer.getEditPartRegistry() == null)
+        return;
+      final ScalableFreeformRootEditPart rootEditPart = (ScalableFreeformRootEditPart) graphicalViewer.getEditPartRegistry().get(LayerManager.ID);
+      final IFigure rootFigure = ((LayerManager) rootEditPart).getLayer(LayerConstants.PRINTABLE_LAYERS);
+      final IFigure gridFigure = ((LayerManager) rootEditPart).getLayer(LayerConstants.GRID_LAYER);
+      final Rectangle rootFigureBounds = rootFigure.getBounds();
+
+      final boolean toggleRequired = gridFigure.isShowing();
+
+      final Display display = Display.getDefault();
+
+      final Image img = new Image(display, rootFigureBounds.width, rootFigureBounds.height);
+      final GC imageGC = new GC(img);
+      final SWTGraphics grap = new SWTGraphics(imageGC);
+
+      // Access UI thread from runnable to print the canvas to the image
+      display.syncExec(new Runnable() {
+
+        public void run() {
+          if (toggleRequired) {
+            // Disable any grids temporarily
+            gridFigure.setVisible(false);
+          }
+          // Deselect any selections
+          graphicalViewer.deselectAll();
+          rootFigure.paint(grap);
+        }
+      });
+
+      ImageLoader imgLoader = new ImageLoader();
+      imgLoader.data = new ImageData[] { img.getImageData() };
+
+      ByteArrayOutputStream baos = new ByteArrayOutputStream(imgLoader.data.length);
+
+      imgLoader.save(baos, SWT.IMAGE_PNG);
+
+      imageGC.dispose();
+      img.dispose();
+
+      // Access UI thread from runnable
+      display.syncExec(new Runnable() {
+
+        public void run() {
+          if (toggleRequired) {
+            // Re-enable any grids
+            gridFigure.setVisible(true);
+          }
+        }
+      });
+
+      String imageFileName = modelFileName.substring(0, modelFileName.lastIndexOf(".")) + ".png";
+      File imageFile = new File(imageFileName);
+      FileOutputStream outStream = new FileOutputStream(imageFile);
+      baos.writeTo(outStream);
+
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+  }
+  
+  public boolean isSaveImage() {
+    return saveImage;
+  }
+
+  public void setSaveImage(boolean saveImage) {
+    this.saveImage = saveImage;
+  }
 }

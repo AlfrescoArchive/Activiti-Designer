@@ -13,6 +13,8 @@
 
 package org.activiti.designer.eclipse.navigator.diagramtree;
 
+import org.activiti.designer.bpmn2.model.Activity;
+import org.activiti.designer.bpmn2.model.BoundaryEvent;
 import org.activiti.designer.bpmn2.model.FlowElement;
 
 /**
@@ -25,8 +27,12 @@ public class FlowElementDiagramTreeNode extends AbstractDiagramTreeNode<FlowElem
   }
 
   @Override
-  protected void extractChildren() {  
-    //no-op
+  protected void extractChildren() { 
+    if(getModelObject() instanceof Activity) {
+      Activity activity = (Activity) getModelObject();
+      for(BoundaryEvent event : activity.getBoundaryEvents()) {
+        addChildNode(DiagramTreeNodeFactory.createFlowElementNode(this, event));
+      }
+    }
   }
-  
 }

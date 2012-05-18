@@ -23,14 +23,19 @@ import org.activiti.designer.bpmn2.model.Activity;
 public class AsyncActivityExport implements ActivitiNamespaceConstants {
 
   public static void createAsyncAttribute(Object object, XMLStreamWriter xtw) throws Exception {
-    boolean async = false;
+    
     if(object instanceof Activity) {
       Activity activity = (Activity) object;
-      async = activity.isAsynchronous();
-    }
-    
-    if(async == true) {
-      xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "async", "true");
+      boolean async = activity.isAsynchronous();
+      boolean notExclusive = activity.isNotExclusive();
+      
+      if(async == true) {
+        xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "async", "true");
+      }
+      
+      if(notExclusive == true) {
+        xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "exclusive", "false");
+      }
     }
   }
 }

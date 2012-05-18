@@ -15,6 +15,7 @@ package org.activiti.designer.eclipse.navigator.diagramtree;
 
 import java.util.List;
 
+import org.activiti.designer.bpmn2.model.BoundaryEvent;
 import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.SubProcess;
 
@@ -29,6 +30,10 @@ public class SubProcessDiagramTreeNode extends AbstractDiagramTreeNode<SubProces
 
   @Override
   protected void extractChildren() {
+    
+    for(BoundaryEvent event : getModelObject().getBoundaryEvents()) {
+      addChildNode(DiagramTreeNodeFactory.createFlowElementNode(this, event));
+    }
     
     final List<FlowElement> modelChildren = getModelObject().getFlowElements();
     for (final FlowElement element : modelChildren) {

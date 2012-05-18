@@ -29,8 +29,6 @@ import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.bpmn2.model.Task;
 import org.activiti.designer.bpmn2.model.UserTask;
 import org.activiti.designer.eclipse.common.ActivitiBPMNDiagramConstants;
-import org.activiti.designer.eclipse.extension.AbstractDiagramWorker;
-import org.activiti.designer.eclipse.extension.validation.ProcessValidator;
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.features.AbstractCreateBPMNFeature;
 import org.activiti.designer.features.ChangeElementTypeFeature;
@@ -70,21 +68,16 @@ import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.extension.CustomServiceTaskContext;
 import org.activiti.designer.util.extension.ExtensionUtil;
 import org.activiti.designer.util.preferences.Preferences;
-import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
 import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.ICreateConnectionFeature;
 import org.eclipse.graphiti.features.ICreateFeature;
-import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.context.IDoubleClickContext;
 import org.eclipse.graphiti.features.context.IPictogramElementContext;
@@ -101,15 +94,12 @@ import org.eclipse.graphiti.palette.IPaletteCompartmentEntry;
 import org.eclipse.graphiti.palette.IToolEntry;
 import org.eclipse.graphiti.palette.impl.ObjectCreationToolEntry;
 import org.eclipse.graphiti.palette.impl.PaletteCompartmentEntry;
-import org.eclipse.graphiti.platform.IPlatformImageConstants;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.tb.ContextButtonEntry;
 import org.eclipse.graphiti.tb.ContextMenuEntry;
 import org.eclipse.graphiti.tb.DefaultToolBehaviorProvider;
 import org.eclipse.graphiti.tb.IContextButtonPadData;
 import org.eclipse.graphiti.tb.IContextMenuEntry;
-import org.eclipse.graphiti.tb.IDecorator;
-import org.eclipse.graphiti.tb.ImageDecorator;
 import org.eclipse.graphiti.ui.internal.GraphitiUIPlugin;
 import org.eclipse.graphiti.ui.internal.services.GraphitiUiInternal;
 import org.eclipse.jface.resource.ImageRegistry;
@@ -611,99 +601,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
         }
       }
     }
-  }
-
-  @Override
-  public IDecorator[] getDecorators(PictogramElement pe) {
-    IFeatureProvider featureProvider = getFeatureProvider();
-    Object bo = featureProvider.getBusinessObjectForPictogramElement(pe);
-    if (bo instanceof StartEvent) {
-      StartEvent startEvent = (StartEvent) bo;
-      if (startEvent.getOutgoing().size() != 1) {
-        IDecorator imageRenderingDecorator = new ImageDecorator(IPlatformImageConstants.IMG_ECLIPSE_ERROR_TSK);
-        imageRenderingDecorator.setMessage("A start event should have exactly one outgoing sequence flow"); //$NON-NLS-1$
-        return new IDecorator[] { imageRenderingDecorator };
-      }
-      /*
-       * } else if (bo instanceof SubProcess) { SubProcess subProcess =
-       * (SubProcess) bo;
-       * 
-       * if (!subProcessDiagramExists(subProcess)) { IDecorator
-       * imageRenderingDecorator = new
-       * ImageDecorator(IPlatformImageConstants.IMG_ECLIPSE_INFORMATION_TSK);
-       * imageRenderingDecorator
-       * .setMessage("This subprocess does not have a diagram model yet"
-       * );//$NON-NLS-1$ return new IDecorator[] { imageRenderingDecorator }; }
-       */
-    } else if (bo instanceof ServiceTask && bo instanceof EObject && ExtensionUtil.isCustomServiceTask((EObject) bo)) {
-
-      final Resource resource = pe.getLink().eResource();
-      final IResource res = ResourcesPlugin.getWorkspace().getRoot().findMember(resource.getURI().toPlatformString(true));
-
-      final List<IMarker> markers = getMarkers(res, (ServiceTask) bo);
-
-      if (markers.size() > 0) {
-
-        int maximumSeverity = 0;
-
-        try {
-          for (final IMarker marker : markers) {
-            final Object severity = marker.getAttribute(IMarker.SEVERITY);
-            if (severity != null && severity instanceof Integer) {
-              maximumSeverity = Math.max(maximumSeverity, (Integer) severity);
-            }
-          }
-        } catch (CoreException e) {
-          e.printStackTrace();
-        }
-
-        String decoratorImagePath = null;
-
-        switch (maximumSeverity) {
-        case IMarker.SEVERITY_INFO:
-          decoratorImagePath = IPlatformImageConstants.IMG_ECLIPSE_INFORMATION_TSK;
-          break;
-        case IMarker.SEVERITY_WARNING:
-          decoratorImagePath = IPlatformImageConstants.IMG_ECLIPSE_WARNING_TSK;
-          break;
-        default:
-          decoratorImagePath = IPlatformImageConstants.IMG_ECLIPSE_ERROR_TSK;
-        }
-
-        final ImageDecorator imageRenderingDecorator = new ImageDecorator(decoratorImagePath);
-        imageRenderingDecorator.setMessage("There are validation markers for the properties of this node");//$NON-NLS-1$ 
-        imageRenderingDecorator.setX(pe.getGraphicsAlgorithm().getWidth() / 2 - 10);
-        imageRenderingDecorator.setY(4);
-
-        return new IDecorator[] { imageRenderingDecorator };
-
-      } else {
-        return new IDecorator[] {};
-      }
-    }
-    return super.getDecorators(pe);
-  }
-  protected List<IMarker> getMarkers(IResource resource, ServiceTask serviceTask) {
-
-    final List<IMarker> result = new ArrayList<IMarker>();
-
-    try {
-      final IMarker[] markers = resource.findMarkers(ProcessValidator.MARKER_ID, true, IResource.DEPTH_INFINITE);
-      for (final IMarker marker : markers) {
-        Object attribute = marker.getAttribute(AbstractDiagramWorker.ATTRIBUTE_NODE_ID);
-        if (attribute != null) {
-          if (StringUtils.equals((String) attribute, serviceTask.getId())) {
-            result.add(marker);
-          }
-        }
-
-      }
-    } catch (CoreException e) {
-      e.printStackTrace();
-    }
-
-    return result;
-  }
+  }  
 
   private boolean subProcessDiagramExists(SubProcess subProcess) {
     Resource resource = getDiagramTypeProvider().getDiagram().eResource();

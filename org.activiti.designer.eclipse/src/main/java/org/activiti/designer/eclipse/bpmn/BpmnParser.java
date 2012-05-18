@@ -179,6 +179,7 @@ public class BpmnParser {
 					String elementId = xtr.getAttributeValue(null, "id");
 					String elementName = xtr.getAttributeValue(null, "name");
 					boolean async = parseAsync(xtr);
+					boolean notExclusive = parseNotExclusive(xtr);
 					String defaultFlow = xtr.getAttributeValue(null, "default");
 					processExtensionAvailable = false;
 
@@ -307,6 +308,7 @@ public class BpmnParser {
 						  
 						  Activity activity = (Activity) currentActivity;
 						  activity.setAsynchronous(async);
+						  activity.setNotExclusive(notExclusive);
 						  if(StringUtils.isNotEmpty(defaultFlow)) {
 						    activity.setDefaultFlow(defaultFlow);
 						  }
@@ -1471,6 +1473,15 @@ public class BpmnParser {
 		}
 		return async;
 	}
+	
+	private boolean parseNotExclusive(XMLStreamReader xtr) {
+    boolean notExclusive = false;
+    String exclusiveString = xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "exclusive");
+    if ("false".equalsIgnoreCase(exclusiveString)) {
+      notExclusive = true;
+    }
+    return notExclusive;
+  }
 	
 	private IntermediateCatchEvent parseIntermediateCatchEvent(XMLStreamReader xtr) {
 		IntermediateCatchEvent catchEvent = new IntermediateCatchEvent();

@@ -27,6 +27,7 @@ import org.activiti.designer.bpmn2.model.ServiceTask;
 import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.eclipse.bpmn.BpmnParser;
 import org.activiti.designer.eclipse.bpmn.SequenceFlowModel;
+import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.eclipse.ui.ActivitiEditorContextMenuProvider;
 import org.activiti.designer.export.bpmn20.export.BPMN20ExportMarshaller;
 import org.activiti.designer.integration.servicetask.CustomServiceTask;
@@ -36,6 +37,7 @@ import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.GraphicInfo;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.designer.util.extension.ExtensionUtil;
+import org.activiti.designer.util.preferences.Preferences;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -169,11 +171,13 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 			
 			String diagramFileString = modelFile.getLocationURI().getPath();
 			
+			boolean saveImage = PreferencesUtil.getBooleanPreference(Preferences.SAVE_IMAGE);
 			BPMN20ExportMarshaller marshaller = new BPMN20ExportMarshaller();
+			marshaller.setSaveImage(saveImage);
 			marshaller.marshallDiagram(ModelHandler.getModel(EcoreUtil.getURI(getDiagramTypeProvider().getDiagram())), 
 					diagramFileString, diagramTypeProvider.getFeatureProvider());
 			
-			modelFile.refreshLocal(IResource.DEPTH_INFINITE, null);
+			modelFile.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block

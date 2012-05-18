@@ -3,7 +3,6 @@
  */
 package org.activiti.designer.eclipse.preferences;
 
-import org.activiti.designer.eclipse.common.ActivitiBPMNDiagramConstants;
 import org.activiti.designer.util.preferences.Preferences;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -27,19 +26,14 @@ public class ActivitiSavePreferencesPageInitializer extends AbstractPreferenceIn
     IPreferenceStore store = PreferencesUtil.getActivitiDesignerPreferenceStore();
 
     // BPMN 2 Marshaller
-    store.setDefault(PreferencesUtil.getExportMarshallerPreferenceId(ActivitiBPMNDiagramConstants.BPMN_MARSHALLER_NAME), true);
-    
     store.setDefault(Preferences.ALFRESCO_ENABLE.getPreferenceId(), true);
     
     store.setDefault(Preferences.ALFRESCO_FORMTYPES_STARTEVENT.getPreferenceId(), FORMTYPES_STARTEVENT);
     
     store.setDefault(Preferences.ALFRESCO_FORMTYPES_USERTASK.getPreferenceId(), FORMTYPES_USERTASK);
 
-    // BPMN 2 Validator
-    store.setDefault(Preferences.VALIDATE_ACTIVITI_BPMN_FORMAT.getPreferenceId(), true);
-
     // Image Marshaller
-    store.setDefault(PreferencesUtil.getExportMarshallerPreferenceId(ActivitiBPMNDiagramConstants.IMAGE_MARSHALLER_NAME), true);
+    store.setDefault(Preferences.SAVE_IMAGE.getPreferenceId(), false);
 
   }
 }

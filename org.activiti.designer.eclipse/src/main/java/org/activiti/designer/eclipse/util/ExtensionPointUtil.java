@@ -20,13 +20,11 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.eclipse.extension.export.ExportMarshaller;
 import org.activiti.designer.eclipse.extension.icon.IconProvider;
 import org.activiti.designer.eclipse.extension.validation.ProcessValidator;
-import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IConfigurationElement;
 import org.eclipse.core.runtime.Platform;
@@ -42,22 +40,6 @@ import org.eclipse.swt.graphics.Image;
 public final class ExtensionPointUtil {
 
   private ExtensionPointUtil() {
-  }
-
-  public static final Collection<ExportMarshaller> getActiveExportMarshallers() {
-
-    final Collection<ExportMarshaller> result = new ArrayList<ExportMarshaller>();
-
-    final Map<String, ExportMarshaller> marshallers = getExportMarshallersAndNames();
-
-    for (final Entry<String, ExportMarshaller> entry : marshallers.entrySet()) {
-      final boolean invokeMarshaller = PreferencesUtil.getBooleanPreference(PreferencesUtil.getPreferenceId(entry.getValue()));
-
-      if (invokeMarshaller) {
-        result.add(entry.getValue());
-      }
-    }
-    return result;
   }
 
   public static final ExportMarshaller getExportMarshaller(final String marshallerName) {

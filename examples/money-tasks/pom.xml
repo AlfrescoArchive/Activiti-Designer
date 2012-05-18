@@ -9,7 +9,7 @@
 	<name>Acme Corporation Money Tasks</name>
 
 	<properties>
-		<activiti.designer.version>5.9.1</activiti.designer.version>
+		<activiti.designer.version>5.9.2</activiti.designer.version>
 	</properties>
 
 	<repositories>

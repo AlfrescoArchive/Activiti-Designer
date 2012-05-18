@@ -65,8 +65,8 @@ public class PropertyIntermediateCatchTimerSection extends ActivitiPropertySecti
           String timeDuration = timerDefinition.getTimeDuration();
           timeDurationText.setText(timeDuration == null ? "" : timeDuration);
           
-        } else if(timerDefinition.getTimeDate() != null) {
-          String timeDate = timerDefinition.getTimeDate().toString();
+        } else if(StringUtils.isNotEmpty(timerDefinition.getTimeDate())) {
+          String timeDate = timerDefinition.getTimeDate();
           timeDateText.setText(timeDate == null ? "" : timeDate);
           
         } else if(StringUtils.isNotEmpty(timerDefinition.getTimeCycle())) {

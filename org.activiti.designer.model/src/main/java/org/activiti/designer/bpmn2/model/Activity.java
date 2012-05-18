@@ -6,6 +6,7 @@ import java.util.List;
 public class Activity extends FlowNode {
 
   protected boolean asynchronous;
+  protected boolean notExclusive;
   protected String defaultFlow;
   protected MultiInstanceLoopCharacteristics loopCharacteristics;
   protected List<BoundaryEvent> boundaryEvents = new ArrayList<BoundaryEvent>();
@@ -16,6 +17,12 @@ public class Activity extends FlowNode {
   }
   public void setAsynchronous(boolean asynchronous) {
     this.asynchronous = asynchronous;
+  }
+  public boolean isNotExclusive() {
+    return notExclusive;
+  }
+  public void setNotExclusive(boolean notExclusive) {
+    this.notExclusive = notExclusive;
   }
   public List<BoundaryEvent> getBoundaryEvents() {
     return boundaryEvents;

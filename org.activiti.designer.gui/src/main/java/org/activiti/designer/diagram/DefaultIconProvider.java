@@ -14,13 +14,17 @@ package org.activiti.designer.diagram;
 
 import org.activiti.designer.Activator;
 import org.activiti.designer.PluginImage;
+import org.activiti.designer.bpmn2.model.BoundaryEvent;
 import org.activiti.designer.bpmn2.model.BusinessRuleTask;
 import org.activiti.designer.bpmn2.model.CallActivity;
 import org.activiti.designer.bpmn2.model.EndEvent;
+import org.activiti.designer.bpmn2.model.ErrorEventDefinition;
+import org.activiti.designer.bpmn2.model.EventDefinition;
 import org.activiti.designer.bpmn2.model.EventGateway;
 import org.activiti.designer.bpmn2.model.EventSubProcess;
 import org.activiti.designer.bpmn2.model.ExclusiveGateway;
 import org.activiti.designer.bpmn2.model.InclusiveGateway;
+import org.activiti.designer.bpmn2.model.IntermediateCatchEvent;
 import org.activiti.designer.bpmn2.model.Lane;
 import org.activiti.designer.bpmn2.model.MailTask;
 import org.activiti.designer.bpmn2.model.ManualTask;
@@ -30,9 +34,13 @@ import org.activiti.designer.bpmn2.model.Process;
 import org.activiti.designer.bpmn2.model.ReceiveTask;
 import org.activiti.designer.bpmn2.model.ScriptTask;
 import org.activiti.designer.bpmn2.model.ServiceTask;
+import org.activiti.designer.bpmn2.model.SignalEventDefinition;
 import org.activiti.designer.bpmn2.model.StartEvent;
 import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.designer.bpmn2.model.ThrowEvent;
+import org.activiti.designer.bpmn2.model.TimerEventDefinition;
 import org.activiti.designer.bpmn2.model.UserTask;
+import org.activiti.designer.bpmn2.model.alfresco.AlfrescoStartEvent;
 import org.activiti.designer.eclipse.extension.icon.IconProvider;
 import org.eclipse.swt.graphics.Image;
 
@@ -108,9 +116,53 @@ public class DefaultIconProvider implements IconProvider {
     } else if (context instanceof CallActivity) {
       result = Activator.getImage(PluginImage.IMG_CALLACTIVITY);
     } else if (context instanceof StartEvent) {
-      result = Activator.getImage(PluginImage.IMG_STARTEVENT_NONE);
+      if(context instanceof AlfrescoStartEvent) {
+        result = Activator.getImage(PluginImage.IMG_STARTEVENT_NONE);
+      } else {
+        if(((StartEvent) context).getEventDefinitions().size() > 0) {
+          if(((StartEvent) context).getEventDefinitions().get(0) instanceof TimerEventDefinition) {
+            result = Activator.getImage(PluginImage.IMG_BOUNDARY_TIMER);
+          } else {
+            result = Activator.getImage(PluginImage.IMG_BOUNDARY_ERROR);
+          }
+        } else {
+          result = Activator.getImage(PluginImage.IMG_STARTEVENT_NONE);
+        }
+      }
+      
     } else if (context instanceof EndEvent) {
-      result = Activator.getImage(PluginImage.IMG_ENDEVENT_NONE);
+      if(((EndEvent) context).getEventDefinitions().size() > 0) {
+        result = Activator.getImage(PluginImage.IMG_ENDEVENT_ERROR);
+      } else {
+        result = Activator.getImage(PluginImage.IMG_ENDEVENT_NONE);
+      }
+    
+    } else if (context instanceof BoundaryEvent) {
+      if(((BoundaryEvent) context).getEventDefinitions().size() > 0) {
+        EventDefinition definition = ((BoundaryEvent) context).getEventDefinitions().get(0);
+        if(definition instanceof ErrorEventDefinition) {
+          result = Activator.getImage(PluginImage.IMG_BOUNDARY_ERROR);
+        } else if(definition instanceof SignalEventDefinition) {
+          result = Activator.getImage(PluginImage.IMG_BOUNDARY_SIGNAL);
+        } else {
+          result = Activator.getImage(PluginImage.IMG_BOUNDARY_TIMER);
+        }
+      }
+    } else if (context instanceof IntermediateCatchEvent) {
+      if(((IntermediateCatchEvent) context).getEventDefinitions().size() > 0) {
+        EventDefinition definition = ((IntermediateCatchEvent) context).getEventDefinitions().get(0);
+        if(definition instanceof SignalEventDefinition) {
+          result = Activator.getImage(PluginImage.IMG_BOUNDARY_SIGNAL);
+        } else {
+          result = Activator.getImage(PluginImage.IMG_BOUNDARY_TIMER);
+        }
+      }
+    } else if (context instanceof ThrowEvent) {
+      if(((ThrowEvent) context).getEventDefinitions().size() > 0) {
+        result = Activator.getImage(PluginImage.IMG_BOUNDARY_SIGNAL);
+      } else {
+        result = Activator.getImage(PluginImage.IMG_BOUNDARY_TIMER);
+      }
     } else {
       throw new IllegalArgumentException("This provider has no Icon for the provided context");
     }
