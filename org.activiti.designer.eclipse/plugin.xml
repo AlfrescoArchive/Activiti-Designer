@@ -209,21 +209,6 @@
       </includes>
     </viewerActionBinding>
   
-    <!-- Additionally defines filter extensions for the Designer filters to the default Project Explorer -->
-    <viewerContentBinding
-      viewerId="org.eclipse.ui.navigator.ProjectExplorer">
-      
-      <includes>
-        <contentExtension
-          isRoot="false"
-          pattern="org.activiti.designer.eclipse.navigatorContent">
-        </contentExtension>
-        <contentExtension
-          pattern="org.activiti.designer.eclipse.navigator.filters.*">
-        </contentExtension>
-      </includes>
-    </viewerContentBinding>
-  
   </extension>
   
   <!-- Adds new content to the navigator -->
@@ -318,45 +303,5 @@
          </filterExpression>
       </commonFilter>
    </extension>
-  
-  <!-- 
-  <extension
-    point="org.eclipse.ui.popupMenus">
-     
-    <objectContribution
-      adaptable="false"
-      id="org.activiti.designer.gui.unitTestContribution"
-      nameFilter="*.bpmn"
-      objectClass="org.eclipse.core.resources.IFile">
-       
-      <menu
-        id="org.activiti.designer.gui.menu1"
-        label="Activiti"
-        path="additions">
-         
-        <separator name="activiti" />
-      </menu>
-      <action
-        class="org.activiti.designer.actions.GenerateUnitTestAction"
-        id="org.activiti.designer.gui.generateUnitTestAction"
-        label="Generate unit test"
-        menubarPath="org.activiti.designer.gui.menu1/group1">
-      </action>
-    </objectContribution>
-    <objectContribution
-      adaptable="false"
-      id="org.activiti.designer.gui.deployment"
-      objectClass="org.eclipse.jdt.core.IJavaProject">
-    
-      <action
-        class="org.activiti.designer.popupmenus.DeploymentMenu"
-        icon="icons/type.send.png"
-        id="org.activiti.designer.gui.deploymentAction"
-        label="Create deployment artifacts"
-        menubarPath="Properties">
-      </action>
-    </objectContribution>
-  </extension>
-  -->
   
 </plugin>
