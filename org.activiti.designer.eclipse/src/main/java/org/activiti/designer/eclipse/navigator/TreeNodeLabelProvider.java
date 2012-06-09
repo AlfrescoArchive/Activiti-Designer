@@ -26,7 +26,6 @@ package org.activiti.designer.eclipse.navigator;
  * limitations under the License.
  */
 
-import org.activiti.designer.eclipse.navigator.diagramtree.DiagramTreeNode;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.ILabelProviderListener;
 import org.eclipse.swt.graphics.Image;
@@ -35,7 +34,7 @@ import org.eclipse.ui.navigator.IDescriptionProvider;
 /**
  * @author Tiese Barrell
  */
-public class DiagramLabelProvider implements ILabelProvider, IDescriptionProvider {
+public class TreeNodeLabelProvider implements ILabelProvider, IDescriptionProvider {
 
   @Override
   public void addListener(ILabelProviderListener arg0) {
@@ -56,21 +55,21 @@ public class DiagramLabelProvider implements ILabelProvider, IDescriptionProvide
 
   @Override
   public String getDescription(Object element) {
-    return "Process element: " + getText(element);
+    return getText(element);
   }
   @Override
   public Image getImage(Object element) {
-    if (element instanceof DiagramTreeNode) {
-      return ((DiagramTreeNode) element).getDisplayImage();
+    if (element instanceof TreeNode) {
+      return ((TreeNode) element).getDisplayImage();
     }
     return null;
   }
 
   @Override
   public String getText(Object element) {
-    if (element instanceof DiagramTreeNode) {
-      final DiagramTreeNode diagramTreeNode = (DiagramTreeNode) element;
-      return diagramTreeNode.getName();
+    if (element instanceof TreeNode) {
+      final TreeNode treeNode = (TreeNode) element;
+      return treeNode.getName();
     }
     return null;
   }

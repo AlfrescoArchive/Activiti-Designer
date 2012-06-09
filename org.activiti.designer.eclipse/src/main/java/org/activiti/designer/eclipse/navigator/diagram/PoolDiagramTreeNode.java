@@ -11,10 +11,11 @@
  * limitations under the License.
  */
 
-package org.activiti.designer.eclipse.navigator.diagramtree;
+package org.activiti.designer.eclipse.navigator.diagram;
 
 import org.activiti.designer.bpmn2.model.Pool;
 import org.activiti.designer.bpmn2.model.Process;
+import org.activiti.designer.eclipse.navigator.TreeNode;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 
 /**
@@ -46,8 +47,8 @@ public class PoolDiagramTreeNode extends AbstractDiagramTreeNode<Pool> {
 
   private void addProcessChild(final Process process) {
     if (process != null) {
-      final DiagramTreeNode transparentProcessNode = DiagramTreeNodeFactory.createTransparentProcessNode(this, process);
-      referenceChildNodesToOwnChildren(transparentProcessNode);
+      final TreeNode transparentTreeNode = DiagramTreeNodeFactory.createTransparentProcessNode(this, process);
+      referenceChildNodesToOwnChildren(transparentTreeNode);
     }
   }
 

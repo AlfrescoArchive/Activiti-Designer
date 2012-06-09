@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.activiti.designer.eclipse.navigator.diagramtree;
+package org.activiti.designer.eclipse.navigator.diagram;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -24,6 +24,7 @@ import javax.xml.stream.XMLStreamReader;
 import org.activiti.designer.bpmn2.model.Pool;
 import org.activiti.designer.bpmn2.model.Process;
 import org.activiti.designer.eclipse.bpmn.BpmnParser;
+import org.activiti.designer.eclipse.navigator.TreeNode;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.eclipse.core.resources.IFile;
 
@@ -100,12 +101,12 @@ public class FileDiagramTreeNode extends AbstractDiagramTreeNode<IFile> {
     extractTransparentProcess(this, model.getMainProcess());
   }
 
-  private void extractProcess(final DiagramTreeNode parent, final Process mainProcess) {
+  private void extractProcess(final TreeNode parent, final Process mainProcess) {
     addChildNode(DiagramTreeNodeFactory.createProcessNode(parent, mainProcess));
   }
 
-  private void extractTransparentProcess(final DiagramTreeNode parent, final Process mainProcess) {
-    final DiagramTreeNode transparentProcessNode = DiagramTreeNodeFactory.createTransparentProcessNode(parent, mainProcess);
+  private void extractTransparentProcess(final TreeNode parent, final Process mainProcess) {
+    final TreeNode transparentProcessNode = DiagramTreeNodeFactory.createTransparentProcessNode(parent, mainProcess);
     referenceChildNodesToOwnChildren(transparentProcessNode);
   }
 

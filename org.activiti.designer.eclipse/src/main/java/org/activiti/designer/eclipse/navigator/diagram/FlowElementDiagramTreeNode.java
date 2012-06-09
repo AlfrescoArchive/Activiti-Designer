@@ -11,26 +11,22 @@
  * limitations under the License.
  */
 
-package org.activiti.designer.eclipse.navigator.diagramtree;
+package org.activiti.designer.eclipse.navigator.diagram;
 
-import java.util.List;
-
-import org.eclipse.swt.graphics.Image;
+import org.activiti.designer.bpmn2.model.FlowElement;
 
 /**
  * @author Tiese Barrell
- * 
  */
-public interface DiagramTreeNode {
+public class FlowElementDiagramTreeNode extends AbstractDiagramTreeNode<FlowElement> {
 
-  List<DiagramTreeNode> getChildren();
+  public FlowElementDiagramTreeNode(final Object parent, final FlowElement flowElement) {
+    super(parent, flowElement, flowElement.getName());
+  }
 
-  boolean hasChildren();
-
-  Object getParent();
-
-  String getName();
-
-  Image getDisplayImage();
-
+  @Override
+  protected void extractChildren() {  
+    //no-op
+  }
+  
 }

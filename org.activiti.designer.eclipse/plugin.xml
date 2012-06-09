@@ -193,7 +193,10 @@
           pattern="org.activiti.designer.eclipse.navigator.filters.*">
         </contentExtension>
         <contentExtension
-          pattern="org.activiti.designer.eclipse.navigator.content">
+          pattern="org.activiti.designer.eclipse.navigator.content.diagram">
+        </contentExtension>
+        <contentExtension
+          pattern="org.activiti.designer.eclipse.navigator.content.project">
         </contentExtension>
       </includes>
     </viewerContentBinding>
@@ -209,6 +212,17 @@
       </includes>
     </viewerActionBinding>
   
+    <!-- Additionally defines filter extensions for the Designer filters to the default Project Explorer -->
+    <viewerContentBinding
+      viewerId="org.eclipse.ui.navigator.ProjectExplorer">
+      
+      <includes>
+        <contentExtension
+          pattern="org.activiti.designer.eclipse.navigator.filters.*">
+        </contentExtension>
+      </includes>
+    </viewerContentBinding>
+  
   </extension>
   
   <!-- Adds new content to the navigator -->
@@ -216,10 +230,10 @@
     point="org.eclipse.ui.navigator.navigatorContent">
   
     <navigatorContent
-      id="org.activiti.designer.eclipse.navigator.content"
+      id="org.activiti.designer.eclipse.navigator.content.diagram"
       name="Activiti Diagram Contents"
-      contentProvider="org.activiti.designer.eclipse.navigator.DiagramContentProvider"
-      labelProvider="org.activiti.designer.eclipse.navigator.DiagramLabelProvider"
+      contentProvider="org.activiti.designer.eclipse.navigator.diagram.DiagramTreeContentProvider"
+      labelProvider="org.activiti.designer.eclipse.navigator.TreeNodeLabelProvider"
       activeByDefault="true"
       icon="community_icon.png"
       priority="higher">
@@ -237,38 +251,39 @@
       <possibleChildren>
         <or>
           <instanceof 
-            value="org.activiti.designer.eclipse.navigator.diagramtree.FileDiagramTreeNode" />
+            value="org.activiti.designer.eclipse.navigator.diagram.FileDiagramTreeNode" />
+        </or>
+      </possibleChildren>
+    </navigatorContent>
+    
+    <navigatorContent
+          activeByDefault="false"
+          appearsBefore="org.activiti.designer.eclipse.navigator.content.diagram"
+          contentProvider="org.activiti.designer.eclipse.navigator.project.ProjectTreeContentProvider"
+          icon="community_icon.png"
+          id="org.activiti.designer.eclipse.navigator.content.project"
+          labelProvider="org.activiti.designer.eclipse.navigator.TreeNodeLabelProvider"
+          name="Activiti Project Contents"
+          priority="higher">
+     	
+      <triggerPoints>
+        <and>
+          <instanceof value="org.eclipse.core.resources.IResource" />
+          <!--<test 
+            forcePluginActivation="true"
+            property="org.eclipse.core.resources.projectNature"
+            value="org.activiti.designer.eclipse.activitinature" />-->
+     	</and>
+      </triggerPoints>
+     
+      <possibleChildren>
+        <or>
+          <instanceof 
+            value="org.activiti.designer.eclipse.navigator.diagram.FileDiagramTreeNode" />
         </or>
       </possibleChildren>
     </navigatorContent>
       
-      
-        <!--
-  <navigatorContent
-        contentProvider="org.activiti.designer.eclipse.navigator.BpmnTreeContentProvider"
-        id="org.activiti.designer.eclipse.navigatorContent"
-        labelProvider="org.activiti.designer.eclipse.navigator.BpmnLabelProvider"
-        name="Activiti navigator content"
-        priority="higher">
-     <triggerPoints>
-        <or>
-           <instanceof
-                 value="org.eclipse.core.resources.IProject">
-           </instanceof>
-        </or>
-     </triggerPoints>
-     <possibleChildren>
-        <or>
-           <instanceof
-                 value="org.activiti.designer.eclipse.navigator.nodes.BpmnElementsNode">
-           </instanceof>
-           <instanceof
-                 value="org.eclipse.bpmn2.StartEvent">
-           </instanceof>
-        </or>
-     </possibleChildren>
-  </navigatorContent>
-  -->
       <commonWizard
             type="import"
             wizardId="org.activiti.designer.eclipse.commonWizard1">
@@ -283,7 +298,7 @@
          </enablement>
       </commonWizard>
       <commonFilter
-            activeByDefault="true"
+            activeByDefault="false"
             description="Hides all projects that are not Activiti Designer projects"
             id="org.activiti.designer.eclipse.navigator.filters.hideNonActivitiProjects"
             name="Hide non-Activiti Projects"

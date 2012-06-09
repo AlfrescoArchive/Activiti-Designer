@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.activiti.designer.eclipse.navigator.diagramtree;
+package org.activiti.designer.eclipse.navigator.diagram;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,6 +19,7 @@ import java.util.List;
 import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.Lane;
 import org.activiti.designer.bpmn2.model.Process;
+import org.activiti.designer.eclipse.navigator.TreeNode;
 
 /**
  * @author Tiese Barrell
@@ -30,8 +31,8 @@ public class ProcessDiagramTreeNode extends AbstractProcessDiagramTreeNode {
   }
 
   @Override
-  protected List<DiagramTreeNode> createChildNodesForFlowElements(List<FlowElement> flowElements) {
-    final List<DiagramTreeNode> result = new ArrayList<DiagramTreeNode>();
+  protected List<TreeNode> createChildNodesForFlowElements(List<FlowElement> flowElements) {
+    final List<TreeNode> result = new ArrayList<TreeNode>();
 
     for (final FlowElement flowElement : flowElements) {
       result.add(DiagramTreeNodeFactory.createFlowElementNode(this, flowElement));
@@ -41,8 +42,8 @@ public class ProcessDiagramTreeNode extends AbstractProcessDiagramTreeNode {
   }
 
   @Override
-  protected List<DiagramTreeNode> createChildNodesForLanes(List<Lane> lanes) {
-    final List<DiagramTreeNode> result = new ArrayList<DiagramTreeNode>();
+  protected List<TreeNode> createChildNodesForLanes(List<Lane> lanes) {
+    final List<TreeNode> result = new ArrayList<TreeNode>();
 
     for (final Lane lane : lanes) {
       result.add(DiagramTreeNodeFactory.createLaneNode(this, lane));

@@ -11,7 +11,7 @@
  * limitations under the License.
  */
 
-package org.activiti.designer.eclipse.navigator.diagramtree;
+package org.activiti.designer.eclipse.navigator.diagram;
 
 import java.util.ArrayList;
 import java.util.List;
