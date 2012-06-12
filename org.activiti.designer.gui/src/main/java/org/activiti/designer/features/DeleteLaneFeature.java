@@ -20,6 +20,7 @@ import org.eclipse.graphiti.features.context.IDeleteContext;
 import org.eclipse.graphiti.features.context.IRemoveContext;
 import org.eclipse.graphiti.features.context.impl.RemoveContext;
 import org.eclipse.graphiti.features.context.impl.ResizeShapeContext;
+import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.ui.features.DefaultDeleteFeature;
 
@@ -33,6 +34,17 @@ public class DeleteLaneFeature extends DefaultDeleteFeature {
 	}
 
 	@Override
+  public boolean canDelete(IDeleteContext context) {
+	  PictogramElement pictogramElement = context.getPictogramElement();
+	  Object bo = getFeatureProvider().getBusinessObjectForPictogramElement(pictogramElement);
+	  if (bo instanceof Lane) {
+	    return true;
+	  } else {
+	    return false;
+	  }
+  }
+	
+  @Override
   public void preDelete(IDeleteContext context) {
     Shape laneShape = (Shape) context.getPictogramElement();
     
@@ -49,10 +61,26 @@ public class DeleteLaneFeature extends DefaultDeleteFeature {
 		  for (Pool pool : model.getPools()) {
 		    if(pool.getProcessRef().equalsIgnoreCase(lane.getParentProcess().getId())) {
 		      parentPool = pool;
+		      break;
 		    }
 		  }
 		  
-		  if(parentPool != null) {
+		  Process laneProcess = model.getProcess(parentPool.getId());
+		  
+		  if (parentPool == null || laneProcess == null) return;
+		  
+		  if(laneProcess.getLanes().size() == 1) {
+        Process process = model.getProcess(parentPool.getId());
+        model.getProcesses().remove(process);
+        model.getPools().remove(parentPool);
+        PictogramElement poolElement = getFeatureProvider().getPictogramElementForBusinessObject(parentPool);
+        IRemoveContext poolRc = new RemoveContext(poolElement);
+        IRemoveFeature poolRemoveFeature = getFeatureProvider().getRemoveFeature(poolRc);
+        if (poolRemoveFeature != null) {
+          poolRemoveFeature.remove(poolRc);
+        }
+        
+		  } else {
 		    Shape poolShape = (Shape) getFeatureProvider().getPictogramElementForBusinessObject(parentPool);
   		  ResizeShapeContext resizeContext = new ResizeShapeContext(poolShape);
   	    resizeContext.setSize(poolShape.getGraphicsAlgorithm().getWidth(), poolShape.getGraphicsAlgorithm().getHeight() - laneHeight);

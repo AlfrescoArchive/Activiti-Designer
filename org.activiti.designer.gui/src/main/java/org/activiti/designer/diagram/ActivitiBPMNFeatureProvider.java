@@ -299,7 +299,7 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
     Object bo = getBusinessObjectForPictogramElement(pictogramElement);
     if(bo instanceof FlowElement) {
       return new DeleteFlowElementFeature(this);
-    } else if(bo instanceof Lane) {
+    } else if(bo instanceof Lane || bo instanceof Pool) {
       return new DeleteLaneFeature(this);
     }
 	  return super.getDeleteFeature(context);
