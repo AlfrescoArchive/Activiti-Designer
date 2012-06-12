@@ -1,5 +1,6 @@
 package com.alfresco.designer.gui.features;
 
+import org.activiti.designer.PluginImage;
 import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.bpmn2.model.Task;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
@@ -110,7 +111,7 @@ public abstract class AddAlfrescoTaskFeature extends AbstractAddShapeFeature {
     
     {
       final Shape shape = peCreateService.createShape(containerShape, false);
-      final Image image = gaService.createImage(shape, "org.activiti.designer.alfresco.logo");
+      final Image image = gaService.createImage(shape, PluginImage.IMG_ALFRESCO_LOGO.getImageKey());
 
       gaService.setLocationAndSize(image, 85, 3, IMAGE_SIZE, IMAGE_SIZE);
     }

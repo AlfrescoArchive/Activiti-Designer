@@ -1,5 +1,6 @@
 package com.alfresco.designer.gui.features;
 
+import org.activiti.designer.PluginImage;
 import org.eclipse.graphiti.features.IFeatureProvider;
 
 public class AddAlfrescoUserTaskFeature extends AddAlfrescoTaskFeature {
@@ -9,6 +10,6 @@ public class AddAlfrescoUserTaskFeature extends AddAlfrescoTaskFeature {
 	}
 
 	protected String getIcon(Object bo) {
-		return "org.activiti.designer.usertask";
+		return PluginImage.IMG_USERTASK.getImageKey();
 	}
 }

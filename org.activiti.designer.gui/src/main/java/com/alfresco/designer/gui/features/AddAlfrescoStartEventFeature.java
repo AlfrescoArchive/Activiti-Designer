@@ -1,5 +1,6 @@
 package com.alfresco.designer.gui.features;
 
+import org.activiti.designer.PluginImage;
 import org.activiti.designer.bpmn2.model.EndEvent;
 import org.activiti.designer.bpmn2.model.Event;
 import org.activiti.designer.bpmn2.model.SubProcess;
@@ -65,7 +66,7 @@ public class AddAlfrescoStartEventFeature extends AbstractAddShapeFeature {
 		
 		{
       final Shape shape = peCreateService.createShape(containerShape, false);
-      final Image image = gaService.createImage(shape, "org.activiti.designer.alfresco.logo");
+      final Image image = gaService.createImage(shape, PluginImage.IMG_ALFRESCO_LOGO.getImageKey());
 
       gaService.setLocationAndSize(image, 10, 10, IMAGE_SIZE, IMAGE_SIZE);
     }

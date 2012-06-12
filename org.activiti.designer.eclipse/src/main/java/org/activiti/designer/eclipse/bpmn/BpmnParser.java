@@ -83,6 +83,7 @@ public class BpmnParser {
 	public List<SequenceFlowModel> sequenceFlowList = new ArrayList<SequenceFlowModel>();
 	private List<BoundaryEventModel> boundaryList = new ArrayList<BoundaryEventModel>();
 	public Map<String, List<GraphicInfo>> flowLocationMap = new HashMap<String, List<GraphicInfo>>();
+	public Map<String, GraphicInfo> labelLocationMap = new HashMap<String, GraphicInfo>();
 
 	public void parseBpmn(XMLStreamReader xtr, Bpmn2MemoryModel model) {
 		try {
@@ -287,11 +288,27 @@ public class BpmnParser {
 						List<GraphicInfo> wayPointList = new ArrayList<GraphicInfo>();
 						while (xtr.hasNext()) {
 							xtr.next();
-							if (xtr.isStartElement() && "waypoint".equalsIgnoreCase(xtr.getLocalName())) {
+							if (xtr.isStartElement() && "BPMNLabel".equalsIgnoreCase(xtr.getLocalName())) {
+							  
+							  while (xtr.hasNext()) {
+		              xtr.next();
+		              if (xtr.isStartElement() && "Bounds".equalsIgnoreCase(xtr.getLocalName())) {
+    							  GraphicInfo graphicInfo = new GraphicInfo();
+                    graphicInfo.x = Double.valueOf(xtr.getAttributeValue(null, "x")).intValue();
+                    graphicInfo.y = Double.valueOf(xtr.getAttributeValue(null, "y")).intValue();
+    							  labelLocationMap.put(id, graphicInfo);
+    							  break;
+		              } else if(xtr.isEndElement() && "BPMNLabel".equalsIgnoreCase(xtr.getLocalName())) {
+		                break;
+		              }
+							  }
+							  
+							} else if (xtr.isStartElement() && "waypoint".equalsIgnoreCase(xtr.getLocalName())) {
 								GraphicInfo graphicInfo = new GraphicInfo();
 								graphicInfo.x = Double.valueOf(xtr.getAttributeValue(null, "x")).intValue();
 								graphicInfo.y = Double.valueOf(xtr.getAttributeValue(null, "y")).intValue();
 								wayPointList.add(graphicInfo);
+								
 							} else if(xtr.isEndElement() && "BPMNEdge".equalsIgnoreCase(xtr.getLocalName())) {
 								break;
 							}
@@ -368,6 +385,9 @@ public class BpmnParser {
       
       if(flowElement instanceof SubProcess) {
       	flowNode = getFlowNode(elementid, ((SubProcess) flowElement).getFlowElements());
+      	if(flowNode != null) {
+      	  break;
+      	}
       }
     }
     return flowNode;
@@ -1376,8 +1396,8 @@ public class BpmnParser {
 				}
 			}
 		}
-		if (xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "inputVariableNames") != null) {
-			String inputNames = xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "inputVariableNames");
+		if (xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "ruleVariablesInput") != null) {
+			String inputNames = xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "ruleVariablesInput");
 			if (inputNames != null && inputNames.length() > 0) {
 				businessRuleTask.getInputVariables().clear();
 				if (inputNames.contains(",") == false) {

@@ -31,6 +31,7 @@ import org.activiti.designer.bpmn2.model.Task;
 import org.activiti.designer.bpmn2.model.ThrowEvent;
 import org.activiti.designer.bpmn2.model.TimerEventDefinition;
 import org.activiti.designer.bpmn2.model.UserTask;
+import org.activiti.designer.bpmn2.model.alfresco.AlfrescoMailTask;
 import org.activiti.designer.bpmn2.model.alfresco.AlfrescoScriptTask;
 import org.activiti.designer.bpmn2.model.alfresco.AlfrescoStartEvent;
 import org.activiti.designer.bpmn2.model.alfresco.AlfrescoUserTask;
@@ -142,6 +143,7 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
 
+import com.alfresco.designer.gui.features.AddAlfrescoMailTaskFeature;
 import com.alfresco.designer.gui.features.AddAlfrescoScriptTaskFeature;
 import com.alfresco.designer.gui.features.AddAlfrescoStartEventFeature;
 import com.alfresco.designer.gui.features.AddAlfrescoUserTaskFeature;
@@ -191,6 +193,8 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 		  } else {
 		    return new AddUserTaskFeature(this);
 		  }
+		} else if (context.getNewObject() instanceof AlfrescoMailTask) {
+      return new AddAlfrescoMailTaskFeature(this);
 		} else if (context.getNewObject() instanceof MailTask) {
 		  return new AddMailTaskFeature(this);
 		} else if (context.getNewObject() instanceof ManualTask) {
@@ -199,7 +203,9 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 		  return new AddReceiveTaskFeature(this);
 		} else if (context.getNewObject() instanceof BusinessRuleTask) {
       return new AddBusinessRuleTaskFeature(this);
-		} else if (context.getNewObject() instanceof ScriptTask) {
+		} else if (context.getNewObject() instanceof AlfrescoScriptTask) {
+      return new AddAlfrescoScriptTaskFeature(this);
+    } else if (context.getNewObject() instanceof ScriptTask) {
 		  return new AddScriptTaskFeature(this);
 		} else if (context.getNewObject() instanceof ServiceTask) {
 		  return new AddServiceTaskFeature(this);
@@ -247,9 +253,7 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
       return new AddLaneFeature(this);
 		} else if (context.getNewObject() instanceof CallActivity) {
 			return new AddCallActivityFeature(this);
-		} else if (context.getNewObject() instanceof AlfrescoScriptTask) {
-      return new AddAlfrescoScriptTaskFeature(this);
-    }
+		}
 		return super.getAddFeature(context);
 	}
 

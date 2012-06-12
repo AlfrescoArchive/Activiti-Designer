@@ -541,18 +541,16 @@ public class ActivitiDiagramEditor extends DiagramEditor {
       AddConnectionContext addContext = new AddConnectionContext(sourceAnchor, targetAnchor);
       
       List<GraphicInfo> bendpointList = new ArrayList<GraphicInfo>();
-      for (String sequenceGraphElement : parser.flowLocationMap.keySet()) {
-	      if(sequenceFlowModel.id.equalsIgnoreCase(sequenceGraphElement)) {
-	      	List<GraphicInfo> pointList = parser.flowLocationMap.get(sequenceGraphElement);
-	      	if(pointList.size() > 2) {
-	      		for(int i = 1; i < pointList.size() - 1; i++) {
-	      			bendpointList.add(pointList.get(i));
-	      		}
-	      	}
-	      }
+      if (parser.flowLocationMap.containsKey(sequenceFlowModel.id)) {
+        List<GraphicInfo> pointList = parser.flowLocationMap.get(sequenceFlowModel.id);
+        if(pointList.size() > 2) {
+          for(int i = 1; i < pointList.size() - 1; i++) {
+            bendpointList.add(pointList.get(i));
+          }
+        }
       }
-    
       addContext.putProperty("org.activiti.designer.bendpoints", bendpointList);
+      addContext.putProperty("org.activiti.designer.connectionlabel", parser.labelLocationMap.get(sequenceFlowModel.id));
       
       addContext.setNewObject(sequenceFlow);
       getDiagramTypeProvider().getFeatureProvider().addIfPossible(addContext);

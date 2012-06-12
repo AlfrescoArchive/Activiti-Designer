@@ -4,8 +4,10 @@ import org.activiti.designer.PluginImage;
 import org.activiti.designer.bpmn2.model.StartEvent;
 import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.bpmn2.model.alfresco.AlfrescoStartEvent;
+import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.features.AbstractCreateBPMNFeature;
 import org.activiti.designer.util.editor.ModelHandler;
+import org.activiti.designer.util.preferences.Preferences;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
@@ -30,6 +32,11 @@ public class CreateAlfrescoStartEventFeature extends AbstractCreateBPMNFeature {
 
     startEvent.setId(getNextId(startEvent));
     startEvent.setName("Alfresco start");
+    
+    String[] formTypes = PreferencesUtil.getStringArray(Preferences.ALFRESCO_FORMTYPES_STARTEVENT);
+    if (formTypes != null && formTypes.length > 0) {
+      startEvent.setFormKey(formTypes[0]);
+    }
 
     Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
     if (parentObject instanceof SubProcess) {

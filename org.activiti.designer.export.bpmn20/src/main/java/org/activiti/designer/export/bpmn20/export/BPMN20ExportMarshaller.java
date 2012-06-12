@@ -299,14 +299,14 @@ public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
     } else if (object instanceof UserTask) {
       UserTaskExport.createUserTask(object, xtw);
 
+    } else if (object instanceof AlfrescoScriptTask) {
+      AlfrescoScriptTaskExport.createScriptTask(object, xtw);
+      
     } else if (object instanceof ScriptTask) {
       ScriptTaskExport.createScriptTask(object, xtw);
 
     } else if (object instanceof ServiceTask) {
       ServiceTaskExport.createServiceTask(object, xtw);
-    
-    } else if (object instanceof AlfrescoScriptTask) {
-      AlfrescoScriptTaskExport.createScriptTask(object, xtw);
 
     } else if (object instanceof MailTask) {
       MailTaskExport.createMailTask(object, xtw);

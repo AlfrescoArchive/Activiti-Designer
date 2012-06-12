@@ -3,8 +3,10 @@ package com.alfresco.designer.gui.features;
 import org.activiti.designer.PluginImage;
 import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.bpmn2.model.alfresco.AlfrescoUserTask;
+import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.features.AbstractCreateFastBPMNFeature;
 import org.activiti.designer.util.editor.ModelHandler;
+import org.activiti.designer.util.preferences.Preferences;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
@@ -30,6 +32,11 @@ public class CreateAlfrescoUserTaskFeature extends AbstractCreateFastBPMNFeature
 
     newUserTask.setId(getNextId(newUserTask));
     newUserTask.setName("Alfresco User Task");
+    
+    String[] formTypes = PreferencesUtil.getStringArray(Preferences.ALFRESCO_FORMTYPES_USERTASK);
+    if (formTypes != null && formTypes.length > 0) {
+      newUserTask.setFormKey(formTypes[0]);
+    }
 
     Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
     if (parentObject instanceof SubProcess) {

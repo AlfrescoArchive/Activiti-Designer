@@ -7,8 +7,12 @@ import org.activiti.designer.bpmn2.model.FlowNode;
 import org.activiti.designer.bpmn2.model.Gateway;
 import org.activiti.designer.bpmn2.model.SequenceFlow;
 import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.designer.util.TextUtil;
 import org.activiti.designer.util.editor.GraphicInfo;
+import org.activiti.designer.util.platform.OSEnum;
+import org.activiti.designer.util.platform.OSUtil;
 import org.activiti.designer.util.style.StyleUtil;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.graphiti.datatypes.ILocation;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -17,10 +21,11 @@ import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.impl.AbstractAddFeature;
 import org.eclipse.graphiti.mm.GraphicsAlgorithmContainer;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
+import org.eclipse.graphiti.mm.algorithms.MultiText;
 import org.eclipse.graphiti.mm.algorithms.Polygon;
 import org.eclipse.graphiti.mm.algorithms.Polyline;
-import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.algorithms.styles.LineStyle;
+import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
 import org.eclipse.graphiti.mm.algorithms.styles.Point;
 import org.eclipse.graphiti.mm.algorithms.styles.StylesFactory;
 import org.eclipse.graphiti.mm.pictograms.Anchor;
@@ -188,13 +193,27 @@ public class AddSequenceFlowFeature extends AbstractAddFeature {
 
 		// add dynamic text decorator for the reference name
 		ConnectionDecorator textDecorator = peCreateService.createConnectionDecorator(connection, true, 0.5, true);
-		Text text = gaService.createDefaultText(getDiagram(), textDecorator);
+		MultiText text = gaService.createDefaultMultiText(getDiagram(), textDecorator);
 		text.setStyle(StyleUtil.getStyleForTask((getDiagram())));
-		gaService.setLocation(text, 10, 0);
+		text.setHorizontalAlignment(Orientation.ALIGNMENT_LEFT);
+    text.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);
+    if (OSUtil.getOperatingSystem() == OSEnum.Mac) {
+      text.setFont(gaService.manageFont(getDiagram(), text.getFont().getName(), 11));
+    }
+    
+    if(addConContext.getProperty("org.activiti.designer.connectionlabel") != null) {
+      GraphicInfo labelLocation = (GraphicInfo) addConContext.getProperty("org.activiti.designer.connectionlabel");
+      gaService.setLocation(text, labelLocation.x, labelLocation.y);
+    } else {
+      gaService.setLocation(text, 10, 0);
+    }
+		
+		if (StringUtils.isNotEmpty(addedSequenceFlow.getName())) {
+		  TextUtil.setTextSize(addedSequenceFlow.getName(), text);
+		}
 
 		// set reference name in the text decorator
-		SequenceFlow sequenceFlow = (SequenceFlow) context.getNewObject();
-		text.setValue(sequenceFlow.getName());
+		text.setValue(addedSequenceFlow.getName());
 
 		// add static graphical decorators (composition and navigable)
 		ConnectionDecorator cd = peCreateService.createConnectionDecorator(connection, false, 1.0, true);

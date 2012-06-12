@@ -26,6 +26,7 @@ import org.activiti.designer.bpmn2.model.InclusiveGateway;
 import org.activiti.designer.bpmn2.model.Lane;
 import org.activiti.designer.bpmn2.model.Pool;
 import org.activiti.designer.bpmn2.model.SequenceFlow;
+import org.activiti.designer.util.TextUtil;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.eclipse.emf.common.util.EList;
@@ -372,9 +373,10 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
             return;
           EList<ConnectionDecorator> decoratorList = ((FreeFormConnection) getSelectedPictogramElement()).getConnectionDecorators();
           for (ConnectionDecorator decorator : decoratorList) {
-            if (decorator.getGraphicsAlgorithm() instanceof org.eclipse.graphiti.mm.algorithms.Text) {
-              org.eclipse.graphiti.mm.algorithms.Text text = (org.eclipse.graphiti.mm.algorithms.Text) decorator.getGraphicsAlgorithm();
+            if (decorator.getGraphicsAlgorithm() instanceof org.eclipse.graphiti.mm.algorithms.MultiText) {
+              org.eclipse.graphiti.mm.algorithms.MultiText text = (org.eclipse.graphiti.mm.algorithms.MultiText) decorator.getGraphicsAlgorithm();
               text.setValue(name);
+              TextUtil.setTextSize(name, text);
             }
           }
         }
