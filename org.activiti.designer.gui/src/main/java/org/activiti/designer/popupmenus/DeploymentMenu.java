@@ -145,8 +145,12 @@ public class DeploymentMenu implements org.eclipse.ui.IObjectActionDelegate{
                 compressPackage(deploymentFolder, tempclassesFolder, processName + ".jar");
               }
               
-              tempbarFolder.delete(true, null);
-              tempclassesFolder.delete(true, null);
+              try {
+                tempbarFolder.delete(true, null);
+                tempclassesFolder.delete(true, null);
+              } catch(Exception e) {
+                e.printStackTrace();
+              }
           
               // refresh the output folder to reflect changes
               deploymentFolder.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
@@ -219,6 +223,7 @@ public class DeploymentMenu implements org.eclipse.ui.IObjectActionDelegate{
         byte[] fileContent = new byte[(int)file.length()];
         fin.read(fileContent);
         out.write(fileContent);
+        fin.close();
       }
       out.closeEntry();
     }
