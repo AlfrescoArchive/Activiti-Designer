@@ -4,7 +4,6 @@ import java.util.List;
 
 import org.activiti.designer.bpmn2.model.Activity;
 import org.activiti.designer.bpmn2.model.BoundaryEvent;
-import org.activiti.designer.bpmn2.model.EventSubProcess;
 import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.Lane;
 import org.activiti.designer.bpmn2.model.SequenceFlow;
@@ -38,22 +37,9 @@ public class MoveActivityFeature extends DefaultMoveShapeFeature {
 
 	@Override
   public boolean canMoveShape(IMoveShapeContext context) {
-	  Object bo = getFeatureProvider().getBusinessObjectForPictogramElement(context.getPictogramElement());
-	  if (bo instanceof EventSubProcess) {
-	    
-	    if (context.getTargetContainer() instanceof Diagram)
-	      return false;
-
-	    Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-	    if (parentObject instanceof SubProcess == true) {
-	      return true;
-	    }
-	    
-	    return false;
-	    
-	  } else {
-	    return true;
-	  }
+	  Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
+    return (context.getTargetContainer() instanceof Diagram || 
+            parentObject instanceof SubProcess || parentObject instanceof Lane);
   }
 
   /**

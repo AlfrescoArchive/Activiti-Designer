@@ -2,6 +2,7 @@ package org.activiti.designer.features;
 
 import org.activiti.designer.PluginImage;
 import org.activiti.designer.bpmn2.model.EventSubProcess;
+import org.activiti.designer.bpmn2.model.Lane;
 import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.platform.OSEnum;
@@ -120,15 +121,9 @@ public class AddEventSubProcessFeature extends AbstractAddShapeFeature {
   @Override
   public boolean canAdd(IAddContext context) {
     if (context.getNewObject() instanceof EventSubProcess) {
-
-      if (context.getTargetContainer() instanceof Diagram) {
-        return false;
-      }
-
       Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-      if (parentObject instanceof SubProcess == true) {
-        return true;
-      }
+      return (context.getTargetContainer() instanceof Diagram || 
+              parentObject instanceof SubProcess || parentObject instanceof Lane);
     }
     return false;
   }
