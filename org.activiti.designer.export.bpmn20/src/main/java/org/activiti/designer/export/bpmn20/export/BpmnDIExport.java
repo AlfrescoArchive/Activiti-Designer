@@ -148,19 +148,6 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
     xtw.writeAttribute("bpmnElement", sequenceFlow.getId());
     xtw.writeAttribute("id", "BPMNEdge_" + sequenceFlow.getId());
     
-    EList<ConnectionDecorator> decoratorList = freeFormConnection.getConnectionDecorators();
-    for (ConnectionDecorator decorator : decoratorList) {
-      if (decorator.getGraphicsAlgorithm() instanceof org.eclipse.graphiti.mm.algorithms.MultiText) {
-        org.eclipse.graphiti.mm.algorithms.MultiText text = (org.eclipse.graphiti.mm.algorithms.MultiText) decorator.getGraphicsAlgorithm();
-        if(text.getHeight() > 0) {
-          xtw.writeStartElement(BPMNDI_PREFIX, "BPMNLabel", BPMNDI_NAMESPACE);
-          createBounds(text.getX(), text.getY(), text.getWidth(), text.getHeight());
-          xtw.writeEndElement();
-          break;
-        }
-      }
-    }
-    
     ILocation sourceLocation = Graphiti.getLayoutService().getLocationRelativeToDiagram(sourceElement);
     int sourceX = sourceLocation.getX();
     int sourceY = sourceLocation.getY();
@@ -244,6 +231,19 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
 		} else {
 			lastWayPoint = createWayPoint(targetX + targetWidth, targetMiddleY, xtw);
 		}
+    
+    EList<ConnectionDecorator> decoratorList = freeFormConnection.getConnectionDecorators();
+    for (ConnectionDecorator decorator : decoratorList) {
+      if (decorator.getGraphicsAlgorithm() instanceof org.eclipse.graphiti.mm.algorithms.MultiText) {
+        org.eclipse.graphiti.mm.algorithms.MultiText text = (org.eclipse.graphiti.mm.algorithms.MultiText) decorator.getGraphicsAlgorithm();
+        if(text.getHeight() > 0) {
+          xtw.writeStartElement(BPMNDI_PREFIX, "BPMNLabel", BPMNDI_NAMESPACE);
+          createBounds(text.getX(), text.getY(), text.getWidth(), text.getHeight());
+          xtw.writeEndElement();
+          break;
+        }
+      }
+    }
     
     xtw.writeEndElement();
   }
