@@ -12,17 +12,16 @@ Require-Bundle: org.eclipse.graphiti,
  org.eclipse.ui.views.properties.tabbed,
  org.eclipse.emf.transaction,
  org.eclipse.jdt.core,
- org.eclipse.jdt.launching,
  org.apache.commons.lang,
  org.eclipse.wst.xml.ui,
  org.eclipse.wst.sse.ui,
  org.eclipse.jface.text,
  org.eclipse.wst.sse.core,
- org.junit,
  org.activiti.designer.util,
  org.activiti.designer.model,
  org.activiti.designer.integration,
- org.activiti.designer.export.bpmn20
+ org.activiti.designer.export.bpmn20,
+ org.eclipse.jdt.launching
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: 
@@ -41,3 +40,6 @@ Export-Package:
  org.activiti.designer.eclipse.util
 Bundle-Activator: org.activiti.designer.eclipse.common.ActivitiPlugin
 Import-Package: org.activiti.designer.eclipse.bpmn
+Bundle-ClassPath: .,
+ jdi.jar,
+ jdimodel.jar

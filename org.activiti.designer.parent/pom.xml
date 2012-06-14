@@ -8,7 +8,7 @@
 	<name>Activiti Designer - Parent project</name>
 
 	<properties>
-		<tycho-version>0.14.1</tycho-version>
+		<tycho-version>0.15.0</tycho-version>
 	</properties>
 
 	<modules>
@@ -26,7 +26,7 @@
 
 	<repositories>
 		<repository>
-			<id>eclipse-helios</id>
+			<id>eclipse-indigo</id>
 			<layout>p2</layout>
 			<url>http://download.eclipse.org/releases/indigo</url>
 		</repository>
@@ -35,18 +35,6 @@
 			<layout>p2</layout>
 			<url>http://download.eclipse.org/graphiti/updates/milestones/</url>
 		</repository>
-		<repository>
-      <id>eclipse-bpmn2</id>
-      <!--  TODO: change this when BPMN2 metamodel finds a premanent home -->
-      <url>http://download.eclipse.org/bpmn2-modeler/bpmn2/site</url>
-      <layout>p2</layout>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-    </repository>
 		<repository>
 			<id>Oribit</id>
 			<layout>p2</layout>

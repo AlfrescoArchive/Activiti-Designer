@@ -16,17 +16,18 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.core.expressions,
  org.eclipse.emf.transaction,
  org.eclipse.gef,
- org.eclipse.jdt.launching,
- org.eclipse.jdt.junit.core,
- org.eclipse.jdt.ui,
  org.apache.commons.lang,
  org.activiti.designer.eclipse,
  org.activiti.designer.integration,
  org.eclipse.ui.ide,
  org.activiti.designer.util,
- org.activiti.designer.model
+ org.activiti.designer.model,
+ org.eclipse.jdt.ui
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: org.activiti.designer
 Bundle-Vendor: Eclipse Modeling Project
 Bundle-Activator: org.activiti.designer.Activator
+Bundle-ClassPath: .,
+ jdi.jar,
+ jdimodel.jar
