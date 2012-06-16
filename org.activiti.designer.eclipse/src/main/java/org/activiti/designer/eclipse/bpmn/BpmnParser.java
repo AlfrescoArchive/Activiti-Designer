@@ -19,10 +19,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
 import org.activiti.designer.bpmn2.model.ActivitiListener;
 import org.activiti.designer.bpmn2.model.Activity;
+import org.activiti.designer.bpmn2.model.Artifact;
+import org.activiti.designer.bpmn2.model.AssociationDirection;
 import org.activiti.designer.bpmn2.model.BoundaryEvent;
 import org.activiti.designer.bpmn2.model.BusinessRuleTask;
 import org.activiti.designer.bpmn2.model.CallActivity;
@@ -55,6 +58,7 @@ import org.activiti.designer.bpmn2.model.SignalEventDefinition;
 import org.activiti.designer.bpmn2.model.StartEvent;
 import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.bpmn2.model.Task;
+import org.activiti.designer.bpmn2.model.TextAnnotation;
 import org.activiti.designer.bpmn2.model.ThrowEvent;
 import org.activiti.designer.bpmn2.model.TimerEventDefinition;
 import org.activiti.designer.bpmn2.model.UserTask;
@@ -81,6 +85,7 @@ public class BpmnParser {
 
 	public boolean bpmdiInfoFound;
 	public List<SequenceFlowModel> sequenceFlowList = new ArrayList<SequenceFlowModel>();
+	public List<AssociationModel> associationModels = new ArrayList<AssociationModel>();
 	private List<BoundaryEventModel> boundaryList = new ArrayList<BoundaryEventModel>();
 	public Map<String, List<GraphicInfo>> flowLocationMap = new HashMap<String, List<GraphicInfo>>();
 	public Map<String, GraphicInfo> labelLocationMap = new HashMap<String, GraphicInfo>();
@@ -176,6 +181,7 @@ public class BpmnParser {
 
 				} else {
 
+				  Artifact currentArtifact = null;
 					FlowNode currentActivity = null;
 					String elementId = xtr.getAttributeValue(null, "id");
 					String elementName = xtr.getAttributeValue(null, "name");
@@ -266,6 +272,14 @@ public class BpmnParser {
 						SequenceFlowModel sequenceFlow = parseSequenceFlow(xtr);
 						sequenceFlow.parentProcess = activeProcess;
 						sequenceFlowList.add(sequenceFlow);
+						
+					} else if (xtr.isStartElement() && "textAnnotation".equalsIgnoreCase(xtr.getLocalName())) {
+					  currentArtifact = parseTextAnnotation(xtr);
+
+					} else if (xtr.isStartElement() && "association".equalsIgnoreCase(xtr.getLocalName())) {
+					  final AssociationModel associationModel = parseAssociation(xtr);
+					  associationModel.parentProcess = activeProcess;
+					  associationModels.add(associationModel);
 
 					} else if (xtr.isStartElement() && "BPMNShape".equalsIgnoreCase(xtr.getLocalName())) {
 						bpmdiInfoFound = true;
@@ -314,6 +328,18 @@ public class BpmnParser {
 							}
 						}
 						flowLocationMap.put(id, wayPointList);
+					}
+					
+					if (currentArtifact != null) {
+					  currentArtifact.setId(elementId);
+
+            if (isInSubProcess(activeSubProcessList)) {
+              final SubProcess currentSubProcess = activeSubProcessList.get(activeSubProcessList.size() - 2);
+              currentSubProcess.getArtifacts().add(currentArtifact);
+
+            } else {
+              activeProcess.getArtifacts().add(currentArtifact);
+            }
 					}
 					
 					if(currentActivity != null) {
@@ -596,6 +622,37 @@ public class BpmnParser {
 		sequenceFlow.conditionExpression = parseSequenceFlowCondition(xtr, sequenceFlow);
 		return sequenceFlow;
 	}
+	
+	private AssociationModel parseAssociation(XMLStreamReader xtr) {
+
+	   final AssociationModel association = new AssociationModel();
+	   association.id = xtr.getAttributeValue(null, "id");
+	   association.sourceRef = xtr.getAttributeValue(null, "sourceRef");
+	   association.targetRef = xtr.getAttributeValue(null, "targetRef");
+
+	   final String direction = xtr.getAttributeValue(null, "associationDirection");
+	   for (final AssociationDirection oneDir : AssociationDirection.values()) {
+	     if (oneDir.getValue().equalsIgnoreCase(direction)) {
+	       association.associationDirection = oneDir;
+	     }
+	   }
+
+	   return association;
+	}
+
+	private TextAnnotation parseTextAnnotation(XMLStreamReader xtr) throws XMLStreamException {
+	  final TextAnnotation ta = new TextAnnotation();
+	  ta.setId(xtr.getAttributeValue(null, "id"));
+	  ta.setTextFormat(xtr.getAttributeValue(null, "textFormat"));
+	  while (xtr.hasNext()) {
+	    xtr.next();
+	    if (xtr.isStartElement() && "text".equalsIgnoreCase(xtr.getLocalName())) {
+	      ta.setText(xtr.getElementText());
+	      break;
+	    }
+	  }
+	  return ta;
+	} 
 
 	private static String parseSequenceFlowCondition(XMLStreamReader xtr, SequenceFlowModel sequenceFlow) {
 		String condition = null;

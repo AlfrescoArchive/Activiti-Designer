@@ -10,6 +10,7 @@ public class Process extends FlowElementsContainer {
   protected String documentation;
   protected List<ActivitiListener> executionListeners = new ArrayList<ActivitiListener>();
   protected List<Lane> lanes = new ArrayList<Lane>();
+  protected List<Artifact> artifacts = new ArrayList<Artifact>();
 
   public String getDocumentation() {
     return documentation;
@@ -40,5 +41,11 @@ public class Process extends FlowElementsContainer {
   }
   public void setLanes(List<Lane> lanes) {
     this.lanes = lanes;
+  }
+  public List<Artifact> getArtifacts() {
+    return artifacts;
+  }
+  public void setArtifacts(List<Artifact> artifacts) {
+    this.artifacts = artifacts;
   }
 }

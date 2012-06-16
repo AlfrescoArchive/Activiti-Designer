@@ -65,6 +65,9 @@ public enum PluginImage {
 
   IMG_THROW_SIGNAL("throw.signal", "throw.signal.png"), //$NON-NLS-1$
   IMG_THROW_NONE("throw.none", "throw.none.png"), //$NON-NLS-1$
+  
+  IMG_TEXT_ANNOTATION("textannotation", "textannotation.png"),
+  IMG_ASSOCIATION("association", "association.png"),
 
   IMG_ALFRESCO_LOGO("alfresco.logo", "alfresco.png"), //$NON-NLS-1$
 

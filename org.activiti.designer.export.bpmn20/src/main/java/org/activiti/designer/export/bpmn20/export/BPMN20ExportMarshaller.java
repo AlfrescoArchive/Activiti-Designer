@@ -13,6 +13,9 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.activiti.designer.bpmn2.model.Activity;
+import org.activiti.designer.bpmn2.model.Artifact;
+import org.activiti.designer.bpmn2.model.Association;
+import org.activiti.designer.bpmn2.model.BaseElement;
 import org.activiti.designer.bpmn2.model.BoundaryEvent;
 import org.activiti.designer.bpmn2.model.BusinessRuleTask;
 import org.activiti.designer.bpmn2.model.CallActivity;
@@ -37,6 +40,7 @@ import org.activiti.designer.bpmn2.model.ServiceTask;
 import org.activiti.designer.bpmn2.model.Signal;
 import org.activiti.designer.bpmn2.model.StartEvent;
 import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.designer.bpmn2.model.TextAnnotation;
 import org.activiti.designer.bpmn2.model.ThrowEvent;
 import org.activiti.designer.bpmn2.model.TimerEventDefinition;
 import org.activiti.designer.bpmn2.model.UserTask;
@@ -178,6 +182,14 @@ public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
         	
   	      createXML(flowElement);
         }
+        
+        for (Artifact artifact : process.getArtifacts()) {
+          final PictogramElement pe = featureProvider.getPictogramElementForBusinessObject(artifact);
+          if (pe == null) {
+            continue;
+          }
+          createXML(artifact);
+        }
   
         // end process element
         xtw.writeEndElement();
@@ -203,7 +215,7 @@ public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
     }
   }
 
-  private void createXML(FlowElement object) throws Exception {
+  private void createXML(BaseElement object) throws Exception {
     if (object instanceof StartEvent) {
       StartEvent startEvent = (StartEvent) object;
       // start StartEvent element
@@ -296,6 +308,9 @@ public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
     } else if (object instanceof SequenceFlow) {
       SequenceFlowExport.createSequenceFlow(object, xtw);
 
+    } else if (object instanceof Association) {
+      AssociationExport.createAssociation(object, xtw);
+      
     } else if (object instanceof UserTask) {
       UserTaskExport.createUserTask(object, xtw);
 
@@ -343,7 +358,7 @@ public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
       if (exclusiveGateway.getName() != null) {
         xtw.writeAttribute("name", exclusiveGateway.getName());
       }
-      DefaultFlowExport.createDefaultFlow(object, xtw);
+      DefaultFlowExport.createDefaultFlow(exclusiveGateway, xtw);
 
       // end ExclusiveGateway element
       xtw.writeEndElement();
@@ -356,7 +371,7 @@ public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
       if (inclusiveGateway.getName() != null) {
         xtw.writeAttribute("name", inclusiveGateway.getName());
       }
-      DefaultFlowExport.createDefaultFlow(object, xtw);
+      DefaultFlowExport.createDefaultFlow(inclusiveGateway, xtw);
 
       // end InclusiveGateway element
       xtw.writeEndElement();
@@ -393,7 +408,7 @@ public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
       	xtw.writeAttribute("triggeredByEvent", "true");
       }
       
-      DefaultFlowExport.createDefaultFlow(object, xtw);
+      DefaultFlowExport.createDefaultFlow(subProcess, xtw);
       AsyncActivityExport.createAsyncAttribute(object, xtw);
 
       ExecutionListenerExport.createExecutionListenerXML(subProcess.getExecutionListeners(), true, xtw);
@@ -406,6 +421,9 @@ public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
 
       // end SubProcess element
       xtw.writeEndElement();
+      
+    } else if (object instanceof TextAnnotation) {
+      TextAnnotationExport.createTextAnnotation(object, xtw); 
     }
     
     if (object instanceof Activity) {

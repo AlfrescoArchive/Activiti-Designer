@@ -1,8 +1,8 @@
 package org.activiti.designer.features;
 
 import org.activiti.designer.PluginImage;
+import org.activiti.designer.bpmn2.model.BaseElement;
 import org.activiti.designer.bpmn2.model.EndEvent;
-import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.FlowNode;
 import org.activiti.designer.bpmn2.model.Lane;
 import org.activiti.designer.bpmn2.model.SequenceFlow;
@@ -131,7 +131,7 @@ public class CreateSequenceFlowFeature extends AbstractCreateBPMNConnectionFeatu
   }
 
   @Override
-  protected Class< ? extends FlowElement> getFeatureClass() {
+  protected Class< ? extends BaseElement> getFeatureClass() {
     return new SequenceFlow().getClass();
   }
 

@@ -3,7 +3,7 @@
  */
 package org.activiti.designer.features;
 
-import org.activiti.designer.bpmn2.model.FlowElement;
+import org.activiti.designer.bpmn2.model.BaseElement;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.impl.AbstractCreateConnectionFeature;
@@ -22,7 +22,7 @@ public abstract class AbstractCreateBPMNConnectionFeature extends AbstractCreate
 
   protected abstract String getFeatureIdKey();
 
-  protected abstract Class<? extends FlowElement> getFeatureClass();
+  protected abstract Class<? extends BaseElement> getFeatureClass();
 
   protected String getNextId() {
     return ActivitiUiUtil.getNextId(getFeatureClass(), getFeatureIdKey(), getDiagram());

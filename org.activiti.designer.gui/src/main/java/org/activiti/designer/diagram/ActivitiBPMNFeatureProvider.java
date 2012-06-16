@@ -1,6 +1,7 @@
 package org.activiti.designer.diagram;
 
 import org.activiti.designer.bpmn2.model.Activity;
+import org.activiti.designer.bpmn2.model.Association;
 import org.activiti.designer.bpmn2.model.BoundaryEvent;
 import org.activiti.designer.bpmn2.model.BusinessRuleTask;
 import org.activiti.designer.bpmn2.model.CallActivity;
@@ -28,6 +29,7 @@ import org.activiti.designer.bpmn2.model.SignalEventDefinition;
 import org.activiti.designer.bpmn2.model.StartEvent;
 import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.bpmn2.model.Task;
+import org.activiti.designer.bpmn2.model.TextAnnotation;
 import org.activiti.designer.bpmn2.model.ThrowEvent;
 import org.activiti.designer.bpmn2.model.TimerEventDefinition;
 import org.activiti.designer.bpmn2.model.UserTask;
@@ -35,6 +37,7 @@ import org.activiti.designer.bpmn2.model.alfresco.AlfrescoMailTask;
 import org.activiti.designer.bpmn2.model.alfresco.AlfrescoScriptTask;
 import org.activiti.designer.bpmn2.model.alfresco.AlfrescoStartEvent;
 import org.activiti.designer.bpmn2.model.alfresco.AlfrescoUserTask;
+import org.activiti.designer.features.AddAssociationFeature;
 import org.activiti.designer.features.AddBoundaryErrorFeature;
 import org.activiti.designer.features.AddBoundarySignalFeature;
 import org.activiti.designer.features.AddBoundaryTimerFeature;
@@ -61,12 +64,14 @@ import org.activiti.designer.features.AddServiceTaskFeature;
 import org.activiti.designer.features.AddSignalCatchingEventFeature;
 import org.activiti.designer.features.AddSignalThrowingEventFeature;
 import org.activiti.designer.features.AddStartEventFeature;
+import org.activiti.designer.features.AddTextAnnotationFeature;
 import org.activiti.designer.features.AddTimerCatchingEventFeature;
 import org.activiti.designer.features.AddTimerStartEventFeature;
 import org.activiti.designer.features.AddUserTaskFeature;
 import org.activiti.designer.features.ChangeElementTypeFeature;
 import org.activiti.designer.features.ContainerResizeFeature;
 import org.activiti.designer.features.CopyFlowElementFeature;
+import org.activiti.designer.features.CreateAssociationFeature;
 import org.activiti.designer.features.CreateBoundaryErrorFeature;
 import org.activiti.designer.features.CreateBoundarySignalFeature;
 import org.activiti.designer.features.CreateBoundaryTimerFeature;
@@ -93,14 +98,18 @@ import org.activiti.designer.features.CreateServiceTaskFeature;
 import org.activiti.designer.features.CreateSignalCatchingEventFeature;
 import org.activiti.designer.features.CreateSignalThrowingEventFeature;
 import org.activiti.designer.features.CreateStartEventFeature;
+import org.activiti.designer.features.CreateTextAnnotationFeature;
 import org.activiti.designer.features.CreateTimerCatchingEventFeature;
 import org.activiti.designer.features.CreateTimerStartEventFeature;
 import org.activiti.designer.features.CreateUserTaskFeature;
+import org.activiti.designer.features.DeleteAssociationFeature;
 import org.activiti.designer.features.DeleteFlowElementFeature;
 import org.activiti.designer.features.DeleteLaneFeature;
 import org.activiti.designer.features.DeletePoolFeature;
 import org.activiti.designer.features.DeleteSequenceFlowFeature;
 import org.activiti.designer.features.DirectEditFlowElementFeature;
+import org.activiti.designer.features.DirectEditTextAnnotationFeature;
+import org.activiti.designer.features.LayoutTextAnnotationFeature;
 import org.activiti.designer.features.MoveActivityFeature;
 import org.activiti.designer.features.MoveBoundaryEventFeature;
 import org.activiti.designer.features.MoveEventFeature;
@@ -112,6 +121,7 @@ import org.activiti.designer.features.SaveBpmnModelFeature;
 import org.activiti.designer.features.TaskResizeFeature;
 import org.activiti.designer.features.UpdateFlowElementFeature;
 import org.activiti.designer.features.UpdatePoolAndLaneFeature;
+import org.activiti.designer.features.UpdateTextAnnotationFeature;
 import org.activiti.designer.util.editor.POJOIndependenceSolver;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.IAddFeature;
@@ -121,6 +131,7 @@ import org.eclipse.graphiti.features.ICreateFeature;
 import org.eclipse.graphiti.features.IDeleteFeature;
 import org.eclipse.graphiti.features.IDirectEditingFeature;
 import org.eclipse.graphiti.features.IFeature;
+import org.eclipse.graphiti.features.ILayoutFeature;
 import org.eclipse.graphiti.features.IMoveShapeFeature;
 import org.eclipse.graphiti.features.IPasteFeature;
 import org.eclipse.graphiti.features.IReconnectionFeature;
@@ -131,6 +142,7 @@ import org.eclipse.graphiti.features.context.ICopyContext;
 import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.context.IDeleteContext;
 import org.eclipse.graphiti.features.context.IDirectEditingContext;
+import org.eclipse.graphiti.features.context.ILayoutContext;
 import org.eclipse.graphiti.features.context.IMoveShapeContext;
 import org.eclipse.graphiti.features.context.IPasteContext;
 import org.eclipse.graphiti.features.context.IPictogramElementContext;
@@ -187,6 +199,9 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 		  }
 		} else if (context.getNewObject() instanceof SequenceFlow) {
 		  return new AddSequenceFlowFeature(this);
+
+		} else if (context.getNewObject() instanceof Association) {
+		  return new AddAssociationFeature(this);
 		} else if (context.getNewObject() instanceof UserTask) {
 		  if(context.getNewObject() instanceof AlfrescoUserTask) {
 		    return new AddAlfrescoUserTaskFeature(this);
@@ -202,7 +217,11 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 		} else if (context.getNewObject() instanceof ReceiveTask) {
 		  return new AddReceiveTaskFeature(this);
 		} else if (context.getNewObject() instanceof BusinessRuleTask) {
-      return new AddBusinessRuleTaskFeature(this);
+		  return new AddBusinessRuleTaskFeature(this);
+		} else if (context.getNewObject() instanceof ScriptTask) {
+		  return new AddScriptTaskFeature(this);
+		} else if (context.getNewObject() instanceof ServiceTask) {
+		  return new AddServiceTaskFeature(this);
 		} else if (context.getNewObject() instanceof AlfrescoScriptTask) {
       return new AddAlfrescoScriptTaskFeature(this);
     } else if (context.getNewObject() instanceof ScriptTask) {
@@ -246,14 +265,22 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 		} else if (context.getNewObject() instanceof EventSubProcess) {
       return new AddEventSubProcessFeature(this);
 		} else if (context.getNewObject() instanceof SubProcess) {
-      return new AddEmbeddedSubProcessFeature(this);
+          return new AddEmbeddedSubProcessFeature(this);
+		} else if (context.getNewObject() instanceof Pool) {
+          return new AddPoolFeature(this);
+		} else if (context.getNewObject() instanceof Lane) {
+          return new AddLaneFeature(this);
 		} else if (context.getNewObject() instanceof Pool) {
       return new AddPoolFeature(this);
 		} else if (context.getNewObject() instanceof Lane) {
       return new AddLaneFeature(this);
 		} else if (context.getNewObject() instanceof CallActivity) {
 			return new AddCallActivityFeature(this);
-		}
+		} else if (context.getNewObject() instanceof AlfrescoScriptTask) {
+      return new AddAlfrescoScriptTaskFeature(this);
+    } else if (context.getNewObject() instanceof TextAnnotation) {
+      return new AddTextAnnotationFeature(this);
+    }
 		return super.getAddFeature(context);
 	}
 
@@ -290,7 +317,8 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 		        new CreateLaneFeature(this),
 		        new CreateCallActivityFeature(this),
 		        new CreateAlfrescoScriptTaskFeature(this),
-		        new CreateAlfrescoMailTaskFeature(this)};
+		        new CreateAlfrescoMailTaskFeature(this),
+		        new CreateTextAnnotationFeature(this)};
 	}
 	
 	@Override
@@ -317,7 +345,9 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 	
 	@Override
 	public ICreateConnectionFeature[] getCreateConnectionFeatures() {
-		return new ICreateConnectionFeature[] { new CreateSequenceFlowFeature(this) };
+	  
+		return new ICreateConnectionFeature[] { new CreateSequenceFlowFeature(this)
+		                                      , new CreateAssociationFeature(this) };
 	}
 	
 	@Override
@@ -328,12 +358,15 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 	@Override
 	public IUpdateFeature getUpdateFeature(IUpdateContext context) {
 		PictogramElement pictogramElement = context.getPictogramElement();
+		Object bo = getBusinessObjectForPictogramElement(pictogramElement);
+		
 		if (pictogramElement instanceof ContainerShape) {
-			Object bo = getBusinessObjectForPictogramElement(pictogramElement);
 			if (bo instanceof FlowElement) {
 				return new UpdateFlowElementFeature(this);
 			} else if (bo instanceof Pool || bo instanceof Lane) {
 			  return new UpdatePoolAndLaneFeature(this);
+			} else if (bo instanceof TextAnnotation) {
+			  return new UpdateTextAnnotationFeature(this);
 			}
 		}
 		return super.getUpdateFeature(context);
@@ -351,6 +384,8 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 		Object bo = getBusinessObjectForPictogramElement(pe);
 		if (bo instanceof FlowElement) {
 			return new DirectEditFlowElementFeature(this);
+		} else if (bo instanceof TextAnnotation) {
+			return new DirectEditTextAnnotationFeature(this);
 		}
 		return super.getDirectEditingFeature(context);
 	}
@@ -389,11 +424,25 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
     } 
     return super.getMoveShapeFeature(context);
   }
+ 
+
+  @Override
+  public ILayoutFeature getLayoutFeature(ILayoutContext context) {
+	  final PictogramElement pe = context.getPictogramElement();
+	  final Object bo = getBusinessObjectForPictogramElement(pe);
+	  
+	  if (bo instanceof TextAnnotation) {
+		  return new LayoutTextAnnotationFeature(this);
+	  }
+	  
+	  return super.getLayoutFeature(context);
+  }
 
   @Override
 	public ICustomFeature[] getCustomFeatures(ICustomContext context) {
 		return new ICustomFeature[] { new SaveBpmnModelFeature(this), 
-				new DeleteSequenceFlowFeature(this), new DeletePoolFeature(this), new ChangeElementTypeFeature(this) };
+				new DeleteSequenceFlowFeature(this), new DeletePoolFeature(this), new ChangeElementTypeFeature(this), 
+				new DeleteAssociationFeature(this) };
 	}
 
 }

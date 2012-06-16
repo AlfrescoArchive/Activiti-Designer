@@ -18,9 +18,9 @@ import java.util.List;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.activiti.designer.bpmn2.model.Activity;
+import org.activiti.designer.bpmn2.model.Artifact;
 import org.activiti.designer.bpmn2.model.BaseElement;
 import org.activiti.designer.bpmn2.model.BoundaryEvent;
-import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.FlowNode;
 import org.activiti.designer.bpmn2.model.Lane;
 import org.activiti.designer.bpmn2.model.Pool;
@@ -72,6 +72,7 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
     
     for (Process process : model.getProcesses()) {   
       loopThroughElements(process.getFlowElements());
+      loopThroughElements(process.getArtifacts());
     }
     
     xtw.writeEndElement();
@@ -80,8 +81,8 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
   
   
   
-  private static void loopThroughElements(List<FlowElement> elementList) throws Exception {
-  	for (FlowElement element : elementList) {
+  private static void loopThroughElements(List<? extends BaseElement> elementList) throws Exception {
+  	for (BaseElement element : elementList) {
       if (element instanceof FlowNode) {
       	PictogramElement picElement = featureProvider.getPictogramElementForBusinessObject(element);
         writeBpmnElement(element, picElement);
@@ -96,10 +97,14 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
         		writeBpmnElement(boundaryEvent, boundaryElement);
           }
         }
+        
+      } else if (element instanceof Artifact) {
+        final PictogramElement pe = featureProvider.getPictogramElementForBusinessObject(element);
+        writeBpmnElement(element, pe);
       }
     }
   	
-  	for (FlowElement element : elementList) {
+  	for (BaseElement element : elementList) {
       if (element instanceof SequenceFlow) {
         writeBpmnEdge((SequenceFlow) element);
       } 

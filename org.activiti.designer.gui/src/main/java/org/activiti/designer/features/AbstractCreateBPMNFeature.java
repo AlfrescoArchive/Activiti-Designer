@@ -5,6 +5,7 @@ package org.activiti.designer.features;
 
 import java.util.List;
 
+import org.activiti.designer.bpmn2.model.Artifact;
 import org.activiti.designer.bpmn2.model.BaseElement;
 import org.activiti.designer.bpmn2.model.CallActivity;
 import org.activiti.designer.bpmn2.model.Event;
@@ -12,10 +13,12 @@ import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.FlowNode;
 import org.activiti.designer.bpmn2.model.Gateway;
 import org.activiti.designer.bpmn2.model.Lane;
+import org.activiti.designer.bpmn2.model.Process;
 import org.activiti.designer.bpmn2.model.SequenceFlow;
 import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.bpmn2.model.Task;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
+import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -63,25 +66,82 @@ public abstract class AbstractCreateBPMNFeature extends AbstractCreateFeature {
             parentObject instanceof SubProcess || parentObject instanceof Lane);
   }
   
+  private void addFlowNodeOrArtifact(final BaseElement baseElement, final BaseElement container) {
+    
+    List<Artifact> artifacts = null;
+    List<FlowElement> flowNodes = null;
+    
+    if (container instanceof Process) {
+      final Process process = (Process) container;
+      
+      artifacts = process.getArtifacts();
+      flowNodes = process.getFlowElements();
+    }
+    else if (container instanceof SubProcess) {
+      final SubProcess subProcess = (SubProcess) container;
+      
+      artifacts = subProcess.getArtifacts();
+      flowNodes = subProcess.getFlowElements();
+    }
+    else {
+      throw new IllegalArgumentException("Container must be Process or SubProcess.");
+    }
+    
+    if (baseElement instanceof FlowElement) {
+      flowNodes.add((FlowElement) baseElement);
+    }
+    else if (baseElement instanceof Artifact) {
+      artifacts.add((Artifact) baseElement);
+    }
+    else {
+      throw new IllegalArgumentException("BaseElement must be FlowElement or Artifact.");
+    }
+  }
+  
+  /**
+   * Adds the given base element to the context. At first, a new ID is generated for the new object.
+   * Depending on the type of element, it is added as artifact or flow element.
+   * 
+   * @param context the context to add it
+   * @param baseElement the base element to add
+   */
+  protected void addObjectToContainer(ICreateContext context, BaseElement baseElement) {
+    baseElement.setId(getNextId(baseElement));
+    
+    final ContainerShape targetContainer = context.getTargetContainer();
+    
+    if (targetContainer instanceof Diagram) {
+      final Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+      
+      addFlowNodeOrArtifact(baseElement, model.getMainProcess());
+    }
+    else {
+      // find the parent object
+      final Object parent = getBusinessObjectForPictogramElement(targetContainer);
+      
+      if (parent instanceof SubProcess) {
+        addFlowNodeOrArtifact(baseElement, (SubProcess) parent);
+        
+      } else if (parent instanceof Lane) {
+        final Lane lane = (Lane) parent;
+        
+        // for flow elements, the lane gets informed about the flow elements Id 
+        if (baseElement instanceof FlowElement)
+        {
+          final FlowElement flowElement = (FlowElement) baseElement;
+          lane.getFlowReferences().add(flowElement.getId());
+        }
+  
+        addFlowNodeOrArtifact(baseElement, lane.getParentProcess());
+      }
+    }
+    
+    addGraphicalContent(context, baseElement);
+  }
+  
   protected void addObjectToContainer(ICreateContext context, FlowNode flowNode, String name) {
-  	flowNode.setId(getNextId(flowNode));
-  	setName(name, flowNode, context);
-  	ContainerShape targetContainer = context.getTargetContainer();
-		if(targetContainer instanceof Diagram) {
-			ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getMainProcess().getFlowElements().add(flowNode);
-		
-		} else {
-			Object parentObject = getBusinessObjectForPictogramElement(targetContainer);
-			if(parentObject instanceof SubProcess) {
-				((SubProcess) parentObject).getFlowElements().add(flowNode);
-			
-			} else if(parentObject instanceof Lane) {
-			  Lane lane = (Lane) parentObject;
-			  lane.getFlowReferences().add(flowNode.getId());
-			  lane.getParentProcess().getFlowElements().add(flowNode);
-			}
-		}
-		addGraphicalContent(context, flowNode);
+    addObjectToContainer(context, flowNode);
+    setName(name, flowNode, context);
   }
   
   @SuppressWarnings("unchecked")

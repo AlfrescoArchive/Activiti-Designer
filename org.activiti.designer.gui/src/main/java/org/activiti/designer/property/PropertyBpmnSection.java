@@ -18,6 +18,7 @@ package org.activiti.designer.property;
 import java.util.List;
 
 import org.activiti.designer.bpmn2.model.Activity;
+import org.activiti.designer.bpmn2.model.Artifact;
 import org.activiti.designer.bpmn2.model.BaseElement;
 import org.activiti.designer.bpmn2.model.ExclusiveGateway;
 import org.activiti.designer.bpmn2.model.FlowElement;
@@ -26,6 +27,7 @@ import org.activiti.designer.bpmn2.model.InclusiveGateway;
 import org.activiti.designer.bpmn2.model.Lane;
 import org.activiti.designer.bpmn2.model.Pool;
 import org.activiti.designer.bpmn2.model.SequenceFlow;
+import org.activiti.designer.bpmn2.model.TextAnnotation;
 import org.activiti.designer.util.TextUtil;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
@@ -55,8 +57,9 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
 public class PropertyBpmnSection extends ActivitiPropertySection implements ITabbedPropertyConstants {
 
-	private Composite composite;
+  private Composite composite;
   private Text idText;
+  private CLabel nameLabel;
   private Text nameText;
   private CCombo asyncCombo;
   private CCombo defaultCombo;
@@ -95,14 +98,14 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
     nameText.setLayoutData(data);
     nameText.addFocusListener(listener);
 
-    CLabel valueLabel = factory.createCLabel(composite, "Name:", SWT.WRAP); //$NON-NLS-1$
+    nameLabel = factory.createCLabel(composite, "Name:", SWT.WRAP); //$NON-NLS-1$
     data = new FormData();
     data.left = new FormAttachment(0, 0);
     data.right = new FormAttachment(nameText, -HSPACE);
     data.top = new FormAttachment(nameText, 0, SWT.CENTER);
-    valueLabel.setLayoutData(data);
+    nameLabel.setLayoutData(data);
   }
-
+  
   @Override
   public void refresh() {
     nameText.removeFocusListener(listener);
@@ -121,7 +124,7 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
       // the filter assured, that it is a EClass
       if (bo == null)
         return;
-      
+
       String name = null;
       if (bo instanceof FlowElement) {
         name = ((FlowElement) bo).getName();
@@ -129,7 +132,12 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
         name = ((Pool) bo).getName();
       } else if (bo instanceof Lane) {
         name = ((Lane) bo).getName();
+      } else if (bo instanceof Artifact) {
+        // text annotations do not have a name
+        nameText.setVisible(false);
+        nameLabel.setVisible(false);
       }
+      
       String id = ((BaseElement) bo).getId();
       nameText.setText(name == null ? "" : name);
       idText.setText(id == null ? "" : id);
@@ -278,6 +286,7 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
         }
       }
       
+      
       idText.addFocusListener(listener);
       nameText.addFocusListener(listener);
       if(defaultCombo != null) {
@@ -300,8 +309,15 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
         return;
       final Object bo = getBusinessObject(pe);
 
-      if (!(bo instanceof BaseElement))
-        return;
+      if (!(bo instanceof BaseElement) || (bo instanceof TextAnnotation)) {
+    	  // we need to exclude the text annotation here, although it is a base element
+    	  // because it's text is handled differently and by the corresponding property
+    	  // PropertyTextAnnotationSection
+    	  
+    	  // if we do not ignore this here, the text will get lost during activation
+    	  // of the base property sheet.
+    	  return;
+      }
 
       DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
       TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();

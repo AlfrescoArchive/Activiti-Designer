@@ -10,6 +10,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import org.activiti.designer.PluginImage;
+import org.activiti.designer.bpmn2.model.Association;
 import org.activiti.designer.bpmn2.model.BusinessRuleTask;
 import org.activiti.designer.bpmn2.model.CallActivity;
 import org.activiti.designer.bpmn2.model.EventGateway;
@@ -58,9 +59,11 @@ import org.activiti.designer.features.CreateServiceTaskFeature;
 import org.activiti.designer.features.CreateSignalCatchingEventFeature;
 import org.activiti.designer.features.CreateSignalThrowingEventFeature;
 import org.activiti.designer.features.CreateStartEventFeature;
+import org.activiti.designer.features.CreateTextAnnotationFeature;
 import org.activiti.designer.features.CreateTimerCatchingEventFeature;
 import org.activiti.designer.features.CreateTimerStartEventFeature;
 import org.activiti.designer.features.CreateUserTaskFeature;
+import org.activiti.designer.features.DeleteAssociationFeature;
 import org.activiti.designer.features.DeletePoolFeature;
 import org.activiti.designer.features.DeleteSequenceFlowFeature;
 import org.activiti.designer.integration.palette.PaletteEntry;
@@ -151,6 +154,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     toolMapping.put(CreateBusinessRuleTaskFeature.class, PaletteEntry.BUSINESSRULE_TASK);
     toolMapping.put(CreateAlfrescoScriptTaskFeature.class, PaletteEntry.ALFRESCO_SCRIPT_TASK);
     toolMapping.put(CreateAlfrescoMailTaskFeature.class, PaletteEntry.ALFRESCO_MAIL_TASK);
+    toolMapping.put(CreateTextAnnotationFeature.class, PaletteEntry.TEXT_ANNOTATION);
   }
 
   @Override
@@ -383,6 +387,11 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
           subMenuDelete.setText("Delete sequence flow"); //$NON-NLS-1$
           subMenuDelete.setSubmenu(false);
           menuList.add(subMenuDelete);
+        } else if (object instanceof Association) {
+          final ContextMenuEntry subMenuDelete = new ContextMenuEntry(new DeleteAssociationFeature(getFeatureProvider()), context);
+          subMenuDelete.setText(subMenuDelete.getFeature().getDescription());
+          subMenuDelete.setSubmenu(false);
+          menuList.add(subMenuDelete);
         } else if (object instanceof Pool) {
           ContextMenuEntry subMenuDelete = new ContextMenuEntry(new DeletePoolFeature(getFeatureProvider()), context);
           subMenuDelete.setText("Delete pool"); //$NON-NLS-1$
@@ -412,6 +421,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     IPaletteCompartmentEntry containerCompartmentEntry = new PaletteCompartmentEntry("Container", null);
     IPaletteCompartmentEntry boundaryEventCompartmentEntry = new PaletteCompartmentEntry("Boundary event", null);
     IPaletteCompartmentEntry intermediateEventCompartmentEntry = new PaletteCompartmentEntry("Intermediate event", null);
+    IPaletteCompartmentEntry artifactsCompartmentEntry = new PaletteCompartmentEntry("Artifacts", null);
     IPaletteCompartmentEntry alfrescoCompartmentEntry = new PaletteCompartmentEntry("Alfresco", PluginImage.IMG_ALFRESCO_LOGO.getImageKey());
 
     for (int i = 0; i < superCompartments.length; i++) {
@@ -425,8 +435,12 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     }
 
     for (IPaletteCompartmentEntry iPaletteCompartmentEntry : superCompartments) {
-      for (IToolEntry toolEntry : iPaletteCompartmentEntry.getToolEntries()) {
+      final List<IToolEntry> toolEntries = iPaletteCompartmentEntry.getToolEntries();
+    	
+      for (IToolEntry toolEntry : toolEntries) {
         if ("sequenceflow".equalsIgnoreCase(toolEntry.getLabel())) {
+          connectionCompartmentEntry.getToolEntries().add(toolEntry);
+        } else if ("association".equalsIgnoreCase(toolEntry.getLabel())) {
           connectionCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("startevent".equalsIgnoreCase(toolEntry.getLabel())) {
           eventCompartmentEntry.getToolEntries().add(toolEntry);
@@ -492,6 +506,8 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
           alfrescoCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("alfrescomailtask".equalsIgnoreCase(toolEntry.getLabel())) {
           alfrescoCompartmentEntry.getToolEntries().add(toolEntry);
+        } else if ("annotation".equalsIgnoreCase(toolEntry.getLabel())) {
+          artifactsCompartmentEntry.getToolEntries().add(toolEntry);
         }
       }
     }
@@ -516,8 +532,10 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     if (intermediateEventCompartmentEntry.getToolEntries().size() > 0) {
       ret.add(intermediateEventCompartmentEntry);
     }
+    if (!artifactsCompartmentEntry.getToolEntries().isEmpty()) {
+      ret.add(artifactsCompartmentEntry);
+    }
     if (PreferencesUtil.getBooleanPreference(Preferences.ALFRESCO_ENABLE) && alfrescoCompartmentEntry.getToolEntries().size() > 0) {
-
       ret.add(alfrescoCompartmentEntry);
     }
 

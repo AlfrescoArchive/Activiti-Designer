@@ -13,6 +13,8 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 import org.activiti.designer.bpmn2.model.Activity;
+import org.activiti.designer.bpmn2.model.Artifact;
+import org.activiti.designer.bpmn2.model.Association;
 import org.activiti.designer.bpmn2.model.BaseElement;
 import org.activiti.designer.bpmn2.model.BoundaryEvent;
 import org.activiti.designer.bpmn2.model.CustomProperty;
@@ -25,6 +27,7 @@ import org.activiti.designer.bpmn2.model.Process;
 import org.activiti.designer.bpmn2.model.SequenceFlow;
 import org.activiti.designer.bpmn2.model.ServiceTask;
 import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.designer.eclipse.bpmn.AssociationModel;
 import org.activiti.designer.eclipse.bpmn.BpmnParser;
 import org.activiti.designer.eclipse.bpmn.SequenceFlowModel;
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
@@ -263,8 +266,10 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 				
 				for (Process process : model.getProcesses()) {
 				  drawFlowElements(process.getFlowElements(), model.getLocationMap(), diagram, process);
+				  drawArtifacts(process.getArtifacts(), model.getLocationMap(), diagram, process);
         }
 				drawSequenceFlows(model.getProcesses());
+				drawAssociations(model.getProcesses());
 			}
 		});
 	}
@@ -466,6 +471,56 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 		return new Point(location.x + containerShape.getGraphicsAlgorithm().getX(), location.y + containerShape.getGraphicsAlgorithm().getY());
 	}
 	
+	private void drawArtifacts(final List<Artifact> artifacts, final Map<String, GraphicInfo> locationMap,
+	        final ContainerShape parent, final Process process) {
+
+	  final IFeatureProvider featureProvider = getDiagramTypeProvider().getFeatureProvider();
+
+	  final List<Artifact> artifactsWithoutDI = new ArrayList<Artifact>();
+	  for (final Artifact artifact : artifacts) {
+	    final AddContext context = new AddContext(new AreaContext(), artifact);
+	    final IAddFeature addFeature = featureProvider.getAddFeature(context);
+ 
+	    if (addFeature == null) {
+	      System.out.println("Element not supported: " + artifact);
+	      return;
+	    }
+ 
+	    final GraphicInfo gi = locationMap.get(artifact.getId());
+	    if (gi == null) {
+	      artifactsWithoutDI.add(artifact);
+	    } else {
+	      context.setNewObject(artifact);
+	      context.setSize(gi.width, gi.height);
+   
+	      ContainerShape parentContainer = null;
+	      if (parent instanceof Diagram) {
+	        parentContainer = getParentContainer(artifact.getId(), process, (Diagram) parent);
+	      } else {
+	        parentContainer = parent;
+	      }
+   
+	      context.setTargetContainer(parentContainer);
+	      if (parentContainer instanceof Diagram) {
+	        context.setLocation(gi.x, gi.y);
+	      } else {
+	        final Point location = getLocation(parentContainer);
+     
+	        context.setLocation(gi.x - location.x, gi.y - location.y);
+	      }
+   
+	      if (addFeature.canAdd(context)) {
+	        final PictogramElement newContainer = addFeature.add(context);
+	        featureProvider.link(newContainer, new Object[] { artifact });
+	      }
+	    }
+	  }
+
+	  for (final Artifact artifact : artifactsWithoutDI) {
+	    artifacts.remove(artifact);
+	  }
+	}
+	
 	private void drawSequenceFlows(List<Process> processes) {
     int sequenceCounter = 1;
     for(SequenceFlowModel sequenceFlowModel : parser.sequenceFlowList) {
@@ -596,6 +651,141 @@ public class ActivitiDiagramEditor extends DiagramEditor {
       }
     }
     return flowNode;
+  }
+	
+	private void drawAssociations(List<Process> processes) {
+    int associationCounter = 1;
+    
+    for (AssociationModel associationModel : parser.associationModels) {
+      final Association association = new Association();
+      
+      if (StringUtils.isEmpty(associationModel.id)
+              || associationModel.id.matches("aid--\\w{4,12}-\\w{4,12}-\\w{4,12}-\\w{4,12}-\\w{4,12}")) {
+        association.setId("association" + associationCounter++);
+      } else {
+        association.setId(associationModel.id);
+      }
+     
+      association.setSourceRef(getBaseElement(associationModel.sourceRef, processes));
+      association.setTargetRef(getBaseElement(associationModel.targetRef, processes));
+      
+      if (association.getSourceRef() == null || association.getSourceRef().getId() == null
+              || association.getTargetRef() == null || association.getTargetRef().getId() == null) {
+        continue;
+      }
+      
+      SubProcess subProcessContainsAssociation = null;
+       for (final FlowElement flowElement : associationModel.parentProcess.getFlowElements()) {
+         if (flowElement instanceof SubProcess) {
+           SubProcess subProcess = (SubProcess) flowElement;
+           
+           if (subProcess.getFlowElements().contains(association.getSourceRef())
+                   || subProcess.getArtifacts().contains(association.getSourceRef())) {
+             subProcessContainsAssociation = subProcess;
+           }
+         }
+       }
+
+       if (subProcessContainsAssociation != null) {
+         subProcessContainsAssociation.getArtifacts().add(association);
+       } else {
+         associationModel.parentProcess.getArtifacts().add(association);
+       }
+
+       Anchor sourceAnchor = null;
+       Anchor targetAnchor = null;
+       ContainerShape sourceShape = (ContainerShape) getDiagramTypeProvider()
+           .getFeatureProvider().getPictogramElementForBusinessObject(
+               association.getSourceRef());
+
+       if (sourceShape == null)
+         continue;
+
+       EList<Anchor> anchorList = sourceShape.getAnchors();
+       for (Anchor anchor : anchorList) {
+         if (anchor instanceof ChopboxAnchor) {
+           sourceAnchor = anchor;
+           break;
+         }
+       }
+
+       ContainerShape targetShape = (ContainerShape) getDiagramTypeProvider()
+           .getFeatureProvider().getPictogramElementForBusinessObject(
+               association.getTargetRef());
+
+       if (targetShape == null)
+         continue;
+
+       anchorList = targetShape.getAnchors();
+       for (Anchor anchor : anchorList) {
+         if (anchor instanceof ChopboxAnchor) {
+           targetAnchor = anchor;
+           break;
+         }
+       }
+
+       AddConnectionContext addContext = new AddConnectionContext(
+           sourceAnchor, targetAnchor);
+
+       List<GraphicInfo> bendpointList = new ArrayList<GraphicInfo>();
+       for (String sequenceGraphElement : parser.flowLocationMap.keySet()) {
+         if (associationModel.id.equalsIgnoreCase(sequenceGraphElement)) {
+           List<GraphicInfo> pointList = parser.flowLocationMap
+               .get(sequenceGraphElement);
+           if (pointList.size() > 2) {
+             for (int i = 1; i < pointList.size() - 1; i++) {
+               bendpointList.add(pointList.get(i));
+             }
+           }
+         }
+       }
+
+       addContext.putProperty("org.activiti.designer.bendpoints",
+           bendpointList);
+
+       addContext.setNewObject(association);
+       getDiagramTypeProvider().getFeatureProvider().addIfPossible(
+           addContext);
+    }
+	}
+	
+	private BaseElement getBaseElement(String elementId, List<Process> processes) {
+    BaseElement baseElement = null;
+    
+    for (final Process process : processes) {
+      BaseElement be = getBaseElement(elementId, process);
+      
+      if (be != null) {
+        baseElement = be;
+        
+        break;
+      }
+    }
+    return baseElement;
+  }
+
+  private BaseElement getBaseElement(String elementId, Process process) {
+    BaseElement result = getFlowNodeInProcess(elementId, process.getFlowElements());
+    
+    if (result == null) {
+      result = getArtifactsInProcess(elementId, process.getArtifacts());
+    }
+    
+    return result;
+  }
+
+  private BaseElement getArtifactsInProcess(String elementId, List<Artifact> artifacts) {
+    BaseElement result = null;
+    
+    for (final Artifact artifact : artifacts) {
+      if (artifact.getId().equalsIgnoreCase(elementId)) {
+        result = artifact;
+        
+        break;
+      }
+    }
+    
+    return result;
   }
 	
 	public IFile getModelFile() {

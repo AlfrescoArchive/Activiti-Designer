@@ -102,6 +102,11 @@
                id="org.activiti.designer.mainConfigTab.sequenceflow"
                tab="org.activiti.designer.mainConfigTab">
          </propertySection>
+         <propertySection 
+         	class="org.activiti.designer.property.PropertyTextAnnotationSection"
+         	filter="org.activiti.designer.property.PropertyTextAnnotationFilter"
+         	id="org.activiti.designer.mainConfigTab.textannotation"
+         	tab="org.activiti.designer.mainConfigTab" />
          <propertySection
                class="org.activiti.designer.property.PropertyScriptTaskSection"
                filter="org.activiti.designer.property.PropertyScriptTaskFilter"

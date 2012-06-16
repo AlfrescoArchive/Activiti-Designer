@@ -144,7 +144,7 @@ public class DeploymentMenu implements org.eclipse.ui.IObjectActionDelegate{
                 }
                 compressPackage(deploymentFolder, tempclassesFolder, processName + ".jar");
               }
-              
+
               try {
                 tempbarFolder.delete(true, null);
                 tempclassesFolder.delete(true, null);
