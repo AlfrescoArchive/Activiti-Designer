@@ -11,6 +11,7 @@ import org.eclipse.graphiti.ui.platform.AbstractPropertySectionFilter;
 public class ActivitiPropertyFilter extends AbstractPropertySectionFilter {
 
 	protected Object getBusinessObject(PictogramElement element) {
+	  if (element == null) return null;
 		Diagram diagram = getContainer(element);
 		Bpmn2MemoryModel model = (ModelHandler.getModel(EcoreUtil.getURI(diagram)));
   	if(model != null) {

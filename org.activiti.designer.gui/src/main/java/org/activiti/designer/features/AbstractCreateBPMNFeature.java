@@ -140,8 +140,8 @@ public abstract class AbstractCreateBPMNFeature extends AbstractCreateFeature {
   }
   
   protected void addObjectToContainer(ICreateContext context, FlowNode flowNode, String name) {
-    addObjectToContainer(context, flowNode);
     setName(name, flowNode, context);
+    addObjectToContainer(context, flowNode);
   }
   
   @SuppressWarnings("unchecked")
