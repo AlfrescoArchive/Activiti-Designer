@@ -50,12 +50,20 @@ public class BpmnDIExport implements ActivitiNamespaceConstants {
   public static void createDIXML(Bpmn2MemoryModel model, IFeatureProvider inputFeatureProvider, XMLStreamWriter inputXtw) throws Exception {
   	featureProvider = inputFeatureProvider;
     xtw = inputXtw;
+    
+    String processId = null;
+    if(model.getPools().size() > 0) {
+      processId = "Collaboration";
+    } else {
+      processId = model.getMainProcess().getId();
+    }
+    
     xtw.writeStartElement(BPMNDI_PREFIX, "BPMNDiagram", BPMNDI_NAMESPACE);
-    xtw.writeAttribute("id", "BPMNDiagram_" + model.getMainProcess().getId());
+    xtw.writeAttribute("id", "BPMNDiagram_" + processId);
 
     xtw.writeStartElement(BPMNDI_PREFIX, "BPMNPlane", BPMNDI_NAMESPACE);
-    xtw.writeAttribute("bpmnElement", model.getMainProcess().getId());
-    xtw.writeAttribute("id", "BPMNPlane_" + model.getMainProcess().getId());
+    xtw.writeAttribute("bpmnElement", processId);
+    xtw.writeAttribute("id", "BPMNPlane_" + processId);
 
     for (Pool pool : model.getPools()) {
       PictogramElement picElement = featureProvider.getPictogramElementForBusinessObject(pool);

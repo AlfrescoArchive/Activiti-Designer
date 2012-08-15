@@ -99,7 +99,6 @@ public class BpmnParser {
 				try {
 					xtr.next();
 				} catch(Exception e) {
-					e.printStackTrace();
 					return;
 				}
 
