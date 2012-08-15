@@ -200,7 +200,39 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
 		}
 	}
 	
-	private void setFieldsInListener(ActivitiListener listener, List<FieldExtensionModel> fieldList) {
+	@Override
+  protected void upPressed() {
+	  final int index = table.getSelectionIndex();
+    final Object bo = BpmnBOUtil.getExecutionListenerBO(pictogramElement, diagram);
+    if (bo != null) {
+      TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
+      ActivitiUiUtil.runModelChange(new Runnable() {
+        public void run() {
+          ActivitiListener listener = listenerList.remove(index);
+          listenerList.add(index - 1, listener);
+        }
+      }, editingDomain, "Model Update");
+    }
+    super.upPressed();
+  }
+
+  @Override
+  protected void downPressed() {
+    final int index = table.getSelectionIndex();
+    final Object bo = BpmnBOUtil.getExecutionListenerBO(pictogramElement, diagram);
+    if (bo != null) {
+      TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
+      ActivitiUiUtil.runModelChange(new Runnable() {
+        public void run() {
+          ActivitiListener listener = listenerList.remove(index);
+          listenerList.add(index + 1, listener);
+        }
+      }, editingDomain, "Model Update");
+    }
+    super.downPressed();
+  }
+
+  private void setFieldsInListener(ActivitiListener listener, List<FieldExtensionModel> fieldList) {
 	  if(listener != null) {
   		listener.getFieldExtensions().clear();
 		  for (FieldExtensionModel fieldModel : fieldList) {

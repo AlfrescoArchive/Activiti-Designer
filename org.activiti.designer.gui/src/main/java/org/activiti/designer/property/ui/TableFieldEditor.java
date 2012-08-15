@@ -509,14 +509,14 @@ public abstract class TableFieldEditor extends FieldEditor {
 	/**
    * Notifies that the Up button has been pressed.
    */
-  private void upPressed() {
+  protected void upPressed() {
   	swap(true);
   }
 
   /**
    * Notifies that the Down button has been pressed.
    */
-  private void downPressed() {
+  protected void downPressed() {
   	swap(false);
   }
 	

@@ -148,6 +148,8 @@ public class FieldExtensionDialog extends Dialog {
 			}
 		});
 
+		fieldText.setFocus();
+		
 		// Set the OK button as the default, so
 		// user can type input and press Enter
 		// to dismiss
