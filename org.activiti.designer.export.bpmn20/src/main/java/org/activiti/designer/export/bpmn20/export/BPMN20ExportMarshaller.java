@@ -7,6 +7,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
+import java.util.Iterator;
 import java.util.List;
 
 import javax.xml.stream.XMLOutputFactory;
@@ -152,6 +153,25 @@ public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
           xtw.writeCharacters(process.getDocumentation());
           xtw.writeEndElement();
         }
+        
+        if (process.getCandidateStarterUsers().size() > 0) {
+            Iterator<String> candidateStarterUserIterator = process.getCandidateStarterUsers().iterator();
+            String candidateStarterUsers = candidateStarterUserIterator.next();
+            while (candidateStarterUserIterator.hasNext()) {
+            	candidateStarterUsers += ", " + candidateStarterUserIterator.next();
+            }
+            xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "candidateStarterUsers", candidateStarterUsers);
+          } 
+        
+        if (process.getCandidateStarterGroups().size() > 0) {
+            Iterator<String> candidateStarterGroupIterator = process.getCandidateStarterGroups().iterator();
+            String candidateStarterGroups = candidateStarterGroupIterator.next();
+            while (candidateStarterGroupIterator.hasNext()) {
+            	candidateStarterGroups += ", " + candidateStarterGroupIterator.next();
+            }
+            xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "candidateStarterGroups", candidateStarterGroups);
+          } 
+        
         
         if(process.getLanes().size() > 0) {
           xtw.writeStartElement("laneSet");

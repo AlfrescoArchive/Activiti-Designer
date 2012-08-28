@@ -19,6 +19,7 @@ import org.activiti.designer.bpmn2.model.Activity;
 import org.activiti.designer.bpmn2.model.MultiInstanceLoopCharacteristics;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
@@ -120,7 +121,6 @@ public class PropertyMultiInstanceSection extends ActivitiPropertySection implem
       return;
     
     Activity activity = (Activity) bo;
-    if(activity.getLoopCharacteristics() == null) return;
     MultiInstanceLoopCharacteristics multiInstanceDef = (MultiInstanceLoopCharacteristics) activity.getLoopCharacteristics();
     
 	  loopCardinaltyText.removeFocusListener(listener);
@@ -129,35 +129,35 @@ public class PropertyMultiInstanceSection extends ActivitiPropertySection implem
 	  completionConditionText.removeFocusListener(listener);
 	  
     
-	  if(multiInstanceDef.isSequential() == true && yesButton.getSelection() == false) {
+	  if(multiInstanceDef == null || (multiInstanceDef.isSequential() == true && yesButton.getSelection() == false)) {
 	    yesButton.setSelection(true);
 	    noButton.setSelection(false);
     }
 	  
-	  if(multiInstanceDef.isSequential() == false && yesButton.getSelection() == true) {
+	  if(multiInstanceDef != null && multiInstanceDef.isSequential() == false && yesButton.getSelection() == true) {
       yesButton.setSelection(false);
       noButton.setSelection(true);
     }
 	  
-    if(multiInstanceDef.getLoopCardinality() != null) {
+    if(multiInstanceDef != null && StringUtils.isNotEmpty(multiInstanceDef.getLoopCardinality())) {
       loopCardinaltyText.setText(multiInstanceDef.getLoopCardinality());
     } else {
     	loopCardinaltyText.setText("");
     }
 		
-    if(multiInstanceDef.getInputDataItem() != null) {
+    if(multiInstanceDef != null && StringUtils.isNotEmpty(multiInstanceDef.getInputDataItem())) {
       collectionText.setText(multiInstanceDef.getInputDataItem());
     } else {
     	collectionText.setText("");
     }
     
-    if(multiInstanceDef.getElementVariable() != null) {
+    if(multiInstanceDef != null && StringUtils.isNotEmpty(multiInstanceDef.getElementVariable())) {
       elementVariableText.setText(multiInstanceDef.getElementVariable());
     } else {
     	elementVariableText.setText("");
     }
     
-    if(multiInstanceDef.getCompletionCondition() != null) {
+    if(multiInstanceDef != null && StringUtils.isNotEmpty(multiInstanceDef.getCompletionCondition())) {
       completionConditionText.setText(multiInstanceDef.getCompletionCondition());
     } else {
     	completionConditionText.setText("");

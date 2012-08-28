@@ -11,6 +11,9 @@ public class Process extends FlowElementsContainer {
   protected List<ActivitiListener> executionListeners = new ArrayList<ActivitiListener>();
   protected List<Lane> lanes = new ArrayList<Lane>();
   protected List<Artifact> artifacts = new ArrayList<Artifact>();
+  protected List<String> candidateStarterUsers = new ArrayList<String>();
+  protected List<String> candidateStarterGroups = new ArrayList<String>();
+  
 
   public String getDocumentation() {
     return documentation;
@@ -48,4 +51,18 @@ public class Process extends FlowElementsContainer {
   public void setArtifacts(List<Artifact> artifacts) {
     this.artifacts = artifacts;
   }
+  
+  public List<String> getCandidateStarterUsers() {
+	    return candidateStarterUsers;
+	  }
+  public void setCandidateStarterUsers(List<String> candidateStarterUsers) {
+	    this.candidateStarterUsers = candidateStarterUsers;
+	  }
+	  public List<String> getCandidateStarterGroups() {
+	    return candidateStarterGroups;
+	  }
+	  public void setCandidateGroups(List<String> candidateStarterGroups) {
+	    this.candidateStarterGroups = candidateStarterGroups;
+	  }
+
 }

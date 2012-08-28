@@ -71,9 +71,11 @@ import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.GraphicInfo;
 import org.activiti.designer.util.preferences.Preferences;
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.jface.bindings.keys.formatting.FormalKeyFormatter;
 
 /**
  * @author Tijs Rademakers
+ * @author Saeid Mirzaei
  */
 public class BpmnParser {
 
@@ -89,6 +91,33 @@ public class BpmnParser {
 	private List<BoundaryEventModel> boundaryList = new ArrayList<BoundaryEventModel>();
 	public Map<String, List<GraphicInfo>> flowLocationMap = new HashMap<String, List<GraphicInfo>>();
 	public Map<String, GraphicInfo> labelLocationMap = new HashMap<String, GraphicInfo>();
+
+  static void parseUsersExpression(String assignmentText, List<String> users, List<String> groups) {
+    List<String> assignmentList = new ArrayList<String>();
+    if (assignmentText.contains(",")) {
+      String[] assignmentArray = assignmentText.split(",");
+      assignmentList = Arrays.asList(assignmentArray);
+    } else {
+      assignmentList.add(assignmentText);
+    }
+    for (String assignmentValue : assignmentList) {
+      if (assignmentValue == null)
+        continue;
+      assignmentValue = assignmentValue.trim();
+      if (assignmentValue.length() == 0)
+        continue;
+
+      if (assignmentValue.trim().startsWith("user(")) {
+        users.add(assignmentValue.substring("user(".length(), assignmentValue.indexOf(')')));
+
+      } else {
+        if (assignmentValue.startsWith("group("))
+          assignmentValue = assignmentValue.substring("group(".length(), assignmentValue.indexOf(')'));
+        groups.add(assignmentValue);
+      }
+    }
+    
+  }
 
 	public void parseBpmn(XMLStreamReader xtr, Bpmn2MemoryModel model) {
 		try {
@@ -136,10 +165,39 @@ public class BpmnParser {
 					
 				  if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, "id"))) {
 				    String processId = xtr.getAttributeValue(null, "id");
+				    
             processExtensionAvailable = true;
             Process process = new Process();
             process.setId(processId);
             process.setName(xtr.getAttributeValue(null, "name"));
+
+            // parse candidate starter Users
+            if (StringUtils.isNotEmpty(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "candidateStarterUsers"))) {
+              String expression = xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "candidateStarterUsers");
+              String[] expressionList = null;
+              if (expression.contains(",")) {
+                expressionList = expression.split(",");
+              } else {
+                expressionList = new String[] { expression.trim() };
+              }
+              for (String user : expressionList) {
+                process.getCandidateStarterUsers().add(user.trim());
+              }
+            } 
+            
+            // parse candidate starter Groups
+            if (StringUtils.isNotEmpty(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "candidateStarterGroups"))) {
+              String expression = xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "candidateStarterGroups");
+              String[] expressionList = null;
+              if (expression.contains(",")) {
+                expressionList = expression.split(",");
+              } else {
+                expressionList = new String[] { expression.trim() };
+              }
+              for (String group : expressionList) {
+                process.getCandidateStarterGroups().add(group.trim());
+              }
+            } 
             model.getProcesses().add(process);
             activeProcess = process;	
 				  }
@@ -175,7 +233,8 @@ public class BpmnParser {
 
 				} else if (processExtensionAvailable == true && xtr.isStartElement() && "extensionElements".equalsIgnoreCase(xtr.getLocalName())) {
 					
-				  activeProcess.getExecutionListeners().addAll(parseListeners(xtr));
+				  activeProcess.getExecutionListeners().addAll(parseListeners(xtr,  activeProcess));
+				  
 					processExtensionAvailable = false;
 
 				} else {
@@ -197,7 +256,7 @@ public class BpmnParser {
 						activeSubProcessList.add((SubProcess) currentActivity);
 						
 					} else if (activeSubProcessList.size() > 0 && xtr.isStartElement() && "extensionElements".equalsIgnoreCase(xtr.getLocalName())) {
-						activeSubProcessList.get(activeSubProcessList.size() - 1).getExecutionListeners().addAll(parseListeners(xtr));
+						activeSubProcessList.get(activeSubProcessList.size() - 1).getExecutionListeners().addAll(parseListeners(xtr, null));
 
 					} else if (activeSubProcessList.size() > 0 && xtr.isStartElement() && "multiInstanceLoopCharacteristics".equalsIgnoreCase(xtr.getLocalName())) {
 						
@@ -666,7 +725,7 @@ public class BpmnParser {
 					condition = xtr.getElementText();
 
 				} else if (xtr.isStartElement() && "extensionElements".equalsIgnoreCase(xtr.getLocalName())) {
-					sequenceFlow.listenerList.addAll(parseListeners(xtr));
+					sequenceFlow.listenerList.addAll(parseListeners(xtr, null));
 
 				} else if (xtr.isEndElement() && "sequenceFlow".equalsIgnoreCase(xtr.getLocalName())) {
 					readyWithSequenceFlow = true;
@@ -676,6 +735,7 @@ public class BpmnParser {
 		}
 		return condition;
 	}
+
 
 	private UserTask parseUserTask(XMLStreamReader xtr) {
 		UserTask userTask = null;
@@ -742,6 +802,7 @@ public class BpmnParser {
 			userTask.setPriority(priorityValue);
 		}
 
+		
 		boolean readyWithUserTask = false;
 		try {
 			String assignmentType = null;
@@ -756,28 +817,18 @@ public class BpmnParser {
 
 				} else if (xtr.isStartElement() && "formalExpression".equalsIgnoreCase(xtr.getLocalName())) {
 					if ("potentialOwner".equals(assignmentType)) {
-						List<String> assignmentList = new ArrayList<String>();
-						String assignmentText = xtr.getElementText();
-						if (assignmentText.contains(",")) {
-							String[] assignmentArray = assignmentText.split(",");
-							assignmentList = Arrays.asList(assignmentArray);
-						} else {
-							assignmentList.add(assignmentText);
-						}
-						for (String assignmentValue : assignmentList) {
-							if (assignmentValue == null)
-								continue;
-							assignmentValue = assignmentValue.trim();
-							if (assignmentValue.length() == 0)
-								continue;
-
-							if (assignmentValue.trim().startsWith("user(")) {
-								userTask.getCandidateUsers().add(assignmentValue);
-
-							} else {
-								userTask.getCandidateGroups().add(assignmentValue);
-							}
-						}
+					  
+					  ArrayList<String> users = new ArrayList<String>(); 
+					  ArrayList<String> groups = new ArrayList<String>();
+					  String assignmentText = xtr.getElementText();
+            					  
+					  parseUsersExpression(assignmentText, users, groups);
+					  
+					  for (String user: users)
+					    userTask.getCandidateUsers().add(user);
+					  for (String group: groups)
+					    userTask.getCandidateGroups().add(group);
+				  
 
 					} else {
 						userTask.setAssignee(xtr.getElementText());
@@ -850,7 +901,7 @@ public class BpmnParser {
 					scriptTask.setScript(xtr.getElementText());
 
 				} else if (xtr.isStartElement() && "extensionElements".equalsIgnoreCase(xtr.getLocalName())) {
-					scriptTask.getExecutionListeners().addAll(parseListeners(xtr));
+					scriptTask.getExecutionListeners().addAll(parseListeners(xtr, null));
 
 				} else if (xtr.isStartElement() && "multiInstanceLoopCharacteristics".equalsIgnoreCase(xtr.getLocalName())) {
 					scriptTask.setLoopCharacteristics(parseMultiInstanceDef(xtr));
@@ -1301,13 +1352,42 @@ public class BpmnParser {
 		return null;
 	}
 
-	private static List<ActivitiListener> parseListeners(XMLStreamReader xtr) {
+	
+	
+	  // model == null means no need to parse userExpression
+	private static List<ActivitiListener> parseListeners(XMLStreamReader xtr,  Process activeProcess) {
 		List<ActivitiListener> listenerList = new ArrayList<ActivitiListener>();
 		boolean readyWithListener = false;
+		boolean inPotentialStarter = false;
+		boolean inResourceAssignmentExpression = false;
+		boolean inFormalExpression = false;
+		String formalExpression = "";
+		
 		try {
 			ActivitiListener listener = null;
 			while (readyWithListener == false && xtr.hasNext()) {
 				xtr.next();
+				
+				if (inFormalExpression && activeProcess != null) {
+				  formalExpression = xtr.getText();
+				  List<String> users = new ArrayList<String>();
+          List<String> groups = new ArrayList<String>();
+				  
+				  parseUsersExpression(formalExpression, users, groups);
+				  
+				  for (String user:users) {
+            activeProcess.getCandidateStarterUsers().add(user);
+
+				  }
+				  
+				  for (String group:groups) {
+				    activeProcess.getCandidateStarterGroups().add(group);
+          }
+				  
+				  
+				  inFormalExpression = false;
+				}
+				  
 				if (xtr.isStartElement()
 				    && ("executionListener".equalsIgnoreCase(xtr.getLocalName()) || "taskListener".equalsIgnoreCase(xtr.getLocalName()))) {
 
@@ -1339,7 +1419,22 @@ public class BpmnParser {
 
 				} else if (xtr.isStartElement() && "field".equalsIgnoreCase(xtr.getLocalName())) {
 					listener.getFieldExtensions().add(parseFieldExtension(xtr));
-				} else if (xtr.isEndElement() && "extensionElements".equalsIgnoreCase(xtr.getLocalName())) {
+				} else if (xtr.isStartElement() &&  "potentialStarter".equalsIgnoreCase(xtr.getLocalName())) {
+				  inPotentialStarter = true;					   
+				  
+				} else if (inPotentialStarter && xtr.isStartElement() &&  "resourceAssignmentExpression".equalsIgnoreCase(xtr.getLocalName())) {
+				  inResourceAssignmentExpression = true;				  
+				} else if (inPotentialStarter && xtr.isEndElement() &&  "resourceAssignmentExpression".equalsIgnoreCase(xtr.getLocalName())) {
+	          inResourceAssignmentExpression = false;          
+	        }
+				else if (inResourceAssignmentExpression && xtr.isStartElement() &&  "formalExpression".equalsIgnoreCase(xtr.getLocalName())) {
+				  inFormalExpression = true;
+                   
+        }
+				else if (xtr.isEndElement() && "potentialStarter".equalsIgnoreCase(xtr.getLocalName())) {
+          inPotentialStarter = false;           
+        }
+				else if (xtr.isEndElement() && "extensionElements".equalsIgnoreCase(xtr.getLocalName())) {
 					readyWithListener = true;
 				}
 			}
@@ -1373,7 +1468,7 @@ public class BpmnParser {
 			while (readyWithTask == false && xtr.hasNext()) {
 				xtr.next();
 				if (xtr.isStartElement() && "extensionElements".equalsIgnoreCase(xtr.getLocalName())) {
-					manualTask.getExecutionListeners().addAll(parseListeners(xtr));
+					manualTask.getExecutionListeners().addAll(parseListeners(xtr, null));
 
 				} else if (xtr.isStartElement() && "multiInstanceLoopCharacteristics".equalsIgnoreCase(xtr.getLocalName())) {
 					manualTask.setLoopCharacteristics(parseMultiInstanceDef(xtr));
@@ -1421,7 +1516,7 @@ public class BpmnParser {
 			while (readyWithTask == false && xtr.hasNext()) {
 				xtr.next();
 				if (xtr.isStartElement() && "extensionElements".equalsIgnoreCase(xtr.getLocalName())) {
-					receiveTask.getExecutionListeners().addAll(parseListeners(xtr));
+					receiveTask.getExecutionListeners().addAll(parseListeners(xtr, null));
 
 				} else if (xtr.isStartElement() && "multiInstanceLoopCharacteristics".equalsIgnoreCase(xtr.getLocalName())) {
 					receiveTask.setLoopCharacteristics(parseMultiInstanceDef(xtr));
@@ -1480,7 +1575,7 @@ public class BpmnParser {
 			while (readyWithTask == false && xtr.hasNext()) {
 				xtr.next();
 				if (xtr.isStartElement() && "extensionElements".equalsIgnoreCase(xtr.getLocalName())) {
-					businessRuleTask.getExecutionListeners().addAll(parseListeners(xtr));
+					businessRuleTask.getExecutionListeners().addAll(parseListeners(xtr, null));
 
 				} else if (xtr.isStartElement() && "multiInstanceLoopCharacteristics".equalsIgnoreCase(xtr.getLocalName())) {
 					businessRuleTask.setLoopCharacteristics(parseMultiInstanceDef(xtr));

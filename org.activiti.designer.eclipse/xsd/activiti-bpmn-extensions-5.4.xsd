@@ -277,6 +277,28 @@
     </annotation>
   </attribute>
 
+  <attribute name="candidateStarterUsers">
+    <annotation>
+      <documentation>
+        Process attribute to set the potential starter users of a process.
+        The provided user(s) will be candidate for starting the process.
+        In case of multiple user ids, a comma-separated list must be provided.
+        Also supports expressions that evaluate to a String or Collection&lt;String&gt;.
+      </documentation>
+    </annotation>
+  </attribute>
+  
+  <attribute name="candidateStarterGroups">
+    <annotation>
+      <documentation>
+        Process attribute to set the potential starter groups of a process.
+        The provided group(s) will be candidate for starting the process.
+        In case of multiple group ids, a comma-separated list must be provided.
+        Also supports expressions that evaluate to a String or Collection&lt;String&gt;.
+      </documentation>
+    </annotation>
+  </attribute>
+
   <element name="taskListener">
     <annotation>
       <documentation>
