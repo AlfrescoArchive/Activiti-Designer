@@ -13,6 +13,7 @@ import java.util.jar.Manifest;
 
 import org.activiti.designer.bpmn2.model.CustomProperty;
 import org.activiti.designer.bpmn2.model.ServiceTask;
+import org.activiti.designer.integration.servicetask.CustomServiceTaskDescriptor;
 import org.activiti.designer.integration.palette.AbstractDefaultPaletteCustomizer;
 import org.activiti.designer.integration.palette.DefaultPaletteCustomizer;
 import org.activiti.designer.integration.palette.PaletteEntry;
@@ -53,9 +54,16 @@ public final class ExtensionUtil {
 	public static final String USER_LIBRARY_NAME_EXTENSIONS = "Activiti Designer Extensions";
 
   public static final String DESIGNER_EXTENSIONS_USER_LIB_PATH = "org.eclipse.jdt.USER_LIBRARY/" + USER_LIBRARY_NAME_EXTENSIONS;
+  
+  public static List<CustomServiceTaskDescriptor> providedCustomServiceTaskDescriptors;
 	
   private ExtensionUtil() {
 
+  }
+  
+  public static void addProvidedCustomServiceTaskDescriptors(List<CustomServiceTaskDescriptor> descriptors){
+	  if (providedCustomServiceTaskDescriptors == null) providedCustomServiceTaskDescriptors = new ArrayList<CustomServiceTaskDescriptor>();
+	  providedCustomServiceTaskDescriptors.addAll(descriptors);
   }
 
   public static final Set<PaletteEntry> getDisabledPaletteEntries(IProject project) {
@@ -414,6 +422,8 @@ public final class ExtensionUtil {
   public static List<CustomServiceTaskContext> getCustomServiceTaskContexts(final IProject project) {
 
     List<CustomServiceTaskContext> result = new ArrayList<CustomServiceTaskContext>();
+    
+    addToCustomServiceTasks(result);
 
     IJavaProject javaProject = null;
     try {
@@ -546,7 +556,23 @@ public final class ExtensionUtil {
 
     return result;
   }
-
+  
+	private static void addToCustomServiceTasks(List<CustomServiceTaskContext> result) {
+		if (providedCustomServiceTaskDescriptors != null) {
+			for (CustomServiceTaskDescriptor dscr : providedCustomServiceTaskDescriptors) {
+				Class<? extends CustomServiceTask> clazz = dscr.getClazz();
+				if (clazz != null && !Modifier.isAbstract(clazz.getModifiers()) && CustomServiceTask.class.isAssignableFrom(clazz)) {
+					try {
+						CustomServiceTask customServiceTask = (CustomServiceTask)clazz.newInstance();
+						result.add(new CustomServiceTaskContextImpl(customServiceTask,dscr.getExtensionName(),dscr.getExtensionJarPath()));
+					} catch (Exception e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		}
+	}
+  
   /**
    * @param packageFragmentRoot
    * @throws JavaModelException

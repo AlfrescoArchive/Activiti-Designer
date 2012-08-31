@@ -265,11 +265,11 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 				}
 				
 				for (Process process : model.getProcesses()) {
-				  drawFlowElements(process.getFlowElements(), model.getLocationMap(), diagram, process);
-				  drawArtifacts(process.getArtifacts(), model.getLocationMap(), diagram, process);
+          drawFlowElements(process.getFlowElements(), model.getLocationMap(), diagram, process);
+          drawArtifacts(process.getArtifacts(), model.getLocationMap(), diagram, process);
         }
-				drawSequenceFlows(model.getProcesses());
-				drawAssociations(model.getProcesses());
+        drawSequenceFlows(model.getProcesses());
+        drawAssociations(model.getProcesses());
 			}
 		});
 	}
@@ -446,11 +446,9 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 	private ContainerShape getParentContainer(String flowElementId, Process process, Diagram diagram) {
 	  Lane foundLane = null;
 	  for (Lane lane : process.getLanes()) {
-      for (String flowNodeRef : lane.getFlowReferences()) {
-        if(flowNodeRef.equals(flowElementId)) {
-          foundLane = lane;
-          break;
-        }
+      if (lane.getFlowReferences().contains(flowElementId)) {
+        foundLane = lane;
+        break;
       }
     }
 	  
@@ -466,7 +464,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 		if(containerShape instanceof Diagram == true) {
 			return new Point(containerShape.getGraphicsAlgorithm().getX(), containerShape.getGraphicsAlgorithm().getY());
 		}
-			
+		
 		Point location = getLocation(containerShape.getContainer());
 		return new Point(location.x + containerShape.getGraphicsAlgorithm().getX(), location.y + containerShape.getGraphicsAlgorithm().getY());
 	}

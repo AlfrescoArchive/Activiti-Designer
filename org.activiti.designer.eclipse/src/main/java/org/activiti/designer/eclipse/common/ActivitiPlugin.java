@@ -13,6 +13,8 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
+import org.activiti.designer.eclipse.util.PaletteExtensionUtil;
+
 public class ActivitiPlugin extends AbstractUIPlugin {
 
   public static final String PLUGIN_ID = "org.activiti.designer.eclipse"; //$NON-NLS-1$
@@ -32,6 +34,8 @@ public class ActivitiPlugin extends AbstractUIPlugin {
   public static final String PROCESS_VALIDATOR_EXTENSIONPOINT_ID = "org.activiti.designer.eclipse.extension.validation.ProcessValidator";
 
   public static final String ICON_PROVIDER_EXTENSIONPOINT_ID = "org.activiti.designer.eclipse.extension.IconProvider";
+
+  public static final String PALETTE_EXTENSION_PROVIDER_EXTENSIONPOINT_ID = "org.activiti.designer.eclipse.extension.PaletteExtensionProvider";
 
   private static ActivitiPlugin _plugin;
 
@@ -62,6 +66,8 @@ public class ActivitiPlugin extends AbstractUIPlugin {
 
     // Initialize the image cache
     imageCache = new ImageCache();
+    
+    PaletteExtensionUtil.pushPaletteExtensions();
   }
 
   @Override

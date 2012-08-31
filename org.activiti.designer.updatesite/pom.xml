@@ -4,12 +4,12 @@
 	<parent>
 		<groupId>org.activiti.designer</groupId>
 		<artifactId>org.activiti.designer.parent</artifactId>
-		<version>5.9.3</version>
+		<version>5.10.0</version>
 		<relativePath>../org.activiti.designer.parent/pom.xml</relativePath>
 	</parent>
 
 	<artifactId>org.activiti.designer.updatesite</artifactId>
-	<packaging>eclipse-update-site</packaging>
+	<packaging>eclipse-repository</packaging>
 	<name>Activiti Designer - Update site</name>
 
 </project>

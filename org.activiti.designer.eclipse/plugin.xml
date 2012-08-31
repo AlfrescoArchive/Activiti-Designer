@@ -4,6 +4,7 @@
    <extension-point id="org.activiti.designer.eclipse.extension.export.ExportMarshaller" name="Export Marshaller" schema="schema/org.activiti.designer.eclipse.extension.export.ExportMarshaller.exsd"/>
    <extension-point id="org.activiti.designer.eclipse.extension.validation.ProcessValidator" name="ProcessValidator" schema="schema/org.activiti.designer.eclipse.extension.validation.ProcessValidator.exsd"/>
    <extension-point id="org.activiti.designer.eclipse.extension.IconProvider" name="Icon Provider" schema="schema/org.activiti.designer.eclipse.extension.IconProvider.exsd"/>
+   <extension-point id="org.activiti.designer.eclipse.extension.PaletteExtensionProvider" name="Palette Extension Provider" schema="schema/org.activiti.designer.eclipse.extension.PaletteExtensionProvider.exsd"/>
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
