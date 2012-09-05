@@ -8,7 +8,7 @@ import java.io.InputStream;
 import org.activiti.designer.integration.servicetask.CustomServiceTask;
 
 /**
- * @author a139923
+ * @author Tiese Barrell
  * 
  */
 public interface CustomServiceTaskContext extends Comparable<CustomServiceTaskContext> {

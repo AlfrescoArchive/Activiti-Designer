@@ -119,11 +119,11 @@ public class CustomServiceTaskContextImpl implements CustomServiceTaskContext {
   }
 
   private InputStream getDefaultCustomServiceTaskIconStream() {
-    return CustomServiceTaskContextImpl.class.getClassLoader().getResourceAsStream(DEFAULT_ICON_PATH);
+    return Thread.currentThread().getContextClassLoader().getResourceAsStream(DEFAULT_ICON_PATH);
   }
 
   private InputStream getErrorCustomServiceTaskIconStream() {
-    return CustomServiceTaskContextImpl.class.getClassLoader().getResourceAsStream(ERROR_ICON_PATH);
+    return Thread.currentThread().getContextClassLoader().getResourceAsStream(ERROR_ICON_PATH);
   }
 
   @Override
