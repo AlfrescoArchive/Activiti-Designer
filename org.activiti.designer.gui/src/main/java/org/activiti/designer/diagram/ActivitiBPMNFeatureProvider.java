@@ -19,6 +19,7 @@ import org.activiti.designer.bpmn2.model.IntermediateCatchEvent;
 import org.activiti.designer.bpmn2.model.Lane;
 import org.activiti.designer.bpmn2.model.MailTask;
 import org.activiti.designer.bpmn2.model.ManualTask;
+import org.activiti.designer.bpmn2.model.MessageEventDefinition;
 import org.activiti.designer.bpmn2.model.ParallelGateway;
 import org.activiti.designer.bpmn2.model.Pool;
 import org.activiti.designer.bpmn2.model.ReceiveTask;
@@ -54,6 +55,7 @@ import org.activiti.designer.features.AddInclusiveGatewayFeature;
 import org.activiti.designer.features.AddLaneFeature;
 import org.activiti.designer.features.AddMailTaskFeature;
 import org.activiti.designer.features.AddManualTaskFeature;
+import org.activiti.designer.features.AddMessageStartEventFeature;
 import org.activiti.designer.features.AddNoneThrowingEventFeature;
 import org.activiti.designer.features.AddParallelGatewayFeature;
 import org.activiti.designer.features.AddPoolFeature;
@@ -88,6 +90,7 @@ import org.activiti.designer.features.CreateInclusiveGatewayFeature;
 import org.activiti.designer.features.CreateLaneFeature;
 import org.activiti.designer.features.CreateMailTaskFeature;
 import org.activiti.designer.features.CreateManualTaskFeature;
+import org.activiti.designer.features.CreateMessageStartEventFeature;
 import org.activiti.designer.features.CreateNoneThrowingEventFeature;
 import org.activiti.designer.features.CreateParallelGatewayFeature;
 import org.activiti.designer.features.CreatePoolFeature;
@@ -184,7 +187,9 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 		  	if(((StartEvent) context.getNewObject()).getEventDefinitions().size() > 0) {
 		  		if(((StartEvent) context.getNewObject()).getEventDefinitions().get(0) instanceof TimerEventDefinition) {
 		  			return new AddTimerStartEventFeature(this);
-		  		} else {
+		  		} if (((StartEvent) context.getNewObject()).getEventDefinitions().get(0) instanceof MessageEventDefinition) {
+		  		  return new AddMessageStartEventFeature(this);
+		  		}  else {
 		  			return new AddErrorStartEventFeature(this);
 		  		}
 		  	} else {
@@ -289,6 +294,7 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 		return new ICreateFeature[] { new CreateAlfrescoStartEventFeature(this),
 						new CreateStartEventFeature(this),
 						new CreateTimerStartEventFeature(this),
+						new CreateMessageStartEventFeature(this), 
 						new CreateErrorStartEventFeature(this),
 		        new CreateEndEventFeature(this),
 		        new CreateErrorEndEventFeature(this),

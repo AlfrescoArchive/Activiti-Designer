@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.designer.bpmn2.model.FlowElement;
+import org.activiti.designer.bpmn2.model.Message;
 import org.activiti.designer.bpmn2.model.Pool;
 import org.activiti.designer.bpmn2.model.Process;
 import org.activiti.designer.bpmn2.model.Signal;
@@ -20,6 +21,8 @@ public class Bpmn2MemoryModel {
 	protected List<FlowElement> clipboard = new ArrayList<FlowElement>();
 	protected Map<String, GraphicInfo> locationMap = new HashMap<String, GraphicInfo>();
 	protected List<Signal> signals = new ArrayList<Signal>();
+  protected List<Message> messages = new ArrayList<Message>();
+
 	protected List<Pool> pools = new ArrayList<Pool>();
 	protected String targetNamespace;
 
@@ -112,6 +115,14 @@ public class Bpmn2MemoryModel {
 	
   public void setSignals(List<Signal> signals) {
     this.signals = signals;
+  }
+  
+  public List<Message> getMessages() {
+    return messages;
+  }
+  
+  public void setMessages(List<Message> messages) {
+    this.messages = messages;
   }
 
   public List<Pool> getPools() {

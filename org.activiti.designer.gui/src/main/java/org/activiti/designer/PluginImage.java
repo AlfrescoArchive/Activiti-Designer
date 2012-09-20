@@ -33,6 +33,9 @@ public enum PluginImage {
   IMG_STARTEVENT_NONE("startevent.none", "type.startevent.none.png"), //$NON-NLS-1$
   IMG_ENDEVENT_NONE("endevent.none", "type.endevent.none.png"), //$NON-NLS-1$
   IMG_ENDEVENT_ERROR("endevent.error", "error.png"), //$NON-NLS-1$
+  IMG_STARTEVENT_MESSAGEICON("message.startevent.none", "type.startevent.message.png"),
+  IMG_STARTEVENT_MESSAGE("message.startevent.message", "letter.png"),
+
 
   // Gateway image icons
   IMG_GATEWAY_PARALLEL("gateway.parallel", "type.gateway.parallel.png"), //$NON-NLS-1$
