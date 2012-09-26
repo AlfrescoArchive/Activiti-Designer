@@ -316,9 +316,20 @@ public class PropertyCustomServiceTaskSection extends ActivitiPropertySection im
             });
           }
         }
+
+        // ensure the model is populated with custom properties if this is the
+        // first time the section is shown for this serviceTask.
+        if (customPropertiesMustBeInitialized(serviceTask)) {
+          storeFieldsToModel();
+        }
+
       }
     }
     this.workParent.getParent().getParent().layout(true, true);
+  }
+
+  private boolean customPropertiesMustBeInitialized(final ServiceTask serviceTask) {
+    return customPropertyFields.size() > 0 && serviceTask.getCustomProperties().size() <= 1;
   }
 
   @Override
