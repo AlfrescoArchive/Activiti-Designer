@@ -4,6 +4,7 @@ import org.activiti.designer.bpmn2.model.ServiceTask;
 import org.activiti.designer.property.ui.FieldExtensionEditor;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
@@ -302,8 +303,10 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 				expressionText.setText(implementationName == null ? "" : implementationName);
 			}
 			
-			if(serviceTask.getResultVariableName() != null) {
+			if(StringUtils.isNotEmpty(serviceTask.getResultVariableName())) {
 			  resultVariableText.setText(serviceTask.getResultVariableName());
+			} else {
+			  resultVariableText.setText("");
 			}
 			
 			fieldEditor.pictogramElement = pe;
