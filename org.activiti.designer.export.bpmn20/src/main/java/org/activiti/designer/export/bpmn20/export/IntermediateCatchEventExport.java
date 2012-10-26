@@ -19,6 +19,7 @@ import javax.xml.stream.XMLStreamWriter;
 
 import org.activiti.designer.bpmn2.model.EventDefinition;
 import org.activiti.designer.bpmn2.model.IntermediateCatchEvent;
+import org.activiti.designer.bpmn2.model.MessageEventDefinition;
 import org.activiti.designer.bpmn2.model.SignalEventDefinition;
 import org.activiti.designer.bpmn2.model.TimerEventDefinition;
 import org.apache.commons.lang.StringUtils;
@@ -87,6 +88,27 @@ public class IntermediateCatchEventExport implements ActivitiNamespaceConstants 
         xtw.writeEndElement();
 
         // end SignalIntermediateCatchEvent element
+        xtw.writeEndElement();
+        
+      } else if(eventDefinitionList.get(0) instanceof MessageEventDefinition) {
+        MessageEventDefinition messageDef = (MessageEventDefinition) eventDefinitionList.get(0);
+          
+        // start MessageIntermediateCatchEvent element
+        xtw.writeStartElement("intermediateCatchEvent");
+        xtw.writeAttribute("id", catchEvent.getId());
+        if (catchEvent.getName() != null) {
+          xtw.writeAttribute("name", catchEvent.getName());
+        }
+        
+        xtw.writeStartElement("messageEventDefinition");
+        
+        if(StringUtils.isNotEmpty(messageDef.getMessageRef())) {
+          xtw.writeAttribute("messageRef", messageDef.getMessageRef());
+        }
+        
+        xtw.writeEndElement();
+
+        // end MessageIntermediateCatchEvent element
         xtw.writeEndElement();
       } 
     }

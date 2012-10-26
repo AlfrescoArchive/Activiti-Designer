@@ -55,6 +55,7 @@ import org.activiti.designer.features.AddInclusiveGatewayFeature;
 import org.activiti.designer.features.AddLaneFeature;
 import org.activiti.designer.features.AddMailTaskFeature;
 import org.activiti.designer.features.AddManualTaskFeature;
+import org.activiti.designer.features.AddMessageCatchingEventFeature;
 import org.activiti.designer.features.AddMessageStartEventFeature;
 import org.activiti.designer.features.AddNoneThrowingEventFeature;
 import org.activiti.designer.features.AddParallelGatewayFeature;
@@ -90,6 +91,7 @@ import org.activiti.designer.features.CreateInclusiveGatewayFeature;
 import org.activiti.designer.features.CreateLaneFeature;
 import org.activiti.designer.features.CreateMailTaskFeature;
 import org.activiti.designer.features.CreateManualTaskFeature;
+import org.activiti.designer.features.CreateMessageCatchingEventFeature;
 import org.activiti.designer.features.CreateMessageStartEventFeature;
 import org.activiti.designer.features.CreateNoneThrowingEventFeature;
 import org.activiti.designer.features.CreateParallelGatewayFeature;
@@ -256,6 +258,8 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 		    EventDefinition definition = ((IntermediateCatchEvent) context.getNewObject()).getEventDefinitions().get(0);
 		    if(definition instanceof SignalEventDefinition) {
 		    	return new AddSignalCatchingEventFeature(this);
+		    } else if(definition instanceof MessageEventDefinition) {
+          return new AddMessageCatchingEventFeature(this);
 		    } else {
 		      return new AddTimerCatchingEventFeature(this);
 		    }
@@ -310,6 +314,7 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 		        new CreateBoundarySignalFeature(this),
 		        new CreateTimerCatchingEventFeature(this),
 		        new CreateSignalCatchingEventFeature(this),
+		        new CreateMessageCatchingEventFeature(this),
 		        new CreateSignalThrowingEventFeature(this),
 		        new CreateNoneThrowingEventFeature(this),
 		        new CreateEventSubProcessFeature(this), 

@@ -1671,6 +1671,12 @@ public class BpmnParser {
 				} else if (xtr.isStartElement() && "signalEventDefinition".equalsIgnoreCase(xtr.getLocalName())) {
 					catchEvent.getEventDefinitions().add(parseSignalEventDefinition(xtr));
 					break;
+					
+				} else if (xtr.isStartElement() && "messageEventDefinition".equalsIgnoreCase(xtr.getLocalName())) {
+				  MessageEventDefinition messageDefinition = new MessageEventDefinition();
+          messageDefinition.setMessageRef(xtr.getAttributeValue(null, "messageRef"));
+          catchEvent.getEventDefinitions().add(messageDefinition);
+          break;
 
 				} else if (xtr.isEndElement() && "intermediateCatchEvent".equalsIgnoreCase(xtr.getLocalName())) {
 					break;

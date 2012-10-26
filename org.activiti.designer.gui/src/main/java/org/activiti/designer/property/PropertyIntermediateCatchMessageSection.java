@@ -1,12 +1,8 @@
 package org.activiti.designer.property;
 
-/**
- * @author Saeid Mirzaei
- */
-
+import org.activiti.designer.bpmn2.model.IntermediateCatchEvent;
 import org.activiti.designer.bpmn2.model.Message;
 import org.activiti.designer.bpmn2.model.MessageEventDefinition;
-import org.activiti.designer.bpmn2.model.StartEvent;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
@@ -29,10 +25,10 @@ import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
-public class PropertyMessageStartEventSection extends ActivitiPropertySection implements ITabbedPropertyConstants {
-	
-  private CCombo messageCombo;
-	
+public class PropertyIntermediateCatchMessageSection extends ActivitiPropertySection implements ITabbedPropertyConstants {
+
+	private CCombo messageCombo;
+
 	@Override
 	public void createControls(Composite parent, TabbedPropertySheetPage tabbedPropertySheetPage) {
 		super.createControls(parent, tabbedPropertySheetPage);
@@ -41,56 +37,56 @@ public class PropertyMessageStartEventSection extends ActivitiPropertySection im
 		Composite composite = factory.createFlatFormComposite(parent);
 		
 		messageCombo = getWidgetFactory().createCCombo(composite, SWT.NONE);
-		FormData data = new FormData();
-		data.left = new FormAttachment(0, 160);
-		data.right = new FormAttachment(100, -HSPACE);
-		data.top = new FormAttachment(0, VSPACE);
-		messageCombo.setLayoutData(data);
-		messageCombo.addFocusListener(listener);
-		createLabel(composite, "Message Ref Id", messageCombo, factory); //$NON-NLS-1$
-		
+    FormData data = new FormData();
+    data.left = new FormAttachment(0, 160);
+    data.right = new FormAttachment(100, -HSPACE);
+    data.top = new FormAttachment(0, VSPACE);
+    messageCombo.setLayoutData(data);
+    messageCombo.addFocusListener(listener);
+    createLabel(composite, "Message Ref Id", messageCombo, factory); //$NON-NLS-1$
 	}
 
 	@Override
 	public void refresh() {
 	  messageCombo.removeFocusListener(listener);
-	  
+
 		PictogramElement pe = getSelectedPictogramElement();
 		if (pe != null) {
 			Object bo = getBusinessObject(pe);
-			// the filter assured, that it is a EClass
 			if (bo == null)
 				return;
 			
 			final Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
-			if (model == null) {
-			  return;
-			}
+	    if (model == null) {
+	      return;
+	    }
 			
-			String messageRef = null;
-			StartEvent startEvent = (StartEvent) bo;
-			if(startEvent.getEventDefinitions().get(0) != null) {
-			  MessageEventDefinition messageDefinition = (MessageEventDefinition) startEvent.getEventDefinitions().get(0);
-        if(StringUtils.isNotEmpty(messageDefinition.getMessageRef())) {
-          messageRef = messageDefinition.getMessageRef();
-          
+	    String messageRef = null;
+	    if(bo instanceof IntermediateCatchEvent) {
+        IntermediateCatchEvent catchEvent = (IntermediateCatchEvent) bo;
+        if(catchEvent.getEventDefinitions().get(0) != null) {
+          MessageEventDefinition messageDefinition = (MessageEventDefinition) catchEvent.getEventDefinitions().get(0);
+          if(StringUtils.isNotEmpty(messageDefinition.getMessageRef())) {
+            messageRef = messageDefinition.getMessageRef();
+            
+          }
         }
-			}
+	    }
+      
+      String[] items = new String[model.getMessages().size() + 1];
+      items[0] = "";
+      int counter = 1;
+      int selectedCounter = 0;
+      for (Message message : model.getMessages()) {
+        items[counter] = message.getId() + " / " + message.getName();
+        if(message.getId().equals(messageRef)) {
+          selectedCounter = counter;
+        }
+        counter++;
+      }
 			
-			String[] items = new String[model.getMessages().size() + 1];
-			items[0] = "";
-			int counter = 1;
-			int selectedCounter = 0;
-			for (Message message : model.getMessages()) {
-			  items[counter] = message.getId() + " / " + message.getName();
-			  if(message.getId().equals(messageRef)) {
-			    selectedCounter = counter;
-			  }
-			  counter++;
-			}
 			messageCombo.setItems(items);
 			messageCombo.select(selectedCounter);
-			
 		}
 		messageCombo.addFocusListener(listener);
 	}
@@ -101,27 +97,26 @@ public class PropertyMessageStartEventSection extends ActivitiPropertySection im
 		}
 
 		public void focusLost(final FocusEvent e) {
-		  final Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
-      if (model == null) {
-        return;
-      }
-		  
+			final Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+	    if (model == null) {
+	      return;
+	    }
+	    
 			PictogramElement pe = getSelectedPictogramElement();
 			if (pe != null) {
 				final Object bo = getBusinessObject(pe);
-				if (bo instanceof StartEvent) {
+				if (bo instanceof IntermediateCatchEvent) {
 					DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
 					TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
 					ActivitiUiUtil.runModelChange(new Runnable() {
 						public void run() {
-							StartEvent startEvent = (StartEvent) bo;
-              MessageEventDefinition messageDefinition = (MessageEventDefinition) startEvent.getEventDefinitions().get(0);
-              
-              if(messageCombo.getSelectionIndex() > 0) {
-                messageDefinition.setMessageRef(model.getMessages().get(messageCombo.getSelectionIndex() - 1).getId());
-              } else {
-                messageDefinition.setMessageRef("");
-              }
+							
+						  MessageEventDefinition messageDefinition = (MessageEventDefinition) ((IntermediateCatchEvent) bo).getEventDefinitions().get(0);
+							if(messageCombo.getSelectionIndex() > 0) {
+							  messageDefinition.setMessageRef(model.getMessages().get(messageCombo.getSelectionIndex() - 1).getId());
+							} else {
+							  messageDefinition.setMessageRef("");
+							}
 						}
 					}, editingDomain, "Model Update");
 				}
@@ -129,8 +124,8 @@ public class PropertyMessageStartEventSection extends ActivitiPropertySection im
 			}
 		}
 	};
-  
-  private CLabel createLabel(Composite parent, String text, Control control, TabbedPropertySheetWidgetFactory factory) {
+	
+	private CLabel createLabel(Composite parent, String text, Control control, TabbedPropertySheetWidgetFactory factory) {
     CLabel label = factory.createCLabel(parent, text); //$NON-NLS-1$
     FormData data = new FormData();
     data.left = new FormAttachment(0, 0);
@@ -139,5 +134,4 @@ public class PropertyMessageStartEventSection extends ActivitiPropertySection im
     label.setLayoutData(data);
     return label;
   }
-
 }

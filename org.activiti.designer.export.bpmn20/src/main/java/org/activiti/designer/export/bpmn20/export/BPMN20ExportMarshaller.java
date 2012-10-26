@@ -295,15 +295,9 @@ public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
       if (startEvent.getEventDefinitions().size() > 0 && startEvent.getEventDefinitions().get(0) instanceof MessageEventDefinition) {
 
         MessageEventDefinition messageDef = (MessageEventDefinition) startEvent.getEventDefinitions().get(0);
-
         xtw.writeStartElement("messageEventDefinition ");
-
         if (StringUtils.isNotEmpty(messageDef.getMessageRef())) {
-
-          xtw.writeStartElement("messageRef");
-          xtw.writeCharacters(messageDef.getMessageRef());
-          xtw.writeEndElement();
-
+          xtw.writeAttribute("messageRef", messageDef.getMessageRef());
         }         
         xtw.writeEndElement();
       }
@@ -314,11 +308,9 @@ public class BPMN20ExportMarshaller implements ActivitiNamespaceConstants {
       	ErrorEventDefinition errorDef = (ErrorEventDefinition) startEvent.getEventDefinitions().get(0);
 
         xtw.writeStartElement("errorEventDefinition");
-
         if(StringUtils.isNotEmpty(errorDef.getErrorCode())) {
         	xtw.writeAttribute("errorRef", errorDef.getErrorCode());
         }
-
         xtw.writeEndElement();
       }
 

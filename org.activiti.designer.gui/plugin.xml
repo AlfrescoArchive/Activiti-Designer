@@ -242,6 +242,12 @@
                tab="org.activiti.designer.mainConfigTab">
          </propertySection>
          <propertySection
+               class="org.activiti.designer.property.PropertyIntermediateCatchMessageSection"
+               filter="org.activiti.designer.property.PropertyIntermediateCatchMessageFilter"
+               id="org.activiti.designer.mainConfigTab.messageintermediatecatchevent"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <propertySection
                class="org.activiti.designer.property.PropertyIntermediateThrowSignalSection"
                filter="org.activiti.designer.property.PropertyIntermediateThrowSignalFilter"
                id="org.activiti.designer.mainConfigTab.timerintermediatethrowevent"

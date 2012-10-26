@@ -50,6 +50,7 @@ import org.activiti.designer.features.CreateInclusiveGatewayFeature;
 import org.activiti.designer.features.CreateLaneFeature;
 import org.activiti.designer.features.CreateMailTaskFeature;
 import org.activiti.designer.features.CreateManualTaskFeature;
+import org.activiti.designer.features.CreateMessageCatchingEventFeature;
 import org.activiti.designer.features.CreateMessageStartEventFeature;
 import org.activiti.designer.features.CreateNoneThrowingEventFeature;
 import org.activiti.designer.features.CreateParallelGatewayFeature;
@@ -125,7 +126,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     // Setup tool mappings to palette entries
     toolMapping.put(CreateStartEventFeature.class, PaletteEntry.START_EVENT);
     toolMapping.put(CreateTimerStartEventFeature.class, PaletteEntry.TIMER_START_EVENT);
-    toolMapping.put(CreateMessageStartEventFeature.class,PaletteEntry.TIMER_MESSAGE_START_EVENT);
+    toolMapping.put(CreateMessageStartEventFeature.class,PaletteEntry.MESSAGE_START_EVENT);
     toolMapping.put(CreateErrorStartEventFeature.class, PaletteEntry.ERROR_START_EVENT);
     toolMapping.put(CreateAlfrescoStartEventFeature.class, PaletteEntry.ALFRESCO_START_EVENT);
     toolMapping.put(CreateEndEventFeature.class, PaletteEntry.END_EVENT);
@@ -147,10 +148,11 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     toolMapping.put(CreateUserTaskFeature.class, PaletteEntry.USER_TASK);
     toolMapping.put(CreateAlfrescoUserTaskFeature.class, PaletteEntry.ALFRESCO_USER_TASK);
     toolMapping.put(CreateBoundaryTimerFeature.class, PaletteEntry.BOUNDARY_TIMER);
-    toolMapping.put(CreateBoundaryErrorFeature.class, PaletteEntry.ERROR_END_EVENT);
+    toolMapping.put(CreateBoundaryErrorFeature.class, PaletteEntry.BOUNDARY_ERROR);
     toolMapping.put(CreateBoundarySignalFeature.class, PaletteEntry.BOUNDARY_SIGNAL);
-    toolMapping.put(CreateTimerCatchingEventFeature.class, PaletteEntry.BOUNDARY_TIMER);
-    toolMapping.put(CreateSignalCatchingEventFeature.class, PaletteEntry.BOUNDARY_SIGNAL);
+    toolMapping.put(CreateTimerCatchingEventFeature.class, PaletteEntry.CATCH_TIMER);
+    toolMapping.put(CreateSignalCatchingEventFeature.class, PaletteEntry.CATCH_SIGNAL);
+    toolMapping.put(CreateMessageCatchingEventFeature.class, PaletteEntry.CATCH_MESSAGE);
     toolMapping.put(CreateSignalThrowingEventFeature.class, PaletteEntry.THROW_SIGNAL);
     toolMapping.put(CreateNoneThrowingEventFeature.class, PaletteEntry.THROW_NONE);
     toolMapping.put(CreateBusinessRuleTaskFeature.class, PaletteEntry.BUSINESSRULE_TASK);
@@ -479,6 +481,8 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
         } else if ("timercatchingevent".equalsIgnoreCase(toolEntry.getLabel())) {
           intermediateEventCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("signalcatchingevent".equalsIgnoreCase(toolEntry.getLabel())) {
+          intermediateEventCompartmentEntry.getToolEntries().add(toolEntry);
+        } else if ("messagecatchingevent".equalsIgnoreCase(toolEntry.getLabel())) {
           intermediateEventCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("signalthrowingevent".equalsIgnoreCase(toolEntry.getLabel())) {
           intermediateEventCompartmentEntry.getToolEntries().add(toolEntry);
