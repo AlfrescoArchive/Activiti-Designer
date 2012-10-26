@@ -67,6 +67,8 @@ public class BusinessRuleTaskExport implements ActivitiNamespaceConstants {
               "resultVariableName", businessRuleTask.getResultVariableName());
     }
     
+    ExecutionListenerExport.createExecutionListenerXML(businessRuleTask.getExecutionListeners(), true, xtw);
+    
     MultiInstanceExport.createMultiInstance(object, xtw);
 
     // end BusinessRuleTask element
