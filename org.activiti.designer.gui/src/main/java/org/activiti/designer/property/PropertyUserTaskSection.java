@@ -209,18 +209,8 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
                 userTask.setDueDate(null);
               }
               
-              if(StringUtils.isNotEmpty(priorityText.getText())) {
-                Integer priorityValue = null;
-                try {
-                  priorityValue = Integer.valueOf(priorityText.getText());
-                } catch(Exception e) {}
-                userTask.setPriority(priorityValue);
-              }
-
-              String documentation = documentationText.getText();
-              if (documentation != null) {
-                userTask.setDocumentation(documentation);
-              }
+              userTask.setPriority(priorityText.getText());
+              userTask.setDocumentation(documentationText.getText());
             }
           }, editingDomain, "Model Update");
         }

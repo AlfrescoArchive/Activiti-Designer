@@ -9,6 +9,7 @@ import org.activiti.designer.bpmn2.model.BaseElement;
 import org.activiti.designer.bpmn2.model.Lane;
 import org.activiti.designer.bpmn2.model.Process;
 import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.designer.bpmn2.model.TextAnnotation;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -32,7 +33,13 @@ public class CreateAssociationFeature extends AbstractCreateBPMNConnectionFeatur
     final BaseElement sourceBo = getBaseElement(context.getSourceAnchor());
     final BaseElement targetBo = getBaseElement(context.getTargetAnchor());
     
-    return sourceBo != targetBo;
+    boolean canCreate = false;
+    
+    if (sourceBo != targetBo && (sourceBo instanceof TextAnnotation || targetBo instanceof TextAnnotation)) {
+      canCreate = true;
+    }
+    
+    return canCreate;
   }
 
   @Override

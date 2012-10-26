@@ -804,19 +804,8 @@ public class BpmnParser {
 			}
 		}
 
-		if (StringUtils.isNotEmpty(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "formKey"))) {
-			userTask.setFormKey(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "formKey"));
-		}
-
-		if (StringUtils.isNotEmpty(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "priority"))) {
-			Integer priorityValue = null;
-			try {
-				priorityValue = Integer.valueOf(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "priority"));
-			} catch (Exception e) {
-			}
-			userTask.setPriority(priorityValue);
-		}
-
+		userTask.setFormKey(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "formKey"));
+		userTask.setPriority(xtr.getAttributeValue(ACTIVITI_EXTENSIONS_NAMESPACE, "priority"));
 		
 		boolean readyWithUserTask = false;
 		try {

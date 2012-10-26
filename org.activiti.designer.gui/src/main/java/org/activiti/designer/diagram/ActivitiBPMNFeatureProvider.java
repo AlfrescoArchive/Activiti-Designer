@@ -179,7 +179,6 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 
 	@Override
 	public IAddFeature getAddFeature(IAddContext context) {
-		// is object for add request a EClass?
 		if (context.getNewObject() instanceof StartEvent) {
 		  if(context.getNewObject() instanceof AlfrescoStartEvent) {
 		    return new AddAlfrescoStartEventFeature(this);
@@ -270,15 +269,11 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 		} else if (context.getNewObject() instanceof EventSubProcess) {
       return new AddEventSubProcessFeature(this);
 		} else if (context.getNewObject() instanceof SubProcess) {
-          return new AddEmbeddedSubProcessFeature(this);
+        return new AddEmbeddedSubProcessFeature(this);
 		} else if (context.getNewObject() instanceof Pool) {
-          return new AddPoolFeature(this);
+        return new AddPoolFeature(this);
 		} else if (context.getNewObject() instanceof Lane) {
-          return new AddLaneFeature(this);
-		} else if (context.getNewObject() instanceof Pool) {
-      return new AddPoolFeature(this);
-		} else if (context.getNewObject() instanceof Lane) {
-      return new AddLaneFeature(this);
+        return new AddLaneFeature(this);
 		} else if (context.getNewObject() instanceof CallActivity) {
 			return new AddCallActivityFeature(this);
 		} else if (context.getNewObject() instanceof AlfrescoScriptTask) {

@@ -18,6 +18,7 @@ import java.util.Iterator;
 import javax.xml.stream.XMLStreamWriter;
 
 import org.activiti.designer.bpmn2.model.UserTask;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * @author Tijs Rademakers
@@ -63,16 +64,15 @@ public class UserTaskExport implements ActivitiNamespaceConstants {
       xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "candidateGroups", candidateGroups);
     }
 
-    if (userTask.getFormKey() != null && userTask.getFormKey().length() > 0) {
+    if (StringUtils.isNotEmpty(userTask.getFormKey())) {
       xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "formKey", userTask.getFormKey());
     }
     
-    if (userTask.getPriority() != null) {
-      xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "priority", userTask.getPriority().toString());
+    if (StringUtils.isNotEmpty(userTask.getPriority())) {
+      xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "priority", userTask.getPriority());
     }
     
-    if (userTask.getDocumentation() != null && userTask.getDocumentation().length() > 0) {
-
+    if (StringUtils.isNotEmpty(userTask.getDocumentation())) {
       xtw.writeStartElement("documentation");
       xtw.writeCharacters(userTask.getDocumentation());
       // end documentation element

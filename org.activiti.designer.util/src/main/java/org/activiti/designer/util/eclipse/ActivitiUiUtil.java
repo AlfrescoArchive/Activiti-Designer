@@ -197,7 +197,7 @@ public class ActivitiUiUtil {
   }
 
   public static final String getNextId(final Class<? extends BaseElement> featureClass, final String featureIdKey, final Diagram diagram) {
-    Bpmn2MemoryModel model =  ModelHandler.getModel(EcoreUtil.getURI(diagram));
+    Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(diagram));
     int determinedId = 0;
     
     if (featureClass.equals(Pool.class)) {

@@ -205,14 +205,7 @@ public class PropertyAlfrescoUserTaskSection extends ActivitiPropertySection imp
               } else {
                 userTask.setFormKey("");
               }
-              if(priorityText.getText() != null && priorityText.getText().length() > 0) {
-                Integer priorityValue = null;
-                try {
-                  priorityValue = Integer.valueOf(priorityText.getText());
-                } catch(Exception e) {}
-                userTask.setPriority(priorityValue);
-              }
-
+              userTask.setPriority(priorityText.getText());
               userTask.setDocumentation(documentationText.getText());
             }
           }, editingDomain, "Model Update");
