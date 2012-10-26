@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.activiti.designer.bpmn2.model.Activity;
 import org.activiti.designer.bpmn2.model.Artifact;
+import org.activiti.designer.bpmn2.model.Association;
 import org.activiti.designer.bpmn2.model.BaseElement;
 import org.activiti.designer.bpmn2.model.BoundaryEvent;
 import org.activiti.designer.bpmn2.model.FlowElement;
@@ -208,7 +209,7 @@ public class ActivitiUiUtil {
           
         if (featureClass.equals(Lane.class)) {
           determinedId = loopThroughLanes(featureClass, determinedId, process.getLanes(), featureIdKey);
-        } else if (featureClass.equals(TextAnnotation.class)) {
+        } else if (featureClass.equals(TextAnnotation.class) || featureClass.equals(Association.class)) {
           determinedId = loopThroughArtifacts(featureClass, determinedId, process.getArtifacts(), featureIdKey);
         } else {
           determinedId = loopThroughElements(featureClass, determinedId, process.getFlowElements(), featureIdKey);
