@@ -19,11 +19,15 @@ import org.activiti.designer.bpmn2.model.ServiceTask;
 import org.activiti.designer.integration.servicetask.PropertyType;
 import org.activiti.designer.property.PropertyCustomServiceTaskSection;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Event;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
 /**
@@ -67,7 +71,7 @@ public class CustomPropertyBooleanChoiceField extends AbstractCustomPropertyFiel
       addFieldValidator(buttonControl, getPropertyAnnotation().fieldValidator());
     }
 
-    buttonControl.addFocusListener(listener);
+    buttonControl.addSelectionListener(new CheckboxChangeListener(listener));
 
     data = new FormData();
     data.left = new FormAttachment(0);
@@ -76,5 +80,36 @@ public class CustomPropertyBooleanChoiceField extends AbstractCustomPropertyFiel
     buttonControl.setLayoutData(data);
 
     return result;
+  }
+
+  private class CheckboxChangeListener implements SelectionListener {
+
+    private final FocusListener delegate;
+
+    public CheckboxChangeListener(final FocusListener delegate) {
+      super();
+      this.delegate = delegate;
+    }
+
+    @Override
+    public void widgetSelected(SelectionEvent e) {
+      handleSelection(e);
+    }
+
+    @Override
+    public void widgetDefaultSelected(SelectionEvent e) {
+      handleSelection(e);
+    }
+
+    private void handleSelection(SelectionEvent e) {
+
+      Event propagatedEvent = new Event();
+      propagatedEvent.item = e.item;
+      propagatedEvent.widget = buttonControl;
+      propagatedEvent.type = SWT.BUTTON1;
+
+      delegate.focusLost(new FocusEvent(propagatedEvent));
+    }
+
   }
 }
