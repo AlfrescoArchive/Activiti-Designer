@@ -179,9 +179,14 @@ public class PropertyDiagramSection extends ActivitiPropertySection implements I
 					
 					String id = idText.getText();
 					if (id != null) {
-					  process.setId(id);
-					} else {
-					  process.setId("");
+            process.setId(id);
+          } else {
+            process.setId("");
+          }
+					
+					if(getSelectedPictogramElement() instanceof Diagram == false) {
+					  Pool pool = ((Pool) getBusinessObject(getSelectedPictogramElement()));
+					  pool.setProcessRef(process.getId());
 					}
 					
 					String name = nameText.getText();
@@ -210,15 +215,15 @@ public class PropertyDiagramSection extends ActivitiPropertySection implements I
 					String candidateStartUsers = candidateStarterUsersText.getText();
 					if (StringUtils.isNotEmpty(candidateStartUsers)) {
 						String[] expressionList = null;
-		                if (candidateStartUsers.contains(",")) {
-		                  expressionList = candidateStartUsers.split(",");
-		                } else {
-		                  expressionList = new String[] { candidateStartUsers };
-		                }
-		                
-		                for (String user : expressionList) {
-		                  process.getCandidateStarterUsers().add(user.trim());
-		                }
+            if (candidateStartUsers.contains(",")) {
+              expressionList = candidateStartUsers.split(",");
+            } else {
+              expressionList = new String[] { candidateStartUsers };
+            }
+            
+            for (String user : expressionList) {
+              process.getCandidateStarterUsers().add(user.trim());
+            }
 					}
 					
 					// read candidate groups from control and insert them to the model
@@ -226,15 +231,15 @@ public class PropertyDiagramSection extends ActivitiPropertySection implements I
 					process.getCandidateStarterGroups().clear();
 					if (StringUtils.isNotEmpty(candidateStartGroups)) {
 						String[] expressionList = null;
-		                if (candidateStartGroups.contains(",")) {
-		                  expressionList = candidateStartGroups.split(",");
-		                } else {
-		                  expressionList = new String[] { candidateStartGroups };
-		                }
-		                
-		                for (String user : expressionList) {
-		                  process.getCandidateStarterGroups().add(user.trim());
-		                }
+            if (candidateStartGroups.contains(",")) {
+              expressionList = candidateStartGroups.split(",");
+            } else {
+              expressionList = new String[] { candidateStartGroups };
+            }
+            
+            for (String user : expressionList) {
+              process.getCandidateStarterGroups().add(user.trim());
+            }
 					}
 					
 				}

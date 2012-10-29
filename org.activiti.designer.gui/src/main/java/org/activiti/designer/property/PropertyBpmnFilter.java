@@ -25,9 +25,7 @@ public class PropertyBpmnFilter extends ActivitiPropertyFilter {
   @Override
   protected boolean accept(PictogramElement pe) {
   	Object bo = getBusinessObject(pe);
-  	if(bo != null && bo instanceof BaseElement && 
-  	        ExtensionUtil.isCustomServiceTask(bo) == false) {
-  	  
+  	if(bo != null && bo instanceof BaseElement && ExtensionUtil.isCustomServiceTask(bo) == false) {
       return true;
   	}
     return false;
