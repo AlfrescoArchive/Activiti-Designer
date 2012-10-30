@@ -151,6 +151,13 @@
                tab="org.activiti.designer.generalTab">
          </propertySection>
          <propertySection
+               afterSection="org.activiti.designer.generalTab.flowelement"
+               class="org.activiti.designer.property.PropertyDefaultFlowSection"
+               filter="org.activiti.designer.property.PropertyDefaultFlowFilter"
+               id="org.activiti.designer.generalTab.defaultflow"
+               tab="org.activiti.designer.generalTab">
+         </propertySection>
+         <propertySection
                class="org.activiti.designer.property.PropertyExecutionListenerSection"
                filter="org.activiti.designer.property.PropertyExecutionListenerFilter"
                id="org.activiti.designer.listenerTab.ExecutionTab"
@@ -300,6 +307,13 @@
                filter="org.activiti.designer.property.PropertyDiagramFilter"
                id="org.activiti.designer.messageTab.messages"
                tab="org.activiti.designer.messageTab">
+         </propertySection>
+         <propertySection
+               afterSection="org.activiti.designer.generalTab.defaultflow"
+               class="org.activiti.designer.property.PropertyAsyncSection"
+               filter="org.activiti.designer.property.PropertyAsyncFilter"
+               id="org.activiti.designer.generalTab.async"
+               tab="org.activiti.designer.generalTab">
          </propertySection>
          
       </propertySections>

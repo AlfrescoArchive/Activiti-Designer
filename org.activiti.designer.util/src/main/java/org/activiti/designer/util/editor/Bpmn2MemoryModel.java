@@ -41,7 +41,7 @@ public class Bpmn2MemoryModel {
 	
 	public Process getMainProcess() {
 	  Process process = getProcess(null);
-	  if(process == null) {
+	  if (process == null) {
 	    process = new Process();
 	    process.setName("process1");
 	    process.setId("process1");

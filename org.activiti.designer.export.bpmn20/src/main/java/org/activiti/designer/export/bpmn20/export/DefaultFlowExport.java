@@ -17,6 +17,7 @@ import javax.xml.stream.XMLStreamWriter;
 import org.activiti.designer.bpmn2.model.Activity;
 import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.Gateway;
+import org.apache.commons.lang.StringUtils;
 
 
 /**
@@ -26,15 +27,15 @@ public class DefaultFlowExport {
 
   public static void createDefaultFlow(FlowElement object, XMLStreamWriter xtw) throws Exception {
     String defaultFlow = null;
-    if(object instanceof Activity) {
+    if (object instanceof Activity) {
       defaultFlow = ((Activity) object).getDefaultFlow();
-    } else if(object instanceof Gateway) {
+    } else if (object instanceof Gateway) {
       defaultFlow = ((Gateway) object).getDefaultFlow();
     } else {
         throw new Exception("Invalid element for default flow.  Expected 'Activity', " +
         		"'ExclusiveGateway', 'InclusiveGateway', but got: '" + object.getClass());
     }
-    if(defaultFlow != null) {
+    if (StringUtils.isNotEmpty(defaultFlow)) {
       xtw.writeAttribute("default", defaultFlow);
     }
   }

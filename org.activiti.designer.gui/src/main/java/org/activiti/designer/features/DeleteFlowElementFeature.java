@@ -11,6 +11,7 @@ import org.activiti.designer.bpmn2.model.Event;
 import org.activiti.designer.bpmn2.model.FlowElement;
 import org.activiti.designer.bpmn2.model.FlowNode;
 import org.activiti.designer.bpmn2.model.Gateway;
+import org.activiti.designer.bpmn2.model.Lane;
 import org.activiti.designer.bpmn2.model.Process;
 import org.activiti.designer.bpmn2.model.SequenceFlow;
 import org.activiti.designer.bpmn2.model.SubProcess;
@@ -63,9 +64,16 @@ public class DeleteFlowElementFeature extends DefaultDeleteFeature {
   	List<Process> processes = ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getProcesses();
     for (Process process : processes) {
       process.getFlowElements().remove(element);
+      removeElementInLanes(element.getId(), process.getLanes());
       removeElementInProcess(element, process.getFlowElements());
     }
 	}
+	
+	private void removeElementInLanes(String elementId, List<Lane> laneList) {
+    for (Lane lane : laneList) {
+      lane.getFlowReferences().remove(elementId);
+    }
+  }
 	
 	private void removeElementInProcess(BaseElement element, List<FlowElement> elementList) {
     for (FlowElement flowElement : elementList) {

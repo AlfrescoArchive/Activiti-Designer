@@ -1,5 +1,7 @@
 package org.activiti.designer.diagram;
 
+import java.util.Date;
+
 import org.activiti.designer.bpmn2.model.Activity;
 import org.activiti.designer.bpmn2.model.Association;
 import org.activiti.designer.bpmn2.model.BoundaryEvent;
@@ -331,6 +333,7 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 	public IDeleteFeature getDeleteFeature(IDeleteContext context) {
 	  PictogramElement pictogramElement = context.getPictogramElement();
     Object bo = getBusinessObjectForPictogramElement(pictogramElement);
+    
     if(bo instanceof FlowElement) {
       return new DeleteFlowElementFeature(this);
     } else if(bo instanceof Lane || bo instanceof Pool) {

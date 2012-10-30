@@ -97,10 +97,16 @@ public class PropertyDiagramSection extends ActivitiPropertySection implements I
 		Process process = null;
 		if(getSelectedPictogramElement() instanceof Diagram) {
 		  process = model.getMainProcess();
+		  if (process.getFlowElements().size() == 0 && model.getPools().size() > 0) {
+		    setEnabled(false);
+		  } else {
+		    setEnabled(true);
+		  }
 		
 		} else {
 		  Pool pool = ((Pool) getBusinessObject(getSelectedPictogramElement()));
 		  process = model.getProcess(pool.getId());
+		  setEnabled(true);
 		}
 		
 		idText.setText(process.getId());
@@ -122,16 +128,16 @@ public class PropertyDiagramSection extends ActivitiPropertySection implements I
 		
 		
 		candidateStarterUsersText.setText("");
-	      if (process.getCandidateStarterUsers().size() > 0) {
-	        StringBuffer expressionBuffer = new StringBuffer();
-	        for (String user : process.getCandidateStarterUsers()) {
-	          if (expressionBuffer.length() > 0) {
-	            expressionBuffer.append(",");
-	          }
-	          expressionBuffer.append(user.trim());
-	        }
-	        candidateStarterUsersText.setText(expressionBuffer.toString());
-	      } 
+    if (process.getCandidateStarterUsers().size() > 0) {
+      StringBuffer expressionBuffer = new StringBuffer();
+      for (String user : process.getCandidateStarterUsers()) {
+        if (expressionBuffer.length() > 0) {
+          expressionBuffer.append(",");
+        }
+        expressionBuffer.append(user.trim());
+      }
+      candidateStarterUsersText.setText(expressionBuffer.toString());
+    } 
 		
 		candidateStarterGroupsText.setText("");
 		if (process.getCandidateStarterGroups().size() > 0) {
@@ -143,7 +149,7 @@ public class PropertyDiagramSection extends ActivitiPropertySection implements I
 				expressionBuffer.append(group.trim());
 			}
 			candidateStarterGroupsText.setText(expressionBuffer.toString());
-		}		
+		}
 		
 		idText.addFocusListener(listener);
 		nameText.addFocusListener(listener);
@@ -151,6 +157,15 @@ public class PropertyDiagramSection extends ActivitiPropertySection implements I
 		documentationText.addFocusListener(listener);
 		candidateStarterUsersText.addFocusListener(listener);
 		candidateStarterGroupsText.addFocusListener(listener);
+	}
+	
+	private void setEnabled(boolean enabled) {
+	  idText.setEnabled(enabled);
+    nameText.setEnabled(enabled);
+    namespaceText.setEnabled(enabled);
+    documentationText.setEnabled(enabled);
+    candidateStarterUsersText.setEnabled(enabled);
+    candidateStarterGroupsText.setEnabled(enabled);
 	}
 
 	private FocusListener listener = new FocusListener() {
