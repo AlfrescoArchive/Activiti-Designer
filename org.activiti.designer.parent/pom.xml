@@ -34,7 +34,7 @@
 			<id>Graphiti</id>
 			<layout>p2</layout>
 			<!-- <url>http://download.eclipse.org/graphiti/updates/milestones/</url> -->
-			<url>http://download.eclipse.org/graphiti/updates/0.9.0</url>
+			<url>http://download.eclipse.org/graphiti/updates/0.9.1</url>
 		</repository>
 		<repository>
 			<id>Oribit</id>
@@ -89,5 +89,17 @@
 			</plugin>
 		</plugins>
 	</build>
+	
+	<distributionManagement>
+		<snapshotRepository>
+		  <id>alfresco.snapshot.repo</id>
+		  <url>https://maven.alfresco.com/nexus/content/repositories/activiti-snapshots/</url>
+		  <uniqueVersion>false</uniqueVersion>
+		</snapshotRepository>
+		<repository>
+		  <id>alfresco.release.repo</id>
+		  <url>https://artifacts.alfresco.com/nexus/content/repositories/activiti-releases/</url>
+		</repository>
+  	</distributionManagement>
 
 </project>
