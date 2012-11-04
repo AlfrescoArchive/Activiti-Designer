@@ -13,6 +13,8 @@ public final class ExtensionConstants {
 
   public static final String PROPERTY_ID_CUSTOM_SERVICE_TASK = "customServiceTaskId";
 
+  public static final String ATTRIBUTE_NAME_SERVICE_TASK_EXTENSION_ID = "extensionId";
+
   public static final String CUSTOM_PROPERTY_ID_SEPARATOR = "_";
 
   private ExtensionConstants() {

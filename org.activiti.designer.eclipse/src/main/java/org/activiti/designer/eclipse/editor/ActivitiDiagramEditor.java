@@ -352,38 +352,33 @@ public class ActivitiDiagramEditor extends DiagramEditor {
         }
 
         if (flowElement instanceof ServiceTask) {
-          // Customize the name displayed by default
-          final List<CustomServiceTask> customServiceTasks = ExtensionUtil.getCustomServiceTasks(ActivitiUiUtil.getProjectFromDiagram(getDiagramTypeProvider()
-                  .getDiagram()));
 
           ServiceTask serviceTask = (ServiceTask) flowElement;
-          CustomServiceTask targetTask = null;
 
-          for (final CustomServiceTask customServiceTask : customServiceTasks) {
-            if (customServiceTask.getRuntimeClassname() != null && customServiceTask.getRuntimeClassname().equals(serviceTask.getImplementation())) {
-              targetTask = customServiceTask;
-              break;
+          if (serviceTask.isExtended()) {
+
+            CustomServiceTask targetTask = findCustomServiceTask(serviceTask);
+
+            if (targetTask != null) {
+              CustomProperty customServiceTaskProperty = new CustomProperty();
+
+              customServiceTaskProperty.setId(ExtensionUtil.wrapCustomPropertyId(serviceTask, ExtensionConstants.PROPERTY_ID_CUSTOM_SERVICE_TASK));
+              customServiceTaskProperty.setName(ExtensionConstants.PROPERTY_ID_CUSTOM_SERVICE_TASK);
+              customServiceTaskProperty.setSimpleValue(targetTask.getId());
+
+              serviceTask.getCustomProperties().add(customServiceTaskProperty);
+
+              for (FieldExtension field : serviceTask.getFieldExtensions()) {
+                CustomProperty customFieldProperty = new CustomProperty();
+                customFieldProperty.setName(field.getFieldName());
+                customFieldProperty.setSimpleValue(field.getExpression());
+                serviceTask.getCustomProperties().add(customFieldProperty);
+              }
+
+              serviceTask.getFieldExtensions().clear();
             }
           }
 
-          if (targetTask != null) {
-            CustomProperty customServiceTaskProperty = new CustomProperty();
-
-            customServiceTaskProperty.setId(ExtensionUtil.wrapCustomPropertyId(serviceTask, ExtensionConstants.PROPERTY_ID_CUSTOM_SERVICE_TASK));
-            customServiceTaskProperty.setName(ExtensionConstants.PROPERTY_ID_CUSTOM_SERVICE_TASK);
-            customServiceTaskProperty.setSimpleValue(targetTask.getId());
-
-            serviceTask.getCustomProperties().add(customServiceTaskProperty);
-
-            for (FieldExtension field : serviceTask.getFieldExtensions()) {
-              CustomProperty customFieldProperty = new CustomProperty();
-              customFieldProperty.setName(field.getFieldName());
-              customFieldProperty.setSimpleValue(field.getExpression());
-              serviceTask.getCustomProperties().add(customFieldProperty);
-            }
-
-            serviceTask.getFieldExtensions().clear();
-          }
         }
 
         if (addFeature.canAdd(context)) {
@@ -444,6 +439,27 @@ public class ActivitiDiagramEditor extends DiagramEditor {
         elementList.remove(flowElement);
       }
     }
+  }
+
+  private CustomServiceTask findCustomServiceTask(ServiceTask serviceTask) {
+
+    CustomServiceTask result = null;
+
+    if (serviceTask.isExtended()) {
+
+      final List<CustomServiceTask> customServiceTasks = ExtensionUtil.getCustomServiceTasks(ActivitiUiUtil.getProjectFromDiagram(getDiagramTypeProvider()
+              .getDiagram()));
+
+      for (final CustomServiceTask customServiceTask : customServiceTasks) {
+        if (serviceTask.getExtensionId().equals(customServiceTask.getId())) {
+          result = customServiceTask;
+          break;
+        }
+      }
+
+    }
+
+    return result;
   }
 
   private ContainerShape getParentContainer(String flowElementId, Process process, Diagram diagram) {

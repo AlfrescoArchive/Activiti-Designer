@@ -42,34 +42,39 @@ public class ServiceTaskExport implements ActivitiNamespaceConstants {
       xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, "resultVariableName", serviceTask.getResultVariableName());
     }
 
+    if (serviceTask.isExtended()) {
+      xtw.writeAttribute(ACTIVITI_EXTENSIONS_PREFIX, ACTIVITI_EXTENSIONS_NAMESPACE, ExtensionConstants.ATTRIBUTE_NAME_SERVICE_TASK_EXTENSION_ID,
+              serviceTask.getExtensionId());
+    }
+
     boolean executionListenersAvailable = false;
     if (serviceTask.getExecutionListeners() != null && serviceTask.getExecutionListeners().size() > 0) {
-    	executionListenersAvailable = true;
+      executionListenersAvailable = true;
     }
-    
+
     boolean fieldExtensionsAvailable = false;
-    if(serviceTask.getFieldExtensions() != null && serviceTask.getFieldExtensions().size() > 0) {
-    	
-    	for (FieldExtension fieldExtension : serviceTask.getFieldExtensions()) {
-        if(fieldExtension.getFieldName() != null && fieldExtension.getFieldName().length() > 0 &&
-                fieldExtension.getExpression() != null && fieldExtension.getExpression().length() > 0) {
-        	
-        	fieldExtensionsAvailable = true;
-        	break;
+    if (serviceTask.getFieldExtensions() != null && serviceTask.getFieldExtensions().size() > 0) {
+
+      for (FieldExtension fieldExtension : serviceTask.getFieldExtensions()) {
+        if (fieldExtension.getFieldName() != null && fieldExtension.getFieldName().length() > 0 && fieldExtension.getExpression() != null
+                && fieldExtension.getExpression().length() > 0) {
+
+          fieldExtensionsAvailable = true;
+          break;
         }
-    	}
+      }
     }
-    
-    if(executionListenersAvailable == true || fieldExtensionsAvailable == true) {
-    	xtw.writeStartElement("extensionElements");
+
+    if (executionListenersAvailable == true || fieldExtensionsAvailable == true) {
+      xtw.writeStartElement("extensionElements");
     }
-    
+
     ExecutionListenerExport.createExecutionListenerXML(serviceTask.getExecutionListeners(), false, xtw);
-    
+
     FieldExtensionsExport.writeFieldExtensions(xtw, serviceTask.getFieldExtensions(), false);
-    
-    if(executionListenersAvailable == true || fieldExtensionsAvailable == true) {
-    	xtw.writeEndElement();
+
+    if (executionListenersAvailable == true || fieldExtensionsAvailable == true) {
+      xtw.writeEndElement();
     }
 
     if (serviceTask.getCustomProperties() != null && serviceTask.getCustomProperties().size() > 0) {
@@ -79,7 +84,7 @@ public class ServiceTaskExport implements ActivitiNamespaceConstants {
           continue;
         }
         if (customProperty.getSimpleValue() == null || customProperty.getSimpleValue().length() == 0) {
-        	continue;
+          continue;
         }
         if (firstCustomProperty == true) {
           xtw.writeStartElement("extensionElements");
@@ -96,9 +101,9 @@ public class ServiceTaskExport implements ActivitiNamespaceConstants {
         xtw.writeEndElement();
       }
     }
-    
+
     MultiInstanceExport.createMultiInstance(object, xtw);
-    
+
     // end ServiceTask element
     xtw.writeEndElement();
   }

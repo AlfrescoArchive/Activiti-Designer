@@ -60,120 +60,119 @@ public final class CloneUtil {
 
   public static FlowElement clone(final FlowElement element, final Diagram diagram) {
 
-  	FlowElement cloneElement = null;
-  	List<FormProperty> formProperties = null;
-  	
+    FlowElement cloneElement = null;
+    List<FormProperty> formProperties = null;
+
     if (element instanceof StartEvent) {
-    	cloneElement = clone((StartEvent) element, diagram);
-    	formProperties = ((StartEvent) element).getFormProperties();
+      cloneElement = clone((StartEvent) element, diagram);
+      formProperties = ((StartEvent) element).getFormProperties();
     } else if (element instanceof ServiceTask) {
-    	cloneElement = clone((ServiceTask) element, diagram);
+      cloneElement = clone((ServiceTask) element, diagram);
     } else if (element instanceof EndEvent) {
-    	cloneElement = clone((EndEvent) element, diagram);
+      cloneElement = clone((EndEvent) element, diagram);
     } else if (element instanceof ExclusiveGateway) {
-    	cloneElement = clone((ExclusiveGateway) element, diagram);
+      cloneElement = clone((ExclusiveGateway) element, diagram);
     } else if (element instanceof InclusiveGateway) {
-    	cloneElement = clone((InclusiveGateway) element, diagram);
+      cloneElement = clone((InclusiveGateway) element, diagram);
     } else if (element instanceof MailTask) {
-    	cloneElement = clone((MailTask) element, diagram);
+      cloneElement = clone((MailTask) element, diagram);
     } else if (element instanceof ManualTask) {
-    	cloneElement = clone((ManualTask) element, diagram);
+      cloneElement = clone((ManualTask) element, diagram);
     } else if (element instanceof ParallelGateway) {
-    	cloneElement = clone((ParallelGateway) element, diagram);
+      cloneElement = clone((ParallelGateway) element, diagram);
     } else if (element instanceof ScriptTask) {
-    	cloneElement = clone((ScriptTask) element, diagram);
+      cloneElement = clone((ScriptTask) element, diagram);
     } else if (element instanceof UserTask) {
-    	cloneElement = clone((UserTask) element, diagram);
-    	formProperties = ((UserTask) element).getFormProperties();
-    	
-    	List<ActivitiListener> resultListenerList = new ArrayList<ActivitiListener>();
-    	for (ActivitiListener listener : ((UserTask) element).getTaskListeners()) {
-    		resultListenerList.add(clone(listener));
-    	}
-    	((UserTask) cloneElement).setTaskListeners(resultListenerList);
-    }
-    
-    if (element instanceof Activity && element instanceof UserTask == false) {
-    	List<ActivitiListener> resultListenerList = new ArrayList<ActivitiListener>();
-    	for (ActivitiListener listener : ((Activity) element).getExecutionListeners()) {
-    		resultListenerList.add(clone(listener));
-    	}
-    	((Activity) cloneElement).setExecutionListeners(resultListenerList);
-    }
-    
-    if (element instanceof Activity) {
-    	((Activity) cloneElement).setAsynchronous(((Activity) element).isAsynchronous());
-    	((Activity) cloneElement).setDefaultFlow(((Activity) element).getDefaultFlow());
-    }
-    
-    if(formProperties != null) {
-    	List<FormProperty> resultPropertyList = new ArrayList<FormProperty>();
-  		for (FormProperty formProperty : formProperties) {
-	      resultPropertyList.add(clone(formProperty));
+      cloneElement = clone((UserTask) element, diagram);
+      formProperties = ((UserTask) element).getFormProperties();
+
+      List<ActivitiListener> resultListenerList = new ArrayList<ActivitiListener>();
+      for (ActivitiListener listener : ((UserTask) element).getTaskListeners()) {
+        resultListenerList.add(clone(listener));
       }
-  		if(cloneElement instanceof UserTask) {
-  			((UserTask) cloneElement).setFormProperties(resultPropertyList);
-  		} else {
-  			((StartEvent) cloneElement).setFormProperties(resultPropertyList);
-  		}
-  	}
-    
-    if(cloneElement != null) {
-    	cloneElement.setName(element.getName());
-    	ModelHandler.getModel(EcoreUtil.getURI(diagram)).getMainProcess().getFlowElements().add(cloneElement);
+      ((UserTask) cloneElement).setTaskListeners(resultListenerList);
+    }
+
+    if (element instanceof Activity && element instanceof UserTask == false) {
+      List<ActivitiListener> resultListenerList = new ArrayList<ActivitiListener>();
+      for (ActivitiListener listener : ((Activity) element).getExecutionListeners()) {
+        resultListenerList.add(clone(listener));
+      }
+      ((Activity) cloneElement).setExecutionListeners(resultListenerList);
+    }
+
+    if (element instanceof Activity) {
+      ((Activity) cloneElement).setAsynchronous(((Activity) element).isAsynchronous());
+      ((Activity) cloneElement).setDefaultFlow(((Activity) element).getDefaultFlow());
+    }
+
+    if (formProperties != null) {
+      List<FormProperty> resultPropertyList = new ArrayList<FormProperty>();
+      for (FormProperty formProperty : formProperties) {
+        resultPropertyList.add(clone(formProperty));
+      }
+      if (cloneElement instanceof UserTask) {
+        ((UserTask) cloneElement).setFormProperties(resultPropertyList);
+      } else {
+        ((StartEvent) cloneElement).setFormProperties(resultPropertyList);
+      }
+    }
+
+    if (cloneElement != null) {
+      cloneElement.setName(element.getName());
+      ModelHandler.getModel(EcoreUtil.getURI(diagram)).getMainProcess().getFlowElements().add(cloneElement);
     }
 
     return cloneElement;
 
   }
-  
+
   private static ActivitiListener clone(final ActivitiListener listener) {
-  	ActivitiListener result = new ActivitiListener();
-  	result.setId(listener.getId());
-  	result.setEvent(listener.getEvent());
-  	result.setImplementation(listener.getImplementation());
-  	result.setImplementationType(listener.getImplementationType());
-  	result.setRunAs(listener.getRunAs());
-  	result.setScriptProcessor(listener.getScriptProcessor());
-  	
-  	List<FieldExtension> fieldList = new ArrayList<FieldExtension>();
-  	for (FieldExtension fieldExtension : listener.getFieldExtensions()) {
-  		FieldExtension resultField = new FieldExtension();
-  		resultField.setExpression(fieldExtension.getExpression());
-  		resultField.setFieldName(fieldExtension.getFieldName());
-  		fieldList.add(resultField);
-  	}
-  	result.setFieldExtensions(fieldList);
-  	
-  	return result;
-  }
-  
-  private static FormProperty clone(final FormProperty formProperty) {
-  	FormProperty result = new FormProperty();
-  	result.setId(formProperty.getId());
-  	result.setName(formProperty.getName());
-  	result.setType(formProperty.getType());
-  	result.setValue(formProperty.getValue());
-  	result.setExpression(formProperty.getExpression());
-  	result.setVariable(formProperty.getVariable());
-  	result.setDefaultExpression(formProperty.getDefaultExpression());
-  	result.setDatePattern(formProperty.getDatePattern());
-  	result.setReadable(formProperty.getReadable());
-  	result.setRequired(formProperty.getRequired());
-  	result.setWriteable(formProperty.getWriteable());
-  	
-  	List<FormValue> resultValueList = new ArrayList<FormValue>();
-  	for (FormValue formValue : formProperty.getFormValues()) {
-	    FormValue resultValue = new FormValue();
-	    resultValue.setId(formValue.getId());
-	    resultValue.setName(formValue.getName());
-	    resultValueList.add(resultValue);
+    ActivitiListener result = new ActivitiListener();
+    result.setId(listener.getId());
+    result.setEvent(listener.getEvent());
+    result.setImplementation(listener.getImplementation());
+    result.setImplementationType(listener.getImplementationType());
+    result.setRunAs(listener.getRunAs());
+    result.setScriptProcessor(listener.getScriptProcessor());
+
+    List<FieldExtension> fieldList = new ArrayList<FieldExtension>();
+    for (FieldExtension fieldExtension : listener.getFieldExtensions()) {
+      FieldExtension resultField = new FieldExtension();
+      resultField.setExpression(fieldExtension.getExpression());
+      resultField.setFieldName(fieldExtension.getFieldName());
+      fieldList.add(resultField);
     }
-  	result.setFormValues(resultValueList);
-  	
-  	return result;
+    result.setFieldExtensions(fieldList);
+
+    return result;
   }
-  
+
+  private static FormProperty clone(final FormProperty formProperty) {
+    FormProperty result = new FormProperty();
+    result.setId(formProperty.getId());
+    result.setName(formProperty.getName());
+    result.setType(formProperty.getType());
+    result.setValue(formProperty.getValue());
+    result.setExpression(formProperty.getExpression());
+    result.setVariable(formProperty.getVariable());
+    result.setDefaultExpression(formProperty.getDefaultExpression());
+    result.setDatePattern(formProperty.getDatePattern());
+    result.setReadable(formProperty.getReadable());
+    result.setRequired(formProperty.getRequired());
+    result.setWriteable(formProperty.getWriteable());
+
+    List<FormValue> resultValueList = new ArrayList<FormValue>();
+    for (FormValue formValue : formProperty.getFormValues()) {
+      FormValue resultValue = new FormValue();
+      resultValue.setId(formValue.getId());
+      resultValue.setName(formValue.getName());
+      resultValueList.add(resultValue);
+    }
+    result.setFormValues(resultValueList);
+
+    return result;
+  }
 
   /**
    * Clones a {@link StartEvent}.
@@ -310,7 +309,7 @@ public final class CloneUtil {
     result.setFormKey(original.getFormKey());
     result.setDueDate(original.getDueDate());
     result.setPriority(original.getPriority());
-    
+
     return result;
   }
 
@@ -327,6 +326,7 @@ public final class CloneUtil {
 
     result.setId(ActivitiUiUtil.getNextId(result.getClass(), CreateServiceTaskFeature.FEATURE_ID_KEY, diagram));
     result.setImplementation(original.getImplementation());
+    result.setExtensionId(original.getExtensionId());
 
     for (CustomProperty property : original.getCustomProperties()) {
       final CustomProperty clone = clone(property, diagram);

@@ -31,23 +31,15 @@ public class CreateServiceTaskFeature extends AbstractCreateFastBPMNFeature {
   public Object[] create(ICreateContext context) {
     ServiceTask newServiceTask = new ServiceTask();
     newServiceTask.setName("Service Task");
+    newServiceTask.setExtensionId(customServiceTaskId);
 
     // Process custom service tasks
-    if (this.customServiceTaskId != null) {
+    if (newServiceTask.isExtended()) {
 
-      // Customize the name displayed by default
-      final List<CustomServiceTask> customServiceTasks = ExtensionUtil.getCustomServiceTasks(ActivitiUiUtil.getProjectFromDiagram(getDiagram()));
-
-      CustomServiceTask targetTask = null;
-
-      for (final CustomServiceTask customServiceTask : customServiceTasks) {
-        if (this.customServiceTaskId.equals(customServiceTask.getId())) {
-          targetTask = customServiceTask;
-          break;
-        }
-      }
+      CustomServiceTask targetTask = findCustomServiceTask(newServiceTask);
 
       if (targetTask != null) {
+
         // Create custom property containing task name
         CustomProperty customServiceTaskProperty = new CustomProperty();
 
@@ -58,13 +50,30 @@ public class CreateServiceTaskFeature extends AbstractCreateFastBPMNFeature {
         newServiceTask.getCustomProperties().add(customServiceTaskProperty);
         newServiceTask.setImplementation(targetTask.getRuntimeClassname());
         newServiceTask.setName(targetTask.getName());
-      }
 
+      }
     }
 
     addObjectToContainer(context, newServiceTask, newServiceTask.getName());
 
     return new Object[] { newServiceTask };
+  }
+
+  private CustomServiceTask findCustomServiceTask(ServiceTask serviceTask) {
+    CustomServiceTask result = null;
+
+    if (serviceTask.isExtended()) {
+
+      final List<CustomServiceTask> customServiceTasks = ExtensionUtil.getCustomServiceTasks(ActivitiUiUtil.getProjectFromDiagram(getDiagram()));
+
+      for (final CustomServiceTask customServiceTask : customServiceTasks) {
+        if (serviceTask.getExtensionId().equals(customServiceTask.getId())) {
+          result = customServiceTask;
+          break;
+        }
+      }
+    }
+    return result;
   }
 
   @Override
