@@ -40,19 +40,19 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
 
     assigneeText = createText(composite, factory, null);
     createLabel("Assignee:", composite, factory, assigneeText);
-    
+
     candidateUsersText = createText(composite, factory, assigneeText);
     createLabel("Candidate users (comma separated):", composite, factory, candidateUsersText);
-    
+
     candidateGroupsText = createText(composite, factory, candidateUsersText);
-    createLabel("Candidate groups (comma separated:", composite, factory, candidateGroupsText);
+    createLabel("Candidate groups (comma separated):", composite, factory, candidateGroupsText);
 
     formKeyText = createText(composite, factory, candidateGroupsText);
     createLabel("Form key:", composite, factory, formKeyText);
-    
+
     dueDateText = createText(composite, factory, formKeyText);
     createLabel("Due date (variable):", composite, factory, dueDateText);
-    
+
     priorityText = createText(composite, factory, dueDateText);
     createLabel("Priority:", composite, factory, priorityText);
 
@@ -83,12 +83,12 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
         return;
 
       UserTask userTask = (UserTask) bo;
-      
+
       assigneeText.setText("");
       if (StringUtils.isNotEmpty(userTask.getAssignee())) {
-      	assigneeText.setText(userTask.getAssignee());
+        assigneeText.setText(userTask.getAssignee());
       }
-      
+
       candidateUsersText.setText("");
       if (userTask.getCandidateUsers().size() > 0) {
         StringBuffer expressionBuffer = new StringBuffer();
@@ -99,8 +99,8 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
           expressionBuffer.append(user.trim());
         }
         candidateUsersText.setText(expressionBuffer.toString());
-      } 
-      
+      }
+
       candidateGroupsText.setText("");
       if (userTask.getCandidateGroups().size() > 0) {
         StringBuffer expressionBuffer = new StringBuffer();
@@ -112,21 +112,21 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
         }
         candidateGroupsText.setText(expressionBuffer.toString());
       }
-      
+
       formKeyText.setText("");
-      if(formKeyText != null) {
+      if (formKeyText != null) {
         if (StringUtils.isNotEmpty(userTask.getFormKey())) {
           formKeyText.setText(userTask.getFormKey());
         }
       }
-      
+
       dueDateText.setText("");
-      if(StringUtils.isNotEmpty(userTask.getDueDate())) {
-      	dueDateText.setText(userTask.getDueDate().toString());
+      if (StringUtils.isNotEmpty(userTask.getDueDate())) {
+        dueDateText.setText(userTask.getDueDate().toString());
       }
-      
+
       priorityText.setText("");
-      if(userTask.getPriority() != null) {
+      if (userTask.getPriority() != null) {
         priorityText.setText(userTask.getPriority().toString());
       }
 
@@ -151,7 +151,7 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
     }
 
     public void focusLost(final FocusEvent e) {
-      
+
       PictogramElement pe = getSelectedPictogramElement();
       if (pe != null) {
         final Object bo = getBusinessObject(pe);
@@ -162,10 +162,10 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
 
             public void run() {
               UserTask userTask = (UserTask) bo;
-              
+
               String assignee = assigneeText.getText();
               userTask.setAssignee(assignee);
-              
+
               userTask.getCandidateUsers().clear();
               if (StringUtils.isNotEmpty(candidateUsersText.getText())) {
                 String[] expressionList = null;
@@ -174,12 +174,12 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
                 } else {
                   expressionList = new String[] { candidateUsersText.getText() };
                 }
-                
+
                 for (String user : expressionList) {
                   userTask.getCandidateUsers().add(user.trim());
                 }
               }
-              
+
               userTask.getCandidateGroups().clear();
               if (StringUtils.isNotEmpty(candidateGroupsText.getText())) {
                 String[] expressionList = null;
@@ -188,27 +188,27 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
                 } else {
                   expressionList = new String[] { candidateGroupsText.getText() };
                 }
-                
+
                 for (String group : expressionList) {
                   userTask.getCandidateGroups().add(group.trim());
                 }
               }
-              
+
               String formKey = formKeyText.getText();
               if (formKey != null) {
                 userTask.setFormKey(formKey);
               } else {
                 userTask.setFormKey("");
               }
-              
+
               String dueDate = dueDateText.getText();
               if (StringUtils.isNotEmpty(dueDate)) {
                 userTask.setDueDate(dueDate);
-                
+
               } else {
                 userTask.setDueDate(null);
               }
-              
+
               userTask.setPriority(priorityText.getText());
               userTask.setDocumentation(documentationText.getText());
             }
@@ -218,13 +218,13 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
       }
     }
   };
-  
+
   private Text createText(Composite parent, TabbedPropertySheetWidgetFactory factory, Control top) {
     Text text = factory.createText(parent, ""); //$NON-NLS-1$
     FormData data = new FormData();
     data.left = new FormAttachment(0, 250);
     data.right = new FormAttachment(100, -HSPACE);
-    if(top == null) {
+    if (top == null) {
       data.top = new FormAttachment(0, VSPACE);
     } else {
       data.top = new FormAttachment(top, VSPACE);
@@ -233,7 +233,7 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
     text.addFocusListener(listener);
     return text;
   }
-  
+
   private CLabel createLabel(String text, Composite parent, TabbedPropertySheetWidgetFactory factory, Control control) {
     CLabel label = factory.createCLabel(parent, text);
     FormData data = new FormData();
