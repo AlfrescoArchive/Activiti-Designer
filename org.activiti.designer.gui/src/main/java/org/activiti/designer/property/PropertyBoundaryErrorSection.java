@@ -27,7 +27,6 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
 public class PropertyBoundaryErrorSection extends ActivitiPropertySection implements ITabbedPropertyConstants {
 
-	private CCombo cancelActivityCombo;
 	private List<String> cancelFormats = Arrays.asList("true", "false");
 	private Text errorCodeText;
 
@@ -39,22 +38,12 @@ public class PropertyBoundaryErrorSection extends ActivitiPropertySection implem
 		Composite composite = factory.createFlatFormComposite(parent);
 		FormData data;
 		
-		cancelActivityCombo = factory.createCCombo(composite, SWT.NONE);
-		cancelActivityCombo.setItems((String[]) cancelFormats.toArray());
-		data = new FormData();
-		data.left = new FormAttachment(0, 160);
-		data.right = new FormAttachment(100, 0);
-		data.top = new FormAttachment(0, VSPACE);
-		cancelActivityCombo.setLayoutData(data);
-		cancelActivityCombo.addFocusListener(listener);
-		
-		createLabel(composite, "Cancel activity", cancelActivityCombo, factory); //$NON-NLS-1$
 
 		errorCodeText = factory.createText(composite, ""); //$NON-NLS-1$
 		data = new FormData();
 		data.left = new FormAttachment(0, 160);
-		data.right = new FormAttachment(100, -HSPACE);
-		data.top = new FormAttachment(cancelActivityCombo, VSPACE);
+		data.right = new FormAttachment(100, 0);
+		data.top = new FormAttachment(0, VSPACE);
 		errorCodeText.setLayoutData(data);
 		errorCodeText.addFocusListener(listener);
 
@@ -63,7 +52,6 @@ public class PropertyBoundaryErrorSection extends ActivitiPropertySection implem
 
 	@Override
 	public void refresh() {
-		cancelActivityCombo.removeFocusListener(listener);
 	  errorCodeText.removeFocusListener(listener);
 
 		PictogramElement pe = getSelectedPictogramElement();
@@ -71,13 +59,6 @@ public class PropertyBoundaryErrorSection extends ActivitiPropertySection implem
 			Object bo = getBusinessObject(pe);
 			if (bo == null)
 				return;
-			
-			boolean cancelActivity = ((BoundaryEvent) bo).isCancelActivity();
-			if(cancelActivity == false) {
-				cancelActivityCombo.select(1);
-			} else {
-				cancelActivityCombo.select(0);
-			}
 			
 			String errorCode = null;
 			if(bo instanceof BoundaryEvent) {
@@ -91,7 +72,6 @@ public class PropertyBoundaryErrorSection extends ActivitiPropertySection implem
 			}
 			errorCodeText.setText(errorCode == null ? "" : errorCode);
 		}
-		cancelActivityCombo.addFocusListener(listener);
 		errorCodeText.addFocusListener(listener);
 	}
 
@@ -114,12 +94,6 @@ public class PropertyBoundaryErrorSection extends ActivitiPropertySection implem
 							if(bo instanceof BoundaryEvent) {
   							BoundaryEvent boundaryEvent = (BoundaryEvent) bo;
   							
-  							int selection = cancelActivityCombo.getSelectionIndex();
-  							if(selection == 0) {
-  								boundaryEvent.setCancelActivity(true);
-  							} else {
-  								boundaryEvent.setCancelActivity(false);
-  							}
   							
   						  ErrorEventDefinition errorDefinition = (ErrorEventDefinition) boundaryEvent.getEventDefinitions().get(0);
   						  errorDefinition.setErrorCode(errorCode);
