@@ -42,6 +42,12 @@ public class DeleteFlowElementFeature extends DefaultDeleteFeature {
 		  }
 		}
 		
+		if (bo instanceof BoundaryEvent) {
+      if(((BoundaryEvent) bo).getAttachedToRef() != null) {
+        ((BoundaryEvent) bo).getAttachedToRef().getBoundaryEvents().remove(bo);
+      }
+    }
+		
 		if (bo instanceof SubProcess) {
 		  SubProcess subProcess = (SubProcess) bo;
 		  List<FlowElement> toDeleteElements = new ArrayList<FlowElement>();
