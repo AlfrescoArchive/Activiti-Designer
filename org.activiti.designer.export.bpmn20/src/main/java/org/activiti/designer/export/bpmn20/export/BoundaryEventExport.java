@@ -40,10 +40,13 @@ public class BoundaryEventExport implements ActivitiNamespaceConstants {
       if (boundaryEvent.getName() != null) {
         xtw.writeAttribute("name", boundaryEvent.getName());
       }
-      if (boundaryEvent.isCancelActivity()) {
-      	xtw.writeAttribute("cancelActivity", "true");
-      } else {
-      	xtw.writeAttribute("cancelActivity", "false");
+      
+      if (eventDefinitionList.get(0) instanceof ErrorEventDefinition == false) {
+        if (boundaryEvent.isCancelActivity()) {
+        	xtw.writeAttribute("cancelActivity", "true");
+        } else {
+        	xtw.writeAttribute("cancelActivity", "false");
+        }
       }
       
       if (boundaryEvent.getAttachedToRef() != null) {
