@@ -25,6 +25,7 @@ public class BoundaryEventModel {
   public static final String TIMEEVENT = "timeevent";
   public static final String ERROREVENT = "errorevent";
   public static final String SIGNALEVENT = "signalevent";
+  public static final String MESSAGEEVENT = "messageevent";
   
   public BoundaryEvent boundaryEvent;
   public String attachedRef;

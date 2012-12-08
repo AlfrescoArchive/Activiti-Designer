@@ -43,6 +43,7 @@ import org.activiti.designer.bpmn2.model.alfresco.AlfrescoUserTask;
 import org.activiti.designer.features.AddAssociationFeature;
 import org.activiti.designer.features.AddBoundaryErrorFeature;
 import org.activiti.designer.features.AddBoundarySignalFeature;
+import org.activiti.designer.features.AddBoundaryMessageFeature;
 import org.activiti.designer.features.AddBoundaryTimerFeature;
 import org.activiti.designer.features.AddBusinessRuleTaskFeature;
 import org.activiti.designer.features.AddCallActivityFeature;
@@ -79,6 +80,7 @@ import org.activiti.designer.features.CopyFlowElementFeature;
 import org.activiti.designer.features.CreateAssociationFeature;
 import org.activiti.designer.features.CreateBoundaryErrorFeature;
 import org.activiti.designer.features.CreateBoundarySignalFeature;
+import org.activiti.designer.features.CreateBoundaryMessageFeature;
 import org.activiti.designer.features.CreateBoundaryTimerFeature;
 import org.activiti.designer.features.CreateBusinessRuleTaskFeature;
 import org.activiti.designer.features.CreateCallActivityFeature;
@@ -250,7 +252,9 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 		    if(definition instanceof ErrorEventDefinition) {
 		      return new AddBoundaryErrorFeature(this);
 		    } else if(definition instanceof SignalEventDefinition) {
-		    	return new AddBoundarySignalFeature(this);
+		      return new AddBoundarySignalFeature(this);
+		    } else if(definition instanceof MessageEventDefinition) {
+		      return new AddBoundaryMessageFeature(this);
 		    } else {
 		      return new AddBoundaryTimerFeature(this);
 		    }
@@ -314,6 +318,7 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 		        new CreateBoundaryTimerFeature(this),
 		        new CreateBoundaryErrorFeature(this),
 		        new CreateBoundarySignalFeature(this),
+            new CreateBoundaryMessageFeature(this),
 		        new CreateTimerCatchingEventFeature(this),
 		        new CreateSignalCatchingEventFeature(this),
 		        new CreateMessageCatchingEventFeature(this),
@@ -449,7 +454,7 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 
   @Override
 	public ICustomFeature[] getCustomFeatures(ICustomContext context) {
-		return new ICustomFeature[] { new SaveBpmnModelFeature(this), 
+		return new ICustomFeature[] { new SaveBpmnModelFeature(this),
 				new DeleteSequenceFlowFeature(this), new DeletePoolFeature(this), new ChangeElementTypeFeature(this), 
 				new DeleteAssociationFeature(this) };
 	}

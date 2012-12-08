@@ -21,6 +21,7 @@ import org.activiti.designer.bpmn2.model.BoundaryEvent;
 import org.activiti.designer.bpmn2.model.ErrorEventDefinition;
 import org.activiti.designer.bpmn2.model.EventDefinition;
 import org.activiti.designer.bpmn2.model.SignalEventDefinition;
+import org.activiti.designer.bpmn2.model.MessageEventDefinition;
 import org.activiti.designer.bpmn2.model.TimerEventDefinition;
 import org.apache.commons.lang.StringUtils;
 
@@ -91,7 +92,7 @@ public class BoundaryEventExport implements ActivitiNamespaceConstants {
         xtw.writeEndElement();
         
       } else if(eventDefinitionList.get(0) instanceof SignalEventDefinition) {
-      	SignalEventDefinition signalDef = (SignalEventDefinition) eventDefinitionList.get(0);
+        SignalEventDefinition signalDef = (SignalEventDefinition) eventDefinitionList.get(0);
         
         xtw.writeStartElement("signalEventDefinition");
         
@@ -99,6 +100,16 @@ public class BoundaryEventExport implements ActivitiNamespaceConstants {
           xtw.writeAttribute("signalRef", signalDef.getSignalRef());
         }
         
+        xtw.writeEndElement();
+      } else if(eventDefinitionList.get(0) instanceof MessageEventDefinition) {
+        MessageEventDefinition messageDef = (MessageEventDefinition) eventDefinitionList.get(0);
+
+        xtw.writeStartElement("messageEventDefinition");
+
+        if(StringUtils.isNotEmpty(messageDef.getMessageRef())) {
+          xtw.writeAttribute("messageRef", messageDef.getMessageRef());
+        }
+
         xtw.writeEndElement();
       }
       
