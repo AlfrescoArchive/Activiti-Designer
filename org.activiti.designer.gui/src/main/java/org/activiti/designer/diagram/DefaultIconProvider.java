@@ -35,6 +35,7 @@ import org.activiti.designer.bpmn2.model.ReceiveTask;
 import org.activiti.designer.bpmn2.model.ScriptTask;
 import org.activiti.designer.bpmn2.model.ServiceTask;
 import org.activiti.designer.bpmn2.model.SignalEventDefinition;
+import org.activiti.designer.bpmn2.model.MessageEventDefinition;
 import org.activiti.designer.bpmn2.model.StartEvent;
 import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.bpmn2.model.ThrowEvent;
@@ -144,6 +145,8 @@ public class DefaultIconProvider implements IconProvider {
           result = Activator.getImage(PluginImage.IMG_BOUNDARY_ERROR);
         } else if(definition instanceof SignalEventDefinition) {
           result = Activator.getImage(PluginImage.IMG_BOUNDARY_SIGNAL);
+        } else if(definition instanceof MessageEventDefinition) {
+          result = Activator.getImage(PluginImage.IMG_BOUNDARY_MESSAGE);
         } else {
           result = Activator.getImage(PluginImage.IMG_BOUNDARY_TIMER);
         }

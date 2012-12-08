@@ -65,6 +65,7 @@ public enum PluginImage {
   IMG_BOUNDARY_TIMER("boundary.timer", "timer.png"), //$NON-NLS-1$
   IMG_BOUNDARY_ERROR("boundary.error", "error.png"), //$NON-NLS-1$
   IMG_BOUNDARY_SIGNAL("boundary.signal", "signal.png"), //$NON-NLS-1$
+  IMG_BOUNDARY_MESSAGE("boundary.messsage", "letter.png"), //$NON-NLS-1$
 
   IMG_THROW_SIGNAL("throw.signal", "throw.signal.png"), //$NON-NLS-1$
   IMG_THROW_NONE("throw.none", "throw.none.png"), //$NON-NLS-1$

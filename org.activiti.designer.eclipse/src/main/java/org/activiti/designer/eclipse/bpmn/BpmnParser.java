@@ -1615,6 +1615,11 @@ public class BpmnParser {
           boundaryEvent.getEventDefinitions().add(parseSignalEventDefinition(xtr));
           break;
 
+        } else if (xtr.isStartElement() && "messageEventDefinition".equalsIgnoreCase(xtr.getLocalName())) {
+          model.type = BoundaryEventModel.MESSAGEEVENT;
+          boundaryEvent.getEventDefinitions().add(parseMessageEventDefinition(xtr));
+          break;
+
         } else if (xtr.isEndElement() && "boundaryEvent".equalsIgnoreCase(xtr.getLocalName())) {
           break;
         }
@@ -1732,6 +1737,14 @@ public class BpmnParser {
     SignalEventDefinition eventDefinition = new SignalEventDefinition();
     if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, "signalRef"))) {
       eventDefinition.setSignalRef(xtr.getAttributeValue(null, "signalRef"));
+    }
+    return eventDefinition;
+  }
+
+  private MessageEventDefinition parseMessageEventDefinition(XMLStreamReader xtr) {
+    MessageEventDefinition eventDefinition = new MessageEventDefinition();
+    if (StringUtils.isNotEmpty(xtr.getAttributeValue(null, "messageRef"))) {
+      eventDefinition.setMessageRef(xtr.getAttributeValue(null, "messageRef"));
     }
     return eventDefinition;
   }
