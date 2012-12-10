@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-import org.activiti.designer.bpmn2.model.UserTask;
+import org.activiti.bpmn.model.UserTask;
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.preferences.Preferences;
@@ -45,7 +45,7 @@ public class PropertyAlfrescoUserTaskSection extends ActivitiPropertySection imp
     Composite composite = factory.createFlatFormComposite(parent);
     FormData data;
 
-    performerTypeCombo = createCCombo(composite, (String[]) performerTypes.toArray(), factory, null);
+    performerTypeCombo = createCCombo(composite, performerTypes, factory, null);
     createLabel("Performer type:", composite, factory, performerTypeCombo);
 
     expressionText = createText(composite, factory, performerTypeCombo);
@@ -309,9 +309,11 @@ public class PropertyAlfrescoUserTaskSection extends ActivitiPropertySection imp
     return label;
   }
 
-  private CCombo createCCombo(Composite parent, String[] values, TabbedPropertySheetWidgetFactory factory, Control top) {
+  private CCombo createCCombo(Composite parent, List<String> values, TabbedPropertySheetWidgetFactory factory, Control top) {
     CCombo combo = factory.createCCombo(parent, SWT.NONE);
-    combo.setItems(values);
+    for (String value : values) {
+      combo.add(value);
+    }
     FormData data = new FormData();
     data.left = new FormAttachment(0, 160);
     data.right = new FormAttachment(100, 0);

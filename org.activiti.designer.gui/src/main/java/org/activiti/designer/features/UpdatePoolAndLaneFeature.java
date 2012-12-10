@@ -1,7 +1,7 @@
 package org.activiti.designer.features;
 
-import org.activiti.designer.bpmn2.model.Lane;
-import org.activiti.designer.bpmn2.model.Pool;
+import org.activiti.bpmn.model.Lane;
+import org.activiti.bpmn.model.Pool;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.IReason;
 import org.eclipse.graphiti.features.context.IUpdateContext;

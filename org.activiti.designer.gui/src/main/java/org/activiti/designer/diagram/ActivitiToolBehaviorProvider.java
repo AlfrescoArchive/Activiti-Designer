@@ -9,26 +9,25 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.activiti.bpmn.model.Association;
+import org.activiti.bpmn.model.BusinessRuleTask;
+import org.activiti.bpmn.model.CallActivity;
+import org.activiti.bpmn.model.EventGateway;
+import org.activiti.bpmn.model.ExclusiveGateway;
+import org.activiti.bpmn.model.Gateway;
+import org.activiti.bpmn.model.InclusiveGateway;
+import org.activiti.bpmn.model.ManualTask;
+import org.activiti.bpmn.model.ParallelGateway;
+import org.activiti.bpmn.model.Pool;
+import org.activiti.bpmn.model.ReceiveTask;
+import org.activiti.bpmn.model.ScriptTask;
+import org.activiti.bpmn.model.SequenceFlow;
+import org.activiti.bpmn.model.ServiceTask;
+import org.activiti.bpmn.model.StartEvent;
+import org.activiti.bpmn.model.SubProcess;
+import org.activiti.bpmn.model.Task;
+import org.activiti.bpmn.model.UserTask;
 import org.activiti.designer.PluginImage;
-import org.activiti.designer.bpmn2.model.Association;
-import org.activiti.designer.bpmn2.model.BusinessRuleTask;
-import org.activiti.designer.bpmn2.model.CallActivity;
-import org.activiti.designer.bpmn2.model.EventGateway;
-import org.activiti.designer.bpmn2.model.ExclusiveGateway;
-import org.activiti.designer.bpmn2.model.Gateway;
-import org.activiti.designer.bpmn2.model.InclusiveGateway;
-import org.activiti.designer.bpmn2.model.MailTask;
-import org.activiti.designer.bpmn2.model.ManualTask;
-import org.activiti.designer.bpmn2.model.ParallelGateway;
-import org.activiti.designer.bpmn2.model.Pool;
-import org.activiti.designer.bpmn2.model.ReceiveTask;
-import org.activiti.designer.bpmn2.model.ScriptTask;
-import org.activiti.designer.bpmn2.model.SequenceFlow;
-import org.activiti.designer.bpmn2.model.ServiceTask;
-import org.activiti.designer.bpmn2.model.StartEvent;
-import org.activiti.designer.bpmn2.model.SubProcess;
-import org.activiti.designer.bpmn2.model.Task;
-import org.activiti.designer.bpmn2.model.UserTask;
 import org.activiti.designer.eclipse.common.ActivitiBPMNDiagramConstants;
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.features.AbstractCreateBPMNFeature;
@@ -326,7 +325,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
   }
 
   private void addTaskButtons(ContextButtonEntry otherElementButton, Task notTask, CustomContext customContext) {
-    if (notTask == null || notTask instanceof ServiceTask == false) {
+    if (notTask == null || notTask instanceof ServiceTask == false || ServiceTask.MAIL_TASK.equalsIgnoreCase(((ServiceTask) notTask).getType())) {
       addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "servicetask"), customContext, "Change to service task",
               "Change to a service task", PluginImage.IMG_SERVICETASK);
     }
@@ -338,8 +337,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
       addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "usertask"), customContext, "Change to user task",
               "Change to a user task", PluginImage.IMG_USERTASK);
     }
-    if (notTask == null || notTask instanceof MailTask == false) {
-      ;
+    if (notTask == null || notTask instanceof ServiceTask == false || ServiceTask.MAIL_TASK.equalsIgnoreCase(((ServiceTask) notTask).getType()) == false) {
       addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "mailtask"), customContext, "Change to mail task",
               "Change to a mail task", PluginImage.IMG_MAILTASK);
     }

@@ -1,9 +1,9 @@
 package org.activiti.designer.features;
 
+import org.activiti.bpmn.model.Lane;
+import org.activiti.bpmn.model.Pool;
+import org.activiti.bpmn.model.Process;
 import org.activiti.designer.PluginImage;
-import org.activiti.designer.bpmn2.model.Lane;
-import org.activiti.designer.bpmn2.model.Pool;
-import org.activiti.designer.bpmn2.model.Process;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -45,8 +45,8 @@ public class CreatePoolFeature extends AbstractCreateBPMNFeature {
     newPool.setProcessRef(newProcess.getId());
 
     Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
-    model.getPools().add(newPool);
-    model.addProcess(newProcess);
+    model.getBpmnModel().getPools().add(newPool);
+    model.getBpmnModel().addProcess(newProcess);
 
     PictogramElement poolElement = addGraphicalRepresentation(context, newPool);
 

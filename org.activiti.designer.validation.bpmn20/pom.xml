@@ -11,5 +11,5 @@
 	<artifactId>org.activiti.designer.validation.bpmn20</artifactId>
 	<packaging>eclipse-plugin</packaging>
 	<name>Activiti Designer - Validate BPMN 2.0</name>
-
+	
 </project>

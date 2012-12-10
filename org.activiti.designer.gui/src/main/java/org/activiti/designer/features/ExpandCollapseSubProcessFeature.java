@@ -4,7 +4,7 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.bpmn.model.SubProcess;
 import org.activiti.designer.eclipse.common.FileService;
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.eclipse.util.Util;

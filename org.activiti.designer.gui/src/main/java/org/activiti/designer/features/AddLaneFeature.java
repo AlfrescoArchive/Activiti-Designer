@@ -1,8 +1,8 @@
 package org.activiti.designer.features;
 
+import org.activiti.bpmn.model.Lane;
+import org.activiti.bpmn.model.Pool;
 import org.activiti.designer.PluginImage;
-import org.activiti.designer.bpmn2.model.Lane;
-import org.activiti.designer.bpmn2.model.Pool;
 import org.activiti.designer.util.platform.OSEnum;
 import org.activiti.designer.util.platform.OSUtil;
 import org.activiti.designer.util.style.StyleUtil;

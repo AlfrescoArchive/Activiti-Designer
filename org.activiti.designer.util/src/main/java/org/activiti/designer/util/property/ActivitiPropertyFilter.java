@@ -1,5 +1,7 @@
 package org.activiti.designer.util.property;
 
+import org.activiti.bpmn.model.FieldExtension;
+import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.EObject;
@@ -32,4 +34,16 @@ public class ActivitiPropertyFilter extends AbstractPropertySectionFilter {
   protected boolean accept(PictogramElement element) {
 	  return false;
   }
+	
+	protected boolean isAlfrescoMailScriptTask(ServiceTask serviceTask) {
+	  boolean isMailTask = false;
+	  for (FieldExtension fieldExtension : serviceTask.getFieldExtensions()) {
+	    if ("script".equalsIgnoreCase(fieldExtension.getFieldName())) {
+	      if (fieldExtension.getStringValue().contains("mail.execute(bpm_package);")) {
+	        isMailTask = true;
+	      }
+	    }
+	  }
+	  return isMailTask;
+	}
 }

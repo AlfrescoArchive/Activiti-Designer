@@ -5,7 +5,7 @@ package org.activiti.designer.features;
 
 import java.util.List;
 
-import org.activiti.designer.bpmn2.model.FlowElement;
+import org.activiti.bpmn.model.FlowElement;
 import org.activiti.designer.util.CloneUtil;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;

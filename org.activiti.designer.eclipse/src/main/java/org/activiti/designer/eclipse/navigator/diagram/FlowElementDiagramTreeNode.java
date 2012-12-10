@@ -13,7 +13,8 @@
 
 package org.activiti.designer.eclipse.navigator.diagram;
 
-import org.activiti.designer.bpmn2.model.FlowElement;
+import org.activiti.bpmn.model.FlowElement;
+
 
 /**
  * @author Tiese Barrell

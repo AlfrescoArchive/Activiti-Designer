@@ -1,16 +1,17 @@
 package org.activiti.designer.features;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-import org.activiti.designer.bpmn2.model.BaseElement;
-import org.activiti.designer.bpmn2.model.FlowElement;
-import org.activiti.designer.bpmn2.model.FlowNode;
-import org.activiti.designer.bpmn2.model.Lane;
-import org.activiti.designer.bpmn2.model.Pool;
-import org.activiti.designer.bpmn2.model.Process;
-import org.activiti.designer.bpmn2.model.SequenceFlow;
-import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.bpmn.model.BaseElement;
+import org.activiti.bpmn.model.FlowElement;
+import org.activiti.bpmn.model.FlowNode;
+import org.activiti.bpmn.model.Lane;
+import org.activiti.bpmn.model.Pool;
+import org.activiti.bpmn.model.Process;
+import org.activiti.bpmn.model.SequenceFlow;
+import org.activiti.bpmn.model.SubProcess;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -58,21 +59,21 @@ public class DeleteLaneFeature extends DefaultDeleteFeature {
 		  Lane lane = (Lane) bo;
 		  
 		  Pool parentPool = null;
-		  for (Pool pool : model.getPools()) {
+		  for (Pool pool : model.getBpmnModel().getPools()) {
 		    if(pool.getProcessRef().equalsIgnoreCase(lane.getParentProcess().getId())) {
 		      parentPool = pool;
 		      break;
 		    }
 		  }
 		  
-		  Process laneProcess = model.getProcess(parentPool.getId());
+		  Process laneProcess = model.getBpmnModel().getProcess(parentPool.getId());
 		  
 		  if (parentPool == null || laneProcess == null) return;
 		  
 		  if(laneProcess.getLanes().size() == 1) {
-        Process process = model.getProcess(parentPool.getId());
-        model.getProcesses().remove(process);
-        model.getPools().remove(parentPool);
+        Process process = model.getBpmnModel().getProcess(parentPool.getId());
+        model.getBpmnModel().getProcesses().remove(process);
+        model.getBpmnModel().getPools().remove(parentPool);
         PictogramElement poolElement = getFeatureProvider().getPictogramElementForBusinessObject(parentPool);
         IRemoveContext poolRc = new RemoveContext(poolElement);
         IRemoveFeature poolRemoveFeature = getFeatureProvider().getRemoveFeature(poolRc);
@@ -118,19 +119,26 @@ public class DeleteLaneFeature extends DefaultDeleteFeature {
 	}
 	
 	private void removeElement(BaseElement element) {
-  	List<Process> processes = ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getProcesses();
+  	List<Process> processes = ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getBpmnModel().getProcesses();
     for (Process process : processes) {
-      process.getFlowElements().remove(element);
-      removeElementInProcess(element, process.getFlowElements());
+      process.removeFlowElement(element.getId());
+      removeElementInProcess(element, process);
     }
 	}
 	
-	private void removeElementInProcess(BaseElement element, List<FlowElement> elementList) {
+	private void removeElementInProcess(BaseElement element, BaseElement parentElement) {
+	  Collection<FlowElement> elementList = null;
+    if (parentElement instanceof Process) {
+      elementList = ((Process) parentElement).getFlowElements();
+    } else if (parentElement instanceof SubProcess) {
+      elementList = ((SubProcess) parentElement).getFlowElements();
+    }
+	  
     for (FlowElement flowElement : elementList) {
       if(flowElement instanceof SubProcess) {
         SubProcess subProcess = (SubProcess) flowElement;
-        subProcess.getFlowElements().remove(element);
-        removeElementInProcess(element, subProcess.getFlowElements());
+        subProcess.removeFlowElement(element.getId());
+        removeElementInProcess(element, subProcess);
       }
     }
   }
@@ -150,8 +158,19 @@ public class DeleteLaneFeature extends DefaultDeleteFeature {
       if (removeFeature != null) {
         removeFeature.remove(rc);
       }
-      deleteObject.getTargetRef().getIncoming().remove(deleteObject);
-      deleteObject.getSourceRef().getOutgoing().remove(deleteObject);
+      
+      Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+      FlowElement sourceElement = model.getFlowElement(deleteObject.getSourceRef());
+      FlowElement targetElement = model.getFlowElement(deleteObject.getTargetRef());
+      
+      if (sourceElement != null) {
+        sourceElement.getOutgoingFlows().remove(deleteObject);
+      }
+      
+      if (targetElement != null) {
+        targetElement.getIncomingFlows().remove(deleteObject);
+      }
+      
       removeElement(deleteObject);
     }
 	}

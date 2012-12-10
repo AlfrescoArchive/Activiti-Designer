@@ -1,13 +1,13 @@
 package org.activiti.designer.features;
 
+import org.activiti.bpmn.model.BaseElement;
+import org.activiti.bpmn.model.EndEvent;
+import org.activiti.bpmn.model.FlowNode;
+import org.activiti.bpmn.model.Lane;
+import org.activiti.bpmn.model.SequenceFlow;
+import org.activiti.bpmn.model.StartEvent;
+import org.activiti.bpmn.model.SubProcess;
 import org.activiti.designer.PluginImage;
-import org.activiti.designer.bpmn2.model.BaseElement;
-import org.activiti.designer.bpmn2.model.EndEvent;
-import org.activiti.designer.bpmn2.model.FlowNode;
-import org.activiti.designer.bpmn2.model.Lane;
-import org.activiti.designer.bpmn2.model.SequenceFlow;
-import org.activiti.designer.bpmn2.model.StartEvent;
-import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.designer.util.preferences.Preferences;
@@ -90,8 +90,8 @@ public class CreateSequenceFlowFeature extends AbstractCreateBPMNConnectionFeatu
     SequenceFlow sequenceFlow = new SequenceFlow();
 
     sequenceFlow.setId(getNextId());
-    sequenceFlow.setSourceRef(source);
-    sequenceFlow.setTargetRef(target);
+    sequenceFlow.setSourceRef(source.getId());
+    sequenceFlow.setTargetRef(target.getId());
 
     if (PreferencesUtil.getBooleanPreference(Preferences.EDITOR_ADD_LABELS_TO_NEW_SEQUENCEFLOWS)) {
       sequenceFlow.setName(String.format("to %s", target.getName()));
@@ -102,16 +102,16 @@ public class CreateSequenceFlowFeature extends AbstractCreateBPMNConnectionFeatu
     ContainerShape targetContainer = (ContainerShape) context.getSourcePictogramElement();
     ContainerShape parentContainer = targetContainer.getContainer();
     if (parentContainer instanceof Diagram) {
-      ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getMainProcess().getFlowElements().add(sequenceFlow);
+      ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getBpmnModel().getMainProcess().addFlowElement(sequenceFlow);
 
     } else {
       Object parentObject = getBusinessObjectForPictogramElement(parentContainer);
       if (parentObject instanceof SubProcess) {
-        ((SubProcess) parentObject).getFlowElements().add(sequenceFlow);
+        ((SubProcess) parentObject).addFlowElement(sequenceFlow);
 
       } else if (parentObject instanceof Lane) {
         Lane lane = (Lane) parentObject;
-        lane.getParentProcess().getFlowElements().add(sequenceFlow);
+        lane.getParentProcess().addFlowElement(sequenceFlow);
       }
     }
 

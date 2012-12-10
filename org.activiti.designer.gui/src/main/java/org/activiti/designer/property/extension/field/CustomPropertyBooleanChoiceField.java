@@ -15,7 +15,7 @@ package org.activiti.designer.property.extension.field;
 
 import java.lang.reflect.Field;
 
-import org.activiti.designer.bpmn2.model.ServiceTask;
+import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.designer.integration.servicetask.PropertyType;
 import org.activiti.designer.property.PropertyCustomServiceTaskSection;
 import org.eclipse.swt.SWT;

@@ -3,10 +3,11 @@ package org.activiti.designer.property.ui;
 import java.util.Iterator;
 import java.util.List;
 
-import org.activiti.designer.bpmn2.model.FieldExtension;
-import org.activiti.designer.bpmn2.model.ServiceTask;
+import org.activiti.bpmn.model.FieldExtension;
+import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.editor.ModelHandler;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -26,8 +27,8 @@ public class FieldExtensionEditor extends TableFieldEditor {
 	
 	public FieldExtensionEditor(String key, Composite parent) {
 		
-        super(key, "", new String[] {"Field name", "String value / Expression"},
-        		new int[] {200, 400}, parent);
+        super(key, "", new String[] {"Field name", "String value", "Expression"},
+        		new int[] {150, 150, 150}, parent);
         this.parent = parent;
 	}
 	
@@ -35,7 +36,7 @@ public class FieldExtensionEditor extends TableFieldEditor {
 	  removeTableItems();
 		if(fieldList == null || fieldList.size() == 0) return;
 		for (FieldExtension fieldExtension : fieldList) {
-			addTableItem(fieldExtension.getFieldName(), fieldExtension.getExpression());
+			addTableItem(fieldExtension.getFieldName(), fieldExtension.getStringValue(), fieldExtension.getExpression());
 		}
 	}
 	
@@ -43,7 +44,7 @@ public class FieldExtensionEditor extends TableFieldEditor {
 	  removeTableItems();
     if(fieldList == null || fieldList.size() == 0) return;
     for (FieldExtension fieldExtension : fieldList) {
-      addTableItem(fieldExtension.getFieldName(), fieldExtension.getExpression());
+      addTableItem(fieldExtension.getFieldName(), fieldExtension.getStringValue(), fieldExtension.getExpression());
     }
 	}
 
@@ -57,11 +58,18 @@ public class FieldExtensionEditor extends TableFieldEditor {
 		return null;
 	}
 	
-	protected void addTableItem(String name, String value) {
+	protected void addTableItem(String name, String stringValue, String expression) {
     if(table != null) {
       TableItem tableItem = new TableItem(table, SWT.NONE);
       tableItem.setText(0, name);
-      tableItem.setText(1, value);
+      if (stringValue == null) {
+        stringValue = "";
+      }
+      tableItem.setText(1, stringValue);
+      if (expression == null) {
+        expression = "";
+      }
+      tableItem.setText(2, expression);
     }
   }
 
@@ -71,10 +79,11 @@ public class FieldExtensionEditor extends TableFieldEditor {
 		dialog.open();
 		String fieldNameInput = dialog.fieldNameInput;
 		String fieldValueInput = dialog.fieldValueInput;
-		if(fieldNameInput != null && fieldNameInput.length() > 0 &&
-				fieldValueInput != null && fieldValueInput.length() > 0) {
+		String fieldExpressionInput = dialog.fieldExpressionInput;
+		if(StringUtils.isNotEmpty(fieldNameInput) &&
+		        (StringUtils.isNotEmpty(fieldValueInput) || StringUtils.isNotEmpty(fieldExpressionInput))) {
 			
-			return new String[] { fieldNameInput, fieldValueInput };
+			return new String[] { fieldNameInput, fieldValueInput, fieldExpressionInput };
 		} else {
 			return null;
 		}
@@ -83,18 +92,20 @@ public class FieldExtensionEditor extends TableFieldEditor {
 	@Override
   protected String[] getChangedInputObject(TableItem tableItem) {
     FieldExtensionDialog dialog = new FieldExtensionDialog(parent.getShell(), getItems(), 
-            tableItem.getText(0), tableItem.getText(1));
+            tableItem.getText(0), tableItem.getText(1), tableItem.getText(2));
     dialog.open();
     String fieldNameInput = dialog.fieldNameInput;
     String fieldValueInput = dialog.fieldValueInput;
-    if(fieldNameInput != null && fieldNameInput.length() > 0 &&
-        fieldValueInput != null && fieldValueInput.length() > 0) {
+    String fieldExpressionInput = dialog.fieldExpressionInput;
+    if(StringUtils.isNotEmpty(fieldNameInput) &&
+            (StringUtils.isNotEmpty(fieldValueInput) || StringUtils.isNotEmpty(fieldExpressionInput))) {
       
-      if(tableItem.getText(0).equals(fieldNameInput) && tableItem.getText(1).equals(fieldValueInput)) {
+      if(tableItem.getText(0).equals(fieldNameInput) && tableItem.getText(1).equals(fieldValueInput) &&
+              tableItem.getText(2).equals(fieldExpressionInput)) {
         return null;
       }
       
-      return new String[] { fieldNameInput, fieldValueInput };
+      return new String[] { fieldNameInput, fieldValueInput, fieldExpressionInput };
     } else {
       return null;
     }
@@ -121,16 +132,19 @@ public class FieldExtensionEditor extends TableFieldEditor {
 						ServiceTask serviceTask = (ServiceTask)  bo;
 						for (TableItem item : getItems()) {
 							String fieldName = item.getText(0);
-							String fieldExpression = item.getText(1);
-							if(fieldName != null && fieldName.length() > 0 &&
-									fieldExpression != null && fieldExpression.length() > 0) {
+							String fieldStringValue = item.getText(1);
+							String fieldExpression = item.getText(2);
+							if(StringUtils.isNotEmpty(fieldName) &&
+							        (StringUtils.isNotEmpty(fieldStringValue) || StringUtils.isNotEmpty(fieldExpression))) {
 								
 								FieldExtension fieldExtension = fieldExtensionExists(serviceTask, fieldName);
 								if(fieldExtension != null) {
+								  fieldExtension.setStringValue(fieldStringValue);
 									fieldExtension.setExpression(fieldExpression);
 								} else {
 									FieldExtension newFieldExtension = new FieldExtension();
 									newFieldExtension.setFieldName(fieldName);
+									newFieldExtension.setStringValue(fieldStringValue);
 									newFieldExtension.setExpression(fieldExpression);
 									serviceTask.getFieldExtensions().add(newFieldExtension);
 								}

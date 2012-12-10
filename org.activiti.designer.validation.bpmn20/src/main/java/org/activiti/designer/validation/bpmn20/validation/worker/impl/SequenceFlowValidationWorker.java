@@ -5,9 +5,10 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.designer.bpmn2.model.SequenceFlow;
+import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.designer.validation.bpmn20.validation.worker.ProcessValidationWorker;
 import org.activiti.designer.validation.bpmn20.validation.worker.ProcessValidationWorkerMarker;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 
@@ -35,11 +36,11 @@ public class SequenceFlowValidationWorker implements ProcessValidationWorker {
       for (final Object object : sequenceFlows) {
 
         final SequenceFlow sequenceFlow = (SequenceFlow) object;
-        if (sequenceFlow.getSourceRef() == null || sequenceFlow.getSourceRef().getId() == null || sequenceFlow.getSourceRef().getId().length() == 0) {
+        if (StringUtils.isEmpty(sequenceFlow.getSourceRef())) {
           result.add(new ProcessValidationWorkerMarker(IMarker.SEVERITY_ERROR, String.format(NO_SOURCE_ACTIVITY_EXCEPTION_MESSAGE_PATTERN,
                   sequenceFlow.getName()), sequenceFlow.getId(), ValidationCode.VAL_005));
         }
-        if (sequenceFlow.getTargetRef() == null || sequenceFlow.getTargetRef().getId() == null || sequenceFlow.getTargetRef().getId().length() == 0) {
+        if (StringUtils.isEmpty(sequenceFlow.getTargetRef())) {
           result.add(new ProcessValidationWorkerMarker(IMarker.SEVERITY_ERROR, String.format(NO_TARGET_ACTIVITY_EXCEPTION_MESSAGE_PATTERN,
                   sequenceFlow.getName()), sequenceFlow.getId(), ValidationCode.VAL_006));
         }

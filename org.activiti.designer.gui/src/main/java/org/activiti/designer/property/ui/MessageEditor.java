@@ -5,9 +5,10 @@ package org.activiti.designer.property.ui;
  */
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-import org.activiti.designer.bpmn2.model.Message;
+import org.activiti.bpmn.model.Message;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
@@ -33,7 +34,7 @@ public class MessageEditor extends TableFieldEditor {
     this.parent = parent;
   }
 
-  public void initialize(List<Message> messageList) {
+  public void initialize(Collection<Message> messageList) {
     removeTableItems();
     if(messageList == null || messageList.size() == 0) return;
     for (Message message : messageList) {
@@ -116,8 +117,8 @@ public class MessageEditor extends TableFieldEditor {
           	newMessageList.add(newMessage);
           }
         }
-        model.getMessages().clear();
-        model.getMessages().addAll(newMessageList);
+        model.getBpmnModel().getMessages().clear();
+        model.getBpmnModel().getMessages().addAll(newMessageList);
       }
     }, editingDomain, "Model Update");
   }

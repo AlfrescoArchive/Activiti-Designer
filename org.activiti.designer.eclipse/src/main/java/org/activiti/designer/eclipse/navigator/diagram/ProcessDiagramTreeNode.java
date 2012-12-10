@@ -16,9 +16,9 @@ package org.activiti.designer.eclipse.navigator.diagram;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.designer.bpmn2.model.FlowElement;
-import org.activiti.designer.bpmn2.model.Lane;
-import org.activiti.designer.bpmn2.model.Process;
+import org.activiti.bpmn.model.FlowElement;
+import org.activiti.bpmn.model.Lane;
+import org.activiti.bpmn.model.Process;
 import org.activiti.designer.eclipse.navigator.TreeNode;
 
 /**

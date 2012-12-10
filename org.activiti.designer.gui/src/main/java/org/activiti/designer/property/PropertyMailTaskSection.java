@@ -1,6 +1,6 @@
 package org.activiti.designer.property;
 
-import org.activiti.designer.bpmn2.model.MailTask;
+import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
@@ -104,15 +104,16 @@ public class PropertyMailTaskSection extends ActivitiPropertySection implements 
 			if (bo == null)
 				return;
 
-			MailTask mailTask = (MailTask)  bo;
-			toText.setText(mailTask.getTo() == null ? "" : mailTask.getTo());
-			fromText.setText(mailTask.getFrom() == null ? "" : mailTask.getFrom());
-			subjectText.setText(mailTask.getSubject() == null ? "" : mailTask.getSubject());
-			ccText.setText(mailTask.getCc() == null ? "" : mailTask.getCc());
-			bccText.setText(mailTask.getBcc() == null ? "" : mailTask.getBcc());
-			charsetText.setText(mailTask.getCharset() == null ? "" : mailTask.getCharset());
-			htmlText.setText(mailTask.getHtml() == null ? "" : mailTask.getHtml());
-			nonHtmlText.setText(mailTask.getText() == null ? "" : mailTask.getText());
+			ServiceTask mailTask = (ServiceTask)  bo;
+			
+			toText.setText(getFieldString("to", mailTask));
+			fromText.setText(getFieldString("from", mailTask));
+			subjectText.setText(getFieldString("subject", mailTask));
+			ccText.setText(getFieldString("cc", mailTask));
+			bccText.setText(getFieldString("bcc", mailTask));
+			charsetText.setText(getFieldString("charset", mailTask));
+			htmlText.setText(getFieldString("html", mailTask));
+			nonHtmlText.setText(getFieldString("text", mailTask));
 			
 			toText.addFocusListener(listener);
 			fromText.addFocusListener(listener);
@@ -134,20 +135,20 @@ public class PropertyMailTaskSection extends ActivitiPropertySection implements 
 			PictogramElement pe = getSelectedPictogramElement();
 			if (pe != null) {
 				final Object bo = getBusinessObject(pe);
-				if (bo instanceof MailTask) {
+				if (bo instanceof ServiceTask) {
 					DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
 					TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
 					ActivitiUiUtil.runModelChange(new Runnable() {
 						public void run() {
-							MailTask mailTask = (MailTask)  bo;
-							mailTask.setTo(toText.getText());
-							mailTask.setFrom(fromText.getText());
-							mailTask.setSubject(subjectText.getText());
-							mailTask.setCc(ccText.getText());
-							mailTask.setBcc(bccText.getText());
-							mailTask.setCharset(charsetText.getText());
-							mailTask.setHtml(htmlText.getText());
-							mailTask.setText(nonHtmlText.getText());
+						  ServiceTask mailTask = (ServiceTask) bo;
+						  setFieldString("to", toText.getText(), mailTask);
+						  setFieldString("from", fromText.getText(), mailTask);
+						  setFieldString("subject", subjectText.getText(), mailTask);
+						  setFieldString("cc", ccText.getText(), mailTask);
+						  setFieldString("bcc", bccText.getText(), mailTask);
+              setFieldString("charset", charsetText.getText(), mailTask);
+              setFieldString("html", htmlText.getText(), mailTask);
+              setFieldString("text", nonHtmlText.getText(), mailTask);
 						}
 					}, editingDomain, "Model Update");
 				}
@@ -155,5 +156,4 @@ public class PropertyMailTaskSection extends ActivitiPropertySection implements 
 			}
 		}
 	};
-
 }

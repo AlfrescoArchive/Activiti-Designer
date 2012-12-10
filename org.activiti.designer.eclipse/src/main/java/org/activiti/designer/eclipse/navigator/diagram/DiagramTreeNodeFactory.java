@@ -12,11 +12,11 @@
  */
 package org.activiti.designer.eclipse.navigator.diagram;
 
-import org.activiti.designer.bpmn2.model.FlowElement;
-import org.activiti.designer.bpmn2.model.Lane;
-import org.activiti.designer.bpmn2.model.Pool;
-import org.activiti.designer.bpmn2.model.Process;
-import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.bpmn.model.FlowElement;
+import org.activiti.bpmn.model.Lane;
+import org.activiti.bpmn.model.Pool;
+import org.activiti.bpmn.model.Process;
+import org.activiti.bpmn.model.SubProcess;
 import org.activiti.designer.eclipse.navigator.TreeNode;
 import org.eclipse.core.resources.IFile;
 

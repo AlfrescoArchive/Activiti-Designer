@@ -1,6 +1,6 @@
 package org.activiti.designer.property;
 
-import org.activiti.designer.bpmn2.model.CallActivity;
+import org.activiti.bpmn.model.CallActivity;
 import org.activiti.designer.util.property.ActivitiPropertyFilter;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 

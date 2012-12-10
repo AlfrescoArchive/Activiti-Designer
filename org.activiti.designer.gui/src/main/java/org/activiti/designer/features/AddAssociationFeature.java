@@ -2,12 +2,15 @@ package org.activiti.designer.features;
 
 import java.util.List;
 
-import org.activiti.designer.bpmn2.model.Association;
-import org.activiti.designer.bpmn2.model.BaseElement;
-import org.activiti.designer.bpmn2.model.EndEvent;
-import org.activiti.designer.bpmn2.model.Gateway;
-import org.activiti.designer.bpmn2.model.SubProcess;
-import org.activiti.designer.util.editor.GraphicInfo;
+import org.activiti.bpmn.model.Association;
+import org.activiti.bpmn.model.BaseElement;
+import org.activiti.bpmn.model.EndEvent;
+import org.activiti.bpmn.model.Gateway;
+import org.activiti.bpmn.model.GraphicInfo;
+import org.activiti.bpmn.model.SubProcess;
+import org.activiti.designer.util.editor.Bpmn2MemoryModel;
+import org.activiti.designer.util.editor.ModelHandler;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.datatypes.ILocation;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddConnectionContext;
@@ -61,7 +64,7 @@ public class AddAssociationFeature extends AbstractAddFeature {
           continue;
         }
         
-        if (baseElement.getId().equals(association.getSourceRef().getId())) {
+        if (baseElement.getId().equals(association.getSourceRef())) {
           final List<Anchor> anchors = ((ContainerShape) shape).getAnchors();
           for (final Anchor anchor : anchors) {
             if (anchor instanceof ChopboxAnchor) {
@@ -72,7 +75,7 @@ public class AddAssociationFeature extends AbstractAddFeature {
           }
         }
         
-        if (baseElement.getId().equals(association.getTargetRef().getId())) {
+        if (baseElement.getId().equals(association.getTargetRef())) {
           final List<Anchor> anchors = ((ContainerShape) shape).getAnchors();
           for (final Anchor anchor : anchors) {
             if (anchor instanceof ChopboxAnchor) {
@@ -99,77 +102,85 @@ public class AddAssociationFeature extends AbstractAddFeature {
     
     sourceAnchor.getOutgoingConnections().add(connection);
     targetAnchor.getIncomingConnections().add(connection);
+    
+    Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+    
+    BaseElement sourceElement = model.getFlowElement(association.getSourceRef());
+    if (sourceElement == null) {
+      sourceElement = model.getArtifact(association.getSourceRef());
+    }
+    BaseElement targetElement = model.getFlowElement(association.getTargetRef());
+    if (targetElement == null) {
+      targetElement = model.getArtifact(association.getTargetRef());
+    }
 
-    final GraphicsAlgorithm sourceGraphics = getPictogramElement(
-        association.getSourceRef()).getGraphicsAlgorithm();
-    GraphicsAlgorithm targetGraphics = getPictogramElement(
-        association.getTargetRef()).getGraphicsAlgorithm();
+    final GraphicsAlgorithm sourceGraphics = getPictogramElement(sourceElement).getGraphicsAlgorithm();
+    GraphicsAlgorithm targetGraphics = getPictogramElement(targetElement).getGraphicsAlgorithm();
     
     @SuppressWarnings("unchecked")
-    List<GraphicInfo> bendpointList  
-      = (List<GraphicInfo>) addConnectionContext.getProperty("org.activiti.designer.bendpoints");
+    List<GraphicInfo> bendpointList = (List<GraphicInfo>) addConnectionContext.getProperty("org.activiti.designer.bendpoints");
    
     if(bendpointList != null && bendpointList.size() >= 0) {
       for (GraphicInfo graphicInfo : bendpointList) {
         Point bendPoint = StylesFactory.eINSTANCE.createPoint();
-        bendPoint.setX(graphicInfo.x);
-        bendPoint.setY(graphicInfo.y);
+        bendPoint.setX((int)graphicInfo.x);
+        bendPoint.setY((int)graphicInfo.y);
         connection.getBendpoints().add(bendPoint);
       }
       
     } else {
       
-      Shape sourceShape = (Shape) getPictogramElement(association.getSourceRef());
+      Shape sourceShape = (Shape) getPictogramElement(sourceElement);
       ILocation sourceShapeLocation = Graphiti.getLayoutService().getLocationRelativeToDiagram(sourceShape);
       int sourceX = sourceShapeLocation.getX();
       int sourceY = sourceShapeLocation.getY();
       
-      Shape targetShape = (Shape) getPictogramElement(association.getTargetRef());
+      Shape targetShape = (Shape) getPictogramElement(targetElement);
       ILocation targetShapeLocation = Graphiti.getLayoutService().getLocationRelativeToDiagram(targetShape);
       int targetX = targetShapeLocation.getX();
       int targetY = targetShapeLocation.getY();
       
-      if (association.getSourceRef() instanceof Gateway && association.getTargetRef() instanceof Gateway == false) {
+      if (sourceElement instanceof Gateway && targetElement instanceof Gateway == false) {
         if (((sourceGraphics.getY() + 10) < targetGraphics.getY()
             || (sourceGraphics.getY() - 10) > targetGraphics.getY())  && 
             (sourceGraphics.getX() + (sourceGraphics.getWidth() / 2)) < targetGraphics.getX()) {
           
           boolean subProcessWithBendPoint = false;
-          if(association.getTargetRef() instanceof SubProcess) {
+          if(targetElement instanceof SubProcess) {
             int middleSub = targetGraphics.getY() + (targetGraphics.getHeight() / 2);
             if((sourceGraphics.getY() + 20) < middleSub || (sourceGraphics.getY() - 20) > middleSub) {
               subProcessWithBendPoint = true;
             }
           }
           
-          if(association.getTargetRef() instanceof SubProcess == false || subProcessWithBendPoint == true) {
+          if(targetElement instanceof SubProcess == false || subProcessWithBendPoint == true) {
             Point bendPoint = StylesFactory.eINSTANCE.createPoint();
             bendPoint.setX(sourceX + 20);
             bendPoint.setY(targetY + (targetGraphics.getHeight() / 2));
             connection.getBendpoints().add(bendPoint);
           }
         }
-      } else if (association.getTargetRef() instanceof Gateway) {
+      } else if (targetElement instanceof Gateway) {
         if (((sourceGraphics.getY() + 10) < targetGraphics.getY()
             || (sourceGraphics.getY() - 10) > targetGraphics.getY()) && 
             (sourceGraphics.getX() + sourceGraphics.getWidth()) < targetGraphics.getX()) {
           
           boolean subProcessWithBendPoint = false;
-          if(association.getSourceRef() instanceof SubProcess) {
+          if(sourceElement instanceof SubProcess) {
             int middleSub = sourceGraphics.getY() + (sourceGraphics.getHeight() / 2);
             if((middleSub + 20) < targetGraphics.getY() || (middleSub - 20) > targetGraphics.getY()) {
               subProcessWithBendPoint = true;
             }
           }
           
-          if(association.getSourceRef() instanceof SubProcess == false || subProcessWithBendPoint == true) {
+          if(sourceElement instanceof SubProcess == false || subProcessWithBendPoint == true) {
             Point bendPoint = StylesFactory.eINSTANCE.createPoint();
             bendPoint.setX(targetX + 20);
             bendPoint.setY(sourceY + (sourceGraphics.getHeight() / 2));
             connection.getBendpoints().add(bendPoint);
           }
         }
-      } else if (association.getTargetRef() instanceof EndEvent) {
+      } else if (targetElement instanceof EndEvent) {
         int middleSource = sourceGraphics.getY() + (sourceGraphics.getHeight() / 2);
         int middleTarget = targetGraphics.getY() + (targetGraphics.getHeight() / 2);
         if (((middleSource + 10) < middleTarget && 

@@ -2,9 +2,9 @@ package org.activiti.designer.features;
 
 import java.util.List;
 
+import org.activiti.bpmn.model.CustomProperty;
+import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.designer.PluginImage;
-import org.activiti.designer.bpmn2.model.CustomProperty;
-import org.activiti.designer.bpmn2.model.ServiceTask;
 import org.activiti.designer.integration.servicetask.CustomServiceTask;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.eclipse.ExtensionConstants;

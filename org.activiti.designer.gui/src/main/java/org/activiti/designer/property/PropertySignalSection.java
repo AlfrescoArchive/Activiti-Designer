@@ -1,8 +1,8 @@
 package org.activiti.designer.property;
 
-import java.util.List;
+import java.util.Collection;
 
-import org.activiti.designer.bpmn2.model.Signal;
+import org.activiti.bpmn.model.Signal;
 import org.activiti.designer.property.ui.SignalEditor;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
@@ -60,7 +60,7 @@ public class PropertySignalSection extends ActivitiPropertySection implements IT
       return;
     }
     
-    List<Signal> signalList = model.getSignals();
+    Collection<Signal> signalList = model.getBpmnModel().getSignals();
     
     signalEditor.diagramEditor = getDiagramEditor();
     signalEditor.diagram = getDiagram();

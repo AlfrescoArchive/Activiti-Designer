@@ -15,12 +15,12 @@
  *******************************************************************************/
 package org.activiti.designer.property;
 
-import org.activiti.designer.bpmn2.model.Artifact;
-import org.activiti.designer.bpmn2.model.BaseElement;
-import org.activiti.designer.bpmn2.model.FlowElement;
-import org.activiti.designer.bpmn2.model.Lane;
-import org.activiti.designer.bpmn2.model.Pool;
-import org.activiti.designer.bpmn2.model.TextAnnotation;
+import org.activiti.bpmn.model.Artifact;
+import org.activiti.bpmn.model.BaseElement;
+import org.activiti.bpmn.model.FlowElement;
+import org.activiti.bpmn.model.Lane;
+import org.activiti.bpmn.model.Pool;
+import org.activiti.bpmn.model.TextAnnotation;
 import org.activiti.designer.util.TextUtil;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;

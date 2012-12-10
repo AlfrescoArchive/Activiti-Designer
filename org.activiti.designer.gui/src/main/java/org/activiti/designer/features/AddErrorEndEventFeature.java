@@ -1,10 +1,10 @@
 package org.activiti.designer.features;
 
+import org.activiti.bpmn.model.EndEvent;
+import org.activiti.bpmn.model.Event;
+import org.activiti.bpmn.model.Lane;
+import org.activiti.bpmn.model.SubProcess;
 import org.activiti.designer.PluginImage;
-import org.activiti.designer.bpmn2.model.EndEvent;
-import org.activiti.designer.bpmn2.model.Event;
-import org.activiti.designer.bpmn2.model.Lane;
-import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.style.StyleUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;

@@ -1,9 +1,9 @@
 package org.activiti.designer.features;
 
+import org.activiti.bpmn.model.Activity;
+import org.activiti.bpmn.model.BoundaryEvent;
+import org.activiti.bpmn.model.TimerEventDefinition;
 import org.activiti.designer.PluginImage;
-import org.activiti.designer.bpmn2.model.Activity;
-import org.activiti.designer.bpmn2.model.BoundaryEvent;
-import org.activiti.designer.bpmn2.model.TimerEventDefinition;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 

@@ -2,10 +2,12 @@ package org.activiti.designer.features;
 
 import java.util.List;
 
-import org.activiti.designer.bpmn2.model.FlowNode;
-import org.activiti.designer.bpmn2.model.Lane;
-import org.activiti.designer.bpmn2.model.SequenceFlow;
-import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.bpmn.model.FlowElement;
+import org.activiti.bpmn.model.FlowNode;
+import org.activiti.bpmn.model.Lane;
+import org.activiti.bpmn.model.SequenceFlow;
+import org.activiti.bpmn.model.SubProcess;
+import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -23,6 +25,7 @@ public class ReconnectSequenceFlowFeature extends DefaultReconnectionFeature {
 	
 	@Override
 	public void postReconnect(IReconnectionContext context) {
+	  Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
 		Object connectionObject = getFeatureProvider().getBusinessObjectForPictogramElement(context.getConnection());
 	  if(connectionObject instanceof SequenceFlow == false) return;
 	  
@@ -36,18 +39,22 @@ public class ReconnectSequenceFlowFeature extends DefaultReconnectionFeature {
 			List<SequenceFlow> flowList = targetElement.getIncoming();
 			boolean found = false;
 			for (SequenceFlow sequenceFlow : flowList) {
-	      if(sequenceFlow.equals(flow)) {
+	      if(sequenceFlow.getId().equals(flow.getId())) {
 	      	found = true;
 	      }
       }
 			
 			if(found == false) {
 				
-				// remove old target
-				flow.getTargetRef().getIncoming().remove(flow);
+			  FlowElement targetFlowElement = model.getBpmnModel().getFlowElement(flow.getTargetRef());
+		   
+			  if (targetFlowElement != null) {
+  				// remove old target
+			    targetFlowElement.getIncomingFlows().remove(flow);
+			  }
 				
 				targetElement.getIncoming().add(flow);
-				flow.setTargetRef(targetElement);
+				flow.setTargetRef(targetElement.getId());
 			}
 			
 		} else if(ReconnectionContext.RECONNECT_SOURCE.equalsIgnoreCase(context.getReconnectType())) {
@@ -62,46 +69,49 @@ public class ReconnectSequenceFlowFeature extends DefaultReconnectionFeature {
 			
 			if(found == false) {
 				
-			  ContainerShape sourceElement = (ContainerShape) getFeatureProvider().getPictogramElementForBusinessObject(flow.getSourceRef());
+			  FlowElement sourceFlowElement = model.getBpmnModel().getFlowElement(flow.getSourceRef());
+			  ContainerShape sourceElement = (ContainerShape) getFeatureProvider().getPictogramElementForBusinessObject(sourceFlowElement);
 			  ContainerShape oldParentContainer = sourceElement.getContainer(); 
 			  ContainerShape newParentContainer = ((ContainerShape) context.getTargetPictogramElement()).getContainer();
 			  
 			  if (oldParentContainer != newParentContainer) {
 			    
 			    if (oldParentContainer instanceof Diagram) {
-			      ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getMainProcess().getFlowElements().remove(flow);
+			      ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getBpmnModel().getMainProcess().removeFlowElement(flow.getId());
 
 			    } else {
 			      Object parentObject = getFeatureProvider().getBusinessObjectForPictogramElement(oldParentContainer);
 			      if (parentObject instanceof SubProcess) {
-			        ((SubProcess) parentObject).getFlowElements().remove(flow);
+			        ((SubProcess) parentObject).removeFlowElement(flow.getId());
 
 			      } else if (parentObject instanceof Lane) {
 			        Lane lane = (Lane) parentObject;
-			        lane.getParentProcess().getFlowElements().remove(flow);
+			        lane.getParentProcess().removeFlowElement(flow.getId());
 			      }
 			    }
 			    
 			    if (newParentContainer instanceof Diagram) {
-			      ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getMainProcess().getFlowElements().add(flow);
+			      ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getBpmnModel().getMainProcess().addFlowElement(flow);
 
 			    } else {
 			      Object parentObject = getBusinessObjectForPictogramElement(newParentContainer);
 			      if (parentObject instanceof SubProcess) {
-			        ((SubProcess) parentObject).getFlowElements().add(flow);
+			        ((SubProcess) parentObject).addFlowElement(flow);
 
 			      } else if (parentObject instanceof Lane) {
 			        Lane lane = (Lane) parentObject;
-			        lane.getParentProcess().getFlowElements().add(flow);
+			        lane.getParentProcess().addFlowElement(flow);
 			      }
 			    }
 			  }
 			  
 				// remove old source
-				flow.getSourceRef().getOutgoing().remove(flow);
+			  if (sourceFlowElement != null) {
+			    sourceFlowElement.getOutgoingFlows().remove(flow);
+			  }
 				
 				targetElement.getOutgoing().add(flow);
-				flow.setSourceRef(targetElement);
+				flow.setSourceRef(targetElement.getId());
 				
 			}
 		}

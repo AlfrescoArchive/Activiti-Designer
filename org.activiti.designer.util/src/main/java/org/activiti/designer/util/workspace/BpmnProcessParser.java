@@ -20,7 +20,7 @@ import java.util.Set;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
-import org.activiti.designer.bpmn2.model.Process;
+import org.activiti.bpmn.model.Process;
 import org.eclipse.core.resources.IFile;
 
 /**

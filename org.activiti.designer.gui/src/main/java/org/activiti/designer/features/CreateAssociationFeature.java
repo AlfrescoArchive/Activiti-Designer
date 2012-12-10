@@ -1,15 +1,12 @@
 package org.activiti.designer.features;
 
-import java.util.List;
-
+import org.activiti.bpmn.model.Association;
+import org.activiti.bpmn.model.BaseElement;
+import org.activiti.bpmn.model.Lane;
+import org.activiti.bpmn.model.SubProcess;
+import org.activiti.bpmn.model.TextAnnotation;
 import org.activiti.designer.PluginImage;
-import org.activiti.designer.bpmn2.model.Artifact;
-import org.activiti.designer.bpmn2.model.Association;
-import org.activiti.designer.bpmn2.model.BaseElement;
-import org.activiti.designer.bpmn2.model.Lane;
-import org.activiti.designer.bpmn2.model.Process;
-import org.activiti.designer.bpmn2.model.SubProcess;
-import org.activiti.designer.bpmn2.model.TextAnnotation;
+import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -70,34 +67,30 @@ public class CreateAssociationFeature extends AbstractCreateBPMNConnectionFeatur
     final Association association = new Association();
     
     association.setId(getNextId());
-    association.setSourceRef(sourceBo);
-    association.setTargetRef(targetBo);
+    association.setSourceRef(sourceBo.getId());
+    association.setTargetRef(targetBo.getId());
     
     final ContainerShape targetContainer = (ContainerShape) context.getSourcePictogramElement();
     final ContainerShape parentContainer = targetContainer.getContainer();
     
-    List<Artifact> artifacts = null;
-    
     if (parentContainer instanceof Diagram) {
-      final Process process = ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getMainProcess();
-      
-      artifacts = process.getArtifacts();
+      final Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+      if (model.getBpmnModel().getPools().size() > 0) {
+        String poolRef = model.getBpmnModel().getPools().get(0).getId();
+        model.getBpmnModel().getProcess(poolRef).addArtifact(association);
+      } else {
+        model.getBpmnModel().getMainProcess().addArtifact(association);
+      }
     } else {
       final Object parentBo = getBusinessObjectForPictogramElement(parentContainer);
       
       if (parentBo instanceof SubProcess) {
         final SubProcess subProcess = (SubProcess) parentBo;
-        
-        artifacts = subProcess.getArtifacts();
+        subProcess.addArtifact(association);
       } else if (parentBo instanceof Lane) {
         final Lane lane = (Lane) parentBo;
-        
-        artifacts = lane.getParentProcess().getArtifacts();
+        lane.getParentProcess().addArtifact(association);
       }
-    }
-    
-    if (artifacts != null) {
-      artifacts.add(association);
     }
     
     return association;

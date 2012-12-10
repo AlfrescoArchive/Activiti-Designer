@@ -1,6 +1,6 @@
 package com.alfresco.designer.gui.property;
 
-import org.activiti.designer.bpmn2.model.alfresco.AlfrescoMailTask;
+import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
@@ -103,15 +103,23 @@ public class PropertyAlfrescoMailTaskSection extends ActivitiPropertySection imp
 			if (bo == null)
 				return;
 
-			AlfrescoMailTask mailTask = (AlfrescoMailTask)  bo;
-			toText.setText(mailTask.getTo() == null ? "" : mailTask.getTo());
-			toManyText.setText(mailTask.getToMany() == null ? "" : mailTask.getToMany());
-			fromText.setText(mailTask.getFrom() == null ? "" : mailTask.getFrom());
-			subjectText.setText(mailTask.getSubject() == null ? "" : mailTask.getSubject());
-			templateText.setText(mailTask.getTemplate() == null ? "" : mailTask.getTemplate());
-			templateModelText.setText(mailTask.getTemplateModel() == null ? "" : mailTask.getTemplateModel());
-			htmlText.setText(mailTask.getHtml() == null ? "" : mailTask.getHtml());
-			nonHtmlText.setText(mailTask.getText() == null ? "" : mailTask.getText());
+			ServiceTask mailTask = (ServiceTask)  bo;
+			String to = getFieldString("mail.parameters.to", mailTask);
+			toText.setText(to == null ? "" : to);
+			String toMany = getFieldString("mail.parameters.to_many", mailTask);
+			toManyText.setText(toMany == null ? "" : toMany);
+			String from = getFieldString("mail.parameters.from", mailTask);
+			fromText.setText(from == null ? "" : from);
+			String subject = getFieldString("mail.parameters.subject", mailTask);
+			subjectText.setText(subject == null ? "" : subject);
+			String template = getFieldString("mail.parameters.template", mailTask);
+			templateText.setText(template == null ? "" : template);
+			String templateModel = getFieldString("mail.parameters.template_model", mailTask);
+			templateModelText.setText(templateModel == null ? "" : templateModel);
+			String html = getFieldString("mail.parameters.html", mailTask);
+			htmlText.setText(html == null ? "" : html);
+			String text = getFieldString("mail.parameters.text", mailTask);
+			nonHtmlText.setText(text == null ? "" : text);
 			
 			toText.addFocusListener(listener);
 			toManyText.addFocusListener(listener);
@@ -133,36 +141,20 @@ public class PropertyAlfrescoMailTaskSection extends ActivitiPropertySection imp
 			PictogramElement pe = getSelectedPictogramElement();
 			if (pe != null) {
 				final Object bo = getBusinessObject(pe);
-				if (bo instanceof AlfrescoMailTask) {
+				if (bo instanceof ServiceTask) {
 					DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
 					TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
 					ActivitiUiUtil.runModelChange(new Runnable() {
 						public void run() {
-							AlfrescoMailTask mailTask = (AlfrescoMailTask)  bo;
-							if (toText.getText() != null) {
-								mailTask.setTo(toText.getText());
-							}
-							if (toManyText.getText() != null) {
-								mailTask.setToMany(toManyText.getText());
-							}
-							if (fromText.getText() != null) {
-								mailTask.setFrom(fromText.getText());
-							}
-							if (subjectText.getText() != null) {
-								mailTask.setSubject(subjectText.getText());
-							}
-							if (templateText.getText() != null) {
-								mailTask.setTemplate(templateText.getText());
-							}
-							if (templateModelText.getText() != null) {
-								mailTask.setTemplateModel(templateModelText.getText());
-							}
-							if (htmlText.getText() != null) {
-								mailTask.setHtml(htmlText.getText());
-							}
-							if (nonHtmlText.getText() != null) {
-								mailTask.setText(nonHtmlText.getText());
-							}
+							ServiceTask mailTask = (ServiceTask)  bo;
+							setFieldString("mail.parameters.to", toText.getText(), mailTask);
+							setFieldString("mail.parameters.to_many", toManyText.getText(), mailTask);
+							setFieldString("mail.parameters.from", fromText.getText(), mailTask);
+							setFieldString("mail.parameters.subject", subjectText.getText(), mailTask);
+							setFieldString("mail.parameters.template", templateText.getText(), mailTask);
+							setFieldString("mail.parameters.template_model", templateModelText.getText(), mailTask);
+							setFieldString("mail.parameters.html", htmlText.getText(), mailTask);
+							setFieldString("mail.parameters.text", nonHtmlText.getText(), mailTask);
 						}
 					}, editingDomain, "Model Update");
 				}

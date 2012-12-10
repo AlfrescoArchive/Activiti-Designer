@@ -1,8 +1,11 @@
 package org.activiti.designer.property;
 
-import org.activiti.designer.bpmn2.model.IntermediateCatchEvent;
-import org.activiti.designer.bpmn2.model.Signal;
-import org.activiti.designer.bpmn2.model.SignalEventDefinition;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.activiti.bpmn.model.IntermediateCatchEvent;
+import org.activiti.bpmn.model.Signal;
+import org.activiti.bpmn.model.SignalEventDefinition;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
@@ -74,11 +77,11 @@ public class PropertyIntermediateCatchSignalSection extends ActivitiPropertySect
   			}
 			}
 			
-			String[] items = new String[model.getSignals().size() + 1];
+			String[] items = new String[model.getBpmnModel().getSignals().size() + 1];
 			items[0] = "";
 			int counter = 1;
 			int selectedCounter = 0;
-			for (Signal signal : model.getSignals()) {
+			for (Signal signal : model.getBpmnModel().getSignals()) {
 	      items[counter] = signal.getId() + " / " + signal.getName();
 	      if(signal.getId().equals(signalRef)) {
 	      	selectedCounter = counter;
@@ -114,7 +117,8 @@ public class PropertyIntermediateCatchSignalSection extends ActivitiPropertySect
 							
 							SignalEventDefinition signalDefinition = (SignalEventDefinition) ((IntermediateCatchEvent) bo).getEventDefinitions().get(0);
 							if(signalCombo.getSelectionIndex() > 0) {
-							  signalDefinition.setSignalRef(model.getSignals().get(signalCombo.getSelectionIndex() - 1).getId());
+							  List<Signal> signalList = new ArrayList<Signal>(model.getBpmnModel().getSignals());
+							  signalDefinition.setSignalRef(signalList.get(signalCombo.getSelectionIndex() - 1).getId());
 							} else {
 							  signalDefinition.setSignalRef("");
 							}

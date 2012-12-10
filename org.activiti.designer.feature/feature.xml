@@ -105,13 +105,6 @@ This Agreement is governed by the laws of the State of New York and the intellec
          unpack="false"/>
 
    <plugin
-         id="org.activiti.designer.model"
-         download-size="0"
-         install-size="0"
-         version="5.10.0"
-         unpack="false"/>
-
-   <plugin
          id="org.activiti.designer.integration"
          download-size="0"
          install-size="0"
@@ -120,13 +113,6 @@ This Agreement is governed by the laws of the State of New York and the intellec
 
    <plugin
          id="org.activiti.designer.help"
-         download-size="0"
-         install-size="0"
-         version="5.10.0"
-         unpack="false"/>
-
-   <plugin
-         id="org.activiti.designer.export.bpmn20"
          download-size="0"
          install-size="0"
          version="5.10.0"

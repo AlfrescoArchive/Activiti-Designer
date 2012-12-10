@@ -3,7 +3,7 @@ package org.activiti.designer.util.editor;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.designer.bpmn2.model.BaseElement;
+import org.activiti.bpmn.model.BaseElement;
 import org.eclipse.graphiti.features.impl.IIndependenceSolver;
 
 /**

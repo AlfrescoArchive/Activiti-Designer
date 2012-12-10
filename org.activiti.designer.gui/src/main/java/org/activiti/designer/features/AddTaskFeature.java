@@ -2,10 +2,10 @@ package org.activiti.designer.features;
 
 import java.util.List;
 
-import org.activiti.designer.bpmn2.model.Lane;
-import org.activiti.designer.bpmn2.model.ServiceTask;
-import org.activiti.designer.bpmn2.model.SubProcess;
-import org.activiti.designer.bpmn2.model.Task;
+import org.activiti.bpmn.model.Lane;
+import org.activiti.bpmn.model.ServiceTask;
+import org.activiti.bpmn.model.SubProcess;
+import org.activiti.bpmn.model.Task;
 import org.activiti.designer.integration.servicetask.CustomServiceTask;
 import org.activiti.designer.integration.servicetask.DiagramBaseShape;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;

@@ -1,12 +1,11 @@
 package org.activiti.designer.features;
 
-import org.activiti.designer.bpmn2.model.Lane;
-import org.activiti.designer.bpmn2.model.SubProcess;
-import org.activiti.designer.bpmn2.model.TextAnnotation;
+import org.activiti.bpmn.model.Lane;
+import org.activiti.bpmn.model.SubProcess;
+import org.activiti.bpmn.model.TextAnnotation;
 import org.activiti.designer.util.platform.OSEnum;
 import org.activiti.designer.util.platform.OSUtil;
 import org.activiti.designer.util.style.StyleUtil;
-import org.eclipse.graphiti.features.IDirectEditingInfo;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.features.impl.AbstractAddShapeFeature;

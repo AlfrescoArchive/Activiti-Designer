@@ -6,7 +6,7 @@ package org.activiti.designer.features;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.designer.bpmn2.model.FlowElement;
+import org.activiti.bpmn.model.FlowElement;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;

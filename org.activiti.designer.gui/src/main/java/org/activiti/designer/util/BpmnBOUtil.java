@@ -16,13 +16,13 @@ package org.activiti.designer.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.designer.bpmn2.model.ActivitiListener;
-import org.activiti.designer.bpmn2.model.Activity;
-import org.activiti.designer.bpmn2.model.Pool;
-import org.activiti.designer.bpmn2.model.Process;
-import org.activiti.designer.bpmn2.model.SequenceFlow;
-import org.activiti.designer.bpmn2.model.UserTask;
-import org.activiti.designer.model.FieldExtensionModel;
+import org.activiti.bpmn.model.ActivitiListener;
+import org.activiti.bpmn.model.Activity;
+import org.activiti.bpmn.model.FieldExtension;
+import org.activiti.bpmn.model.Pool;
+import org.activiti.bpmn.model.Process;
+import org.activiti.bpmn.model.SequenceFlow;
+import org.activiti.bpmn.model.UserTask;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -39,7 +39,7 @@ public class BpmnBOUtil {
   	Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(diagram));
     Object bo = null;
     if(pe instanceof Diagram) {
-      bo = model.getMainProcess();
+      bo = model.getBpmnModel().getMainProcess();
     } else {
       bo = model.getFeatureProvider().getBusinessObjectForPictogramElement(pe);
     }
@@ -59,7 +59,7 @@ public class BpmnBOUtil {
     } else if(bo instanceof Pool) {
       Pool pool = ((Pool) bo);
       Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(diagram));
-      listenerList = model.getProcess(pool.getId()).getExecutionListeners();
+      listenerList = model.getBpmnModel().getProcess(pool.getId()).getExecutionListeners();
     }
     return listenerList;
   }
@@ -76,7 +76,7 @@ public class BpmnBOUtil {
     } else if(bo instanceof Pool) {
       Pool pool = ((Pool) bo);
       Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(diagram));
-      model.getProcess(pool.getId()).getExecutionListeners().add(listener);
+      model.getBpmnModel().getProcess(pool.getId()).getExecutionListeners().add(listener);
     }
   }
   
@@ -92,7 +92,7 @@ public class BpmnBOUtil {
     } else if(bo instanceof Pool) {
       Pool pool = ((Pool) bo);
       Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(diagram));
-      model.getProcess(pool.getId()).getExecutionListeners().set(index, listener);
+      model.getBpmnModel().getProcess(pool.getId()).getExecutionListeners().set(index, listener);
     }
   }
   
@@ -108,18 +108,18 @@ public class BpmnBOUtil {
     } else if(bo instanceof Pool) {
       Pool pool = ((Pool) bo);
       Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(diagram));
-      model.getProcess(pool.getId()).getExecutionListeners().remove(listener);
+      model.getBpmnModel().getProcess(pool.getId()).getExecutionListeners().remove(listener);
     }
   }
   
-  public static List<FieldExtensionModel> getFieldModelList(String fieldString) {
+  public static List<FieldExtension> getFieldModelList(String fieldString) {
     String[] fieldStringList = fieldString.split("± ");
-    List<FieldExtensionModel> fieldList = new ArrayList<FieldExtensionModel>();
+    List<FieldExtension> fieldList = new ArrayList<FieldExtension>();
     for (String field : fieldStringList) {
       String[] fieldExtensionStringList = field.split(":");
       if(fieldExtensionStringList != null && fieldExtensionStringList.length >= 2) {
-        FieldExtensionModel fieldExtension = new FieldExtensionModel();
-        fieldExtension.fieldName = fieldExtensionStringList[0];
+        FieldExtension fieldExtension = new FieldExtension();
+        fieldExtension.setFieldName(fieldExtensionStringList[0]);
         String expression = null;
         for(int i = 1; i < fieldExtensionStringList.length; i++) {
           if(i == 1) {
@@ -128,7 +128,11 @@ public class BpmnBOUtil {
             expression += ":" + fieldExtensionStringList[i];
           }
         }
-        fieldExtension.expression = expression;
+        if (expression.contains("${") || expression.contains("#{")) {
+          fieldExtension.setExpression(expression);
+        } else {
+          fieldExtension.setStringValue(expression);
+        }
         fieldList.add(fieldExtension);
       }
     }

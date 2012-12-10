@@ -1,6 +1,6 @@
 package org.activiti.designer.features;
 
-import org.activiti.designer.bpmn2.model.TextAnnotation;
+import org.activiti.bpmn.model.TextAnnotation;
 import org.eclipse.graphiti.datatypes.IDimension;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ILayoutContext;

@@ -21,9 +21,10 @@ import java.util.List;
 import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
-import org.activiti.designer.bpmn2.model.Pool;
-import org.activiti.designer.bpmn2.model.Process;
-import org.activiti.designer.eclipse.bpmn.BpmnParser;
+import org.activiti.bpmn.converter.BpmnXMLConverter;
+import org.activiti.bpmn.model.BpmnModel;
+import org.activiti.bpmn.model.Pool;
+import org.activiti.bpmn.model.Process;
 import org.activiti.designer.eclipse.navigator.TreeNode;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.eclipse.core.resources.IFile;
@@ -82,23 +83,23 @@ public class FileDiagramTreeNode extends AbstractDiagramTreeNode<IFile> {
   }
 
   private boolean hasMainProcess(final Bpmn2MemoryModel model) {
-    return model.getMainProcess() != null;
+    return model.getBpmnModel().getMainProcess() != null;
   }
 
   private boolean hasNoMainProcess(final Bpmn2MemoryModel model) {
-    return !hasMainProcess(model) || model.getMainProcess().getFlowElements().isEmpty();
+    return !hasMainProcess(model) || model.getBpmnModel().getMainProcess().getFlowElements().isEmpty();
   }
 
   private boolean hasNoPools(final Bpmn2MemoryModel model) {
-    return model.getPools() == null || model.getPools().isEmpty();
+    return model.getBpmnModel().getPools() == null || model.getBpmnModel().getPools().isEmpty();
   }
 
   private boolean hasPools(final Bpmn2MemoryModel model) {
-    return model.getPools() != null && !model.getPools().isEmpty();
+    return model.getBpmnModel().getPools() != null && !model.getBpmnModel().getPools().isEmpty();
   }
 
   private void extractChildrenForMainProcessOnly(final Bpmn2MemoryModel model) {
-    extractTransparentProcess(this, model.getMainProcess());
+    extractTransparentProcess(this, model.getBpmnModel().getMainProcess());
   }
 
   private void extractProcess(final TreeNode parent, final Process mainProcess) {
@@ -111,7 +112,7 @@ public class FileDiagramTreeNode extends AbstractDiagramTreeNode<IFile> {
   }
 
   private void extractChildrenForPoolsOnly(final Bpmn2MemoryModel model) {
-    extractPools(model.getPools());
+    extractPools(model.getBpmnModel().getPools());
   }
 
   private void extractPools(final List<Pool> pools) {
@@ -121,8 +122,8 @@ public class FileDiagramTreeNode extends AbstractDiagramTreeNode<IFile> {
   }
 
   private void extractChildrenForPoolsAndMainProcess(final Bpmn2MemoryModel model) {
-    extractProcess(this, model.getMainProcess());
-    extractPools(model.getPools());
+    extractProcess(this, model.getBpmnModel().getMainProcess());
+    extractPools(model.getBpmnModel().getPools());
   }
 
   private Bpmn2MemoryModel buildModel(final IFile modelFile) {
@@ -136,8 +137,9 @@ public class FileDiagramTreeNode extends AbstractDiagramTreeNode<IFile> {
         final XMLInputFactory xif = XMLInputFactory.newInstance();
         final InputStreamReader in = new InputStreamReader(fileStream, "UTF-8");
         final XMLStreamReader xtr = xif.createXMLStreamReader(in);
-        final BpmnParser parser = new BpmnParser();
-        parser.parseBpmn(xtr, result);
+        BpmnXMLConverter converter = new BpmnXMLConverter();
+        BpmnModel bpmnModel = converter.convertToBpmnModel(xtr);
+        result.setBpmnModel(bpmnModel);
       }
     } catch (Exception e) {
       e.printStackTrace();

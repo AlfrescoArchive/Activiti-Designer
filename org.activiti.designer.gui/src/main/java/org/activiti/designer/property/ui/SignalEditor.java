@@ -1,9 +1,10 @@
 package org.activiti.designer.property.ui;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-import org.activiti.designer.bpmn2.model.Signal;
+import org.activiti.bpmn.model.Signal;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
@@ -30,7 +31,7 @@ public class SignalEditor extends TableFieldEditor {
     this.parent = parent;
   }
 
-  public void initialize(List<Signal> signalList) {
+  public void initialize(Collection<Signal> signalList) {
     removeTableItems();
     if(signalList == null || signalList.size() == 0) return;
     for (Signal signal : signalList) {
@@ -113,8 +114,8 @@ public class SignalEditor extends TableFieldEditor {
           	newSignalList.add(newSignal);
           }
         }
-        model.getSignals().clear();
-        model.getSignals().addAll(newSignalList);
+        model.getBpmnModel().getSignals().clear();
+        model.getBpmnModel().getSignals().addAll(newSignalList);
       }
     }, editingDomain, "Model Update");
   }

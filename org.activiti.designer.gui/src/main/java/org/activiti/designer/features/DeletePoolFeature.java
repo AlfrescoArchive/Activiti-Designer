@@ -1,7 +1,7 @@
 package org.activiti.designer.features;
 
-import org.activiti.designer.bpmn2.model.Pool;
-import org.activiti.designer.bpmn2.model.Process;
+import org.activiti.bpmn.model.Pool;
+import org.activiti.bpmn.model.Process;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -51,9 +51,9 @@ public class DeletePoolFeature extends AbstractCustomFeature {
       if(boObject instanceof Pool == true) {
         final Pool pool = (Pool) boObject;
         Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
-        Process process = model.getProcess(pool.getId());
-        model.getProcesses().remove(process);
-        model.getPools().remove(pool);
+        Process process = model.getBpmnModel().getProcess(pool.getId());
+        model.getBpmnModel().getProcesses().remove(process);
+        model.getBpmnModel().getPools().remove(pool);
         IRemoveContext rc = new RemoveContext(pictogramElement);
         IFeatureProvider featureProvider = getFeatureProvider();
         IRemoveFeature removeFeature = featureProvider.getRemoveFeature(rc);

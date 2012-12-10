@@ -1,6 +1,6 @@
 package com.alfresco.designer.gui.property;
 
-import org.activiti.designer.bpmn2.model.alfresco.AlfrescoScriptTask;
+import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
@@ -62,12 +62,14 @@ public class PropertyAlfrescoScriptTaskSection extends ActivitiPropertySection i
 			if (bo == null)
 				return;
 			
-			AlfrescoScriptTask scriptTask = (AlfrescoScriptTask) bo;
+			ServiceTask scriptTask = (ServiceTask) bo;
 			
-			String script = scriptTask.getScript();
+			String script = getFieldString("script", scriptTask);
 			scriptText.setText(script == null ? "" : script);
-			runAsText.setText(scriptTask.getRunAs() == null ? "" : scriptTask.getRunAs());
-			scriptProcessorText.setText(scriptTask.getScriptProcessor() == null ? "" : scriptTask.getScriptProcessor());
+			String runAs = getFieldString("runAs", scriptTask);
+			runAsText.setText(runAs == null ? "" : runAs);
+			String scriptProcessor = getFieldString("scriptProcessor", scriptTask);
+			scriptProcessorText.setText(scriptProcessor == null ? "" : scriptProcessor);
 		}
 		scriptText.addFocusListener(listener);
     runAsText.addFocusListener(listener);
@@ -83,21 +85,15 @@ public class PropertyAlfrescoScriptTaskSection extends ActivitiPropertySection i
 			PictogramElement pe = getSelectedPictogramElement();
 			if (pe != null) {
 				final Object bo = getBusinessObject(pe);
-				if (bo instanceof AlfrescoScriptTask) {
+				if (bo instanceof ServiceTask) {
 					DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
 					TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
 					ActivitiUiUtil.runModelChange(new Runnable() {
 						public void run() {
-							AlfrescoScriptTask scriptTask = (AlfrescoScriptTask) bo;
-							if (scriptText.getText() != null) {
-							  scriptTask.setScript(scriptText.getText());
-							}
-							if (runAsText.getText() != null) {
-                scriptTask.setRunAs(runAsText.getText());
-              }
-							if (scriptProcessorText.getText() != null) {
-                scriptTask.setScriptProcessor(scriptProcessorText.getText());
-              }
+							ServiceTask scriptTask = (ServiceTask) bo;
+							setFieldString("script", scriptText.getText(), scriptTask);
+							setFieldString("runAs", runAsText.getText(), scriptTask);
+							setFieldString("scriptProcessor", scriptProcessorText.getText(), scriptTask);
 						}
 					}, editingDomain, "Model Update");
 				}

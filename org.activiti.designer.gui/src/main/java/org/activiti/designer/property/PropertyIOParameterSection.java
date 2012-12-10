@@ -2,8 +2,8 @@ package org.activiti.designer.property;
 
 import java.util.List;
 
-import org.activiti.designer.bpmn2.model.CallActivity;
-import org.activiti.designer.bpmn2.model.IOParameter;
+import org.activiti.bpmn.model.CallActivity;
+import org.activiti.bpmn.model.IOParameter;
 import org.activiti.designer.property.ui.IOParameterEditor;
 import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;

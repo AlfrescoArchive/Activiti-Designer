@@ -2,10 +2,10 @@ package org.activiti.designer.features;
 
 import java.util.List;
 
+import org.activiti.bpmn.model.Lane;
+import org.activiti.bpmn.model.Pool;
+import org.activiti.bpmn.model.Process;
 import org.activiti.designer.PluginImage;
-import org.activiti.designer.bpmn2.model.Lane;
-import org.activiti.designer.bpmn2.model.Pool;
-import org.activiti.designer.bpmn2.model.Process;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -47,7 +47,7 @@ public class CreateLaneFeature extends AbstractCreateBPMNFeature {
       parentPool = (Pool) parentBo;
     } else {
       Lane lane = (Lane) parentBo;
-      for (Pool pool : model.getPools()) {
+      for (Pool pool : model.getBpmnModel().getPools()) {
         if (pool.getProcessRef().equals(lane.getParentProcess().getId())) {
           parentPool = pool;
           break;
@@ -59,7 +59,7 @@ public class CreateLaneFeature extends AbstractCreateBPMNFeature {
       return null;
 
     ContainerShape poolShape = (ContainerShape) getFeatureProvider().getPictogramElementForBusinessObject(parentPool);
-    Process poolProcess = model.getProcess(parentPool.getId());
+    Process poolProcess = model.getBpmnModel().getProcess(parentPool.getId());
 
     if (poolProcess == null)
       return null;

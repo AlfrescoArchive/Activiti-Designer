@@ -7,14 +7,14 @@ Bundle-Activator: org.activiti.designer.validation.bpmn20.bundle.Activator
 Bundle-Vendor: Activiti
 Require-Bundle: org.eclipse.core.runtime,
  org.activiti.designer.eclipse,
- org.activiti.designer.model,
  org.eclipse.emf,
  org.eclipse.graphiti.mm,
  org.eclipse.graphiti.ui,
  org.eclipse.core.resources,
  org.activiti.designer.gui,
  org.apache.commons.lang,
- org.activiti.designer.util
+ org.activiti.designer.util,
+ org.activiti.designer.libs
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Bundle-ClassPath: .,

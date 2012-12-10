@@ -1,8 +1,11 @@
 package com.alfresco.designer.gui.features;
 
+import org.activiti.bpmn.model.FieldExtension;
+import org.activiti.bpmn.model.ImplementationType;
+import org.activiti.bpmn.model.ServiceTask;
+import org.activiti.bpmn.model.SubProcess;
+import org.activiti.bpmn.model.alfresco.AlfrescoScriptTask;
 import org.activiti.designer.PluginImage;
-import org.activiti.designer.bpmn2.model.SubProcess;
-import org.activiti.designer.bpmn2.model.alfresco.AlfrescoMailTask;
 import org.activiti.designer.features.AbstractCreateFastBPMNFeature;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -26,16 +29,21 @@ public class CreateAlfrescoMailTaskFeature extends AbstractCreateFastBPMNFeature
 
   @Override
   public Object[] create(ICreateContext context) {
-    AlfrescoMailTask newMailTask = new AlfrescoMailTask();
-
+    ServiceTask newMailTask = new ServiceTask();
+    newMailTask.setImplementation(AlfrescoScriptTask.ALFRESCO_SCRIPT_DELEGATE);
+    newMailTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
     newMailTask.setId(getNextId(newMailTask));
     newMailTask.setName("Alfresco Mail Task");
-
+    FieldExtension fieldExtension = new FieldExtension();
+    fieldExtension.setFieldName("script");
+    fieldExtension.setStringValue("var mail = actions.create(\"mail\");\nmail.execute(bpm_package);");
+    newMailTask.getFieldExtensions().add(fieldExtension);
+    
     Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
     if (parentObject instanceof SubProcess) {
-      ((SubProcess) parentObject).getFlowElements().add(newMailTask);
+      ((SubProcess) parentObject).addFlowElement(newMailTask);
     } else {
-      ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getMainProcess().getFlowElements().add(newMailTask);
+      ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getBpmnModel().getMainProcess().addFlowElement(newMailTask);
     }
 
     addGraphicalContent(context, newMailTask);

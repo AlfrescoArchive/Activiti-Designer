@@ -3,10 +3,10 @@ package org.activiti.designer.property.ui;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.designer.bpmn2.model.FormProperty;
-import org.activiti.designer.bpmn2.model.FormValue;
-import org.activiti.designer.bpmn2.model.StartEvent;
-import org.activiti.designer.bpmn2.model.UserTask;
+import org.activiti.bpmn.model.FormProperty;
+import org.activiti.bpmn.model.FormValue;
+import org.activiti.bpmn.model.StartEvent;
+import org.activiti.bpmn.model.UserTask;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.apache.commons.lang.StringUtils;

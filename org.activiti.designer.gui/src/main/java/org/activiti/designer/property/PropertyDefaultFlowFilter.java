@@ -17,10 +17,10 @@ package org.activiti.designer.property;
 
 import java.util.List;
 
-import org.activiti.designer.bpmn2.model.Activity;
-import org.activiti.designer.bpmn2.model.ExclusiveGateway;
-import org.activiti.designer.bpmn2.model.InclusiveGateway;
-import org.activiti.designer.bpmn2.model.SequenceFlow;
+import org.activiti.bpmn.model.Activity;
+import org.activiti.bpmn.model.ExclusiveGateway;
+import org.activiti.bpmn.model.InclusiveGateway;
+import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.designer.util.property.ActivitiPropertyFilter;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 

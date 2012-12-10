@@ -1,12 +1,14 @@
 package org.activiti.designer.features;
 
+import java.util.Collection;
 import java.util.List;
 
-import org.activiti.designer.bpmn2.model.FlowElement;
-import org.activiti.designer.bpmn2.model.FlowNode;
-import org.activiti.designer.bpmn2.model.Process;
-import org.activiti.designer.bpmn2.model.SequenceFlow;
-import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.bpmn.model.BaseElement;
+import org.activiti.bpmn.model.FlowElement;
+import org.activiti.bpmn.model.FlowNode;
+import org.activiti.bpmn.model.Process;
+import org.activiti.bpmn.model.SequenceFlow;
+import org.activiti.bpmn.model.SubProcess;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -59,10 +61,10 @@ public class ChangeElementTypeFeature extends AbstractCustomFeature {
 	  taskContext.putProperty("org.activiti.designer.changetype.name", oldObject.getName());
 	  
 	  targetContainer.getChildren().remove(element);
-	  List<Process> processes = ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getProcesses();
+	  List<Process> processes = ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getBpmnModel().getProcesses();
     for (Process process : processes) {
-      process.getFlowElements().remove(oldObject);
-      removeElement(oldObject, process.getFlowElements());
+      process.removeFlowElement(oldObject.getId());
+      removeElement(oldObject, process);
     }
 	  
 	  if("servicetask".equals(newType)) {
@@ -97,12 +99,19 @@ public class ChangeElementTypeFeature extends AbstractCustomFeature {
 	  }
   }
 	
-	private void removeElement(FlowElement element, List<FlowElement> elementList) {
+	private void removeElement(FlowElement element, BaseElement parentElement) {
+	  Collection<FlowElement> elementList = null;
+	  if (parentElement instanceof Process) {
+	    elementList = ((Process) parentElement).getFlowElements();
+	  } else if (parentElement instanceof SubProcess) {
+	    elementList = ((SubProcess) parentElement).getFlowElements();
+	  }
+	  
     for (FlowElement flowElement : elementList) {
       if(flowElement instanceof SubProcess) {
         SubProcess subProcess = (SubProcess) flowElement;
-        subProcess.getFlowElements().remove(element);
-        removeElement(element, subProcess.getFlowElements());
+        subProcess.removeFlowElement(element.getId());
+        removeElement(element, subProcess);
       }
     }
   }

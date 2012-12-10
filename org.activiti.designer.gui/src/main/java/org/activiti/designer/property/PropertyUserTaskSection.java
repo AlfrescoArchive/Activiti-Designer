@@ -1,6 +1,6 @@
 package org.activiti.designer.property;
 
-import org.activiti.designer.bpmn2.model.UserTask;
+import org.activiti.bpmn.model.UserTask;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.apache.commons.lang.StringUtils;
@@ -208,7 +208,7 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
               } else {
                 userTask.setDueDate(null);
               }
-
+ 
               userTask.setPriority(priorityText.getText());
               userTask.setDocumentation(documentationText.getText());
             }

@@ -12,35 +12,33 @@
  */
 package org.activiti.designer.diagram;
 
+import org.activiti.bpmn.model.BoundaryEvent;
+import org.activiti.bpmn.model.BusinessRuleTask;
+import org.activiti.bpmn.model.CallActivity;
+import org.activiti.bpmn.model.EndEvent;
+import org.activiti.bpmn.model.ErrorEventDefinition;
+import org.activiti.bpmn.model.EventDefinition;
+import org.activiti.bpmn.model.EventGateway;
+import org.activiti.bpmn.model.EventSubProcess;
+import org.activiti.bpmn.model.ExclusiveGateway;
+import org.activiti.bpmn.model.InclusiveGateway;
+import org.activiti.bpmn.model.IntermediateCatchEvent;
+import org.activiti.bpmn.model.Lane;
+import org.activiti.bpmn.model.ManualTask;
+import org.activiti.bpmn.model.ParallelGateway;
+import org.activiti.bpmn.model.Pool;
+import org.activiti.bpmn.model.ReceiveTask;
+import org.activiti.bpmn.model.ScriptTask;
+import org.activiti.bpmn.model.ServiceTask;
+import org.activiti.bpmn.model.SignalEventDefinition;
+import org.activiti.bpmn.model.StartEvent;
+import org.activiti.bpmn.model.SubProcess;
+import org.activiti.bpmn.model.ThrowEvent;
+import org.activiti.bpmn.model.TimerEventDefinition;
+import org.activiti.bpmn.model.UserTask;
+import org.activiti.bpmn.model.alfresco.AlfrescoStartEvent;
 import org.activiti.designer.Activator;
 import org.activiti.designer.PluginImage;
-import org.activiti.designer.bpmn2.model.BoundaryEvent;
-import org.activiti.designer.bpmn2.model.BusinessRuleTask;
-import org.activiti.designer.bpmn2.model.CallActivity;
-import org.activiti.designer.bpmn2.model.EndEvent;
-import org.activiti.designer.bpmn2.model.ErrorEventDefinition;
-import org.activiti.designer.bpmn2.model.EventDefinition;
-import org.activiti.designer.bpmn2.model.EventGateway;
-import org.activiti.designer.bpmn2.model.EventSubProcess;
-import org.activiti.designer.bpmn2.model.ExclusiveGateway;
-import org.activiti.designer.bpmn2.model.InclusiveGateway;
-import org.activiti.designer.bpmn2.model.IntermediateCatchEvent;
-import org.activiti.designer.bpmn2.model.Lane;
-import org.activiti.designer.bpmn2.model.MailTask;
-import org.activiti.designer.bpmn2.model.ManualTask;
-import org.activiti.designer.bpmn2.model.ParallelGateway;
-import org.activiti.designer.bpmn2.model.Pool;
-import org.activiti.designer.bpmn2.model.Process;
-import org.activiti.designer.bpmn2.model.ReceiveTask;
-import org.activiti.designer.bpmn2.model.ScriptTask;
-import org.activiti.designer.bpmn2.model.ServiceTask;
-import org.activiti.designer.bpmn2.model.SignalEventDefinition;
-import org.activiti.designer.bpmn2.model.StartEvent;
-import org.activiti.designer.bpmn2.model.SubProcess;
-import org.activiti.designer.bpmn2.model.ThrowEvent;
-import org.activiti.designer.bpmn2.model.TimerEventDefinition;
-import org.activiti.designer.bpmn2.model.UserTask;
-import org.activiti.designer.bpmn2.model.alfresco.AlfrescoStartEvent;
 import org.activiti.designer.eclipse.extension.icon.IconProvider;
 import org.eclipse.swt.graphics.Image;
 
@@ -104,11 +102,14 @@ public class DefaultIconProvider implements IconProvider {
     } else if (context instanceof UserTask) {
       result = Activator.getImage(PluginImage.IMG_USERTASK);
     } else if (context instanceof ServiceTask) {
-      result = Activator.getImage(PluginImage.IMG_SERVICETASK);
+      ServiceTask serviceTask = (ServiceTask) context;
+      if (ServiceTask.MAIL_TASK.equalsIgnoreCase(serviceTask.getType())) {
+        result = Activator.getImage(PluginImage.IMG_MAILTASK);
+      } else {
+        result = Activator.getImage(PluginImage.IMG_SERVICETASK);
+      }
     } else if (context instanceof ScriptTask) {
       result = Activator.getImage(PluginImage.IMG_SCRIPTTASK);
-    } else if (context instanceof MailTask) {
-      result = Activator.getImage(PluginImage.IMG_MAILTASK);
     } else if (context instanceof ReceiveTask) {
       result = Activator.getImage(PluginImage.IMG_RECEIVETASK);
     } else if (context instanceof BusinessRuleTask) {

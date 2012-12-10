@@ -1,8 +1,8 @@
 package org.activiti.designer.features;
 
+import org.activiti.bpmn.model.EndEvent;
+import org.activiti.bpmn.model.ErrorEventDefinition;
 import org.activiti.designer.PluginImage;
-import org.activiti.designer.bpmn2.model.EndEvent;
-import org.activiti.designer.bpmn2.model.ErrorEventDefinition;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 

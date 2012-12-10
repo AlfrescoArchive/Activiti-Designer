@@ -2,8 +2,8 @@ package org.activiti.designer.property;
 
 import java.util.List;
 
-import org.activiti.designer.bpmn2.model.ActivitiListener;
-import org.activiti.designer.bpmn2.model.SequenceFlow;
+import org.activiti.bpmn.model.ActivitiListener;
+import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.designer.property.ui.ExecutionListenerEditor;
 import org.activiti.designer.util.BpmnBOUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;

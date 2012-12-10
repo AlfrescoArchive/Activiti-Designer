@@ -1,7 +1,7 @@
 package org.activiti.designer.features;
 
+import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.designer.PluginImage;
-import org.activiti.designer.bpmn2.model.MailTask;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 
@@ -15,7 +15,8 @@ public class CreateMailTaskFeature extends AbstractCreateFastBPMNFeature {
 
   @Override
   public Object[] create(ICreateContext context) {
-    MailTask newMailTask = new MailTask();
+    ServiceTask newMailTask = new ServiceTask();
+    newMailTask.setType(ServiceTask.MAIL_TASK);
     addObjectToContainer(context, newMailTask, "Mail Task");
 
     return new Object[] { newMailTask };

@@ -1,6 +1,6 @@
 package org.activiti.designer.property;
 
-import org.activiti.designer.bpmn2.model.BusinessRuleTask;
+import org.activiti.bpmn.model.BusinessRuleTask;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;

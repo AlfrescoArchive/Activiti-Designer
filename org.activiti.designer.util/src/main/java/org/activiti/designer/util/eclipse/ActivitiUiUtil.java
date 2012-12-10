@@ -1,18 +1,19 @@
 package org.activiti.designer.util.eclipse;
 
+import java.util.Collection;
 import java.util.List;
 
-import org.activiti.designer.bpmn2.model.Activity;
-import org.activiti.designer.bpmn2.model.Artifact;
-import org.activiti.designer.bpmn2.model.Association;
-import org.activiti.designer.bpmn2.model.BaseElement;
-import org.activiti.designer.bpmn2.model.BoundaryEvent;
-import org.activiti.designer.bpmn2.model.FlowElement;
-import org.activiti.designer.bpmn2.model.Lane;
-import org.activiti.designer.bpmn2.model.Pool;
-import org.activiti.designer.bpmn2.model.Process;
-import org.activiti.designer.bpmn2.model.SubProcess;
-import org.activiti.designer.bpmn2.model.TextAnnotation;
+import org.activiti.bpmn.model.Activity;
+import org.activiti.bpmn.model.Artifact;
+import org.activiti.bpmn.model.Association;
+import org.activiti.bpmn.model.BaseElement;
+import org.activiti.bpmn.model.BoundaryEvent;
+import org.activiti.bpmn.model.FlowElement;
+import org.activiti.bpmn.model.Lane;
+import org.activiti.bpmn.model.Pool;
+import org.activiti.bpmn.model.Process;
+import org.activiti.bpmn.model.SubProcess;
+import org.activiti.bpmn.model.TextAnnotation;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.apache.commons.lang.ArrayUtils;
@@ -202,10 +203,10 @@ public class ActivitiUiUtil {
     int determinedId = 0;
     
     if (featureClass.equals(Pool.class)) {
-      determinedId = loopThroughPools(featureClass, determinedId, model.getPools(), featureIdKey);
+      determinedId = loopThroughPools(featureClass, determinedId, model.getBpmnModel().getPools(), featureIdKey);
     } else {
     
-      for (Process process : model.getProcesses()) {
+      for (Process process : model.getBpmnModel().getProcesses()) {
           
         if (featureClass.equals(Lane.class)) {
           determinedId = loopThroughLanes(featureClass, determinedId, process.getLanes(), featureIdKey);
@@ -241,7 +242,7 @@ public class ActivitiUiUtil {
   }
   
   public static int loopThroughArtifacts(final Class<? extends BaseElement> featureClass, int determinedId, 
-      List<Artifact> artifactList, final String featureIdKey) {
+      Collection<Artifact> artifactList, final String featureIdKey) {
     
     for (Artifact artifact : artifactList) {
       String contentObjectId = artifact.getId().replace(featureIdKey, "");
@@ -251,7 +252,7 @@ public class ActivitiUiUtil {
   }
   
   public static int loopThroughElements(final Class<? extends BaseElement> featureClass, int determinedId, 
-  		List<FlowElement> elementList, final String featureIdKey) {
+  		Collection<FlowElement> elementList, final String featureIdKey) {
   	
   	for (FlowElement element : elementList) {
       

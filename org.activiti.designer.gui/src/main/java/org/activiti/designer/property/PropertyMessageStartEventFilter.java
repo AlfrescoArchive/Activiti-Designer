@@ -2,9 +2,9 @@ package org.activiti.designer.property;
 /**
  * @author Saeid Mirzaei
  */
-import org.activiti.designer.bpmn2.model.MessageEventDefinition;
-import org.activiti.designer.bpmn2.model.StartEvent;
-import org.activiti.designer.bpmn2.model.alfresco.AlfrescoStartEvent;
+import org.activiti.bpmn.model.MessageEventDefinition;
+import org.activiti.bpmn.model.StartEvent;
+import org.activiti.bpmn.model.alfresco.AlfrescoStartEvent;
 import org.activiti.designer.util.property.ActivitiPropertyFilter;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 

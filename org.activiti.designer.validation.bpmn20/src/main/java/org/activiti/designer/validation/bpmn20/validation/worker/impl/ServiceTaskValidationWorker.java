@@ -6,9 +6,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.designer.bpmn2.model.FlowElement;
-import org.activiti.designer.bpmn2.model.ServiceTask;
-import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.bpmn.model.FlowElement;
+import org.activiti.bpmn.model.ServiceTask;
+import org.activiti.bpmn.model.SubProcess;
 import org.activiti.designer.validation.bpmn20.validation.worker.ProcessValidationWorker;
 import org.activiti.designer.validation.bpmn20.validation.worker.ProcessValidationWorkerMarker;
 import org.eclipse.graphiti.mm.pictograms.Diagram;

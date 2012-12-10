@@ -1,8 +1,8 @@
 package org.activiti.designer.property;
 
-import org.activiti.designer.bpmn2.model.BoundaryEvent;
-import org.activiti.designer.bpmn2.model.EndEvent;
-import org.activiti.designer.bpmn2.model.ErrorEventDefinition;
+import org.activiti.bpmn.model.BoundaryEvent;
+import org.activiti.bpmn.model.EndEvent;
+import org.activiti.bpmn.model.ErrorEventDefinition;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;

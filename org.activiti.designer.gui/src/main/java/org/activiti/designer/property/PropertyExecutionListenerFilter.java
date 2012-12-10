@@ -1,9 +1,9 @@
 package org.activiti.designer.property;
 
-import org.activiti.designer.bpmn2.model.Activity;
-import org.activiti.designer.bpmn2.model.Pool;
-import org.activiti.designer.bpmn2.model.SequenceFlow;
-import org.activiti.designer.bpmn2.model.UserTask;
+import org.activiti.bpmn.model.Activity;
+import org.activiti.bpmn.model.Pool;
+import org.activiti.bpmn.model.SequenceFlow;
+import org.activiti.bpmn.model.UserTask;
 import org.activiti.designer.util.extension.ExtensionUtil;
 import org.activiti.designer.util.property.ActivitiPropertyFilter;
 import org.eclipse.graphiti.mm.pictograms.Diagram;

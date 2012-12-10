@@ -1,6 +1,8 @@
 package com.alfresco.designer.gui.property;
 
-import org.activiti.designer.bpmn2.model.StartEvent;
+import java.util.List;
+
+import org.activiti.bpmn.model.StartEvent;
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.preferences.Preferences;
@@ -33,7 +35,10 @@ public class PropertyAlfrescoStartEventSection extends ActivitiPropertySection i
 		FormData data;
 
 		formTypeCombo = factory.createCCombo(composite, SWT.NONE); //$NON-NLS-1$
-		formTypeCombo.setItems(PreferencesUtil.getStringArray(Preferences.ALFRESCO_FORMTYPES_STARTEVENT));
+		List<String> formTypes = PreferencesUtil.getStringArray(Preferences.ALFRESCO_FORMTYPES_STARTEVENT);
+		for (String formType : formTypes) {
+		  formTypeCombo.add(formType);
+    }
     data = new FormData();
     data.left = new FormAttachment(0, 120);
     data.right = new FormAttachment(100, 0);

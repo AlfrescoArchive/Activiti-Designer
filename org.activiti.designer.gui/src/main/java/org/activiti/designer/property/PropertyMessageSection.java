@@ -3,9 +3,9 @@ package org.activiti.designer.property;
 /**
  * @author Saeid Mirzaei
  */
-import java.util.List;
+import java.util.Collection;
 
-import org.activiti.designer.bpmn2.model.Message;
+import org.activiti.bpmn.model.Message;
 import org.activiti.designer.property.ui.MessageEditor;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
@@ -64,7 +64,7 @@ public class PropertyMessageSection extends ActivitiPropertySection implements I
       return;
     }
     
-    List<Message> messageList = model.getMessages();
+    Collection<Message> messageList = model.getBpmnModel().getMessages();
     
     messageEditor.diagramEditor = getDiagramEditor();
     messageEditor.diagram = getDiagram();

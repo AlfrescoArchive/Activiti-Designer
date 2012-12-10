@@ -2,8 +2,8 @@ package org.activiti.designer.property;
 
 import java.util.List;
 
-import org.activiti.designer.bpmn2.model.ActivitiListener;
-import org.activiti.designer.bpmn2.model.UserTask;
+import org.activiti.bpmn.model.ActivitiListener;
+import org.activiti.bpmn.model.UserTask;
 import org.activiti.designer.property.ui.TaskListenerEditor;
 import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;

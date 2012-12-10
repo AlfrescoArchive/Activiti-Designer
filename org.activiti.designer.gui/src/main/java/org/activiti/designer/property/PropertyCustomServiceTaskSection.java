@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import org.activiti.designer.bpmn2.model.ComplexDataType;
-import org.activiti.designer.bpmn2.model.CustomProperty;
-import org.activiti.designer.bpmn2.model.ServiceTask;
+import org.activiti.bpmn.model.ComplexDataType;
+import org.activiti.bpmn.model.CustomProperty;
+import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.designer.integration.servicetask.CustomServiceTask;
 import org.activiti.designer.integration.servicetask.annotation.Help;
 import org.activiti.designer.integration.servicetask.annotation.Property;

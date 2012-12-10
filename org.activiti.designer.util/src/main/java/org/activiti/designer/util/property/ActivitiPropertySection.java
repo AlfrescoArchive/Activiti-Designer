@@ -1,7 +1,10 @@
 package org.activiti.designer.util.property;
 
+import org.activiti.bpmn.model.FieldExtension;
+import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -60,5 +63,42 @@ public abstract class ActivitiPropertySection extends GFPropertySection {
 			return getContainer(container.eContainer());
 		}
 	}
+	
+	protected String getFieldString(String fieldname, ServiceTask mailTask) {
+    String result = null;
+    for(FieldExtension extension : mailTask.getFieldExtensions()) {
+      if (fieldname.equalsIgnoreCase(extension.getFieldName())) {
+        if (StringUtils.isNotEmpty(extension.getExpression())) {
+          result = extension.getExpression();
+        } else {
+          result = extension.getStringValue();
+        }
+      }
+    }
+    if (result == null) {
+      result = "";
+    }
+    return result;
+  }
+  
+  protected void setFieldString(String fieldname, String fieldValue, ServiceTask mailTask) {
+    FieldExtension fieldExtension = null;
+    for(FieldExtension extension : mailTask.getFieldExtensions()) {
+      if (fieldname.equalsIgnoreCase(extension.getFieldName())) {
+        fieldExtension = extension;
+      }
+    }
+    if (fieldExtension == null) {
+      fieldExtension = new FieldExtension();
+      fieldExtension.setFieldName(fieldname);
+      mailTask.getFieldExtensions().add(fieldExtension);
+    }
+    
+    if (fieldValue != null && fieldValue.contains("${") || fieldValue.contains("#{")) {
+      fieldExtension.setExpression(fieldValue);
+    } else {
+      fieldExtension.setStringValue(fieldValue);
+    }
+  }
 
 }

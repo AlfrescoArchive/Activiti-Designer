@@ -1,6 +1,6 @@
 package org.activiti.designer.features;
 
-import org.activiti.designer.bpmn2.model.BoundaryEvent;
+import org.activiti.bpmn.model.BoundaryEvent;
 import org.eclipse.graphiti.datatypes.ILocation;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IMoveShapeContext;

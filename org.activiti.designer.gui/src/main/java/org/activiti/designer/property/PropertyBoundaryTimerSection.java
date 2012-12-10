@@ -3,8 +3,8 @@ package org.activiti.designer.property;
 import java.util.Arrays;
 import java.util.List;
 
-import org.activiti.designer.bpmn2.model.BoundaryEvent;
-import org.activiti.designer.bpmn2.model.TimerEventDefinition;
+import org.activiti.bpmn.model.BoundaryEvent;
+import org.activiti.bpmn.model.TimerEventDefinition;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.apache.commons.lang.StringUtils;

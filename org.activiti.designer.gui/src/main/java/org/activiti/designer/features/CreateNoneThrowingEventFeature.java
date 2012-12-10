@@ -1,7 +1,7 @@
 package org.activiti.designer.features;
 
+import org.activiti.bpmn.model.ThrowEvent;
 import org.activiti.designer.PluginImage;
-import org.activiti.designer.bpmn2.model.ThrowEvent;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 

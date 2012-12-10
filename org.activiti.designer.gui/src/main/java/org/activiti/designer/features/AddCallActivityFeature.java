@@ -1,9 +1,9 @@
 package org.activiti.designer.features;
 
+import org.activiti.bpmn.model.CallActivity;
+import org.activiti.bpmn.model.Lane;
+import org.activiti.bpmn.model.SubProcess;
 import org.activiti.designer.PluginImage;
-import org.activiti.designer.bpmn2.model.CallActivity;
-import org.activiti.designer.bpmn2.model.Lane;
-import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.platform.OSEnum;
 import org.activiti.designer.util.platform.OSUtil;

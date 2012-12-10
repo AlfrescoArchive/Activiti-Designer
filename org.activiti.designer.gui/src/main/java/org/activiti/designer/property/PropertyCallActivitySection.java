@@ -2,9 +2,9 @@ package org.activiti.designer.property;
 
 import java.util.Set;
 
+import org.activiti.bpmn.model.CallActivity;
 import org.activiti.designer.Activator;
 import org.activiti.designer.PluginImage;
-import org.activiti.designer.bpmn2.model.CallActivity;
 import org.activiti.designer.eclipse.common.ActivitiBPMNDiagramConstants;
 import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;

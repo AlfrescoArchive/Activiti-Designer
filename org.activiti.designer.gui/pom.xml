@@ -11,5 +11,5 @@
 	<artifactId>org.activiti.designer.gui</artifactId>
 	<packaging>eclipse-plugin</packaging>
 	<name>Activiti Designer - GUI</name>
-
+	
 </project>

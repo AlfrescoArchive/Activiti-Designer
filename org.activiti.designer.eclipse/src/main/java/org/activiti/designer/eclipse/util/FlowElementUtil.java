@@ -2,7 +2,7 @@ package org.activiti.designer.eclipse.util;
 
 import java.lang.reflect.Method;
 
-import org.activiti.designer.bpmn2.model.FlowElement;
+import org.activiti.bpmn.model.FlowElement;
 import org.apache.commons.lang.StringUtils;
 
 public class FlowElementUtil {

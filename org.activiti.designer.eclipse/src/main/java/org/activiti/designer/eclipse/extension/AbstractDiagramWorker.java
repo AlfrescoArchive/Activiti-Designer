@@ -17,11 +17,12 @@ import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.designer.bpmn2.model.FlowElement;
+import org.activiti.bpmn.model.FlowElement;
 import org.activiti.designer.eclipse.common.ActivitiBPMNDiagramConstants;
 import org.activiti.designer.eclipse.extension.export.ExportMarshaller;
 import org.activiti.designer.eclipse.extension.validation.ProcessValidator;
@@ -251,7 +252,7 @@ public abstract class AbstractDiagramWorker {
    *         and the value is a list of all constructs of that type found in the
    *         diagram.
    */
-  protected Map<String, List<Object>> extractProcessConstructs(final List<FlowElement> objects, final IProgressMonitor monitor) {
+  protected Map<String, List<Object>> extractProcessConstructs(final Collection<FlowElement> objects, final IProgressMonitor monitor) {
 
     monitor.beginTask("Analyzing process constructs", objects.size() * EXTRACTION_WORK_UNIT);
 

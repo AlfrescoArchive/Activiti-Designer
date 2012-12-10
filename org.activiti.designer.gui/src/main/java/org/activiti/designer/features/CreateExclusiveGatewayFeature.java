@@ -1,7 +1,7 @@
 package org.activiti.designer.features;
 
+import org.activiti.bpmn.model.ExclusiveGateway;
 import org.activiti.designer.PluginImage;
-import org.activiti.designer.bpmn2.model.ExclusiveGateway;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 

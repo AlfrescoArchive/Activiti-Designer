@@ -11,14 +11,14 @@ import java.util.List;
 import java.util.Set;
 import java.util.jar.Manifest;
 
-import org.activiti.designer.bpmn2.model.CustomProperty;
-import org.activiti.designer.bpmn2.model.ServiceTask;
-import org.activiti.designer.integration.servicetask.CustomServiceTaskDescriptor;
+import org.activiti.bpmn.model.CustomProperty;
+import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.designer.integration.palette.AbstractDefaultPaletteCustomizer;
 import org.activiti.designer.integration.palette.DefaultPaletteCustomizer;
 import org.activiti.designer.integration.palette.PaletteEntry;
 import org.activiti.designer.integration.servicetask.AbstractCustomServiceTask;
 import org.activiti.designer.integration.servicetask.CustomServiceTask;
+import org.activiti.designer.integration.servicetask.CustomServiceTaskDescriptor;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.eclipse.ExtensionConstants;
 import org.apache.commons.lang.StringUtils;

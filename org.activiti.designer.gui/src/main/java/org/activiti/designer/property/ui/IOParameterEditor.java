@@ -3,8 +3,8 @@ package org.activiti.designer.property.ui;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.designer.bpmn2.model.CallActivity;
-import org.activiti.designer.bpmn2.model.IOParameter;
+import org.activiti.bpmn.model.CallActivity;
+import org.activiti.bpmn.model.IOParameter;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.apache.commons.lang.StringUtils;

@@ -6,27 +6,26 @@ package org.activiti.designer.util;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.designer.bpmn2.model.ActivitiListener;
-import org.activiti.designer.bpmn2.model.Activity;
-import org.activiti.designer.bpmn2.model.ComplexDataType;
-import org.activiti.designer.bpmn2.model.CustomProperty;
-import org.activiti.designer.bpmn2.model.DataGrid;
-import org.activiti.designer.bpmn2.model.DataGridField;
-import org.activiti.designer.bpmn2.model.DataGridRow;
-import org.activiti.designer.bpmn2.model.EndEvent;
-import org.activiti.designer.bpmn2.model.ExclusiveGateway;
-import org.activiti.designer.bpmn2.model.FieldExtension;
-import org.activiti.designer.bpmn2.model.FlowElement;
-import org.activiti.designer.bpmn2.model.FormProperty;
-import org.activiti.designer.bpmn2.model.FormValue;
-import org.activiti.designer.bpmn2.model.InclusiveGateway;
-import org.activiti.designer.bpmn2.model.MailTask;
-import org.activiti.designer.bpmn2.model.ManualTask;
-import org.activiti.designer.bpmn2.model.ParallelGateway;
-import org.activiti.designer.bpmn2.model.ScriptTask;
-import org.activiti.designer.bpmn2.model.ServiceTask;
-import org.activiti.designer.bpmn2.model.StartEvent;
-import org.activiti.designer.bpmn2.model.UserTask;
+import org.activiti.bpmn.model.ActivitiListener;
+import org.activiti.bpmn.model.Activity;
+import org.activiti.bpmn.model.ComplexDataType;
+import org.activiti.bpmn.model.CustomProperty;
+import org.activiti.bpmn.model.DataGrid;
+import org.activiti.bpmn.model.DataGridField;
+import org.activiti.bpmn.model.DataGridRow;
+import org.activiti.bpmn.model.EndEvent;
+import org.activiti.bpmn.model.ExclusiveGateway;
+import org.activiti.bpmn.model.FieldExtension;
+import org.activiti.bpmn.model.FlowElement;
+import org.activiti.bpmn.model.FormProperty;
+import org.activiti.bpmn.model.FormValue;
+import org.activiti.bpmn.model.InclusiveGateway;
+import org.activiti.bpmn.model.ManualTask;
+import org.activiti.bpmn.model.ParallelGateway;
+import org.activiti.bpmn.model.ScriptTask;
+import org.activiti.bpmn.model.ServiceTask;
+import org.activiti.bpmn.model.StartEvent;
+import org.activiti.bpmn.model.UserTask;
 import org.activiti.designer.features.CreateEndEventFeature;
 import org.activiti.designer.features.CreateExclusiveGatewayFeature;
 import org.activiti.designer.features.CreateInclusiveGatewayFeature;
@@ -74,8 +73,6 @@ public final class CloneUtil {
       cloneElement = clone((ExclusiveGateway) element, diagram);
     } else if (element instanceof InclusiveGateway) {
       cloneElement = clone((InclusiveGateway) element, diagram);
-    } else if (element instanceof MailTask) {
-      cloneElement = clone((MailTask) element, diagram);
     } else if (element instanceof ManualTask) {
       cloneElement = clone((ManualTask) element, diagram);
     } else if (element instanceof ParallelGateway) {
@@ -120,7 +117,7 @@ public final class CloneUtil {
 
     if (cloneElement != null) {
       cloneElement.setName(element.getName());
-      ModelHandler.getModel(EcoreUtil.getURI(diagram)).getMainProcess().getFlowElements().add(cloneElement);
+      ModelHandler.getModel(EcoreUtil.getURI(diagram)).getBpmnModel().getMainProcess().addFlowElement(cloneElement);
     }
 
     return cloneElement;
@@ -133,18 +130,9 @@ public final class CloneUtil {
     result.setEvent(listener.getEvent());
     result.setImplementation(listener.getImplementation());
     result.setImplementationType(listener.getImplementationType());
-    result.setRunAs(listener.getRunAs());
-    result.setScriptProcessor(listener.getScriptProcessor());
-
-    List<FieldExtension> fieldList = new ArrayList<FieldExtension>();
-    for (FieldExtension fieldExtension : listener.getFieldExtensions()) {
-      FieldExtension resultField = new FieldExtension();
-      resultField.setExpression(fieldExtension.getExpression());
-      resultField.setFieldName(fieldExtension.getFieldName());
-      fieldList.add(resultField);
+    for (FieldExtension extension : listener.getFieldExtensions()) {
+      result.getFieldExtensions().add(clone(extension));
     }
-    result.setFieldExtensions(fieldList);
-
     return result;
   }
 
@@ -229,28 +217,6 @@ public final class CloneUtil {
   }
 
   /**
-   * Clones a {@link MailTask}.
-   * 
-   * @param original
-   *          the object to clone
-   * @return a clone of the original object
-   */
-  private static final MailTask clone(final MailTask original, final Diagram diagram) {
-    MailTask result = new MailTask();
-
-    result.setId(ActivitiUiUtil.getNextId(result.getClass(), CreateMailTaskFeature.FEATURE_ID_KEY, diagram));
-    result.setBcc(original.getBcc());
-    result.setCc(original.getCc());
-    result.setFrom(original.getFrom());
-    result.setHtml(original.getHtml());
-    result.setSubject(original.getSubject());
-    result.setText(original.getText());
-    result.setTo(original.getTo());
-
-    return result;
-  }
-
-  /**
    * Clones a {@link ManualTask}.
    * 
    * @param original
@@ -328,8 +294,12 @@ public final class CloneUtil {
     result.setImplementation(original.getImplementation());
     result.setExtensionId(original.getExtensionId());
 
+    for (FieldExtension extension : original.getFieldExtensions()) {
+      result.getFieldExtensions().add(clone(extension));
+    }
+    
     for (CustomProperty property : original.getCustomProperties()) {
-      final CustomProperty clone = clone(property, diagram);
+      final CustomProperty clone = clone(property);
       // Reset the id
       clone.setId(ExtensionUtil.wrapCustomPropertyId(result, ExtensionUtil.upWrapCustomPropertyId(clone.getId())));
       result.getCustomProperties().add(clone);
@@ -345,7 +315,7 @@ public final class CloneUtil {
    *          the object to clone
    * @return a clone of the original object
    */
-  private static final CustomProperty clone(final CustomProperty original, final Diagram diagram) {
+  private static final CustomProperty clone(final CustomProperty original) {
     CustomProperty result = new CustomProperty();
     result.setId(original.getId());
     if (original.getComplexValue() != null) {
@@ -353,6 +323,14 @@ public final class CloneUtil {
     }
     result.setName(original.getName());
     result.setSimpleValue(original.getSimpleValue());
+    return result;
+  }
+  
+  private static final FieldExtension clone(final FieldExtension original) {
+    FieldExtension result = new FieldExtension();
+    result.setFieldName(original.getFieldName());
+    result.setExpression(original.getExpression());
+    result.setStringValue(original.getStringValue());
     return result;
   }
 

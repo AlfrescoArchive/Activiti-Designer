@@ -16,10 +16,10 @@ package org.activiti.designer.features;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.designer.bpmn2.model.Lane;
-import org.activiti.designer.bpmn2.model.Pool;
-import org.activiti.designer.bpmn2.model.Process;
-import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.bpmn.model.Lane;
+import org.activiti.bpmn.model.Pool;
+import org.activiti.bpmn.model.Process;
+import org.activiti.bpmn.model.SubProcess;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -111,7 +111,7 @@ public class ContainerResizeFeature extends DefaultResizeShapeFeature {
       if(context.getProperty("org.activiti.designer.lane.create") == null) {
         Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
         Pool pool = (Pool) bo;
-        Process process = model.getProcess(pool.getId());
+        Process process = model.getBpmnModel().getProcess(pool.getId());
         if (process != null) {
           int deltaLaneHeight = deltaHeight / process.getLanes().size();
           List<Lane> sortedLanes = sortLanesByHorizontalOrder(process.getLanes());

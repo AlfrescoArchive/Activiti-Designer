@@ -18,7 +18,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.activiti.designer.bpmn2.model.ServiceTask;
+import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.designer.integration.servicetask.PropertyType;
 import org.activiti.designer.integration.servicetask.annotation.PropertyItems;
 import org.activiti.designer.property.PropertyCustomServiceTaskSection;

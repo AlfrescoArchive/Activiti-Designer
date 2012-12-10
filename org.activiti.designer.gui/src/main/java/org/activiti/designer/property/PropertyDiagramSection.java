@@ -15,8 +15,8 @@
  *******************************************************************************/
 package org.activiti.designer.property;
 
-import org.activiti.designer.bpmn2.model.Pool;
-import org.activiti.designer.bpmn2.model.Process;
+import org.activiti.bpmn.model.Pool;
+import org.activiti.bpmn.model.Process;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
@@ -96,59 +96,62 @@ public class PropertyDiagramSection extends ActivitiPropertySection implements I
 		Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
 		Process process = null;
 		if(getSelectedPictogramElement() instanceof Diagram) {
-		  process = model.getMainProcess();
-		  if (process.getFlowElements().size() == 0 && model.getPools().size() > 0) {
+		  if (model.getBpmnModel().getPools().size() > 0) {
+		    process = model.getBpmnModel().getProcess(model.getBpmnModel().getPools().get(0).getId());
 		    setEnabled(false);
 		  } else {
+		    process = model.getBpmnModel().getMainProcess();
 		    setEnabled(true);
 		  }
 		
 		} else {
 		  Pool pool = ((Pool) getBusinessObject(getSelectedPictogramElement()));
-		  process = model.getProcess(pool.getId());
+		  process = model.getBpmnModel().getProcess(pool.getId());
 		  setEnabled(true);
 		}
 		
-		idText.setText(process.getId());
-		if(StringUtils.isNotEmpty(process.getName())) {
-		  nameText.setText(process.getName());
-		} else {
-		  nameText.setText("");
-		}
-		if(StringUtils.isNotEmpty(model.getTargetNamespace())) {
-			namespaceText.setText(model.getTargetNamespace());
-		} else {
-			namespaceText.setText("http://www.activiti.org/test");
-		}
-		if(StringUtils.isNotEmpty(process.getDocumentation())) {
-			documentationText.setText(process.getDocumentation());
-		} else {
-			documentationText.setText("");
-		}
+		if(StringUtils.isNotEmpty(model.getBpmnModel().getTargetNamespace())) {
+      namespaceText.setText(model.getBpmnModel().getTargetNamespace());
+    } else {
+      namespaceText.setText("http://www.activiti.org/test");
+    }
 		
-		
-		candidateStarterUsersText.setText("");
-    if (process.getCandidateStarterUsers().size() > 0) {
-      StringBuffer expressionBuffer = new StringBuffer();
-      for (String user : process.getCandidateStarterUsers()) {
-        if (expressionBuffer.length() > 0) {
-          expressionBuffer.append(",");
+		if (process != null) {
+  		idText.setText(process.getId());
+  		if(StringUtils.isNotEmpty(process.getName())) {
+  		  nameText.setText(process.getName());
+  		} else {
+  		  nameText.setText("");
+  		}
+  		if(StringUtils.isNotEmpty(process.getDocumentation())) {
+  			documentationText.setText(process.getDocumentation());
+  		} else {
+  			documentationText.setText("");
+  		}
+  		
+  		candidateStarterUsersText.setText("");
+      if (process.getCandidateStarterUsers().size() > 0) {
+        StringBuffer expressionBuffer = new StringBuffer();
+        for (String user : process.getCandidateStarterUsers()) {
+          if (expressionBuffer.length() > 0) {
+            expressionBuffer.append(",");
+          }
+          expressionBuffer.append(user.trim());
         }
-        expressionBuffer.append(user.trim());
-      }
-      candidateStarterUsersText.setText(expressionBuffer.toString());
-    } 
-		
-		candidateStarterGroupsText.setText("");
-		if (process.getCandidateStarterGroups().size() > 0) {
-			StringBuffer expressionBuffer = new StringBuffer();
-			for (String group : process.getCandidateStarterGroups()) {
-				if (expressionBuffer.length() > 0) {
-					expressionBuffer.append(",");
-				}
-				expressionBuffer.append(group.trim());
-			}
-			candidateStarterGroupsText.setText(expressionBuffer.toString());
+        candidateStarterUsersText.setText(expressionBuffer.toString());
+      } 
+  		
+  		candidateStarterGroupsText.setText("");
+  		if (process.getCandidateStarterGroups().size() > 0) {
+  			StringBuffer expressionBuffer = new StringBuffer();
+  			for (String group : process.getCandidateStarterGroups()) {
+  				if (expressionBuffer.length() > 0) {
+  					expressionBuffer.append(",");
+  				}
+  				expressionBuffer.append(group.trim());
+  			}
+  			candidateStarterGroupsText.setText(expressionBuffer.toString());
+  		}
 		}
 		
 		idText.addFocusListener(listener);
@@ -185,11 +188,11 @@ public class PropertyDiagramSection extends ActivitiPropertySection implements I
 					
 			    Process process = null;
 			    if(getSelectedPictogramElement() instanceof Diagram) {
-			      process = model.getMainProcess();
+			      process = model.getBpmnModel().getMainProcess();
 			    
 			    } else {
 			      Pool pool = ((Pool) getBusinessObject(getSelectedPictogramElement()));
-			      process = model.getProcess(pool.getId());
+			      process = model.getBpmnModel().getProcess(pool.getId());
 			    }
 					
 					String id = idText.getText();
@@ -213,9 +216,9 @@ public class PropertyDiagramSection extends ActivitiPropertySection implements I
 					
 					String namespace = namespaceText.getText();
 					if (namespace != null) {
-						model.setTargetNamespace(namespace);
+						model.getBpmnModel().setTargetNamespace(namespace);
 					} else {
-					  model.setTargetNamespace("");
+					  model.getBpmnModel().setTargetNamespace("");
 					}
 					
 					String documentation = documentationText.getText();

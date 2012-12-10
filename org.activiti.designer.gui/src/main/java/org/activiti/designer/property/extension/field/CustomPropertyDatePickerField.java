@@ -19,7 +19,7 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.activiti.designer.bpmn2.model.ServiceTask;
+import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.designer.integration.servicetask.PropertyType;
 import org.activiti.designer.integration.servicetask.annotation.DatePickerProperty;
 import org.activiti.designer.integration.servicetask.validator.RequiredFieldValidator;

@@ -4,10 +4,10 @@ package org.activiti.designer.features;
  * @author Saeid Mirzaei
  */
 
+import org.activiti.bpmn.model.EventSubProcess;
+import org.activiti.bpmn.model.MessageEventDefinition;
+import org.activiti.bpmn.model.StartEvent;
 import org.activiti.designer.PluginImage;
-import org.activiti.designer.bpmn2.model.EventSubProcess;
-import org.activiti.designer.bpmn2.model.MessageEventDefinition;
-import org.activiti.designer.bpmn2.model.StartEvent;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 

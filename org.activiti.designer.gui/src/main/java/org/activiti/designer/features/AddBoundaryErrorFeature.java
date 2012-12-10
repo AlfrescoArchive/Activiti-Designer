@@ -1,10 +1,10 @@
 package org.activiti.designer.features;
 
+import org.activiti.bpmn.model.BoundaryEvent;
+import org.activiti.bpmn.model.CallActivity;
+import org.activiti.bpmn.model.ServiceTask;
+import org.activiti.bpmn.model.SubProcess;
 import org.activiti.designer.PluginImage;
-import org.activiti.designer.bpmn2.model.BoundaryEvent;
-import org.activiti.designer.bpmn2.model.CallActivity;
-import org.activiti.designer.bpmn2.model.ServiceTask;
-import org.activiti.designer.bpmn2.model.SubProcess;
 import org.activiti.designer.util.style.StyleUtil;
 import org.eclipse.graphiti.datatypes.ILocation;
 import org.eclipse.graphiti.features.IFeatureProvider;

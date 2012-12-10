@@ -3,7 +3,7 @@ package org.activiti.designer.property;
 import java.util.Arrays;
 import java.util.List;
 
-import org.activiti.designer.bpmn2.model.ScriptTask;
+import org.activiti.bpmn.model.ScriptTask;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;

@@ -14,12 +14,13 @@
 package org.activiti.designer.eclipse.navigator.diagram;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
-import org.activiti.designer.bpmn2.model.FlowElement;
-import org.activiti.designer.bpmn2.model.Lane;
-import org.activiti.designer.bpmn2.model.Pool;
-import org.activiti.designer.bpmn2.model.Process;
+import org.activiti.bpmn.model.FlowElement;
+import org.activiti.bpmn.model.Lane;
+import org.activiti.bpmn.model.Pool;
+import org.activiti.bpmn.model.Process;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 
 /**
@@ -64,7 +65,7 @@ public class LaneDiagramTreeNode extends AbstractDiagramTreeNode<Lane> {
 
       final Bpmn2MemoryModel bpmn2MemoryModel = findRootModel();
 
-      result = bpmn2MemoryModel.getProcess(poolId);
+      result = bpmn2MemoryModel.getBpmnModel().getProcess(poolId);
 
     } else {
       throw new IllegalArgumentException("findParentPool was called on a lane that has no pool as a parent");
@@ -89,7 +90,7 @@ public class LaneDiagramTreeNode extends AbstractDiagramTreeNode<Lane> {
     final List<FlowElement> result = new ArrayList<FlowElement>();
 
     final List<String> flowElementRefs = getModelObject().getFlowReferences();
-    final List<FlowElement> parentProcessFlowElements = parentProcess.getFlowElements();
+    final Collection<FlowElement> parentProcessFlowElements = parentProcess.getFlowElements();
     for (final FlowElement flowElement : parentProcessFlowElements) {
       if (flowElementRefs.contains(flowElement.getId())) {
         result.add(flowElement);

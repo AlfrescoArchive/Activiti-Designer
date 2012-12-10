@@ -1,7 +1,7 @@
 package org.activiti.designer.property;
 
-import org.activiti.designer.bpmn2.model.IntermediateCatchEvent;
-import org.activiti.designer.bpmn2.model.TimerEventDefinition;
+import org.activiti.bpmn.model.IntermediateCatchEvent;
+import org.activiti.bpmn.model.TimerEventDefinition;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.apache.commons.lang.StringUtils;

@@ -1,6 +1,7 @@
 package org.activiti.designer.property;
 
-import org.activiti.designer.bpmn2.model.ServiceTask;
+import org.activiti.bpmn.model.ImplementationType;
+import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.designer.property.ui.FieldExtensionEditor;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
@@ -38,10 +39,6 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
 public class PropertyServiceTaskSection extends ActivitiPropertySection implements ITabbedPropertyConstants {
 
-	private final static String CLASS_TYPE = "classType";
-	private final static String EXPRESSION_TYPE = "expressionType";
-	private final static String DELEGATE_EXPRESSION_TYPE = "delegateExpressionType";
-	
 	private Button expressionTypeButton;
 	private Button delegateExpressionTypeButton;
 	private Button classTypeButton;
@@ -81,7 +78,7 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 				setVisibleClassType(true);
 				setVisibleExpressionType(false);
 				setVisibleDelegateExpressionType(false);
-				saveImplementationType(CLASS_TYPE);
+				saveImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
 			}
 
 			@Override
@@ -99,7 +96,7 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 				setVisibleClassType(false);
 				setVisibleExpressionType(true);
 				setVisibleDelegateExpressionType(false);
-				saveImplementationType(EXPRESSION_TYPE);
+				saveImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
 			}
 
 			@Override
@@ -118,7 +115,7 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 		    setVisibleClassType(false);
 		    setVisibleExpressionType(false);
 		    setVisibleDelegateExpressionType(true);
-		    saveImplementationType(DELEGATE_EXPRESSION_TYPE);
+		    saveImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
 		  }
 		
 		  @Override
@@ -177,8 +174,9 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 								String implementationName = classNameText.getText();
 								if (implementationName != null) {
 									if (bo instanceof ServiceTask) {
-
-										((ServiceTask) bo).setImplementation(implementationName);
+									  ServiceTask serviceTask = (ServiceTask) bo;
+									  serviceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
+									  serviceTask.setImplementation(implementationName);
 									}
 								}
 							}
@@ -285,13 +283,13 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 			
 			ServiceTask serviceTask = (ServiceTask) bo;
 			String implementationName = serviceTask.getImplementation();
-			if(serviceTask.getImplementationType() == null || serviceTask.getImplementationType().length() == 0 ||
-					CLASS_TYPE.equals(serviceTask.getImplementationType())) {
+			if(StringUtils.isEmpty(serviceTask.getImplementationType()) ||
+					ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(serviceTask.getImplementationType())) {
 				setVisibleClassType(true);
 				setVisibleExpressionType(false);
 				setVisibleDelegateExpressionType(false);
 				classNameText.setText(implementationName == null ? "" : implementationName);
-			} else if (serviceTask.getImplementationType().equals(DELEGATE_EXPRESSION_TYPE)) {
+			} else if (serviceTask.getImplementationType().equals(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION)) {
 			  setVisibleClassType(false);
 			  setVisibleExpressionType(false);
 			  setVisibleDelegateExpressionType(true);

@@ -2,12 +2,12 @@ package org.activiti.designer.features;
 
 import java.util.List;
 
-import org.activiti.designer.bpmn2.model.Activity;
-import org.activiti.designer.bpmn2.model.BoundaryEvent;
-import org.activiti.designer.bpmn2.model.FlowElement;
-import org.activiti.designer.bpmn2.model.Lane;
-import org.activiti.designer.bpmn2.model.SequenceFlow;
-import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.bpmn.model.Activity;
+import org.activiti.bpmn.model.BoundaryEvent;
+import org.activiti.bpmn.model.FlowElement;
+import org.activiti.bpmn.model.Lane;
+import org.activiti.bpmn.model.SequenceFlow;
+import org.activiti.bpmn.model.SubProcess;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -68,22 +68,22 @@ public class MoveActivityFeature extends DefaultMoveShapeFeature {
 		    Object containerBo = getFeatureProvider().getBusinessObjectForPictogramElement(context.getSourceContainer());
 		    if (containerBo instanceof SubProcess) {
 		      SubProcess subProcess = (SubProcess) containerBo;
-		      subProcess.getFlowElements().remove(activity);
+		      subProcess.removeFlowElement(activity.getId());
 		      for (SequenceFlow flow : activity.getOutgoing()) {
-		        subProcess.getFlowElements().remove(flow);
+		        subProcess.removeFlowElement(flow.getId());
 		      }
 		    } else if (containerBo instanceof Lane) {
 		      Lane lane = (Lane) containerBo;
           lane.getFlowReferences().remove(activity.getId());
-          lane.getParentProcess().getFlowElements().remove(activity);
+          lane.getParentProcess().removeFlowElement(activity.getId());
           for (SequenceFlow flow : activity.getOutgoing()) {
-            lane.getParentProcess().getFlowElements().remove(flow);
+            lane.getParentProcess().removeFlowElement(flow.getId());
           }
         }
 		  } else {
-		    model.getMainProcess().getFlowElements().remove(activity);
+		    model.getBpmnModel().getMainProcess().removeFlowElement(activity.getId());
 		    for (SequenceFlow flow : activity.getOutgoing()) {
-		      model.getMainProcess().getFlowElements().remove(flow);
+		      model.getBpmnModel().getMainProcess().removeFlowElement(flow.getId());
         }
 		  }
 		  
@@ -91,22 +91,22 @@ public class MoveActivityFeature extends DefaultMoveShapeFeature {
         Object containerBo = getFeatureProvider().getBusinessObjectForPictogramElement(context.getTargetContainer());
         if (containerBo instanceof SubProcess) {
           SubProcess subProcess = (SubProcess) containerBo;
-          subProcess.getFlowElements().add(activity);
+          subProcess.addFlowElement(activity);
           for (SequenceFlow flow : activity.getOutgoing()) {
-            subProcess.getFlowElements().add(flow);
+            subProcess.addFlowElement(flow);
           }
         } else if (containerBo instanceof Lane) {
           Lane lane = (Lane) containerBo;
           lane.getFlowReferences().add(activity.getId());
-          lane.getParentProcess().getFlowElements().add(activity);
+          lane.getParentProcess().addFlowElement(activity);
           for (SequenceFlow flow : activity.getOutgoing()) {
-            lane.getParentProcess().getFlowElements().add(flow);
+            lane.getParentProcess().addFlowElement(flow);
           }
         }
       } else {
-        model.getMainProcess().getFlowElements().add(activity);
+        model.getBpmnModel().getMainProcess().addFlowElement(activity);
         for (SequenceFlow flow : activity.getOutgoing()) {
-          model.getMainProcess().getFlowElements().add(flow);
+          model.getBpmnModel().getMainProcess().addFlowElement(flow);
         }
       }
 		}

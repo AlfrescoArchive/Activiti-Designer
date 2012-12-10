@@ -5,18 +5,18 @@ package org.activiti.designer.features;
 
 import java.util.List;
 
-import org.activiti.designer.bpmn2.model.Artifact;
-import org.activiti.designer.bpmn2.model.BaseElement;
-import org.activiti.designer.bpmn2.model.CallActivity;
-import org.activiti.designer.bpmn2.model.Event;
-import org.activiti.designer.bpmn2.model.FlowElement;
-import org.activiti.designer.bpmn2.model.FlowNode;
-import org.activiti.designer.bpmn2.model.Gateway;
-import org.activiti.designer.bpmn2.model.Lane;
-import org.activiti.designer.bpmn2.model.Process;
-import org.activiti.designer.bpmn2.model.SequenceFlow;
-import org.activiti.designer.bpmn2.model.SubProcess;
-import org.activiti.designer.bpmn2.model.Task;
+import org.activiti.bpmn.model.Artifact;
+import org.activiti.bpmn.model.BaseElement;
+import org.activiti.bpmn.model.CallActivity;
+import org.activiti.bpmn.model.Event;
+import org.activiti.bpmn.model.FlowElement;
+import org.activiti.bpmn.model.FlowNode;
+import org.activiti.bpmn.model.Gateway;
+import org.activiti.bpmn.model.Lane;
+import org.activiti.bpmn.model.Process;
+import org.activiti.bpmn.model.SequenceFlow;
+import org.activiti.bpmn.model.SubProcess;
+import org.activiti.bpmn.model.Task;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
@@ -68,33 +68,29 @@ public abstract class AbstractCreateBPMNFeature extends AbstractCreateFeature {
   
   private void addFlowNodeOrArtifact(final BaseElement baseElement, final BaseElement container) {
     
-    List<Artifact> artifacts = null;
-    List<FlowElement> flowNodes = null;
-    
     if (container instanceof Process) {
       final Process process = (Process) container;
       
-      artifacts = process.getArtifacts();
-      flowNodes = process.getFlowElements();
-    }
-    else if (container instanceof SubProcess) {
+      if (baseElement instanceof FlowElement) {
+        process.addFlowElement((FlowElement) baseElement);
+      } else if (baseElement instanceof Artifact) {
+        process.addArtifact((Artifact) baseElement);
+      } else {
+        throw new IllegalArgumentException("BaseElement must be FlowElement or Artifact.");
+      }
+      
+    } else if (container instanceof SubProcess) {
       final SubProcess subProcess = (SubProcess) container;
       
-      artifacts = subProcess.getArtifacts();
-      flowNodes = subProcess.getFlowElements();
-    }
-    else {
+      if (baseElement instanceof FlowElement) {
+        subProcess.addFlowElement((FlowElement) baseElement);
+      } else if (baseElement instanceof Artifact) {
+        subProcess.addArtifact((Artifact) baseElement);
+      } else {
+        throw new IllegalArgumentException("BaseElement must be FlowElement or Artifact.");
+      }
+    } else {
       throw new IllegalArgumentException("Container must be Process or SubProcess.");
-    }
-    
-    if (baseElement instanceof FlowElement) {
-      flowNodes.add((FlowElement) baseElement);
-    }
-    else if (baseElement instanceof Artifact) {
-      artifacts.add((Artifact) baseElement);
-    }
-    else {
-      throw new IllegalArgumentException("BaseElement must be FlowElement or Artifact.");
     }
   }
   
@@ -112,8 +108,12 @@ public abstract class AbstractCreateBPMNFeature extends AbstractCreateFeature {
     
     if (targetContainer instanceof Diagram) {
       final Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
-      
-      addFlowNodeOrArtifact(baseElement, model.getMainProcess());
+      if (model.getBpmnModel().getPools().size() > 0) {
+        String poolRef = model.getBpmnModel().getPools().get(0).getId();
+        addFlowNodeOrArtifact(baseElement, model.getBpmnModel().getProcess(poolRef));
+      } else {
+        addFlowNodeOrArtifact(baseElement, model.getBpmnModel().getMainProcess());
+      }
     }
     else {
       // find the parent object
@@ -162,14 +162,14 @@ public abstract class AbstractCreateBPMNFeature extends AbstractCreateFeature {
 		if(context.getProperty("org.activiti.designer.changetype.sourceflows") != null) {
   		List<SequenceFlow> sourceFlows = (List<SequenceFlow>) context.getProperty("org.activiti.designer.changetype.sourceflows");
   		for (SequenceFlow sourceFlow : sourceFlows) {
-  			sourceFlow.setSourceRef((FlowNode) targetElement);
+  			sourceFlow.setSourceRef(targetElement.getId());
   			Connection connection = (Connection) getFeatureProvider().getPictogramElementForBusinessObject(sourceFlow);
   			connection.setStart(elementAnchor);
       	elementAnchor.getOutgoingConnections().add(connection);
       }
   		List<SequenceFlow> targetFlows = (List<SequenceFlow>) context.getProperty("org.activiti.designer.changetype.targetflows");
   		for (SequenceFlow targetFlow : targetFlows) {
-  			targetFlow.setTargetRef((FlowNode) targetElement);
+  			targetFlow.setTargetRef(targetElement.getId());
   			Connection connection = (Connection) getFeatureProvider().getPictogramElementForBusinessObject(targetFlow);
   			connection.setEnd(elementAnchor);
       	elementAnchor.getIncomingConnections().add(connection);

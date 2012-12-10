@@ -3,6 +3,9 @@
  */
 package org.activiti.designer.eclipse.preferences;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.util.preferences.Preferences;
 import org.eclipse.jface.preference.IPreferenceStore;
@@ -73,12 +76,17 @@ public final class PreferencesUtil {
     return store.getBoolean(preferenceId);
   }
   
-  public static final String[] getStringArray(final Preferences preferenceName) {
+  public static final List<String> getStringArray(final Preferences preferenceName) {
+    List<String> resultList = new ArrayList<String>();
     String defaultFormTypes = PreferencesUtil.getStringPreference(preferenceName);
     if(defaultFormTypes != null && defaultFormTypes.length() > 0) {
       String[] formList = defaultFormTypes.split("±");
-      return formList;
+      if (formList != null) {
+        for (String formKey : formList) {
+          resultList.add(formKey);
+        }
+      }
     }
-    return new String[] {};
+    return resultList;
   }
 }

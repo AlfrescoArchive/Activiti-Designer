@@ -1,9 +1,9 @@
 package org.activiti.designer.features;
 
+import org.activiti.bpmn.model.EventSubProcess;
+import org.activiti.bpmn.model.Lane;
+import org.activiti.bpmn.model.SubProcess;
 import org.activiti.designer.PluginImage;
-import org.activiti.designer.bpmn2.model.EventSubProcess;
-import org.activiti.designer.bpmn2.model.Lane;
-import org.activiti.designer.bpmn2.model.SubProcess;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;

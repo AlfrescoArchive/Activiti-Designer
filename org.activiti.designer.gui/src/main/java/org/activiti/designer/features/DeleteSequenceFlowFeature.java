@@ -1,12 +1,16 @@
 package org.activiti.designer.features;
 
+import java.util.Collection;
 import java.util.List;
 
-import org.activiti.designer.bpmn2.model.FlowElement;
-import org.activiti.designer.bpmn2.model.Process;
-import org.activiti.designer.bpmn2.model.SequenceFlow;
-import org.activiti.designer.bpmn2.model.SubProcess;
+import org.activiti.bpmn.model.BaseElement;
+import org.activiti.bpmn.model.FlowElement;
+import org.activiti.bpmn.model.Process;
+import org.activiti.bpmn.model.SequenceFlow;
+import org.activiti.bpmn.model.SubProcess;
+import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICustomContext;
@@ -53,28 +57,50 @@ public class DeleteSequenceFlowFeature extends AbstractCustomFeature {
         
         getDiagram().getPictogramLinks().remove(pictogramElement.getLink());
         getDiagram().getConnections().remove(pictogramElement);
-        if(sequenceFlow.getSourceRef() != null) {
-          sequenceFlow.getSourceRef().getOutgoing().remove(sequenceFlow);
-        }
-        if(sequenceFlow.getTargetRef() != null) {
-          sequenceFlow.getTargetRef().getIncoming().remove(sequenceFlow);
+        
+        Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+        FlowElement sourceElement = null;
+        String sourceRef = sequenceFlow.getSourceRef();
+        if (StringUtils.isNotEmpty(sourceRef)) {
+          sourceElement = model.getBpmnModel().getFlowElement(sourceRef);
         }
         
-        List<Process> processes = ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getProcesses();
+        FlowElement targetElement = null;
+        String targetRef = sequenceFlow.getTargetRef();
+        if (StringUtils.isNotEmpty(targetRef)) {
+          targetElement = model.getBpmnModel().getFlowElement(targetRef);
+        }
+        
+        if (sourceElement != null) {
+          sourceElement.getOutgoingFlows().remove(sequenceFlow);
+        }
+        
+        if (targetElement != null) {
+          targetElement.getIncomingFlows().remove(sequenceFlow);
+        }
+        
+        List<Process> processes = model.getBpmnModel().getProcesses();
         for (Process process : processes) {
-          process.getFlowElements().remove(sequenceFlow);
-          removeFlow(sequenceFlow, process.getFlowElements());
+          process.removeFlowElement(sequenceFlow.getId());
+          removeFlow(sequenceFlow, process);
         }
       }
     }
   }
   
-  private void removeFlow(SequenceFlow sequenceFlow, List<FlowElement> elementList) {
+  private void removeFlow(SequenceFlow sequenceFlow, BaseElement parentElement) {
+    Collection<FlowElement> elementList = null;
+    if (parentElement instanceof Process) {
+      elementList = ((Process) parentElement).getFlowElements();
+    } else if (parentElement instanceof SubProcess) {
+      elementList = ((SubProcess) parentElement).getFlowElements();
+    }
+    
     for (FlowElement flowElement : elementList) {
       if(flowElement instanceof SubProcess) {
         SubProcess subProcess = (SubProcess) flowElement;
-        subProcess.getFlowElements().remove(sequenceFlow);
-        removeFlow(sequenceFlow, subProcess.getFlowElements());
+        subProcess.removeFlowElement(sequenceFlow.getId());
+        removeFlow(sequenceFlow, subProcess);
       }
     }
   }
