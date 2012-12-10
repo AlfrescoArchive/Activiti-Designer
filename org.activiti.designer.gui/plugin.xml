@@ -206,6 +206,12 @@
                tab="org.activiti.designer.mainConfigTab">
          </propertySection>
          <propertySection
+               class="org.activiti.designer.property.PropertyBoundaryMessageSection"
+               filter="org.activiti.designer.property.PropertyBoundaryMessageFilter"
+               id="org.activiti.designer.mainConfigTab.messageboundaryevent"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <propertySection
                class="org.activiti.designer.property.PropertyCallActivitySection"
                filter="org.activiti.designer.property.PropertyCallActivityFilter"
                id="org.activiti.designer.mainConfigTab.callactivity"
