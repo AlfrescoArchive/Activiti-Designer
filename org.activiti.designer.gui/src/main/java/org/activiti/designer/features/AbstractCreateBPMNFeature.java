@@ -5,6 +5,7 @@ package org.activiti.designer.features;
 
 import java.util.List;
 
+import org.activiti.bpmn.model.Activity;
 import org.activiti.bpmn.model.Artifact;
 import org.activiti.bpmn.model.BaseElement;
 import org.activiti.bpmn.model.CallActivity;
@@ -103,15 +104,16 @@ public abstract class AbstractCreateBPMNFeature extends AbstractCreateFeature {
    */
   protected void addObjectToContainer(ICreateContext context, BaseElement baseElement) {
     baseElement.setId(getNextId(baseElement));
-    
     final ContainerShape targetContainer = context.getTargetContainer();
-    
+    addBaseElementToContainer(targetContainer, baseElement);
+    addGraphicalContent(context, baseElement);
+  }
+  
+  protected void addBaseElementToContainer(ContainerShape targetContainer, BaseElement baseElement) {
     if (targetContainer instanceof Diagram) {
       final Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
-      if (model.getBpmnModel().getPools().size() > 0) {
-        String poolRef = model.getBpmnModel().getPools().get(0).getId();
-        addFlowNodeOrArtifact(baseElement, model.getBpmnModel().getProcess(poolRef));
-      } else {
+      if (model.getBpmnModel().getMainProcess() == null) {
+        model.addMainProcess();
         addFlowNodeOrArtifact(baseElement, model.getBpmnModel().getMainProcess());
       }
     }
@@ -133,10 +135,12 @@ public abstract class AbstractCreateBPMNFeature extends AbstractCreateFeature {
         }
   
         addFlowNodeOrArtifact(baseElement, lane.getParentProcess());
+        
+      } else if (parent instanceof Activity) {
+        ContainerShape parentContainer = targetContainer.getContainer();
+        addBaseElementToContainer(parentContainer, baseElement);
       }
     }
-    
-    addGraphicalContent(context, baseElement);
   }
   
   protected void addObjectToContainer(ICreateContext context, FlowNode flowNode, String name) {
@@ -163,6 +167,9 @@ public abstract class AbstractCreateBPMNFeature extends AbstractCreateFeature {
   		List<SequenceFlow> sourceFlows = (List<SequenceFlow>) context.getProperty("org.activiti.designer.changetype.sourceflows");
   		for (SequenceFlow sourceFlow : sourceFlows) {
   			sourceFlow.setSourceRef(targetElement.getId());
+  			if (targetElement instanceof FlowNode) {
+  			  ((FlowNode) targetElement).getOutgoingFlows().add(sourceFlow);
+  			}
   			Connection connection = (Connection) getFeatureProvider().getPictogramElementForBusinessObject(sourceFlow);
   			connection.setStart(elementAnchor);
       	elementAnchor.getOutgoingConnections().add(connection);
@@ -170,6 +177,9 @@ public abstract class AbstractCreateBPMNFeature extends AbstractCreateFeature {
   		List<SequenceFlow> targetFlows = (List<SequenceFlow>) context.getProperty("org.activiti.designer.changetype.targetflows");
   		for (SequenceFlow targetFlow : targetFlows) {
   			targetFlow.setTargetRef(targetElement.getId());
+  			if (targetElement instanceof FlowNode) {
+          ((FlowNode) targetElement).getIncomingFlows().add(targetFlow);
+        }
   			Connection connection = (Connection) getFeatureProvider().getPictogramElementForBusinessObject(targetFlow);
   			connection.setEnd(elementAnchor);
       	elementAnchor.getIncomingConnections().add(connection);

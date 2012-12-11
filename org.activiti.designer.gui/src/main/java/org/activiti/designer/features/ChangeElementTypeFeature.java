@@ -53,8 +53,8 @@ public class ChangeElementTypeFeature extends AbstractCustomFeature {
   	
   	FlowNode oldObject = (FlowNode) getFeatureProvider().getBusinessObjectForPictogramElement(element);
 	  
-	  List<SequenceFlow> sourceList = oldObject.getOutgoing();
-	  List<SequenceFlow> targetList = oldObject.getIncoming();
+	  List<SequenceFlow> sourceList = oldObject.getOutgoingFlows();
+	  List<SequenceFlow> targetList = oldObject.getIncomingFlows();
 	  
 	  taskContext.putProperty("org.activiti.designer.changetype.sourceflows", sourceList);
 	  taskContext.putProperty("org.activiti.designer.changetype.targetflows", targetList);

@@ -36,11 +36,11 @@ import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.eclipse.ui.ActivitiEditorContextMenuProvider;
 import org.activiti.designer.integration.servicetask.CustomServiceTask;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
-import org.activiti.designer.util.eclipse.ExtensionConstants;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.designer.util.extension.ExtensionUtil;
 import org.activiti.designer.util.preferences.Preferences;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
@@ -295,10 +295,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     try {
       if (bpmnFile.exists() == false) {
         model.setBpmnModel(new BpmnModel());
-        Process process = new Process();
-        process.setName("My process");
-        process.setId("myProcess");
-        model.getBpmnModel().getProcesses().add(process);
+        model.addMainProcess();
         bpmnFile.createNewFile();
         modelFile.refreshLocal(IResource.DEPTH_INFINITE, null);
       } else {
@@ -447,18 +444,15 @@ public class ActivitiDiagramEditor extends DiagramEditor {
             CustomServiceTask targetTask = findCustomServiceTask(serviceTask);
 
             if (targetTask != null) {
-              CustomProperty customServiceTaskProperty = new CustomProperty();
-
-              customServiceTaskProperty.setId(ExtensionUtil.wrapCustomPropertyId(serviceTask, ExtensionConstants.PROPERTY_ID_CUSTOM_SERVICE_TASK));
-              customServiceTaskProperty.setName(ExtensionConstants.PROPERTY_ID_CUSTOM_SERVICE_TASK);
-              customServiceTaskProperty.setSimpleValue(targetTask.getId());
-
-              serviceTask.getCustomProperties().add(customServiceTaskProperty);
-
+              
               for (FieldExtension field : serviceTask.getFieldExtensions()) {
                 CustomProperty customFieldProperty = new CustomProperty();
                 customFieldProperty.setName(field.getFieldName());
-                customFieldProperty.setSimpleValue(field.getExpression());
+                if (StringUtils.isNotEmpty(field.getExpression())) {
+                  customFieldProperty.setSimpleValue(field.getExpression());
+                } else {
+                  customFieldProperty.setSimpleValue(field.getStringValue());
+                }
                 serviceTask.getCustomProperties().add(customFieldProperty);
               }
 
@@ -691,7 +685,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
       }
     }
     addContext.putProperty("org.activiti.designer.bendpoints", bendpointList);
-    //addContext.putProperty("org.activiti.designer.connectionlabel", bpmnModel.labelLocationMap.get(sequenceFlowModel.id));
+    addContext.putProperty("org.activiti.designer.connectionlabel", model.getBpmnModel().getLabelGraphicInfo(sequenceFlow.getId()));
 
     addContext.setNewObject(sequenceFlow);
     getDiagramTypeProvider().getFeatureProvider().addIfPossible(addContext);

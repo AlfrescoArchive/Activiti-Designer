@@ -104,7 +104,7 @@ public class AddSequenceFlowFeature extends AbstractAddFeature {
 		
 		FlowElement sourceElement = model.getFlowElement(addedSequenceFlow.getSourceRef());
     FlowElement targetElement = model.getFlowElement(addedSequenceFlow.getTargetRef());
-		
+    
 		GraphicsAlgorithm sourceGraphics = getPictogramElement(sourceElement).getGraphicsAlgorithm();
 		GraphicsAlgorithm targetGraphics = getPictogramElement(targetElement).getGraphicsAlgorithm();
 		

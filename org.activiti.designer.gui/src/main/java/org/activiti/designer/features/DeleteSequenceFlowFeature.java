@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.activiti.bpmn.model.BaseElement;
 import org.activiti.bpmn.model.FlowElement;
+import org.activiti.bpmn.model.FlowNode;
 import org.activiti.bpmn.model.Process;
 import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.bpmn.model.SubProcess;
@@ -59,24 +60,24 @@ public class DeleteSequenceFlowFeature extends AbstractCustomFeature {
         getDiagram().getConnections().remove(pictogramElement);
         
         Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
-        FlowElement sourceElement = null;
+        FlowNode sourceNode = null;
         String sourceRef = sequenceFlow.getSourceRef();
         if (StringUtils.isNotEmpty(sourceRef)) {
-          sourceElement = model.getBpmnModel().getFlowElement(sourceRef);
+          sourceNode = (FlowNode) model.getBpmnModel().getFlowElement(sourceRef);
         }
         
-        FlowElement targetElement = null;
+        FlowNode targetNode = null;
         String targetRef = sequenceFlow.getTargetRef();
         if (StringUtils.isNotEmpty(targetRef)) {
-          targetElement = model.getBpmnModel().getFlowElement(targetRef);
+          targetNode = (FlowNode) model.getBpmnModel().getFlowElement(targetRef);
         }
         
-        if (sourceElement != null) {
-          sourceElement.getOutgoingFlows().remove(sequenceFlow);
+        if (sourceNode != null) {
+          sourceNode.getOutgoingFlows().remove(sequenceFlow);
         }
         
-        if (targetElement != null) {
-          targetElement.getIncomingFlows().remove(sequenceFlow);
+        if (targetNode != null) {
+          targetNode.getIncomingFlows().remove(sequenceFlow);
         }
         
         List<Process> processes = model.getBpmnModel().getProcesses();

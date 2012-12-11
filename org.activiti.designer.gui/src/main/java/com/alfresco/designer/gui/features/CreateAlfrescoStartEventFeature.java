@@ -2,12 +2,14 @@ package com.alfresco.designer.gui.features;
 
 import java.util.List;
 
+import org.activiti.bpmn.model.Lane;
 import org.activiti.bpmn.model.StartEvent;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.bpmn.model.alfresco.AlfrescoStartEvent;
 import org.activiti.designer.PluginImage;
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.features.AbstractCreateBPMNFeature;
+import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.designer.util.preferences.Preferences;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -26,7 +28,8 @@ public class CreateAlfrescoStartEventFeature extends AbstractCreateBPMNFeature {
 
   public boolean canCreate(ICreateContext context) {
     Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-    return (context.getTargetContainer() instanceof Diagram || parentObject instanceof SubProcess);
+    return (context.getTargetContainer() instanceof Diagram || 
+            parentObject instanceof SubProcess || parentObject instanceof Lane);
   }
 
   public Object[] create(ICreateContext context) {
@@ -43,8 +46,18 @@ public class CreateAlfrescoStartEventFeature extends AbstractCreateBPMNFeature {
     Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
     if (parentObject instanceof SubProcess) {
       ((SubProcess) parentObject).addFlowElement(startEvent);
+      
+    } else if (parentObject instanceof Lane) {
+      final Lane lane = (Lane) parentObject;
+      lane.getFlowReferences().add(startEvent.getId());
+      lane.getParentProcess().addFlowElement(startEvent);
+      
     } else {
-      ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getBpmnModel().getMainProcess().addFlowElement(startEvent);
+      Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+      if (model.getBpmnModel().getMainProcess() == null) {
+        model.addMainProcess();
+      }
+      model.getBpmnModel().getMainProcess().addFlowElement(startEvent);
     }
 
     addGraphicalRepresentation(context, startEvent);

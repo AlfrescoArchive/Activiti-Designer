@@ -1,5 +1,6 @@
 package com.alfresco.designer.gui.features;
 
+import org.activiti.bpmn.model.Lane;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.bpmn.model.Task;
 import org.activiti.designer.PluginImage;
@@ -137,7 +138,9 @@ public abstract class AddAlfrescoTaskFeature extends AbstractAddShapeFeature {
       
       Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
       
-      if (context.getTargetContainer() instanceof Diagram || parentObject instanceof SubProcess) {
+      if (context.getTargetContainer() instanceof Diagram || 
+              parentObject instanceof SubProcess || parentObject instanceof Lane) {
+        
         return true;
       }
     }

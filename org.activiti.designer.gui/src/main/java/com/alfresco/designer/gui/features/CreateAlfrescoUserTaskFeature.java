@@ -2,11 +2,13 @@ package com.alfresco.designer.gui.features;
 
 import java.util.List;
 
+import org.activiti.bpmn.model.Lane;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.bpmn.model.alfresco.AlfrescoUserTask;
 import org.activiti.designer.PluginImage;
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.features.AbstractCreateFastBPMNFeature;
+import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.designer.util.preferences.Preferences;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -25,7 +27,8 @@ public class CreateAlfrescoUserTaskFeature extends AbstractCreateFastBPMNFeature
   @Override
   public boolean canCreate(ICreateContext context) {
     Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-    return (context.getTargetContainer() instanceof Diagram || parentObject instanceof SubProcess);
+    return (context.getTargetContainer() instanceof Diagram || 
+            parentObject instanceof SubProcess || parentObject instanceof Lane);
   }
 
   @Override
@@ -43,8 +46,18 @@ public class CreateAlfrescoUserTaskFeature extends AbstractCreateFastBPMNFeature
     Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
     if (parentObject instanceof SubProcess) {
       ((SubProcess) parentObject).addFlowElement(newUserTask);
+      
+    } else if (parentObject instanceof Lane) {
+      final Lane lane = (Lane) parentObject;
+      lane.getFlowReferences().add(newUserTask.getId());
+      lane.getParentProcess().addFlowElement(newUserTask);
+      
     } else {
-      ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getBpmnModel().getMainProcess().addFlowElement(newUserTask);
+      Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+      if (model.getBpmnModel().getMainProcess() == null) {
+        model.addMainProcess();
+      }
+      model.getBpmnModel().getMainProcess().addFlowElement(newUserTask);
     }
 
     addGraphicalContent(context, newUserTask);

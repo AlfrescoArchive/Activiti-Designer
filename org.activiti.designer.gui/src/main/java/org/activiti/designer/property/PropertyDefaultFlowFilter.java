@@ -34,11 +34,11 @@ public class PropertyDefaultFlowFilter extends ActivitiPropertyFilter {
        
        List<SequenceFlow> flowList = null;
        if(bo instanceof Activity) {
-         flowList = ((Activity) bo).getOutgoing();
+         flowList = ((Activity) bo).getOutgoingFlows();
        } else if(bo instanceof ExclusiveGateway) {
-         flowList = ((ExclusiveGateway) bo).getOutgoing();
+         flowList = ((ExclusiveGateway) bo).getOutgoingFlows();
        } else {
-         flowList = ((InclusiveGateway) bo).getOutgoing();
+         flowList = ((InclusiveGateway) bo).getOutgoingFlows();
        }
        if(flowList != null && flowList.size() > 1) {
          return true;

@@ -39,18 +39,8 @@ public class CreateServiceTaskFeature extends AbstractCreateFastBPMNFeature {
       CustomServiceTask targetTask = findCustomServiceTask(newServiceTask);
 
       if (targetTask != null) {
-
-        // Create custom property containing task name
-        CustomProperty customServiceTaskProperty = new CustomProperty();
-
-        customServiceTaskProperty.setId(ExtensionUtil.wrapCustomPropertyId(newServiceTask, ExtensionConstants.PROPERTY_ID_CUSTOM_SERVICE_TASK));
-        customServiceTaskProperty.setName(ExtensionConstants.PROPERTY_ID_CUSTOM_SERVICE_TASK);
-        customServiceTaskProperty.setSimpleValue(this.customServiceTaskId);
-
-        newServiceTask.getCustomProperties().add(customServiceTaskProperty);
         newServiceTask.setImplementation(targetTask.getRuntimeClassname());
         newServiceTask.setName(targetTask.getName());
-
       }
     }
 

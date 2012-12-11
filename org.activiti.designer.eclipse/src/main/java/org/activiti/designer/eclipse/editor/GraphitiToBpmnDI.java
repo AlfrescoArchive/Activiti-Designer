@@ -18,8 +18,10 @@ import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.graphiti.datatypes.ILocation;
 import org.eclipse.graphiti.features.IFeatureProvider;
+import org.eclipse.graphiti.mm.pictograms.ConnectionDecorator;
 import org.eclipse.graphiti.mm.pictograms.FreeFormConnection;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
@@ -107,6 +109,18 @@ public class GraphitiToBpmnDI {
     
     List<GraphicInfo> flowGraphicsList = createFlowGraphicInfoList(sourceShape, targetShape, freeFormConnection);
     model.getBpmnModel().addFlowGraphicInfoList(sequenceFlow.getId(), flowGraphicsList);
+    
+    EList<ConnectionDecorator> decoratorList = freeFormConnection.getConnectionDecorators();
+    for (ConnectionDecorator decorator : decoratorList) {
+      if (decorator.getGraphicsAlgorithm() instanceof org.eclipse.graphiti.mm.algorithms.MultiText) {
+        org.eclipse.graphiti.mm.algorithms.MultiText text = (org.eclipse.graphiti.mm.algorithms.MultiText) decorator.getGraphicsAlgorithm();
+        if(text.getHeight() > 0) {
+          model.getBpmnModel().addLabelGraphicInfo(sequenceFlow.getId(), createGraphicInfo(
+                  text.getX(), text.getY(), text.getWidth(), text.getHeight()));
+          break;
+        }
+      }
+    }
   }
   
   protected void updateAssociation(Association association, Bpmn2MemoryModel model, IFeatureProvider featureProvider) {

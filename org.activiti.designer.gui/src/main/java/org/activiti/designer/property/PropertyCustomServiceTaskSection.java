@@ -112,7 +112,7 @@ public class PropertyCustomServiceTaskSection extends ActivitiPropertySection im
       CustomServiceTask targetTask = null;
 
       for (final CustomServiceTask customServiceTask : customServiceTasks) {
-        if (customServiceTask.getId().equals(ExtensionUtil.getCustomServiceTaskId(serviceTask))) {
+        if (customServiceTask.getId().equals(serviceTask.getExtensionId())) {
           targetTask = customServiceTask;
           break;
         }

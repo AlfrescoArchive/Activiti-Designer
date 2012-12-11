@@ -117,8 +117,7 @@ public class MessageEditor extends TableFieldEditor {
           	newMessageList.add(newMessage);
           }
         }
-        model.getBpmnModel().getMessages().clear();
-        model.getBpmnModel().getMessages().addAll(newMessageList);
+        model.getBpmnModel().setMessages(newMessageList);
       }
     }, editingDomain, "Model Update");
   }

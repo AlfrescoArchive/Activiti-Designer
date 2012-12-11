@@ -2,7 +2,6 @@ package org.activiti.designer.features;
 
 import java.util.List;
 
-import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.FlowNode;
 import org.activiti.bpmn.model.Lane;
 import org.activiti.bpmn.model.SequenceFlow;
@@ -36,7 +35,7 @@ public class ReconnectSequenceFlowFeature extends DefaultReconnectionFeature {
 	  FlowNode targetElement = (FlowNode) targetObject;
 		
 		if(ReconnectionContext.RECONNECT_TARGET.equalsIgnoreCase(context.getReconnectType())) {
-			List<SequenceFlow> flowList = targetElement.getIncoming();
+			List<SequenceFlow> flowList = targetElement.getIncomingFlows();
 			boolean found = false;
 			for (SequenceFlow sequenceFlow : flowList) {
 	      if(sequenceFlow.getId().equals(flow.getId())) {
@@ -46,20 +45,20 @@ public class ReconnectSequenceFlowFeature extends DefaultReconnectionFeature {
 			
 			if(found == false) {
 				
-			  FlowElement targetFlowElement = model.getBpmnModel().getFlowElement(flow.getTargetRef());
+			  FlowNode targetFlowNode = (FlowNode) model.getBpmnModel().getFlowElement(flow.getTargetRef());
 		   
-			  if (targetFlowElement != null) {
+			  if (targetFlowNode != null) {
   				// remove old target
-			    targetFlowElement.getIncomingFlows().remove(flow);
+			    targetFlowNode.getIncomingFlows().remove(flow);
 			  }
 				
-				targetElement.getIncoming().add(flow);
+				targetElement.getIncomingFlows().add(flow);
 				flow.setTargetRef(targetElement.getId());
 			}
 			
 		} else if(ReconnectionContext.RECONNECT_SOURCE.equalsIgnoreCase(context.getReconnectType())) {
 		  // targetElement is the source side of the sequence flow
-			List<SequenceFlow> flowList = targetElement.getOutgoing();
+			List<SequenceFlow> flowList = targetElement.getOutgoingFlows();
 			boolean found = false;
 			for (SequenceFlow sequenceFlow : flowList) {
 	      if(sequenceFlow.equals(flow)) {
@@ -69,8 +68,8 @@ public class ReconnectSequenceFlowFeature extends DefaultReconnectionFeature {
 			
 			if(found == false) {
 				
-			  FlowElement sourceFlowElement = model.getBpmnModel().getFlowElement(flow.getSourceRef());
-			  ContainerShape sourceElement = (ContainerShape) getFeatureProvider().getPictogramElementForBusinessObject(sourceFlowElement);
+			  FlowNode sourceFlowNode = (FlowNode) model.getBpmnModel().getFlowElement(flow.getSourceRef());
+			  ContainerShape sourceElement = (ContainerShape) getFeatureProvider().getPictogramElementForBusinessObject(sourceFlowNode);
 			  ContainerShape oldParentContainer = sourceElement.getContainer(); 
 			  ContainerShape newParentContainer = ((ContainerShape) context.getTargetPictogramElement()).getContainer();
 			  
@@ -106,11 +105,11 @@ public class ReconnectSequenceFlowFeature extends DefaultReconnectionFeature {
 			  }
 			  
 				// remove old source
-			  if (sourceFlowElement != null) {
-			    sourceFlowElement.getOutgoingFlows().remove(flow);
+			  if (sourceFlowNode != null) {
+			    sourceFlowNode.getOutgoingFlows().remove(flow);
 			  }
 				
-				targetElement.getOutgoing().add(flow);
+				targetElement.getOutgoingFlows().add(flow);
 				flow.setSourceRef(targetElement.getId());
 				
 			}

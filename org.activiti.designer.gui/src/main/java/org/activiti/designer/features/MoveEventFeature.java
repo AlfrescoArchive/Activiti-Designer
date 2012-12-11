@@ -40,20 +40,20 @@ public class MoveEventFeature extends DefaultMoveShapeFeature {
 		    if (containerBo instanceof SubProcess) {
 		      SubProcess subProcess = (SubProcess) containerBo;
 		      subProcess.removeFlowElement(event.getId());
-		      for (SequenceFlow flow : event.getOutgoing()) {
+		      for (SequenceFlow flow : event.getOutgoingFlows()) {
 		        subProcess.removeFlowElement(flow.getId());
 		      }
 		    } else if (containerBo instanceof Lane) {
 		      Lane lane = (Lane) containerBo;
           lane.getFlowReferences().remove(event.getId());
           lane.getParentProcess().removeFlowElement(event.getId());
-          for (SequenceFlow flow : event.getOutgoing()) {
+          for (SequenceFlow flow : event.getOutgoingFlows()) {
             lane.getParentProcess().removeFlowElement(flow.getId());
           }
         }
 		  } else {
 		    model.getBpmnModel().getMainProcess().removeFlowElement(event.getId());
-		    for (SequenceFlow flow : event.getOutgoing()) {
+		    for (SequenceFlow flow : event.getOutgoingFlows()) {
 		      model.getBpmnModel().getMainProcess().removeFlowElement(flow.getId());
         }
 		  }
@@ -63,20 +63,20 @@ public class MoveEventFeature extends DefaultMoveShapeFeature {
         if (containerBo instanceof SubProcess) {
           SubProcess subProcess = (SubProcess) containerBo;
           subProcess.addFlowElement(event);
-          for (SequenceFlow flow : event.getOutgoing()) {
+          for (SequenceFlow flow : event.getOutgoingFlows()) {
             subProcess.addFlowElement(flow);
           }
         } else if (containerBo instanceof Lane) {
           Lane lane = (Lane) containerBo;
           lane.getFlowReferences().add(event.getId());
           lane.getParentProcess().addFlowElement(event);
-          for (SequenceFlow flow : event.getOutgoing()) {
+          for (SequenceFlow flow : event.getOutgoingFlows()) {
             lane.getParentProcess().addFlowElement(flow);
           }
         }
       } else {
         model.getBpmnModel().getMainProcess().addFlowElement(event);
-        for (SequenceFlow flow : event.getOutgoing()) {
+        for (SequenceFlow flow : event.getOutgoingFlows()) {
           model.getBpmnModel().getMainProcess().addFlowElement(flow);
         }
       }

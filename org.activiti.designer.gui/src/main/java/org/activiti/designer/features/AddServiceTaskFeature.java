@@ -2,6 +2,7 @@ package org.activiti.designer.features;
 
 import java.util.List;
 
+import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.designer.PluginImage;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.extension.CustomServiceTaskContext;
@@ -17,10 +18,11 @@ public class AddServiceTaskFeature extends AddTaskFeature {
   protected String getIcon(Object bo) {
 
     if (ExtensionUtil.isCustomServiceTask(bo)) {
-      final List<CustomServiceTaskContext> customServiceTaskContexts = ExtensionUtil.getCustomServiceTaskContexts(ActivitiUiUtil
-              .getProjectFromDiagram(getDiagram()));
+      ServiceTask serviceTask = (ServiceTask) bo;
+      final List<CustomServiceTaskContext> customServiceTaskContexts = ExtensionUtil.getCustomServiceTaskContexts(
+              ActivitiUiUtil.getProjectFromDiagram(getDiagram()));
       for (CustomServiceTaskContext customServiceTaskContext : customServiceTaskContexts) {
-        if (customServiceTaskContext.getServiceTask().getId().equals(ExtensionUtil.getCustomServiceTaskId(bo))) {
+        if (customServiceTaskContext.getServiceTask().getId().equals(serviceTask.getExtensionId())) {
           return customServiceTaskContext.getShapeImageKey();
         }
       }

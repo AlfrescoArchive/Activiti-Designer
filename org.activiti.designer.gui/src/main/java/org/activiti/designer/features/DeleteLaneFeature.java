@@ -145,10 +145,10 @@ public class DeleteLaneFeature extends DefaultDeleteFeature {
 	
 	private void deleteSequenceFlows(FlowNode flowNode) {
 	  List<SequenceFlow> toDeleteSequenceFlows = new ArrayList<SequenceFlow>();
-    for (SequenceFlow incomingSequenceFlow : flowNode.getIncoming()) {
+    for (SequenceFlow incomingSequenceFlow : flowNode.getIncomingFlows()) {
       toDeleteSequenceFlows.add(incomingSequenceFlow);
     }
-    for (SequenceFlow outgoingSequenceFlow : flowNode.getOutgoing()) {
+    for (SequenceFlow outgoingSequenceFlow : flowNode.getOutgoingFlows()) {
       toDeleteSequenceFlows.add(outgoingSequenceFlow);
     }
     for (SequenceFlow deleteObject : toDeleteSequenceFlows) {
@@ -160,15 +160,15 @@ public class DeleteLaneFeature extends DefaultDeleteFeature {
       }
       
       Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
-      FlowElement sourceElement = model.getFlowElement(deleteObject.getSourceRef());
-      FlowElement targetElement = model.getFlowElement(deleteObject.getTargetRef());
+      FlowNode sourceNode = (FlowNode) model.getFlowElement(deleteObject.getSourceRef());
+      FlowNode targetNode = (FlowNode) model.getFlowElement(deleteObject.getTargetRef());
       
-      if (sourceElement != null) {
-        sourceElement.getOutgoingFlows().remove(deleteObject);
+      if (sourceNode != null) {
+        sourceNode.getOutgoingFlows().remove(deleteObject);
       }
       
-      if (targetElement != null) {
-        targetElement.getIncomingFlows().remove(deleteObject);
+      if (targetNode != null) {
+        targetNode.getIncomingFlows().remove(deleteObject);
       }
       
       removeElement(deleteObject);

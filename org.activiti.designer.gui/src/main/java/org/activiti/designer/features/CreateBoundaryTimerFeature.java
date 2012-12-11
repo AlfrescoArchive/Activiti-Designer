@@ -18,8 +18,7 @@ public class CreateBoundaryTimerFeature extends AbstractCreateBPMNFeature {
 
   public boolean canCreate(ICreateContext context) {
     Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-    if (parentObject instanceof Activity == true) {
-
+    if (parentObject instanceof Activity) {
       return true;
     }
     return false;
@@ -29,15 +28,12 @@ public class CreateBoundaryTimerFeature extends AbstractCreateBPMNFeature {
     BoundaryEvent boundaryEvent = new BoundaryEvent();
     TimerEventDefinition timerEvent = new TimerEventDefinition();
     boundaryEvent.getEventDefinitions().add(timerEvent);
-
-    boundaryEvent.setId(getNextId(boundaryEvent));
-
+    
+    addObjectToContainer(context, boundaryEvent, "Timer");
+    
     Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
     ((Activity) parentObject).getBoundaryEvents().add(boundaryEvent);
     boundaryEvent.setAttachedToRef((Activity) parentObject);
-
-    // do the add
-    addGraphicalRepresentation(context, boundaryEvent);
 
     // return newly created business object(s)
     return new Object[] { boundaryEvent };

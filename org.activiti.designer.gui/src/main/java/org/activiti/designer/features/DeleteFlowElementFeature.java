@@ -101,13 +101,13 @@ public class DeleteFlowElementFeature extends DefaultDeleteFeature {
 	
 	private void deleteSequenceFlows(FlowNode flowNode) {
 	  List<SequenceFlow> toDeleteSequenceFlows = new ArrayList<SequenceFlow>();
-    for (SequenceFlow incomingSequenceFlow : flowNode.getIncoming()) {
+    for (SequenceFlow incomingSequenceFlow : flowNode.getIncomingFlows()) {
       SequenceFlow toDeleteObject = (SequenceFlow) getFlowElement(incomingSequenceFlow);
       if (toDeleteObject != null) {
         toDeleteSequenceFlows.add(toDeleteObject);
       }
     }
-    for (SequenceFlow outgoingSequenceFlow : flowNode.getOutgoing()) {
+    for (SequenceFlow outgoingSequenceFlow : flowNode.getOutgoingFlows()) {
       SequenceFlow toDeleteObject = (SequenceFlow) getFlowElement(outgoingSequenceFlow);
       if (toDeleteObject != null) {
         toDeleteSequenceFlows.add(toDeleteObject);
@@ -124,21 +124,21 @@ public class DeleteFlowElementFeature extends DefaultDeleteFeature {
   	  if(diagramObject instanceof FlowNode) {
         SequenceFlow foundIncoming = null;
         SequenceFlow foundOutgoing = null;
-        for(SequenceFlow flow : ((FlowNode) diagramObject).getIncoming()) {
+        for(SequenceFlow flow : ((FlowNode) diagramObject).getIncomingFlows()) {
           if(flow.getId().equals(sequenceFlow.getId())) {
             foundIncoming = flow;
           }
         }
-        for(SequenceFlow flow : ((FlowNode) diagramObject).getOutgoing()) {
+        for(SequenceFlow flow : ((FlowNode) diagramObject).getOutgoingFlows()) {
           if(flow.getId().equals(sequenceFlow.getId())) {
             foundOutgoing = flow;
           }
         }
         if(foundIncoming != null) {
-          ((FlowNode) diagramObject).getIncoming().remove(foundIncoming);
+          ((FlowNode) diagramObject).getIncomingFlows().remove(foundIncoming);
         }
         if(foundOutgoing != null) {
-          ((FlowNode) diagramObject).getOutgoing().remove(foundOutgoing);
+          ((FlowNode) diagramObject).getOutgoingFlows().remove(foundOutgoing);
         }
       }
 	  }

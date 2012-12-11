@@ -40,20 +40,20 @@ public class MoveGatewayFeature extends DefaultMoveShapeFeature {
 		    if (containerBo instanceof SubProcess) {
 		      SubProcess subProcess = (SubProcess) containerBo;
 		      subProcess.removeFlowElement(gateway.getId());
-		      for (SequenceFlow flow : gateway.getOutgoing()) {
+		      for (SequenceFlow flow : gateway.getOutgoingFlows()) {
 		        subProcess.removeFlowElement(flow.getId());
 		      }
 		    } else if (containerBo instanceof Lane) {
 		      Lane lane = (Lane) containerBo;
           lane.getFlowReferences().remove(gateway.getId());
           lane.getParentProcess().removeFlowElement(gateway.getId());
-          for (SequenceFlow flow : gateway.getOutgoing()) {
+          for (SequenceFlow flow : gateway.getOutgoingFlows()) {
             lane.getParentProcess().removeFlowElement(flow.getId());
           }
         }
 		  } else {
 		    model.getBpmnModel().getMainProcess().removeFlowElement(gateway.getId());
-		    for (SequenceFlow flow : gateway.getOutgoing()) {
+		    for (SequenceFlow flow : gateway.getOutgoingFlows()) {
 		      model.getBpmnModel().getMainProcess().removeFlowElement(flow.getId());
         }
 		  }
@@ -63,20 +63,20 @@ public class MoveGatewayFeature extends DefaultMoveShapeFeature {
         if (containerBo instanceof SubProcess) {
           SubProcess subProcess = (SubProcess) containerBo;
           subProcess.addFlowElement(gateway);
-          for (SequenceFlow flow : gateway.getOutgoing()) {
+          for (SequenceFlow flow : gateway.getOutgoingFlows()) {
             subProcess.addFlowElement(flow);
           }
         } else if (containerBo instanceof Lane) {
           Lane lane = (Lane) containerBo;
           lane.getFlowReferences().add(gateway.getId());
           lane.getParentProcess().addFlowElement(gateway);
-          for (SequenceFlow flow : gateway.getOutgoing()) {
+          for (SequenceFlow flow : gateway.getOutgoingFlows()) {
             lane.getParentProcess().addFlowElement(flow);
           }
         }
       } else {
         model.getBpmnModel().getMainProcess().addFlowElement(gateway);
-        for (SequenceFlow flow : gateway.getOutgoing()) {
+        for (SequenceFlow flow : gateway.getOutgoingFlows()) {
           model.getBpmnModel().getMainProcess().addFlowElement(flow);
         }
       }

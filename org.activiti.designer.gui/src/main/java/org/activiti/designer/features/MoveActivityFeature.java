@@ -6,6 +6,7 @@ import org.activiti.bpmn.model.Activity;
 import org.activiti.bpmn.model.BoundaryEvent;
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.Lane;
+import org.activiti.bpmn.model.Process;
 import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
@@ -69,20 +70,23 @@ public class MoveActivityFeature extends DefaultMoveShapeFeature {
 		    if (containerBo instanceof SubProcess) {
 		      SubProcess subProcess = (SubProcess) containerBo;
 		      subProcess.removeFlowElement(activity.getId());
-		      for (SequenceFlow flow : activity.getOutgoing()) {
+		      for (SequenceFlow flow : activity.getOutgoingFlows()) {
 		        subProcess.removeFlowElement(flow.getId());
 		      }
 		    } else if (containerBo instanceof Lane) {
 		      Lane lane = (Lane) containerBo;
           lane.getFlowReferences().remove(activity.getId());
           lane.getParentProcess().removeFlowElement(activity.getId());
-          for (SequenceFlow flow : activity.getOutgoing()) {
+          for (SequenceFlow flow : activity.getOutgoingFlows()) {
             lane.getParentProcess().removeFlowElement(flow.getId());
           }
         }
 		  } else {
+		    if (model.getBpmnModel().getMainProcess() == null) {
+		      model.addMainProcess();
+		    }
 		    model.getBpmnModel().getMainProcess().removeFlowElement(activity.getId());
-		    for (SequenceFlow flow : activity.getOutgoing()) {
+		    for (SequenceFlow flow : activity.getOutgoingFlows()) {
 		      model.getBpmnModel().getMainProcess().removeFlowElement(flow.getId());
         }
 		  }
@@ -92,20 +96,23 @@ public class MoveActivityFeature extends DefaultMoveShapeFeature {
         if (containerBo instanceof SubProcess) {
           SubProcess subProcess = (SubProcess) containerBo;
           subProcess.addFlowElement(activity);
-          for (SequenceFlow flow : activity.getOutgoing()) {
+          for (SequenceFlow flow : activity.getOutgoingFlows()) {
             subProcess.addFlowElement(flow);
           }
         } else if (containerBo instanceof Lane) {
           Lane lane = (Lane) containerBo;
           lane.getFlowReferences().add(activity.getId());
           lane.getParentProcess().addFlowElement(activity);
-          for (SequenceFlow flow : activity.getOutgoing()) {
+          for (SequenceFlow flow : activity.getOutgoingFlows()) {
             lane.getParentProcess().addFlowElement(flow);
           }
         }
       } else {
+        if (model.getBpmnModel().getMainProcess() == null) {
+          model.addMainProcess();
+        }
         model.getBpmnModel().getMainProcess().addFlowElement(activity);
-        for (SequenceFlow flow : activity.getOutgoing()) {
+        for (SequenceFlow flow : activity.getOutgoingFlows()) {
           model.getBpmnModel().getMainProcess().addFlowElement(flow);
         }
       }

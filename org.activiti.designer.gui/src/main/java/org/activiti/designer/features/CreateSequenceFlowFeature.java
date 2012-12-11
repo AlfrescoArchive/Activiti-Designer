@@ -115,8 +115,8 @@ public class CreateSequenceFlowFeature extends AbstractCreateBPMNConnectionFeatu
       }
     }
 
-    source.getOutgoing().add(sequenceFlow);
-    target.getIncoming().add(sequenceFlow);
+    source.getOutgoingFlows().add(sequenceFlow);
+    target.getIncomingFlows().add(sequenceFlow);
     return sequenceFlow;
   }
 

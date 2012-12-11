@@ -81,9 +81,9 @@ public class PropertyDefaultFlowSection extends ActivitiPropertySection implemen
 
       List<SequenceFlow> flowList = null;
       if(bo instanceof Activity) {
-        flowList = ((Activity) bo).getOutgoing();
+        flowList = ((Activity) bo).getOutgoingFlows();
       } else if(bo instanceof Gateway) {
-        flowList = ((Gateway) bo).getOutgoing();
+        flowList = ((Gateway) bo).getOutgoingFlows();
       }
       
       defaultCombo.removeAll();

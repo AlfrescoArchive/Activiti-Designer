@@ -114,8 +114,7 @@ public class SignalEditor extends TableFieldEditor {
           	newSignalList.add(newSignal);
           }
         }
-        model.getBpmnModel().getSignals().clear();
-        model.getBpmnModel().getSignals().addAll(newSignalList);
+        model.getBpmnModel().setSignals(newSignalList);
       }
     }, editingDomain, "Model Update");
   }

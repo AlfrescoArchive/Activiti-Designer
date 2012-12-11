@@ -390,7 +390,10 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
 		ok.setLayoutData(data);
 		ok.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				if(ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(implementationType) && (StringUtils.isEmpty(classNameText.getText()))) {
+				if(ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(implementationType) && (StringUtils.isEmpty(classNameText.getText())) &&
+				        AlfrescoUserTask.ALFRESCO_SCRIPT_TASK_LISTENER.equalsIgnoreCase(implementation) == false &&
+                AlfrescoScriptTask.ALFRESCO_SCRIPT_EXECUTION_LISTENER.equalsIgnoreCase(implementation) == false) {
+				  
 					MessageDialog.openError(shell, "Validation error", "Class name must be filled.");
 					return;
 				}
