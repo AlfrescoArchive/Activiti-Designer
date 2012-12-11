@@ -18,13 +18,19 @@ package org.activiti.designer.property;
 import org.activiti.bpmn.model.Artifact;
 import org.activiti.bpmn.model.BaseElement;
 import org.activiti.bpmn.model.FlowElement;
+import org.activiti.bpmn.model.FlowNode;
 import org.activiti.bpmn.model.Lane;
 import org.activiti.bpmn.model.Pool;
+import org.activiti.bpmn.model.Process;
+import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.bpmn.model.TextAnnotation;
 import org.activiti.designer.util.TextUtil;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
+import org.activiti.designer.util.editor.Bpmn2MemoryModel;
+import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.features.IUpdateFeature;
 import org.eclipse.graphiti.features.context.impl.UpdateContext;
@@ -153,8 +159,11 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
       ActivitiUiUtil.runModelChange(new Runnable() {
 
         public void run() {
+          BaseElement element = (BaseElement) bo;
           String id = idText.getText();
-          ((BaseElement) bo).setId(id);
+          updateParentLane(element.getId(), id);
+          updateFlows(element, id);
+          element.setId(id);
           
           String name = nameText.getText();
           if (bo instanceof FlowElement) {
@@ -199,5 +208,30 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
       }, editingDomain, "Model Update");
     }
   };
+  
+  protected void updateParentLane(String oldElementId, String newElementId) {
+    Bpmn2MemoryModel model = (ModelHandler.getModel(EcoreUtil.getURI(getDiagram())));
+    for (Process process : model.getBpmnModel().getProcesses()) {
+      for (Lane lane : process.getLanes()) {
+        if (lane.getFlowReferences().contains(oldElementId)) {
+          lane.getFlowReferences().remove(oldElementId);
+          lane.getFlowReferences().add(newElementId);
+          return;
+        }
+      }
+    }
+  }
+  
+  protected void updateFlows(BaseElement element, String newElementId) {
+    if (element instanceof FlowNode) {
+      FlowNode flowNode = (FlowNode) element;
+      for (SequenceFlow sequenceFlow : flowNode.getIncomingFlows()) {
+        sequenceFlow.setTargetRef(newElementId);
+      }
+      for (SequenceFlow sequenceFlow : flowNode.getOutgoingFlows()) {
+        sequenceFlow.setSourceRef(newElementId);
+      }
+    }
+  }
 
 }

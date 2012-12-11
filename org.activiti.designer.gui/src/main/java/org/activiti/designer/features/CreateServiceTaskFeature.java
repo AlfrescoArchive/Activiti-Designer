@@ -2,12 +2,10 @@ package org.activiti.designer.features;
 
 import java.util.List;
 
-import org.activiti.bpmn.model.CustomProperty;
 import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.designer.PluginImage;
 import org.activiti.designer.integration.servicetask.CustomServiceTask;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
-import org.activiti.designer.util.eclipse.ExtensionConstants;
 import org.activiti.designer.util.extension.ExtensionUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;

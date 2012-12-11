@@ -16,7 +16,6 @@
 package org.activiti.designer.property;
 
 import org.activiti.bpmn.model.Activity;
-import org.activiti.designer.util.extension.ExtensionUtil;
 import org.activiti.designer.util.property.ActivitiPropertyFilter;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 
@@ -25,7 +24,7 @@ public class PropertyAsyncFilter extends ActivitiPropertyFilter {
   @Override
   protected boolean accept(PictogramElement pe) {
   	Object bo = getBusinessObject(pe);
-  	if(bo != null && bo instanceof Activity && ExtensionUtil.isCustomServiceTask(bo) == false) {
+  	if(bo != null && bo instanceof Activity) {
       return true;
   	}
     return false;

@@ -416,9 +416,9 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
 				} else if(ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(implementationType)) {
 				  implementation = classNameText.getText();
 				} else if(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equals(implementationType)){
-				  implementation = delegateExpressionText.getText();
-				} else {
 				  implementation = expressionText.getText();
+				} else {
+				  implementation = delegateExpressionText.getText();
 				}
 				fieldExtensionList = new ArrayList<FieldExtension>();
 				if(fieldEditor.getItems() != null) {
@@ -426,7 +426,7 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
 				    FieldExtension fieldModel = new FieldExtension();
 				    fieldModel.setFieldName(tableItem.getText(0));
 				    fieldModel.setStringValue(tableItem.getText(1));
-				    fieldModel.setExpression(tableItem.getText(1));
+				    fieldModel.setExpression(tableItem.getText(2));
 				    fieldExtensionList.add(fieldModel);
           }
 				}

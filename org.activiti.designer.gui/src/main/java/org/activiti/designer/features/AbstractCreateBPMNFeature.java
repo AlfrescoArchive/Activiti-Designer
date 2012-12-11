@@ -114,8 +114,8 @@ public abstract class AbstractCreateBPMNFeature extends AbstractCreateFeature {
       final Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
       if (model.getBpmnModel().getMainProcess() == null) {
         model.addMainProcess();
-        addFlowNodeOrArtifact(baseElement, model.getBpmnModel().getMainProcess());
       }
+      addFlowNodeOrArtifact(baseElement, model.getBpmnModel().getMainProcess());
     }
     else {
       // find the parent object
