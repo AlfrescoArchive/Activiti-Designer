@@ -16,7 +16,6 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 import org.activiti.bpmn.converter.BpmnXMLConverter;
-import org.activiti.bpmn.model.Activity;
 import org.activiti.bpmn.model.Artifact;
 import org.activiti.bpmn.model.Association;
 import org.activiti.bpmn.model.BaseElement;
@@ -462,52 +461,29 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 
         }
 
-        if (addFeature.canAdd(context)) {
-          PictogramElement newContainer = addFeature.add(context);
-          featureProvider.link(newContainer, new Object[] { flowElement });
+        if (flowElement instanceof BoundaryEvent) {
+          BoundaryEvent boundaryEvent = (BoundaryEvent) flowElement;
+          if (boundaryEvent.getAttachedToRef() != null) {
+            ContainerShape container = (ContainerShape) featureProvider.getPictogramElementForBusinessObject(boundaryEvent.getAttachedToRef());
 
-          if (flowElement instanceof SubProcess) {
-            drawFlowElements(((SubProcess) flowElement).getFlowElements(), locationMap, (ContainerShape) newContainer, process);
-          }
-
-          if (flowElement instanceof Activity) {
-            Activity activity = (Activity) flowElement;
-            for (BoundaryEvent boundaryEvent : activity.getBoundaryEvents()) {
+            if (container != null) {
               AddContext boundaryContext = new AddContext(new AreaContext(), boundaryEvent);
-              IAddFeature boundaryAddFeature = featureProvider.getAddFeature(boundaryContext);
+              boundaryContext.setTargetContainer(container);
+              Point location = getLocation(container);
+              boundaryContext.setLocation((int) graphicInfo.x - location.x, (int) graphicInfo.y - location.y);
 
-              if (boundaryAddFeature == null) {
-                System.out.println("Element not supported: " + boundaryEvent);
-                return;
-              }
-
-              GraphicInfo boundaryGraphicInfo = locationMap.get(boundaryEvent.getId());
-              if (boundaryGraphicInfo == null) {
-
-                noDIList.add(boundaryEvent);
-
-              } else {
-
-                context.setNewObject(boundaryEvent);
-                context.setSize((int) boundaryGraphicInfo.width, (int) boundaryGraphicInfo.height);
-
-                if (boundaryEvent.getAttachedToRef() != null) {
-                  ContainerShape container = (ContainerShape) featureProvider.getPictogramElementForBusinessObject(boundaryEvent.getAttachedToRef());
-
-                  if (container != null) {
-
-                    boundaryContext.setTargetContainer(container);
-                    Point location = getLocation(container);
-                    boundaryContext.setLocation((int) boundaryGraphicInfo.x - location.x, (int) boundaryGraphicInfo.y - location.y);
-
-                    if (boundaryAddFeature.canAdd(boundaryContext)) {
-                      PictogramElement newBoundaryContainer = boundaryAddFeature.add(boundaryContext);
-                      featureProvider.link(newBoundaryContainer, new Object[] { boundaryEvent });
-                    }
-                  }
-                }
+              if (addFeature.canAdd(boundaryContext)) {
+                PictogramElement newBoundaryContainer = addFeature.add(boundaryContext);
+                featureProvider.link(newBoundaryContainer, new Object[] { boundaryEvent });
               }
             }
+          }
+        } else if (addFeature.canAdd(context)) {
+          PictogramElement newContainer = addFeature.add(context);
+          featureProvider.link(newContainer, new Object[] { flowElement });
+          
+          if (flowElement instanceof SubProcess) {
+            drawFlowElements(((SubProcess) flowElement).getFlowElements(), locationMap, (ContainerShape) newContainer, process);
           }
         }
       }

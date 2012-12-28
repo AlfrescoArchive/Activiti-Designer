@@ -26,7 +26,6 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
 	public String id;
 	public String name;
 	public String type;
-	public String value;
 	public String expression;
 	public String variable;
 	public String defaultExpression;
@@ -39,7 +38,6 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
 	protected String savedId;
 	protected String savedName;
 	protected String savedType;
-	protected String savedValue;
 	protected String savedExpression;
 	protected String savedVariable;
 	protected String savedDefaultExpression;
@@ -55,15 +53,14 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
 	}
 	
 	public FormPropertyDialog(Shell parent, TableItem[] fieldList, String savedId, 
-	        String savedName, String savedType, String savedValue, 
-	        String savedExpression, String savedVariable, String savedDefaultExpression, String savedDatePattern,
-	        String savedRequired, String savedReadable, String savedWriteable, String savedFormValues) {
+	        String savedName, String savedType, String savedExpression, String savedVariable, 
+	        String savedDefaultExpression, String savedDatePattern, String savedRequired, String savedReadable, 
+	        String savedWriteable, String savedFormValues) {
     // Pass the default styles here
     this(parent, fieldList, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
     this.savedId = savedId;
     this.savedName = savedName;
     this.savedType = savedType;
-    this.savedValue = savedValue;
     this.savedExpression = savedExpression;
     this.savedVariable = savedVariable;
     this.savedDefaultExpression = savedDefaultExpression;
@@ -127,10 +124,7 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
     final Text typeText = createText(savedType, shell, nameText);
     createLabel("Type", shell, typeText);
     
-    final Text valueText = createText(savedValue, shell, typeText);
-    createLabel("Value", shell, valueText);
-    
-    final Text expressionText = createText(savedExpression, shell, valueText);
+    final Text expressionText = createText(savedExpression, shell, typeText);
     createLabel("Expression", shell, expressionText);
     
     final Text variableText = createText(savedVariable, shell, expressionText);
@@ -247,7 +241,6 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
 				id = idText.getText();
 				name = nameText.getText();
 				type = typeText.getText();
-				value = valueText.getText();
 				expression = expressionText.getText();
 				variable = variableText.getText();
 				defaultExpression = defaultText.getText(); 

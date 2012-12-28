@@ -1,6 +1,8 @@
 package org.activiti.designer.features;
 
+import org.activiti.bpmn.model.Activity;
 import org.activiti.bpmn.model.BaseElement;
+import org.activiti.bpmn.model.BoundaryEvent;
 import org.activiti.bpmn.model.EndEvent;
 import org.activiti.bpmn.model.FlowNode;
 import org.activiti.bpmn.model.Lane;
@@ -99,7 +101,17 @@ public class CreateSequenceFlowFeature extends AbstractCreateBPMNConnectionFeatu
       sequenceFlow.setName("");
     }
 
-    ContainerShape targetContainer = (ContainerShape) context.getSourcePictogramElement();
+    ContainerShape targetContainer = null;
+    if (source instanceof BoundaryEvent) {
+      BoundaryEvent boundaryEvent = (BoundaryEvent) source;
+      if (boundaryEvent.getAttachedToRef() != null) {
+        Activity attachedActivity = boundaryEvent.getAttachedToRef();
+        targetContainer = (ContainerShape) getFeatureProvider().getPictogramElementForBusinessObject(attachedActivity);
+      }
+    } else {
+      targetContainer = (ContainerShape) context.getSourcePictogramElement();
+    }
+      
     ContainerShape parentContainer = targetContainer.getContainer();
     if (parentContainer instanceof Diagram) {
       ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getBpmnModel().getMainProcess().addFlowElement(sequenceFlow);
@@ -114,7 +126,7 @@ public class CreateSequenceFlowFeature extends AbstractCreateBPMNConnectionFeatu
         lane.getParentProcess().addFlowElement(sequenceFlow);
       }
     }
-
+    
     source.getOutgoingFlows().add(sequenceFlow);
     target.getIncomingFlows().add(sequenceFlow);
     return sequenceFlow;

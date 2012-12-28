@@ -25,6 +25,7 @@ import org.activiti.bpmn.model.InclusiveGateway;
 import org.activiti.bpmn.model.IntermediateCatchEvent;
 import org.activiti.bpmn.model.Lane;
 import org.activiti.bpmn.model.ManualTask;
+import org.activiti.bpmn.model.MessageEventDefinition;
 import org.activiti.bpmn.model.ParallelGateway;
 import org.activiti.bpmn.model.Pool;
 import org.activiti.bpmn.model.ReceiveTask;
@@ -141,10 +142,12 @@ public class DefaultIconProvider implements IconProvider {
     } else if (context instanceof BoundaryEvent) {
       if(((BoundaryEvent) context).getEventDefinitions().size() > 0) {
         EventDefinition definition = ((BoundaryEvent) context).getEventDefinitions().get(0);
-        if(definition instanceof ErrorEventDefinition) {
+        if (definition instanceof ErrorEventDefinition) {
           result = Activator.getImage(PluginImage.IMG_BOUNDARY_ERROR);
-        } else if(definition instanceof SignalEventDefinition) {
+        } else if (definition instanceof SignalEventDefinition) {
           result = Activator.getImage(PluginImage.IMG_BOUNDARY_SIGNAL);
+        } else if (definition instanceof MessageEventDefinition) {
+          result = Activator.getImage(PluginImage.IMG_BOUNDARY_MESSAGE);
         } else {
           result = Activator.getImage(PluginImage.IMG_BOUNDARY_TIMER);
         }

@@ -8,6 +8,7 @@ import java.util.List;
 import org.activiti.bpmn.model.Activity;
 import org.activiti.bpmn.model.Artifact;
 import org.activiti.bpmn.model.BaseElement;
+import org.activiti.bpmn.model.BoundaryEvent;
 import org.activiti.bpmn.model.CallActivity;
 import org.activiti.bpmn.model.Event;
 import org.activiti.bpmn.model.FlowElement;
@@ -122,7 +123,19 @@ public abstract class AbstractCreateBPMNFeature extends AbstractCreateFeature {
       final Object parent = getBusinessObjectForPictogramElement(targetContainer);
       
       if (parent instanceof SubProcess) {
-        addFlowNodeOrArtifact(baseElement, (SubProcess) parent);
+        boolean addToSubProcess = true;
+        if (baseElement instanceof BoundaryEvent) {
+          BoundaryEvent boundaryEvent = (BoundaryEvent) baseElement;
+          if (boundaryEvent.getAttachedToRef() != null && boundaryEvent.getAttachedToRef().getId().equals(((SubProcess) parent).getId())) {
+            addToSubProcess = false;
+          }
+        }
+        if (addToSubProcess == false) {
+          ContainerShape parentContainer = targetContainer.getContainer();
+          addBaseElementToContainer(parentContainer, baseElement);
+        } else {
+          addFlowNodeOrArtifact(baseElement, (SubProcess) parent);
+        }
         
       } else if (parent instanceof Lane) {
         final Lane lane = (Lane) parent;

@@ -141,14 +141,13 @@ public final class CloneUtil {
     result.setId(formProperty.getId());
     result.setName(formProperty.getName());
     result.setType(formProperty.getType());
-    result.setValue(formProperty.getValue());
     result.setExpression(formProperty.getExpression());
     result.setVariable(formProperty.getVariable());
     result.setDefaultExpression(formProperty.getDefaultExpression());
     result.setDatePattern(formProperty.getDatePattern());
-    result.setReadable(formProperty.getReadable());
-    result.setRequired(formProperty.getRequired());
-    result.setWriteable(formProperty.getWriteable());
+    result.setReadable(formProperty.isReadable());
+    result.setRequired(formProperty.isRequired());
+    result.setWriteable(formProperty.isWriteable());
 
     List<FormValue> resultValueList = new ArrayList<FormValue>();
     for (FormValue formValue : formProperty.getFormValues()) {

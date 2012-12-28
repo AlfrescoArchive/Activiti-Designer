@@ -61,7 +61,7 @@ public class DeleteFlowElementFeature extends DefaultDeleteFeature {
         }
 		    removeElement(subFlowElement);
       }
-		  subProcess.getFlowElementMap().clear();
+		  subProcess.getFlowElements().clear();
 		}
 
 		removeElement((BaseElement) bo);
