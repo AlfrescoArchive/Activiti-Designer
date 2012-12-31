@@ -1,8 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: org.activiti.designer.libs
+Bundle-Name: Activiti Designer - External libs
 Bundle-SymbolicName: org.activiti.designer.libs;singleton:=true
-Bundle-Version: 5.11.0
+Bundle-Version: 5.11.1
 Bundle-ClassPath: activiti-bpmn-converter-5.12-SNAPSHOT.jar,
  activiti-bpmn-model-5.12-SNAPSHOT.jar,
  slf4j-api-1.7.2.jar
@@ -27,3 +27,4 @@ Export-Package: org.activiti.bpmn.constants,
  org.activiti.bpmn.model.alfresco;uses:="org.activiti.bpmn.model"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.apache.commons.lang
+Bundle-Vendor: Activiti

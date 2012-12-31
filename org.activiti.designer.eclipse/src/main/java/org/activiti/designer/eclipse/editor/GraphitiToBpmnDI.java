@@ -29,56 +29,114 @@ import org.eclipse.graphiti.services.Graphiti;
 
 
 public class GraphitiToBpmnDI {
+  
+  protected Bpmn2MemoryModel model;
+  protected IFeatureProvider featureProvider;
+  
+  public GraphitiToBpmnDI(Bpmn2MemoryModel model, IFeatureProvider featureProvider) {
+    this.model = model;
+    this.featureProvider = featureProvider;
+  }
 
-  public void processGraphitiElements(Bpmn2MemoryModel model, IFeatureProvider featureProvider) throws Exception {
+  public void processGraphitiElements() throws Exception {
     
+    List<Pool> toDeletePoolList = new ArrayList<Pool>();
     for (Pool pool : model.getBpmnModel().getPools()) {
-      updateFlowElement(pool, model, featureProvider);
-      
-      Process process = model.getBpmnModel().getProcess(pool.getId());
-      if(process != null) {
-        for (Lane lane : process.getLanes()) {
-          updateFlowElement(lane, model, featureProvider);
+      PictogramElement pictElementPool = featureProvider.getPictogramElementForBusinessObject(pool);
+      if (pictElementPool != null) {
+        updateFlowElement(pool);
+        
+        Process process = model.getBpmnModel().getProcess(pool.getId());
+        if(process != null) {
+          List<Lane> toDeleteLaneList = new ArrayList<Lane>();
+          for (Lane lane : process.getLanes()) {
+            PictogramElement pictElementLane = featureProvider.getPictogramElementForBusinessObject(lane);
+            if (pictElementLane != null) {
+              updateFlowElement(lane);
+            } else {
+              toDeleteLaneList.add(lane);
+            }
+          }
+          
+          for (Lane toDeleteLane : toDeleteLaneList) {
+            process.getLanes().remove(toDeleteLane);
+            model.getBpmnModel().removeGraphicInfo(toDeleteLane.getId());
+          }
         }
+      } else {
+        toDeletePoolList.add(pool);
       }
+    }
+    
+    for (Pool toDeletePool : toDeletePoolList) {
+      model.getBpmnModel().getPools().remove(toDeletePool);
+      model.getBpmnModel().removeGraphicInfo(toDeletePool.getId());
     }
     
     for (Process process : model.getBpmnModel().getProcesses()) {
-      loopThroughElements(process.getFlowElements(), model, featureProvider);
-      loopThroughElements(process.getArtifacts(), model, featureProvider);
+      loopThroughElements(process.getFlowElements(), process);
+      loopThroughElements(process.getArtifacts(), process);
     }
   }
   
-  protected void loopThroughElements(Collection<? extends BaseElement> elementList, 
-          Bpmn2MemoryModel model, IFeatureProvider featureProvider) throws Exception {
+  protected void loopThroughElements(Collection<? extends BaseElement> elementList, BaseElement parentElement) throws Exception {
+    
+    List<BaseElement> toDeleteElementList = new ArrayList<BaseElement>();
     
     for (BaseElement element : elementList) {
-      if (element instanceof SequenceFlow) {
-        updateSequenceFlow((SequenceFlow) element, model, featureProvider);
-      } else if (element instanceof FlowElement) {
-        updateFlowElement(element, model, featureProvider);
-        if(element instanceof SubProcess) {
-          SubProcess subProcess = (SubProcess) element;
-          loopThroughElements(subProcess.getFlowElements(), model, featureProvider);
-          loopThroughElements(subProcess.getArtifacts(), model, featureProvider);
-        }
-        if(element instanceof Activity) {
-          Activity activity = (Activity) element;
-          for (BoundaryEvent boundaryEvent : activity.getBoundaryEvents()) {
-            updateFlowElement(boundaryEvent, model, featureProvider);
+      
+      PictogramElement pictElement = featureProvider.getPictogramElementForBusinessObject(element);
+      if (pictElement != null) {
+        if (element instanceof SequenceFlow) {
+          updateSequenceFlow((SequenceFlow) element);
+        } else if (element instanceof FlowElement) {
+          updateFlowElement(element);
+          if(element instanceof SubProcess) {
+            SubProcess subProcess = (SubProcess) element;
+            loopThroughElements(subProcess.getFlowElements(), subProcess);
+            loopThroughElements(subProcess.getArtifacts(), subProcess);
+          }
+          if(element instanceof Activity) {
+            Activity activity = (Activity) element;
+            for (BoundaryEvent boundaryEvent : activity.getBoundaryEvents()) {
+              updateFlowElement(boundaryEvent);
+            }
+          }
+        } else if (element instanceof Artifact) {
+          if (element instanceof Association) {
+            updateAssociation((Association) element);
+          } else {
+            updateFlowElement(element);
           }
         }
-      } else if (element instanceof Artifact) {
-        if (element instanceof Association) {
-          updateAssociation((Association) element, model, featureProvider);
-        } else {
-          updateFlowElement(element, model, featureProvider);
+      } else {
+        // no pictogram exist so delete it from the model as well
+        toDeleteElementList.add(element);
+      }
+    }
+    
+    if (toDeleteElementList.size() > 0) {
+      if (parentElement instanceof Process) {
+        Process process = (Process) parentElement;
+        for (BaseElement toDeleteElement : toDeleteElementList) {
+          process.removeFlowElement(toDeleteElement.getId());
+          model.getBpmnModel().removeGraphicInfo(toDeleteElement.getId());
+          model.getBpmnModel().removeFlowGraphicInfoList(toDeleteElement.getId());
+          model.getBpmnModel().removeLabelGraphicInfo(toDeleteElement.getId());
+        }
+      } else if (parentElement instanceof SubProcess) {
+        SubProcess subProcess = (SubProcess) parentElement;
+        for (BaseElement toDeleteElement : toDeleteElementList) {
+          subProcess.removeFlowElement(toDeleteElement.getId());
+          model.getBpmnModel().removeGraphicInfo(toDeleteElement.getId());
+          model.getBpmnModel().removeFlowGraphicInfoList(toDeleteElement.getId());
+          model.getBpmnModel().removeLabelGraphicInfo(toDeleteElement.getId());
         }
       }
     }
   }
   
-  protected void updateFlowElement(BaseElement flowElement, Bpmn2MemoryModel model, IFeatureProvider featureProvider) {
+  protected void updateFlowElement(BaseElement flowElement) {
     PictogramElement picElement = featureProvider.getPictogramElementForBusinessObject(flowElement);
     if(picElement instanceof Shape) {
       Shape shape = (Shape) picElement;
@@ -88,7 +146,7 @@ public class GraphitiToBpmnDI {
     }
   }
   
-  protected void updateSequenceFlow(SequenceFlow sequenceFlow, Bpmn2MemoryModel model, IFeatureProvider featureProvider) {
+  protected void updateSequenceFlow(SequenceFlow sequenceFlow) {
     Shape sourceShape = null;
     Shape targetShape = null;
     if(StringUtils.isNotEmpty(sequenceFlow.getSourceRef())) {
@@ -123,7 +181,7 @@ public class GraphitiToBpmnDI {
     }
   }
   
-  protected void updateAssociation(Association association, Bpmn2MemoryModel model, IFeatureProvider featureProvider) {
+  protected void updateAssociation(Association association) {
     Shape sourceShape = null;
     Shape targetShape = null;
     if(StringUtils.isNotEmpty(association.getSourceRef())) {

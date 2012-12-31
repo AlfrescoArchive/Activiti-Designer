@@ -183,7 +183,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
       
       // add sequence flow bendpoints to the model
       final IFeatureProvider featureProvider = getDiagramTypeProvider().getFeatureProvider();
-      new GraphitiToBpmnDI().processGraphitiElements(model, featureProvider);
+      new GraphitiToBpmnDI(model, featureProvider).processGraphitiElements();
       
       BpmnXMLConverter converter = new BpmnXMLConverter();
       byte[] xmlBytes = converter.convertToXML(model.getBpmnModel());
