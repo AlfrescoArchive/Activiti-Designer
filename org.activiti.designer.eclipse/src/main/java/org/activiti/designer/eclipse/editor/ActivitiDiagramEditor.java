@@ -25,6 +25,7 @@ import org.activiti.bpmn.model.CustomProperty;
 import org.activiti.bpmn.model.FieldExtension;
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.GraphicInfo;
+import org.activiti.bpmn.model.ImplementationType;
 import org.activiti.bpmn.model.Lane;
 import org.activiti.bpmn.model.Pool;
 import org.activiti.bpmn.model.Process;
@@ -443,7 +444,8 @@ public class ActivitiDiagramEditor extends DiagramEditor {
             CustomServiceTask targetTask = findCustomServiceTask(serviceTask);
 
             if (targetTask != null) {
-              
+              serviceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
+              serviceTask.setImplementation(targetTask.getRuntimeClassname());
               for (FieldExtension field : serviceTask.getFieldExtensions()) {
                 CustomProperty customFieldProperty = new CustomProperty();
                 customFieldProperty.setName(field.getFieldName());

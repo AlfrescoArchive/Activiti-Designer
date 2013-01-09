@@ -2,6 +2,7 @@ package org.activiti.designer.features;
 
 import java.util.List;
 
+import org.activiti.bpmn.model.ImplementationType;
 import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.designer.PluginImage;
 import org.activiti.designer.integration.servicetask.CustomServiceTask;
@@ -37,6 +38,7 @@ public class CreateServiceTaskFeature extends AbstractCreateFastBPMNFeature {
       CustomServiceTask targetTask = findCustomServiceTask(newServiceTask);
 
       if (targetTask != null) {
+        newServiceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
         newServiceTask.setImplementation(targetTask.getRuntimeClassname());
         newServiceTask.setName(targetTask.getName());
       }
