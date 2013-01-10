@@ -123,8 +123,8 @@ public class AddAssociationFeature extends AbstractAddFeature {
     if(bendpointList != null && bendpointList.size() >= 0) {
       for (GraphicInfo graphicInfo : bendpointList) {
         Point bendPoint = StylesFactory.eINSTANCE.createPoint();
-        bendPoint.setX((int)graphicInfo.x);
-        bendPoint.setY((int)graphicInfo.y);
+        bendPoint.setX((int)graphicInfo.getX());
+        bendPoint.setY((int)graphicInfo.getY());
         connection.getBendpoints().add(bendPoint);
       }
       

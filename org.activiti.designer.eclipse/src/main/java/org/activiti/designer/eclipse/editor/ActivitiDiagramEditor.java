@@ -371,11 +371,11 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     AddContext context = new AddContext(new AreaContext(), element);
     IAddFeature addFeature = featureProvider.getAddFeature(context);
     context.setNewObject(element);
-    context.setSize((int) graphicInfo.width, (int) graphicInfo.height);
+    context.setSize((int) graphicInfo.getWidth(), (int) graphicInfo.getHeight());
     context.setTargetContainer(parent);
 
-    int x = (int) graphicInfo.x;
-    int y = (int) graphicInfo.y;
+    int x = (int) graphicInfo.getX();
+    int y = (int) graphicInfo.getY();
 
     if (parent instanceof Diagram == false) {
       x = x - parent.getGraphicsAlgorithm().getX();
@@ -418,7 +418,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
       } else {
 
         context.setNewObject(flowElement);
-        context.setSize((int) graphicInfo.width, (int) graphicInfo.height);
+        context.setSize((int) graphicInfo.getWidth(), (int) graphicInfo.getHeight());
 
         ContainerShape parentContainer = null;
         if (parentShape instanceof Diagram) {
@@ -430,9 +430,9 @@ public class ActivitiDiagramEditor extends DiagramEditor {
         context.setTargetContainer(parentContainer);
         if (parentContainer instanceof Diagram == false) {
           Point location = getLocation(parentContainer);
-          context.setLocation((int) graphicInfo.x - location.x, (int) graphicInfo.y - location.y);
+          context.setLocation((int) graphicInfo.getX() - location.x, (int) graphicInfo.getY() - location.y);
         } else {
-          context.setLocation((int) graphicInfo.x, (int) graphicInfo.y);
+          context.setLocation((int) graphicInfo.getX(), (int) graphicInfo.getY());
         }
 
         if (flowElement instanceof ServiceTask) {
@@ -472,7 +472,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
               AddContext boundaryContext = new AddContext(new AreaContext(), boundaryEvent);
               boundaryContext.setTargetContainer(container);
               Point location = getLocation(container);
-              boundaryContext.setLocation((int) graphicInfo.x - location.x, (int) graphicInfo.y - location.y);
+              boundaryContext.setLocation((int) graphicInfo.getX() - location.x, (int) graphicInfo.getY() - location.y);
 
               if (addFeature.canAdd(boundaryContext)) {
                 PictogramElement newBoundaryContainer = addFeature.add(boundaryContext);
@@ -565,7 +565,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
         artifactsWithoutDI.add(artifact);
       } else {
         context.setNewObject(artifact);
-        context.setSize((int) gi.width, (int) gi.height);
+        context.setSize((int) gi.getWidth(), (int) gi.getHeight());
 
         ContainerShape parentContainer = null;
         if (parent instanceof Diagram) {
@@ -576,11 +576,11 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 
         context.setTargetContainer(parentContainer);
         if (parentContainer instanceof Diagram) {
-          context.setLocation((int) gi.x, (int) gi.y);
+          context.setLocation((int) gi.getX(), (int) gi.getY());
         } else {
           final Point location = getLocation(parentContainer);
 
-          context.setLocation((int) gi.x - location.x, (int) gi.y - location.y);
+          context.setLocation((int) gi.getX() - location.x, (int) gi.getY() - location.y);
         }
 
         if (addFeature.canAdd(context)) {

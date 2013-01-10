@@ -116,8 +116,8 @@ public class AddSequenceFlowFeature extends AbstractAddFeature {
 		if(bendpointList != null && bendpointList.size() >= 0) {
 			for (GraphicInfo graphicInfo : bendpointList) {
 				Point bendPoint = StylesFactory.eINSTANCE.createPoint();
-				bendPoint.setX((int)graphicInfo.x);
-        bendPoint.setY((int)graphicInfo.y);
+				bendPoint.setX((int)graphicInfo.getX());
+        bendPoint.setY((int)graphicInfo.getY());
 				connection.getBendpoints().add(bendPoint);
       }
 			
@@ -210,7 +210,7 @@ public class AddSequenceFlowFeature extends AbstractAddFeature {
     
     if(addConContext.getProperty("org.activiti.designer.connectionlabel") != null) {
       GraphicInfo labelLocation = (GraphicInfo) addConContext.getProperty("org.activiti.designer.connectionlabel");
-      gaService.setLocation(text, (int)labelLocation.x, (int)labelLocation.y);
+      gaService.setLocation(text, (int)labelLocation.getX(), (int)labelLocation.getY());
     } else {
       gaService.setLocation(text, 10, 0);
     }

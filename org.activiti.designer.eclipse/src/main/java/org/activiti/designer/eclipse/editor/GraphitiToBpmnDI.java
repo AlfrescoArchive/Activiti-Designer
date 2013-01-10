@@ -284,13 +284,13 @@ public class GraphitiToBpmnDI {
   
     GraphicInfo lastGraphicInfo = flowGraphicsList.get(flowGraphicsList.size() - 1);
     
-    if((targetBottomY + difference) < lastGraphicInfo.y) {
+    if((targetBottomY + difference) < lastGraphicInfo.getY()) {
       flowGraphicsList.add(createFlowGraphicInfo(targetMiddleX, targetY + targetHeight));
 
-    } else if((targetY - difference) > lastGraphicInfo.y) {
+    } else if((targetY - difference) > lastGraphicInfo.getY()) {
       flowGraphicsList.add(createFlowGraphicInfo(targetMiddleX, targetY));
 
-    } else if(targetX > lastGraphicInfo.x) {
+    } else if(targetX > lastGraphicInfo.getX()) {
       flowGraphicsList.add(createFlowGraphicInfo(targetX, targetMiddleY));
 
     } else {
@@ -302,17 +302,17 @@ public class GraphitiToBpmnDI {
   
   protected GraphicInfo createFlowGraphicInfo(int x, int y) {
     GraphicInfo graphicInfo = new GraphicInfo();
-    graphicInfo.x = x;
-    graphicInfo.y = y;
+    graphicInfo.setX(x);
+    graphicInfo.setY(y);
     return graphicInfo;
   }
   
   protected GraphicInfo createGraphicInfo(int x, int y, int width, int height) {
     GraphicInfo graphicInfo = new GraphicInfo();
-    graphicInfo.x = x;
-    graphicInfo.y = y;
-    graphicInfo.width = width;
-    graphicInfo.height = height;
+    graphicInfo.setX(x);
+    graphicInfo.setY(y);
+    graphicInfo.setWidth(width);
+    graphicInfo.setHeight(height);
     return graphicInfo;
   }
 }
