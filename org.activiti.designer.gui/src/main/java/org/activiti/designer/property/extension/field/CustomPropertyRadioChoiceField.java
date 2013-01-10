@@ -14,7 +14,7 @@
 package org.activiti.designer.property.extension.field;
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -111,7 +111,7 @@ public class CustomPropertyRadioChoiceField extends AbstractCustomPropertyField 
 
         final String[] itemValues = propertyItemsAnnotation.value();
 
-        values = new HashMap<String, String>();
+        values = new LinkedHashMap<String, String>();
 
         for (int i = 0; i < itemValues.length; i += 2) {
           values.put(itemValues[i + 1], itemValues[i]);

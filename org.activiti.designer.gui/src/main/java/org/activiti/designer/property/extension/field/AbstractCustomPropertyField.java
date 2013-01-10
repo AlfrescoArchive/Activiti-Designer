@@ -143,7 +143,7 @@ public abstract class AbstractCustomPropertyField implements CustomPropertyField
    */
   protected String getSimpleValueOrDefault() {
     String result = getSimpleValueFromModel();
-    if (result == null && StringUtils.isNotBlank(getPropertyAnnotation().defaultValue())) {
+    if (StringUtils.isEmpty(result) && StringUtils.isNotBlank(getPropertyAnnotation().defaultValue())) {
       result = getPropertyAnnotation().defaultValue();
     } else if (result == null) {
       result = "";
