@@ -31,12 +31,12 @@ public class CreateBoundaryErrorFeature extends AbstractCreateBPMNFeature {
     BoundaryEvent boundaryEvent = new BoundaryEvent();
     ErrorEventDefinition errorEvent = new ErrorEventDefinition();
     boundaryEvent.getEventDefinitions().add(errorEvent);
-    
-    addObjectToContainer(context, boundaryEvent, "Error");
 
     Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
     ((Activity) parentObject).getBoundaryEvents().add(boundaryEvent);
     boundaryEvent.setAttachedToRef((Activity) parentObject);
+    
+    addObjectToContainer(context, boundaryEvent, "Error");
 
     // return newly created business object(s)
     return new Object[] { boundaryEvent };

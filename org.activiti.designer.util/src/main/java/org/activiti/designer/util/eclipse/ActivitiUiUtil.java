@@ -263,8 +263,10 @@ public class ActivitiUiUtil {
       if(featureClass == BoundaryEvent.class && element instanceof Activity) {
       	Activity activity = (Activity) element;
       	for (BoundaryEvent boundaryEvent : activity.getBoundaryEvents()) {
-      		String contentObjectId = boundaryEvent.getId().replace(featureIdKey, "");
-          determinedId = getId(contentObjectId, determinedId);
+      	  if (boundaryEvent.getId() != null) {
+        		String contentObjectId = boundaryEvent.getId().replace(featureIdKey, "");
+            determinedId = getId(contentObjectId, determinedId);
+      	  }
         }
       }
       

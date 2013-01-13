@@ -29,11 +29,11 @@ public class CreateBoundaryMessageFeature extends AbstractCreateBPMNFeature {
     MessageEventDefinition messageEvent = new MessageEventDefinition();
     boundaryEvent.getEventDefinitions().add(messageEvent);
 
-    addObjectToContainer(context, boundaryEvent, "Message");
-
     Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
     ((Activity) parentObject).getBoundaryEvents().add(boundaryEvent);
     boundaryEvent.setAttachedToRef((Activity) parentObject);
+
+    addObjectToContainer(context, boundaryEvent, "Message");
 
     // return newly created business object(s)
     return new Object[] { boundaryEvent };

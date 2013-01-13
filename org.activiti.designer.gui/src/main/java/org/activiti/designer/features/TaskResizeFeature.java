@@ -15,6 +15,8 @@ package org.activiti.designer.features;
 
 import java.util.List;
 
+import org.activiti.bpmn.model.Activity;
+import org.activiti.bpmn.model.BoundaryEvent;
 import org.activiti.bpmn.model.CallActivity;
 import org.activiti.bpmn.model.Task;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -25,6 +27,7 @@ import org.eclipse.graphiti.mm.algorithms.Image;
 import org.eclipse.graphiti.mm.algorithms.MultiText;
 import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
+import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 
 
@@ -57,19 +60,36 @@ public class TaskResizeFeature extends DefaultResizeShapeFeature {
 
   @Override
   public void resizeShape(IResizeShapeContext context) {
-    super.resizeShape(context);
-    
-    Shape boShape = context.getShape();
-    Object bo = getBusinessObjectForPictogramElement(boShape);
     
     int height = context.getHeight();
     int width = context.getWidth();
     if(height < 55) {
-    	height = 55;
+      height = 55;
     }
     if(width < 105) {
-    	width = 105;
+      width = 105;
     }
+    Shape boShape = context.getShape();
+    int oldX = boShape.getGraphicsAlgorithm().getX();
+    int oldY = boShape.getGraphicsAlgorithm().getY();
+    int deltaHeight = height - boShape.getGraphicsAlgorithm().getHeight();
+    
+    super.resizeShape(context);
+    
+    int newX = boShape.getGraphicsAlgorithm().getX();
+    int newY = boShape.getGraphicsAlgorithm().getY();
+    
+    Object bo = getBusinessObjectForPictogramElement(boShape);
+    
+    Activity activity = (Activity) bo;
+    for (BoundaryEvent boundaryEvent : activity.getBoundaryEvents()) {
+      PictogramElement boundaryElement = getFeatureProvider().getPictogramElementForBusinessObject(boundaryEvent);
+      boundaryElement.getGraphicsAlgorithm().setX(boundaryElement.getGraphicsAlgorithm().getX() + newX - oldX);
+      if (newY - oldY == 0) {
+        boundaryElement.getGraphicsAlgorithm().setY(boundaryElement.getGraphicsAlgorithm().getY() + deltaHeight);
+      }
+    }
+    
     context.getShape().getGraphicsAlgorithm().setHeight(height);
     context.getShape().getGraphicsAlgorithm().setWidth(width);
     for (GraphicsAlgorithm graphicsAlgorithm : context.getShape().getGraphicsAlgorithm().getGraphicsAlgorithmChildren()) {

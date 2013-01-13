@@ -29,11 +29,11 @@ public class CreateBoundaryTimerFeature extends AbstractCreateBPMNFeature {
     TimerEventDefinition timerEvent = new TimerEventDefinition();
     boundaryEvent.getEventDefinitions().add(timerEvent);
     
-    addObjectToContainer(context, boundaryEvent, "Timer");
-    
     Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
     ((Activity) parentObject).getBoundaryEvents().add(boundaryEvent);
     boundaryEvent.setAttachedToRef((Activity) parentObject);
+    
+    addObjectToContainer(context, boundaryEvent, "Timer");
 
     // return newly created business object(s)
     return new Object[] { boundaryEvent };

@@ -16,6 +16,9 @@ package org.activiti.designer.features;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.activiti.bpmn.model.Activity;
+import org.activiti.bpmn.model.BoundaryEvent;
+import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.Lane;
 import org.activiti.bpmn.model.Pool;
 import org.activiti.bpmn.model.Process;
@@ -29,6 +32,7 @@ import org.eclipse.graphiti.features.impl.DefaultResizeShapeFeature;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
+import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
 
@@ -72,8 +76,11 @@ public class ContainerResizeFeature extends DefaultResizeShapeFeature {
     }
     
     Shape shape = context.getShape();
+    int oldX = shape.getGraphicsAlgorithm().getX();
+    int oldY = shape.getGraphicsAlgorithm().getY();
     int deltaWidth = width - shape.getGraphicsAlgorithm().getWidth();
     int deltaHeight = height - shape.getGraphicsAlgorithm().getHeight();
+    
     setSize(shape, width, height);
     
     Object bo = getBusinessObjectForPictogramElement(shape);
@@ -129,9 +136,39 @@ public class ContainerResizeFeature extends DefaultResizeShapeFeature {
     }
     
     super.resizeShape(context);
+    
+    int newX = shape.getGraphicsAlgorithm().getX();
+    int newY = shape.getGraphicsAlgorithm().getY();
+    
+    if (bo instanceof SubProcess) {
+      SubProcess subProcess = (SubProcess) bo;
+      for (BoundaryEvent boundaryEvent : subProcess.getBoundaryEvents()) {
+        PictogramElement boundaryElement = getFeatureProvider().getPictogramElementForBusinessObject(boundaryEvent);
+        boundaryElement.getGraphicsAlgorithm().setX(boundaryElement.getGraphicsAlgorithm().getX() + newX - oldX);
+        if (newY - oldY == 0) {
+          boundaryElement.getGraphicsAlgorithm().setY(boundaryElement.getGraphicsAlgorithm().getY() + deltaHeight);
+        }
+      }
+      for (FlowElement flowElement : subProcess.getFlowElements()) {
+        if (flowElement instanceof Activity) {
+          Activity activity = (Activity) flowElement;
+          for (BoundaryEvent boundaryEvent : activity.getBoundaryEvents()) {
+            if (oldX != newX) {
+              PictogramElement boundaryElement = getFeatureProvider().getPictogramElementForBusinessObject(boundaryEvent);
+              boundaryElement.getGraphicsAlgorithm().setX(boundaryElement.getGraphicsAlgorithm().getX() + newX - oldX);
+            }
+            
+            if (oldY != newY) {
+              PictogramElement boundaryElement = getFeatureProvider().getPictogramElementForBusinessObject(boundaryEvent);
+              boundaryElement.getGraphicsAlgorithm().setY(boundaryElement.getGraphicsAlgorithm().getY() + newY - oldY);
+            }
+          }
+        }
+      } 
+    }
   }
   
-  private void centerText(ContainerShape shape) {
+  protected void centerText(ContainerShape shape) {
     for (Shape shapeChild : shape.getChildren()) {
       if (shapeChild.getGraphicsAlgorithm() instanceof Text) {
         Text text = (Text) shapeChild.getGraphicsAlgorithm();
@@ -140,7 +177,7 @@ public class ContainerResizeFeature extends DefaultResizeShapeFeature {
     }
   }
   
-  private void setSize(Shape shape, int width, int height) {
+  protected void setSize(Shape shape, int width, int height) {
     shape.getGraphicsAlgorithm().setHeight(height);
     shape.getGraphicsAlgorithm().setWidth(width);
     for (GraphicsAlgorithm graphicsAlgorithm : shape.getGraphicsAlgorithm().getGraphicsAlgorithmChildren()) {
@@ -149,7 +186,7 @@ public class ContainerResizeFeature extends DefaultResizeShapeFeature {
     }
   }
   
-  private List<Lane> sortLanesByHorizontalOrder(List<Lane> lanes) {
+  protected List<Lane> sortLanesByHorizontalOrder(List<Lane> lanes) {
     List<Lane> sortedLanes = new ArrayList<Lane>();
     for (Lane lane : lanes) {
       int index = -1;
@@ -171,5 +208,4 @@ public class ContainerResizeFeature extends DefaultResizeShapeFeature {
     }
     return sortedLanes;
   }
-
 }

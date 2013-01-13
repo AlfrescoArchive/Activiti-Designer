@@ -71,14 +71,13 @@ public class PropertyBoundaryTimerSection extends ActivitiPropertySection implem
 		PictogramElement pe = getSelectedPictogramElement();
 		if (pe != null) {
 			Object bo = getBusinessObject(pe);
-			// the filter assured, that it is a EClass
 			if (bo == null)
 				return;
 			
 			BoundaryEvent boundaryEvent = (BoundaryEvent) bo;
 			
 			boolean cancelActivity = ((BoundaryEvent) bo).isCancelActivity();
-			if(cancelActivity == false) {
+			if (cancelActivity == false) {
 				cancelActivityCombo.select(1);
 			} else {
 				cancelActivityCombo.select(0);
@@ -86,18 +85,30 @@ public class PropertyBoundaryTimerSection extends ActivitiPropertySection implem
 			
 			if(boundaryEvent.getEventDefinitions().get(0) != null) {
 			  TimerEventDefinition timerDefinition = (TimerEventDefinition) boundaryEvent.getEventDefinitions().get(0);
-        if(StringUtils.isNotEmpty(timerDefinition.getTimeDuration())) {
+        if (StringUtils.isNotEmpty(timerDefinition.getTimeDuration())) {
           String timeDuration = timerDefinition.getTimeDuration();
           timeDurationText.setText(timeDuration == null ? "" : timeDuration);
-          
-        } else if(StringUtils.isNotEmpty(timerDefinition.getTimeDate())) {
+        } else {
+          timeDurationText.setText("");
+        }
+        
+        if (StringUtils.isNotEmpty(timerDefinition.getTimeDate())) {
           String timeDate = timerDefinition.getTimeDate();
           timeDateText.setText(timeDate == null ? "" : timeDate);
-          
-        } else if(StringUtils.isNotEmpty(timerDefinition.getTimeCycle())) {
+        } else {
+          timeDateText.setText("");
+        }
+        
+        if (StringUtils.isNotEmpty(timerDefinition.getTimeCycle())) {
           String timeCycle = timerDefinition.getTimeCycle();
           timeCycleText.setText(timeCycle == null ? "" : timeCycle);
+        } else {
+          timeCycleText.setText("");
         }
+			} else {
+			  timeDurationText.setText("");
+			  timeDateText.setText("");
+			  timeCycleText.setText("");
 			}
 		}
 		cancelActivityCombo.addFocusListener(listener);

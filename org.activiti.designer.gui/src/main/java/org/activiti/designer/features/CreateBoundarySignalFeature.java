@@ -29,11 +29,11 @@ public class CreateBoundarySignalFeature extends AbstractCreateBPMNFeature {
     SignalEventDefinition signalEvent = new SignalEventDefinition();
     boundaryEvent.getEventDefinitions().add(signalEvent);
 
-    addObjectToContainer(context, boundaryEvent, "Signal");
-
     Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
     ((Activity) parentObject).getBoundaryEvents().add(boundaryEvent);
     boundaryEvent.setAttachedToRef((Activity) parentObject);
+    
+    addObjectToContainer(context, boundaryEvent, "Signal");
 
     // return newly created business object(s)
     return new Object[] { boundaryEvent };

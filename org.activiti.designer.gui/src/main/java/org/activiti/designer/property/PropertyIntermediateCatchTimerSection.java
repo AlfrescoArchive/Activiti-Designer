@@ -61,18 +61,30 @@ public class PropertyIntermediateCatchTimerSection extends ActivitiPropertySecti
 			
 			if(catchEvent.getEventDefinitions().get(0) != null) {
 			  TimerEventDefinition timerDefinition = (TimerEventDefinition) catchEvent.getEventDefinitions().get(0);
-        if(StringUtils.isNotEmpty(timerDefinition.getTimeDuration())) {
+			  if (StringUtils.isNotEmpty(timerDefinition.getTimeDuration())) {
           String timeDuration = timerDefinition.getTimeDuration();
           timeDurationText.setText(timeDuration == null ? "" : timeDuration);
-          
-        } else if(StringUtils.isNotEmpty(timerDefinition.getTimeDate())) {
+        } else {
+          timeDurationText.setText("");
+        }
+        
+        if (StringUtils.isNotEmpty(timerDefinition.getTimeDate())) {
           String timeDate = timerDefinition.getTimeDate();
           timeDateText.setText(timeDate == null ? "" : timeDate);
-          
-        } else if(StringUtils.isNotEmpty(timerDefinition.getTimeCycle())) {
+        } else {
+          timeDateText.setText("");
+        }
+        
+        if (StringUtils.isNotEmpty(timerDefinition.getTimeCycle())) {
           String timeCycle = timerDefinition.getTimeCycle();
           timeCycleText.setText(timeCycle == null ? "" : timeCycle);
+        } else {
+          timeCycleText.setText("");
         }
+			} else {
+			  timeDurationText.setText("");
+        timeDateText.setText("");
+        timeCycleText.setText("");
 			}
 		}
 		timeDurationText.addFocusListener(listener);

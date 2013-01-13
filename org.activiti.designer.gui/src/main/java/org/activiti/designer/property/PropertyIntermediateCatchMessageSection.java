@@ -71,7 +71,6 @@ public class PropertyIntermediateCatchMessageSection extends ActivitiPropertySec
           MessageEventDefinition messageDefinition = (MessageEventDefinition) catchEvent.getEventDefinitions().get(0);
           if(StringUtils.isNotEmpty(messageDefinition.getMessageRef())) {
             messageRef = messageDefinition.getMessageRef();
-            
           }
         }
 	    }
