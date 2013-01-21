@@ -12,8 +12,9 @@ public class PropertyErrorEndEventFilter extends ActivitiPropertyFilter {
 	protected boolean accept(PictogramElement pe) {
 		Object bo = getBusinessObject(pe);
 		if(bo instanceof EndEvent) {
-		  if(((EndEvent) bo).getEventDefinitions() != null) {
-        for(EventDefinition eventDefinition : ((EndEvent) bo).getEventDefinitions()) {
+		  EndEvent endEvent = (EndEvent) bo;
+		  if(endEvent.getEventDefinitions() != null) {
+        for(EventDefinition eventDefinition : endEvent.getEventDefinitions()) {
           if(eventDefinition instanceof ErrorEventDefinition) {
             return true;
           }

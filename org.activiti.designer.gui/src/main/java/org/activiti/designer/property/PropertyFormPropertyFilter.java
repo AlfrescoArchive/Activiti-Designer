@@ -1,6 +1,8 @@
 package org.activiti.designer.property;
 
+import org.activiti.bpmn.model.EventDefinition;
 import org.activiti.bpmn.model.StartEvent;
+import org.activiti.bpmn.model.TimerEventDefinition;
 import org.activiti.bpmn.model.UserTask;
 import org.activiti.designer.util.property.ActivitiPropertyFilter;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
@@ -14,12 +16,12 @@ public class PropertyFormPropertyFilter extends ActivitiPropertyFilter {
 		  return true;
 		} else if (bo instanceof StartEvent) {
 		  StartEvent startEvent = (StartEvent) bo;
-      if (startEvent.getEventDefinitions().size() > 0) {
-        return false;
-      } else {
-        return true;
+      for (EventDefinition event : startEvent.getEventDefinitions()) {
+        if (event instanceof TimerEventDefinition == false) {
+          return false;
+        }
       }
- 			 
+      return true; 
 		}
 		return false;
 	}

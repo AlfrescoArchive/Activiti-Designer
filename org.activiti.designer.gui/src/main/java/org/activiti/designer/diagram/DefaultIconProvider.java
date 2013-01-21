@@ -34,6 +34,7 @@ import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.bpmn.model.SignalEventDefinition;
 import org.activiti.bpmn.model.StartEvent;
 import org.activiti.bpmn.model.SubProcess;
+import org.activiti.bpmn.model.TerminateEventDefinition;
 import org.activiti.bpmn.model.ThrowEvent;
 import org.activiti.bpmn.model.TimerEventDefinition;
 import org.activiti.bpmn.model.UserTask;
@@ -133,9 +134,15 @@ public class DefaultIconProvider implements IconProvider {
       }
       
     } else if (context instanceof EndEvent) {
-      if(((EndEvent) context).getEventDefinitions().size() > 0) {
-        result = Activator.getImage(PluginImage.IMG_ENDEVENT_ERROR);
-      } else {
+      EndEvent endEvent = (EndEvent) context;
+      for (EventDefinition eventDefinition : endEvent.getEventDefinitions()) {
+        if (eventDefinition instanceof ErrorEventDefinition) {
+          result = Activator.getImage(PluginImage.IMG_ENDEVENT_ERROR);
+        } else if (eventDefinition instanceof TerminateEventDefinition) {
+          result = Activator.getImage(PluginImage.IMG_ENDEVENT_TERMINATE);
+        }
+      }
+      if (result == null) {
         result = Activator.getImage(PluginImage.IMG_ENDEVENT_NONE);
       }
     

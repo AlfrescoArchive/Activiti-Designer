@@ -30,6 +30,7 @@ import org.activiti.bpmn.model.SignalEventDefinition;
 import org.activiti.bpmn.model.StartEvent;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.bpmn.model.Task;
+import org.activiti.bpmn.model.TerminateEventDefinition;
 import org.activiti.bpmn.model.TextAnnotation;
 import org.activiti.bpmn.model.ThrowEvent;
 import org.activiti.bpmn.model.TimerEventDefinition;
@@ -67,6 +68,7 @@ import org.activiti.designer.features.AddServiceTaskFeature;
 import org.activiti.designer.features.AddSignalCatchingEventFeature;
 import org.activiti.designer.features.AddSignalThrowingEventFeature;
 import org.activiti.designer.features.AddStartEventFeature;
+import org.activiti.designer.features.AddTerminateEndEventFeature;
 import org.activiti.designer.features.AddTextAnnotationFeature;
 import org.activiti.designer.features.AddTimerCatchingEventFeature;
 import org.activiti.designer.features.AddTimerStartEventFeature;
@@ -104,6 +106,7 @@ import org.activiti.designer.features.CreateServiceTaskFeature;
 import org.activiti.designer.features.CreateSignalCatchingEventFeature;
 import org.activiti.designer.features.CreateSignalThrowingEventFeature;
 import org.activiti.designer.features.CreateStartEventFeature;
+import org.activiti.designer.features.CreateTerminateEndEventFeature;
 import org.activiti.designer.features.CreateTextAnnotationFeature;
 import org.activiti.designer.features.CreateTimerCatchingEventFeature;
 import org.activiti.designer.features.CreateTimerStartEventFeature;
@@ -183,15 +186,16 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 	@Override
 	public IAddFeature getAddFeature(IAddContext context) {
 		if (context.getNewObject() instanceof StartEvent) {
-		  if(context.getNewObject() instanceof AlfrescoStartEvent) {
+		  if (context.getNewObject() instanceof AlfrescoStartEvent) {
 		    return new AddAlfrescoStartEventFeature(this);
 		  } else {
-		  	if(((StartEvent) context.getNewObject()).getEventDefinitions().size() > 0) {
-		  		if(((StartEvent) context.getNewObject()).getEventDefinitions().get(0) instanceof TimerEventDefinition) {
+		    StartEvent startEvent = (StartEvent) context.getNewObject();
+		  	if (startEvent.getEventDefinitions().size() > 0) {
+		  		if (startEvent.getEventDefinitions().get(0) instanceof TimerEventDefinition) {
 		  			return new AddTimerStartEventFeature(this);
-		  		} if (((StartEvent) context.getNewObject()).getEventDefinitions().get(0) instanceof MessageEventDefinition) {
+		  		} if (startEvent.getEventDefinitions().get(0) instanceof MessageEventDefinition) {
 		  		  return new AddMessageStartEventFeature(this);
-		  		}  else {
+		  		} else {
 		  			return new AddErrorStartEventFeature(this);
 		  		}
 		  	} else {
@@ -199,11 +203,16 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 		  	}
 		  }
 		} else if (context.getNewObject() instanceof EndEvent) {
-		  if(((EndEvent) context.getNewObject()).getEventDefinitions().size() > 0) {
-		    return new AddErrorEndEventFeature(this);
-		  } else {
-		    return new AddEndEventFeature(this);
-		  }
+		  EndEvent endEvent = (EndEvent) context.getNewObject();
+		  for (EventDefinition eventDefinition : endEvent.getEventDefinitions()) {
+		    if (eventDefinition instanceof ErrorEventDefinition) {
+		      return new AddErrorEndEventFeature(this);
+		    } else if (eventDefinition instanceof TerminateEventDefinition) {
+		      return new AddTerminateEndEventFeature(this);
+		    }
+		  } 
+		  return new AddEndEventFeature(this);
+		  
 		} else if (context.getNewObject() instanceof SequenceFlow) {
 		  return new AddSequenceFlowFeature(this);
 
@@ -307,6 +316,7 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 						new CreateErrorStartEventFeature(this),
 		        new CreateEndEventFeature(this),
 		        new CreateErrorEndEventFeature(this),
+		        new CreateTerminateEndEventFeature(this),
 		        new CreateUserTaskFeature(this),
 		        new CreateAlfrescoUserTaskFeature(this),
 		        new CreateScriptTaskFeature(this), 

@@ -264,7 +264,12 @@ public class ActivitiDiagramEditor extends DiagramEditor {
         }
       });
 
-      String imageFileName = modelFileName.substring(0, modelFileName.lastIndexOf(".")) + ".png";
+      String imageFileName = null;
+      if (modelFileName.endsWith(".bpmn20.xml")) {
+        imageFileName = modelFileName.substring(0, modelFileName.length() - 11) + ".png";
+      } else {
+        imageFileName = modelFileName.substring(0, modelFileName.lastIndexOf(".")) + ".png";
+      }
       File imageFile = new File(imageFileName);
       FileOutputStream outStream = new FileOutputStream(imageFile);
       baos.writeTo(outStream);

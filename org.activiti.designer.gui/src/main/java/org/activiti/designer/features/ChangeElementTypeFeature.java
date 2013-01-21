@@ -3,7 +3,9 @@ package org.activiti.designer.features;
 import java.util.Collection;
 import java.util.List;
 
+import org.activiti.bpmn.model.Activity;
 import org.activiti.bpmn.model.BaseElement;
+import org.activiti.bpmn.model.BoundaryEvent;
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.FlowNode;
 import org.activiti.bpmn.model.Process;
@@ -52,6 +54,12 @@ public class ChangeElementTypeFeature extends AbstractCustomFeature {
   	taskContext.setWidth(elementGraphics.getWidth());
   	
   	FlowNode oldObject = (FlowNode) getFeatureProvider().getBusinessObjectForPictogramElement(element);
+  	if (oldObject instanceof BoundaryEvent) {
+  	  BoundaryEvent boundaryEvent = (BoundaryEvent) oldObject;
+  	  ContainerShape parentShape = (ContainerShape) getFeatureProvider().getPictogramElementForBusinessObject(boundaryEvent.getAttachedToRef());
+  	  taskContext.setTargetContainer(parentShape);
+  	  taskContext.setLocation(x - parentShape.getGraphicsAlgorithm().getX(), y - parentShape.getGraphicsAlgorithm().getY());
+  	}
 	  
 	  List<SequenceFlow> sourceList = oldObject.getOutgoingFlows();
 	  List<SequenceFlow> targetList = oldObject.getIncomingFlows();
@@ -96,7 +104,41 @@ public class ChangeElementTypeFeature extends AbstractCustomFeature {
      
     } else if("parallelgateway".equals(newType)) {
 	  	new CreateParallelGatewayFeature(getFeatureProvider()).create(taskContext);
-	  }
+	  
+    } else if("nonestartevent".equals(newType)) {
+      new CreateStartEventFeature(getFeatureProvider()).create(taskContext);
+    
+    } else if("timerstartevent".equals(newType)) {
+      new CreateTimerStartEventFeature(getFeatureProvider()).create(taskContext);
+    
+    } else if("messagestartevent".equals(newType)) {
+      new CreateMessageStartEventFeature(getFeatureProvider()).create(taskContext);
+    
+    } else if("errorstartevent".equals(newType)) {
+      new CreateErrorStartEventFeature(getFeatureProvider()).create(taskContext);
+    
+    } else if("noneendevent".equals(newType)) {
+      new CreateEndEventFeature(getFeatureProvider()).create(taskContext);
+    
+    } else if("errorendevent".equals(newType)) {
+      new CreateErrorEndEventFeature(getFeatureProvider()).create(taskContext);
+    
+    } else if("terminateendevent".equals(newType)) {
+      new CreateTerminateEndEventFeature(getFeatureProvider()).create(taskContext);
+    
+    } else if ("timerboundaryevent".equals(newType)) {
+      new CreateBoundaryTimerFeature(getFeatureProvider()).create(taskContext);
+    
+    } else if ("errorboundaryevent".equals(newType)) {
+      new CreateBoundaryErrorFeature(getFeatureProvider()).create(taskContext);
+    
+    } else if ("messageboundaryevent".equals(newType)) {
+      new CreateBoundaryMessageFeature(getFeatureProvider()).create(taskContext);
+    
+    } else if ("signalboundaryevent".equals(newType)) {
+      new CreateBoundarySignalFeature(getFeatureProvider()).create(taskContext);
+    
+    }
   }
 	
 	private void removeElement(FlowElement element, BaseElement parentElement) {
@@ -105,13 +147,17 @@ public class ChangeElementTypeFeature extends AbstractCustomFeature {
 	    elementList = ((Process) parentElement).getFlowElements();
 	  } else if (parentElement instanceof SubProcess) {
 	    elementList = ((SubProcess) parentElement).getFlowElements();
+	    ((SubProcess) parentElement).getBoundaryEvents().remove(element);
 	  }
 	  
     for (FlowElement flowElement : elementList) {
-      if(flowElement instanceof SubProcess) {
+      if (flowElement instanceof SubProcess) {
         SubProcess subProcess = (SubProcess) flowElement;
         subProcess.removeFlowElement(element.getId());
         removeElement(element, subProcess);
+      }
+      if (flowElement instanceof Activity) {
+        ((Activity) flowElement).getBoundaryEvents().remove(element);
       }
     }
   }

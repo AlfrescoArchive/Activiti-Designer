@@ -43,9 +43,11 @@ public class CreateDefaultActivitiDiagramWizard extends BasicNewResourceWizard {
   }
 
   private boolean canCreateDiagramFile() {
-    final IFile fileToCreate = getDiagramFile();
-    if (fileToCreate != null) {
-      return !fileToCreate.exists();
+    if (namePage.getContainerFullPath() != null) {
+      final IFile fileToCreate = getDiagramFile();
+      if (fileToCreate != null) {
+        return !fileToCreate.exists();
+      }
     }
     return false;
   }

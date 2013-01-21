@@ -1,25 +1,25 @@
 package org.activiti.designer.features;
 
 import org.activiti.bpmn.model.EndEvent;
-import org.activiti.bpmn.model.ErrorEventDefinition;
+import org.activiti.bpmn.model.TerminateEventDefinition;
 import org.activiti.designer.PluginImage;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 
-public class CreateErrorEndEventFeature extends AbstractCreateFastBPMNFeature {
+public class CreateTerminateEndEventFeature extends AbstractCreateFastBPMNFeature {
 
-  public static final String FEATURE_ID_KEY = "errorendevent";
+  public static final String FEATURE_ID_KEY = "terminateendevent";
 
-  public CreateErrorEndEventFeature(IFeatureProvider fp) {
+  public CreateTerminateEndEventFeature(IFeatureProvider fp) {
     // set name and description of the creation feature
-    super(fp, "ErrorEndEvent", "Add error end event");
+    super(fp, "TerminateEndEvent", "Add terminate end event");
   }
 
   public Object[] create(ICreateContext context) {
     EndEvent endEvent = new EndEvent();
-    ErrorEventDefinition eventDef = new ErrorEventDefinition();
+    TerminateEventDefinition eventDef = new TerminateEventDefinition();
     endEvent.getEventDefinitions().add(eventDef);
-    addObjectToContainer(context, endEvent, "ErrorEnd");
+    addObjectToContainer(context, endEvent, "TerminateEndEvent");
 
     // return newly created business object(s)
     return new Object[] { endEvent };
@@ -27,7 +27,7 @@ public class CreateErrorEndEventFeature extends AbstractCreateFastBPMNFeature {
 
   @Override
   public String getCreateImageId() {
-    return PluginImage.IMG_ENDEVENT_ERROR.getImageKey();
+    return PluginImage.IMG_ENDEVENT_TERMINATE.getImageKey();
   }
 
   @Override
