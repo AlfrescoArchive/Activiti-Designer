@@ -19,7 +19,8 @@ Require-Bundle: org.eclipse.ui,
  org.activiti.designer.libs;bundle-version="5.10.0"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
-Export-Package: org.activiti.designer.util.eclipse,
+Export-Package: org.activiti.designer.util,
+ org.activiti.designer.util.eclipse,
  org.activiti.designer.util.editor,
  org.activiti.designer.util.extension,
  org.activiti.designer.util.platform,

@@ -5,6 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
+import org.activiti.bpmn.model.Process;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -20,7 +21,7 @@ public class ActivitiWorkspaceUtil {
   /**
    * Returns a Set of projects that have the provided project nature. The result
    * contains only projects that are open and available for use.
-   * 
+   *
    * @param natureId
    *          the id of the project nature required
    * @return a set of projects with the nature, or an empty set if none are
@@ -42,33 +43,17 @@ public class ActivitiWorkspaceUtil {
     return result;
   }
 
-  public static final Set<IFile> getBPMNResourcesById(String callElement) {
-    final Set<IFile> result = new HashSet<IFile>();
 
-    final Set<IFile> allBPMNFiles = getBPMNResources();
-    for (final IFile resource : allBPMNFiles) {
-      if (!cache.containsKey(resource)) {
-        cache.put(resource, new CacheData(getProcessIds(resource), resource.getModificationStamp()));
-      }
-
-      final CacheData data = cache.get(resource);
-      if (data.cacheIsExpired(resource.getModificationStamp())) {
-        data.setProcessIds(getProcessIds(resource));
-        data.setLastModified(resource.getModificationStamp());
-      }
-
-      if (data.hasProcessId(callElement)) {
-        result.add(resource);
-      }
-    }
-    return result;
-  }
 
   private static Set<String> getProcessIds(IFile resource) {
 
     final Set<String> result = new HashSet<String>();
 
     final BpmnProcessParser parser = new BpmnProcessParser(resource);
+
+    for (Process process : parser.getProcesses()) {
+      result.add(process.getId());
+    }
 
     return result;
   }
@@ -90,6 +75,29 @@ public class ActivitiWorkspaceUtil {
     return result;
   }
 
+  public static final Set<IFile> getBPMNResourcesById(String callElement) {
+    final Set<IFile> result = new HashSet<IFile>();
+
+    final Set<IFile> allBPMNFiles = getBPMNResources();
+    for (final IFile resource : allBPMNFiles) {
+
+      if (!cache.containsKey(resource)) {
+        cache.put(resource, new CacheData(getProcessIds(resource), resource.getModificationStamp()));
+      }
+
+      final CacheData data = cache.get(resource);
+      if (data.cacheIsExpired(resource.getModificationStamp())) {
+        data.setProcessIds(getProcessIds(resource));
+        data.setLastModified(resource.getModificationStamp());
+      }
+
+      if (data.hasProcessId(callElement)) {
+        result.add(resource);
+      }
+    }
+    return result;
+  }
+
   private static class BPMNResourceVisitor implements IResourceVisitor {
 
     private static final Set<String> IGNORED_ROOT_SEGMENTS = new HashSet<String>();
@@ -102,11 +110,14 @@ public class ActivitiWorkspaceUtil {
 
     @Override
     public boolean visit(IResource resource) throws CoreException {
+
+      System.out.println("ActivitiWorkspaceUtil:visit: " + resource);
+
       // TODO externalize extension to method
       if (isIgnoredResource(resource)) {
         return false;
       }
-      if (resource instanceof IFile && resource.getName().endsWith(".bpmn20.xml")) {
+      if (resource instanceof IFile && resource.getName().endsWith(".bpmn")) {
         visitResults.add((IFile) resource);
       }
       return true;
@@ -140,16 +151,8 @@ public class ActivitiWorkspaceUtil {
       this.lastModified = lastModified;
     }
 
-    public Set<String> getProcessIds() {
-      return processIds;
-    }
-
     public void setProcessIds(Set<String> processIds) {
       this.processIds = processIds;
-    }
-
-    public Long getLastModified() {
-      return lastModified;
     }
 
     public void setLastModified(Long lastModified) {

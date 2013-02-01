@@ -36,10 +36,9 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IFileEditorInput;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.part.FileEditorInput;
+import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
@@ -97,8 +96,9 @@ public class PropertyCallActivitySection extends ActivitiPropertySection impleme
     if (pe != null) {
       Object bo = getBusinessObject(pe);
       // the filter assured, that it is a EClass
-      if (bo == null)
+      if (bo == null) {
         return;
+      }
 
       CallActivity callActivity = (CallActivity) bo;
       String calledElement = callActivity.getCalledElement();
@@ -130,6 +130,8 @@ public class PropertyCallActivitySection extends ActivitiPropertySection impleme
     callElementButton.setEnabled(true);
     callElementButton.setToolTipText("Click to open the called element's process diagram");
   }
+
+
 
   private SelectionListener openListener = new SelectionListener() {
 
@@ -171,8 +173,8 @@ public class PropertyCallActivitySection extends ActivitiPropertySection impleme
 
       try {
         if (!openBpmnFile) {
-          IFileEditorInput input = new FileEditorInput(activitiFile);
-          PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(input, ActivitiBPMNDiagramConstants.DIAGRAM_EDITOR_ID);
+          IDE.openEditor(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
+                  , activitiFile, ActivitiBPMNDiagramConstants.DIAGRAM_EDITOR_ID);
         }
       } catch (PartInitException e) {
         String error = "Error while opening editor";
@@ -191,9 +193,11 @@ public class PropertyCallActivitySection extends ActivitiPropertySection impleme
 
   private FocusListener listener = new FocusListener() {
 
+    @Override
     public void focusGained(final FocusEvent e) {
     }
 
+    @Override
     public void focusLost(final FocusEvent e) {
       PictogramElement pe = getSelectedPictogramElement();
       if (pe != null) {
@@ -203,6 +207,7 @@ public class PropertyCallActivitySection extends ActivitiPropertySection impleme
           TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
           ActivitiUiUtil.runModelChange(new Runnable() {
 
+            @Override
             public void run() {
               String calledElement = callElementText.getText();
               CallActivity callActivity = (CallActivity) bo;

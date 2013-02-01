@@ -1,6 +1,9 @@
 package org.activiti.designer.eclipse.editor;
 
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.util.Collections;
@@ -10,10 +13,16 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.eclipse.core.resources.IFile;
+import org.eclipse.core.resources.IFolder;
+import org.eclipse.core.resources.IProject;
+import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.IWorkspaceRunnable;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.emf.common.command.CommandStack;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
@@ -25,9 +34,200 @@ import org.eclipse.emf.transaction.Transaction;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.emf.transaction.impl.TransactionalEditingDomainImpl;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
+import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 import org.eclipse.graphiti.ui.internal.services.GraphitiUiInternal;
+import org.eclipse.ui.IEditorInput;
+import org.eclipse.ui.IURIEditorInput;
+import org.eclipse.ui.part.FileEditorInput;
 
 public class FileService {
+
+  /** The extension of the temporary diagram file */
+  public final static String DIAGRAM_FILE_EXTENSION = "bpmn2d";
+
+  /** The extension of the data file */
+  public final static String DATA_FILE_EXTENSION = "bpmn";
+
+  /**
+   * Returns a temporary file used as diagram file. Conceptually, this is a placeholder used by
+   * Graphiti as editor input file. The real data file is found at the given data file path.
+   *
+   * @param dataFilePath path of the actual BPMN2 model file
+   * @param diagramFileTempFolder folder containing the diagram files
+   * @return an IFile for the temporary file. If the file exists, it is first
+   *         deleted.
+   */
+  public static IFile getTemporaryDiagramFile(IPath dataFilePath, IFolder diagramFileTempFolder) {
+
+    final IPath path = dataFilePath.removeFileExtension().addFileExtension(DIAGRAM_FILE_EXTENSION);
+    final IFile tempFile = diagramFileTempFolder.getFile(path.lastSegment());
+
+    // We don't need anything from that file and to be sure there are no side
+    // effects we delete the file
+    if (tempFile.exists()) {
+      try {
+        tempFile.delete(true, null);
+      } catch (CoreException e) {
+        e.printStackTrace();
+      }
+    }
+    return tempFile;
+  }
+
+  /**
+   * Returns or constructs a temporary folder for diagram files used as Graphiti editor input
+   * files. The given path reflects the path where the original data file is located. The folder
+   * is constructed in the project root named after the data file extension
+   * {@link #DATA_FILE_EXTENSION}.
+   *
+   * @param dataFilePath path of the actual BPMN2 model file
+   * @return an IFolder for the temporary folder.
+   * @throws CoreException in case the folder could not be created.
+   */
+  public static IFolder getOrCreateTempFolder(IPath dataFilePath) throws CoreException {
+    IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+
+    String name = dataFilePath.getFileExtension();
+    if (name == null || name.length() == 0) {
+      name = "bpmn";
+    }
+
+    String dir = dataFilePath.segment(0);
+    IFolder folder = root.getProject(dir).getFolder("." + name);
+    if (!folder.exists()) {
+      folder.create(true, true, null);
+    }
+    String[] segments = dataFilePath.segments();
+    for (int i = 1; i < segments.length - 1; i++) {
+      String segment = segments[i];
+      folder = folder.getFolder(segment);
+      if (!folder.exists()) {
+        folder.create(true, true, null);
+      }
+    }
+    return folder;
+  }
+
+  /**
+   * Recreates the data file from the given input path. In case the given path reflects a temporary
+   * diagram file, it's path is used to recreate the data file, otherwise the given path is simply
+   * made absolute and returned.
+   *
+   * @param inputPath the path to recreate the data file from
+   * @return a file object representing the data file
+   */
+  public static IFile recreateDataFile(final IPath inputPath) {
+    final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+    final IProject project = root.getFile(inputPath).getProject();
+
+    final int matchingSegments = project.getFullPath().matchingFirstSegments(inputPath);
+    final int totalSegments = inputPath.segmentCount();
+    final String extension = inputPath.getFileExtension();
+
+    IFile result = null;
+
+    if (totalSegments > matchingSegments) {
+      // it shall be more than just the project
+
+      IPath resultPath = null;
+
+      if (DIAGRAM_FILE_EXTENSION.equals(extension)) {
+        // we got a temporary file here, so rebuild the file of the model from its path
+        String originalExtension = inputPath.segment(matchingSegments);
+        if (originalExtension.startsWith(".")) {
+          originalExtension = originalExtension.substring(1);
+        }
+
+        final String[] segments = inputPath.segments();
+        IPath originalPath = project.getFullPath();
+        for (int index = matchingSegments + 1; index < segments.length; ++index) {
+          originalPath = originalPath.append(segments[index]);
+        }
+
+        resultPath = originalPath.removeFileExtension().addFileExtension(originalExtension);
+      }
+      else {
+        resultPath = inputPath.makeAbsolute();
+      }
+
+      result = root.getFile(resultPath);
+    }
+
+    return result;
+  }
+
+  /**
+   * Returns the appropriate data file for the given input. The data file is the BPMN file with
+   * the file extension {@link #DATA_FILE_EXTENSION}. This method can handle various different
+   * editor input versions:
+   *
+   * <ul>
+   *     <li>the special {@link ActivitiDiagramEditorInput} that directly references the data file</li>
+   *     <li>a {@link DiagramEditorInput} that may either point to a data- or diagram file</li>
+   *     <li>a {@link FileEditorInput} that points to a data file</li>
+   *     <li>a {@link IURIEditorInput} that points to an external file outside Eclipse</li>
+   * </ul>
+   *
+   * @param input the input to handle
+   * @return the appropriate data file or <code>null</code> if none could be determined.
+   */
+  public static IFile getDataFileForInput(final IEditorInput input) {
+    final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+
+    if (input instanceof ActivitiDiagramEditorInput) {
+      final ActivitiDiagramEditorInput adei = (ActivitiDiagramEditorInput) input;
+
+      return adei.getDataFile();
+    } else if (input instanceof DiagramEditorInput) {
+      final DiagramEditorInput dei = (DiagramEditorInput) input;
+
+      IPath path = new Path(dei.getUri().trimFragment().toPlatformString(true));
+
+      return recreateDataFile(path);
+    } else if (input instanceof FileEditorInput) {
+      final FileEditorInput fei = (FileEditorInput) input;
+
+      return fei.getFile();
+    } else if (input instanceof IURIEditorInput) {
+      // opened externally to Eclipse
+      final IURIEditorInput uei = (IURIEditorInput) input;
+      final java.net.URI uri = uei.getURI();
+      final String path = uri.getPath();
+
+      try {
+        final IProject importProject = root.getProject("import");
+        if (!importProject.exists()) {
+          importProject.create(null);
+        }
+
+        importProject.open(null);
+
+        final InputStream is = new FileInputStream(path);
+
+        final String fileName;
+        if (path.contains("/")) {
+          fileName = path.substring(path.lastIndexOf("/") + 1);
+        } else {
+          fileName = path.substring(path.lastIndexOf("\\") + 1);
+        }
+
+        IFile importFile = importProject.getFile(fileName);
+        if (importFile.exists()) {
+          importFile.delete(true, null);
+        }
+
+        importFile.create(is, true, null);
+
+        return importProject.getFile(fileName);
+      } catch (CoreException exception) {
+        exception.printStackTrace();
+      } catch (FileNotFoundException exception) {
+        exception.printStackTrace();
+      }
+    }
+
+    return null;
+  }
 
 	public static TransactionalEditingDomain createEmfFileForDiagram(URI diagramResourceUri, final Diagram diagram) {
 
@@ -86,13 +286,7 @@ public class FileService {
 						Resource[] resourcesArray = new Resource[resources.size()];
 						resourcesArray = resources.toArray(resourcesArray);
 						final Set<Resource> savedResources = new HashSet<Resource>();
-						for (int i = 0; i < resourcesArray.length; i++) {
-							// In case resource modification tracking is
-							// switched on, we can check if a resource
-							// has been modified, so that we only need to same
-							// really changed resources; otherwise
-							// we need to save all resources in the set
-							final Resource resource = resourcesArray[i];
+						for (final Resource resource : resourcesArray) {
 							if (resource.isModified()) {
 								try {
 									resource.save(options.get(resource));
