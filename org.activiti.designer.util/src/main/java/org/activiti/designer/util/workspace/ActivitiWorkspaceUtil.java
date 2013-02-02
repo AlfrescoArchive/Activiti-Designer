@@ -111,8 +111,6 @@ public class ActivitiWorkspaceUtil {
     @Override
     public boolean visit(IResource resource) throws CoreException {
 
-      System.out.println("ActivitiWorkspaceUtil:visit: " + resource);
-
       // TODO externalize extension to method
       if (isIgnoredResource(resource)) {
         return false;

@@ -33,6 +33,7 @@ import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.eclipse.ui.ActivitiEditorContextMenuProvider;
+import org.activiti.designer.eclipse.util.FileService;
 import org.activiti.designer.integration.servicetask.CustomServiceTask;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
@@ -84,17 +85,14 @@ import org.eclipse.ui.PartInitException;
 
 public class ActivitiDiagramEditor extends DiagramEditor {
 
+  private static GraphicalViewer activeGraphicalViewer;
+
   private ActivitiBpmnModelChangeListener activitiBpmnModelChangeListener;
+
   private TransactionalEditingDomain transactionalEditingDomain;
 
   public ActivitiDiagramEditor() {
     super();
-  }
-
-  public ActivitiDiagramEditor(final TransactionalEditingDomain transactionalEditingDomain) {
-    super();
-
-    this.transactionalEditingDomain = transactionalEditingDomain;
   }
 
   @Override
@@ -104,8 +102,6 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     final TransactionalEditingDomain ted = getEditingDomain();
     ted.addResourceSetListener(activitiBpmnModelChangeListener);
   }
-
-
 
   @Override
   public TransactionalEditingDomain getEditingDomain() {
@@ -117,9 +113,6 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 
     return ted;
   }
-
-  public final static String ID = "org.activiti.designer.editor.diagramEditor";
-  private static GraphicalViewer activeGraphicalViewer;
 
   @Override
   public void init(IEditorSite site, IEditorInput input) throws PartInitException {
@@ -155,7 +148,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     // Create new temporary diagram file
     Bpmn2DiagramCreator creator = new Bpmn2DiagramCreator();
 
-    return creator.createBpmnDiagram(dataFile, diagramFile, null, false);
+    return creator.createBpmnDiagram(dataFile, diagramFile, this, null, false);
   }
 
   @Override

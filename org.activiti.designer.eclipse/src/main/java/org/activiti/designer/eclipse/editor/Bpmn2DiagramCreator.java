@@ -6,7 +6,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.activiti.designer.eclipse.common.ActivitiBPMNDiagramConstants;
+import org.activiti.designer.eclipse.util.FileService;
+import org.activiti.designer.util.ActivitiConstants;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -30,6 +31,7 @@ public class Bpmn2DiagramCreator {
 
 	public ActivitiDiagramEditorInput createBpmnDiagram(final IFile dataFile
 	                                                  , final IFile diagramFile
+	                                                  , final ActivitiDiagramEditor diagramEditor
 	                                                  , final String templateContent
 	                                                  , final boolean openEditor) {
 	  IFile finalDataFile = dataFile;
@@ -83,7 +85,7 @@ public class Bpmn2DiagramCreator {
 	  final Diagram diagram
 	    = Graphiti.getPeCreateService().createDiagram("BPMNdiagram", diagramName, true);
 
-	  FileService.createEmfFileForDiagram(uri, diagram);
+	  FileService.createEmfFileForDiagram(uri, diagram, diagramEditor, null, null);
 
 	  final String providerId
 	    = GraphitiUi.getExtensionManager().getDiagramTypeProviderId(diagram.getDiagramTypeId());
@@ -109,7 +111,7 @@ public class Bpmn2DiagramCreator {
 			public void run() {
 				try {
 				  IDE.openEditor(workbench.getActiveWorkbenchWindow().getActivePage()
-				          , editorInput, ActivitiBPMNDiagramConstants.DIAGRAM_EDITOR_ID);
+				          , editorInput, ActivitiConstants.DIAGRAM_EDITOR_ID);
 
 				} catch (PartInitException exception) {
 					exception.printStackTrace();

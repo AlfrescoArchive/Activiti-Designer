@@ -112,7 +112,7 @@ public class CreateDefaultActivitiDiagramWizard extends BasicNewResourceWizard {
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
 				try {
 				  Bpmn2DiagramCreator creator = new Bpmn2DiagramCreator();
-				  creator.createBpmnDiagram(null, diagramFile, contentFileName, true);
+				  creator.createBpmnDiagram(null, diagramFile, null, contentFileName, true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				} finally {

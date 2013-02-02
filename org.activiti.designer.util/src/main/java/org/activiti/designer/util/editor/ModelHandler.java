@@ -13,9 +13,6 @@ public class ModelHandler {
 	private static Map<URI, Bpmn2MemoryModel> modelMap = new HashMap<URI, Bpmn2MemoryModel>();
 
 	public static void addModel(URI uri, Bpmn2MemoryModel model) {
-
-	  System.out.println("ModelHandler:addModel(" + uri + ", model)");
-
 		modelMap.put(uri, model);
 	}
 

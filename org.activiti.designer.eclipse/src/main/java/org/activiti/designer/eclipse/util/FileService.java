@@ -1,4 +1,4 @@
-package org.activiti.designer.eclipse.editor;
+package org.activiti.designer.eclipse.util;
 
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -13,6 +13,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.activiti.designer.eclipse.editor.ActivitiDiagramEditor;
+import org.activiti.designer.eclipse.editor.ActivitiDiagramEditorInput;
+import org.activiti.designer.util.ActivitiConstants;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -29,26 +32,21 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.common.util.WrappedException;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.ResourceSet;
+import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.emf.transaction.RecordingCommand;
 import org.eclipse.emf.transaction.Transaction;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.emf.transaction.impl.TransactionalEditingDomainImpl;
+import org.eclipse.emf.transaction.util.TransactionUtil;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
-import org.eclipse.graphiti.ui.internal.services.GraphitiUiInternal;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IURIEditorInput;
 import org.eclipse.ui.part.FileEditorInput;
 
 public class FileService {
 
-  /** The extension of the temporary diagram file */
-  public final static String DIAGRAM_FILE_EXTENSION = "bpmn2d";
-
-  /** The extension of the data file */
-  public final static String DATA_FILE_EXTENSION = "bpmn";
-
-  /**
+   /**
    * Returns a temporary file used as diagram file. Conceptually, this is a placeholder used by
    * Graphiti as editor input file. The real data file is found at the given data file path.
    *
@@ -59,7 +57,8 @@ public class FileService {
    */
   public static IFile getTemporaryDiagramFile(IPath dataFilePath, IFolder diagramFileTempFolder) {
 
-    final IPath path = dataFilePath.removeFileExtension().addFileExtension(DIAGRAM_FILE_EXTENSION);
+    final IPath path = dataFilePath.removeFileExtension().addFileExtension(
+            ActivitiConstants.DIAGRAM_FILE_EXTENSION_RAW);
     final IFile tempFile = diagramFileTempFolder.getFile(path.lastSegment());
 
     // We don't need anything from that file and to be sure there are no side
@@ -78,7 +77,7 @@ public class FileService {
    * Returns or constructs a temporary folder for diagram files used as Graphiti editor input
    * files. The given path reflects the path where the original data file is located. The folder
    * is constructed in the project root named after the data file extension
-   * {@link #DATA_FILE_EXTENSION}.
+   * {@link #DATA_FILE_EXTENSION_RAW}.
    *
    * @param dataFilePath path of the actual BPMN2 model file
    * @return an IFolder for the temporary folder.
@@ -131,7 +130,7 @@ public class FileService {
 
       IPath resultPath = null;
 
-      if (DIAGRAM_FILE_EXTENSION.equals(extension)) {
+      if (ActivitiConstants.DIAGRAM_FILE_EXTENSION_RAW.equals(extension)) {
         // we got a temporary file here, so rebuild the file of the model from its path
         String originalExtension = inputPath.segment(matchingSegments);
         if (originalExtension.startsWith(".")) {
@@ -158,7 +157,7 @@ public class FileService {
 
   /**
    * Returns the appropriate data file for the given input. The data file is the BPMN file with
-   * the file extension {@link #DATA_FILE_EXTENSION}. This method can handle various different
+   * the file extension {@link #DATA_FILE_EXTENSION_RAW}. This method can handle various different
    * editor input versions:
    *
    * <ul>
@@ -229,11 +228,33 @@ public class FileService {
     return null;
   }
 
-	public static TransactionalEditingDomain createEmfFileForDiagram(URI diagramResourceUri, final Diagram diagram) {
 
-		// Create a resource set and EditingDomain
-		final TransactionalEditingDomain editingDomain = GraphitiUiInternal.getEmfService().createResourceSetAndEditingDomain();
-		final ResourceSet resourceSet = editingDomain.getResourceSet();
+
+	public static TransactionalEditingDomain createEmfFileForDiagram(final URI diagramResourceUri
+	                                                               , final Diagram diagram
+	                                                               , final ActivitiDiagramEditor diagramEditor
+	                                                               , final InputStream contentStream
+	                                                               , final IFile resourceFile) {
+
+		TransactionalEditingDomain editingDomain = null;
+		ResourceSet resourceSet = null;
+
+		if (diagramEditor == null || diagramEditor.getResourceSet() == null || diagramEditor.getEditingDomain() == null) {
+		  // nothing found, create a new one
+		  resourceSet = new ResourceSetImpl();
+
+		  // try to retrieve an editing domain for this resource set
+		  editingDomain = TransactionUtil.getEditingDomain(resourceSet);
+
+		  if (editingDomain == null) {
+		    // not existing yet, create a new one
+		    editingDomain = TransactionalEditingDomain.Factory.INSTANCE.createEditingDomain(resourceSet);
+		  }
+		} else {
+		  editingDomain = diagramEditor.getEditingDomain();
+		  resourceSet = diagramEditor.getResourceSet();
+		}
+
 		// Create a resource for this file.
 		final Resource resource = resourceSet.createResource(diagramResourceUri);
 		final CommandStack commandStack = editingDomain.getCommandStack();
@@ -242,7 +263,16 @@ public class FileService {
 			@Override
 			protected void doExecute() {
 				resource.setTrackingModification(true);
-				resource.getContents().add(diagram);
+
+				if (contentStream == null || resourceFile == null) {
+	        resource.getContents().add(diagram);
+				} else {
+				  try {
+				    resourceFile.create(contentStream, true, null);
+				  } catch (CoreException exception) {
+				    exception.printStackTrace();
+				  }
+				}
 
 			}
 		});

@@ -1,8 +1,8 @@
 package org.activiti.designer.eclipse.ui.wizard.diagram;
 
-import org.activiti.designer.eclipse.common.ActivitiBPMNDiagramConstants;
 import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.eclipse.common.PluginImage;
+import org.activiti.designer.util.ActivitiConstants;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -24,12 +24,12 @@ public class CreateDefaultActivitiDiagramNameWizardPage extends WizardNewFileCre
     setTitle("New Activiti Diagram");
     setImageDescriptor(ActivitiPlugin.getImageDescriptor(PluginImage.ACTIVITI_LOGO_64x64));
     setDescription("Create a new Activiti BPMN 2.0 Diagram.");
-    setFileExtension(StringUtils.substringAfter(ActivitiBPMNDiagramConstants.DIAGRAM_EXTENSION, "."));
+    setFileExtension(StringUtils.substringAfter(ActivitiConstants.DATA_FILE_EXTENSION, "."));
 
     // Set selection to the default folder if the project itself was selected
     final IProject project = getProjectFromSelection(selection);
     if (project != null) {
-      final IFolder folder = project.getFolder(ActivitiBPMNDiagramConstants.DIAGRAM_FOLDER);
+      final IFolder folder = project.getFolder(ActivitiConstants.DIAGRAM_FOLDER);
       if (folder != null && folder.exists()) {
         selection.toList().set(0, folder);
       }

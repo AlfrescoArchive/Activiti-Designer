@@ -24,6 +24,7 @@ import org.activiti.bpmn.model.Pool;
 import org.activiti.bpmn.model.Process;
 import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.bpmn.model.TextAnnotation;
+import org.activiti.designer.util.ActivitiConstants;
 import org.activiti.designer.util.TextUtil;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
@@ -96,10 +97,12 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
     data.right = new FormAttachment(nameText, -HSPACE);
     data.top = new FormAttachment(nameText, 0, SWT.CENTER);
     nameLabel.setLayoutData(data);
+
   }
-  
+
   @Override
   public void refresh() {
+
     nameText.removeFocusListener(listener);
     idText.removeFocusListener(listener);
 
@@ -108,8 +111,9 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
     if (pe != null) {
       Object bo = getBusinessObject(pe);
       // the filter assured, that it is a EClass
-      if (bo == null)
+      if (bo == null) {
         return;
+      }
 
       String name = null;
       if (bo instanceof FlowElement) {
@@ -123,32 +127,36 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
         nameText.setVisible(false);
         nameLabel.setVisible(false);
       }
-      
+
       String id = ((BaseElement) bo).getId();
       nameText.setText(name == null ? "" : name);
       idText.setText(id == null ? "" : id);
-      
+
       idText.addFocusListener(listener);
       nameText.addFocusListener(listener);
     }
+
   }
 
   private FocusListener listener = new FocusListener() {
 
+    @Override
     public void focusGained(final FocusEvent e) {
     }
 
+    @Override
     public void focusLost(final FocusEvent e) {
       final PictogramElement pe = getSelectedPictogramElement();
-      if (pe == null)
+      if (pe == null) {
         return;
+      }
       final Object bo = getBusinessObject(pe);
 
-      if (!(bo instanceof BaseElement) || (bo instanceof TextAnnotation)) {
+      if (!(bo instanceof BaseElement) || bo instanceof TextAnnotation) {
     	  // we need to exclude the text annotation here, although it is a base element
     	  // because it's text is handled differently and by the corresponding property
     	  // PropertyTextAnnotationSection
-    	  
+
     	  // if we do not ignore this here, the text will get lost during activation
     	  // of the base property sheet.
     	  return;
@@ -158,13 +166,14 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
       TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
       ActivitiUiUtil.runModelChange(new Runnable() {
 
+        @Override
         public void run() {
           BaseElement element = (BaseElement) bo;
           String id = idText.getText();
           updateParentLane(element.getId(), id);
           updateFlows(element, id);
           element.setId(id);
-          
+
           String name = nameText.getText();
           if (bo instanceof FlowElement) {
             ((FlowElement) bo).setName(name);
@@ -173,13 +182,13 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
           } else if (bo instanceof Lane) {
             ((Lane) bo).setName(name);
           }
-          
+
           UpdateContext updateContext = new UpdateContext(pe);
           IUpdateFeature updateFeature = getFeatureProvider(pe).getUpdateFeature(updateContext);
           if(updateFeature != null) {
             updateFeature.update(updateContext);
           }
-          
+
           if (pe instanceof ContainerShape) {
             ContainerShape cs = (ContainerShape) pe;
             for (Shape shape : cs.getChildren()) {
@@ -193,9 +202,10 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
               }
             }
           }
-          
-          if (!(getSelectedPictogramElement() instanceof FreeFormConnection))
+
+          if (!(getSelectedPictogramElement() instanceof FreeFormConnection)) {
             return;
+          }
           EList<ConnectionDecorator> decoratorList = ((FreeFormConnection) getSelectedPictogramElement()).getConnectionDecorators();
           for (ConnectionDecorator decorator : decoratorList) {
             if (decorator.getGraphicsAlgorithm() instanceof org.eclipse.graphiti.mm.algorithms.MultiText) {
@@ -205,12 +215,12 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
             }
           }
         }
-      }, editingDomain, "Model Update");
+      }, editingDomain, ActivitiConstants.DEFAULT_MODEL_CHANGE_TEXT);
     }
   };
-  
+
   protected void updateParentLane(String oldElementId, String newElementId) {
-    Bpmn2MemoryModel model = (ModelHandler.getModel(EcoreUtil.getURI(getDiagram())));
+    Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
     for (Process process : model.getBpmnModel().getProcesses()) {
       for (Lane lane : process.getLanes()) {
         if (lane.getFlowReferences().contains(oldElementId)) {
@@ -221,7 +231,7 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
       }
     }
   }
-  
+
   protected void updateFlows(BaseElement element, String newElementId) {
     if (element instanceof FlowNode) {
       FlowNode flowNode = (FlowNode) element;

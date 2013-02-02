@@ -1,5 +1,6 @@
 package org.activiti.designer.eclipse.editor;
 
+import org.activiti.designer.eclipse.util.FileService;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.graphiti.ui.editor.DiagramEditorMatchingStrategy;
 import org.eclipse.ui.IEditorInput;
