@@ -59,7 +59,7 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 		TabbedPropertySheetWidgetFactory factory = getWidgetFactory();
 		Composite composite = factory.createFlatFormComposite(parent);
 		FormData data;
-		
+
 		Composite radioTypeComposite = new Composite(composite, SWT.NULL);
 		radioTypeComposite.setBackground(composite.getBackground());
 		data = new FormData();
@@ -67,7 +67,7 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 		data.right = new FormAttachment(100, 0);
 		radioTypeComposite.setLayoutData(data);
 		radioTypeComposite.setLayout(new RowLayout());
-	    
+
 		classTypeButton = new Button(radioTypeComposite, SWT.RADIO);
 		classTypeButton.setText("Java class");
 		classTypeButton.setSelection(true);
@@ -85,7 +85,7 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 			public void widgetDefaultSelected(SelectionEvent event) {
 				//
 			}
-			
+
 		});
 		expressionTypeButton = new Button(radioTypeComposite, SWT.RADIO);
 		expressionTypeButton.setText("Expression");
@@ -103,13 +103,13 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 			public void widgetDefaultSelected(SelectionEvent event) {
 				//
 			}
-			
+
 		});
-		
+
 		delegateExpressionTypeButton = new Button(radioTypeComposite, SWT.RADIO);
 		delegateExpressionTypeButton.setText("Delegate expression");
 		delegateExpressionTypeButton.addSelectionListener(new SelectionListener() {
-		  
+
 		  @Override
 		  public void widgetSelected(SelectionEvent event) {
 		    setVisibleClassType(false);
@@ -117,14 +117,14 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 		    setVisibleDelegateExpressionType(true);
 		    saveImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
 		  }
-		
+
 		  @Override
       public void widgetDefaultSelected(SelectionEvent event) {
         //
       }
-      
+
     });
-		
+
 		CLabel typeLabel = factory.createCLabel(composite, "Type:"); //$NON-NLS-1$
 		data = new FormData();
 		data.left = new FormAttachment(0, 0);
@@ -147,7 +147,8 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 		data.top = new FormAttachment(classNameText, -2, SWT.TOP);
 		classSelectButton.setLayoutData(data);
 		classSelectButton.addSelectionListener(new SelectionAdapter() {
-			public void widgetSelected(SelectionEvent evt) {
+			@Override
+      public void widgetSelected(SelectionEvent evt) {
 				Shell shell = classNameText.getShell();
 				try {
 					SelectionDialog dialog = JavaUI.createTypeDialog(shell, new ProgressMonitorDialog(shell),
@@ -166,7 +167,8 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 						TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
 
 						ActivitiUiUtil.runModelChange(new Runnable() {
-							public void run() {
+							@Override
+              public void run() {
 								Object bo = getBusinessObject(getSelectedPictogramElement());
 								if (bo == null) {
 									return;
@@ -198,7 +200,7 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 		data.right = new FormAttachment(classNameText, -HSPACE);
 		data.top = new FormAttachment(classNameText, 0, SWT.TOP);
 		classSelectLabel.setLayoutData(data);
-		
+
 		expressionText = factory.createText(composite, ""); //$NON-NLS-1$
 		data = new FormData();
 		data.left = new FormAttachment(0, 160);
@@ -207,7 +209,7 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 		expressionText.setVisible(false);
 		expressionText.setLayoutData(data);
 		expressionText.addFocusListener(listener);
-		
+
 		expressionLabel = factory.createCLabel(composite, "Expression:"); //$NON-NLS-1$
 		data = new FormData();
 		data.left = new FormAttachment(0, 0);
@@ -215,7 +217,7 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 		data.top = new FormAttachment(expressionText, 0, SWT.TOP);
 		expressionLabel.setVisible(false);
 		expressionLabel.setLayoutData(data);
-		
+
 		delegateExpressionText = factory.createText(composite, ""); //$NON-NLS-1$
 		data = new FormData();
 		data.left = new FormAttachment(0, 160);
@@ -224,7 +226,7 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 		delegateExpressionText.setVisible(false);
 		delegateExpressionText.setLayoutData(data);
 		delegateExpressionText.addFocusListener(listener);
-		    
+
 		delegateExpressionLabel = factory.createCLabel(composite, "Delegate expression:"); //$NON-NLS-1$
 		data = new FormData();
 		data.left = new FormAttachment(0, 0);
@@ -232,7 +234,7 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 		data.top = new FormAttachment(delegateExpressionText, 0, SWT.TOP);
 		delegateExpressionLabel.setVisible(false);
 		delegateExpressionLabel.setLayoutData(data);
-		
+
 		resultVariableText = factory.createText(composite, ""); //$NON-NLS-1$
     data = new FormData();
     data.left = new FormAttachment(0, 160);
@@ -240,14 +242,14 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
     data.top = new FormAttachment(expressionText, VSPACE);
     resultVariableText.setLayoutData(data);
     resultVariableText.addFocusListener(listener);
-    
+
     CLabel resultVariableLabel = factory.createCLabel(composite, "Result variable:"); //$NON-NLS-1$
     data = new FormData();
     data.left = new FormAttachment(0, 0);
     data.right = new FormAttachment(resultVariableText, -HSPACE);
     data.top = new FormAttachment(resultVariableText, 0, SWT.TOP);
     resultVariableLabel.setLayoutData(data);
-		
+
 		Composite extensionsComposite = factory.createComposite(composite, SWT.WRAP);
 		data = new FormData();
 		data.left = new FormAttachment(0, 160);
@@ -260,7 +262,7 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 		extensionsComposite.setLayout(layout);
 		fieldEditor = new FieldExtensionEditor("fieldEditor", extensionsComposite);
 		fieldEditor.getLabelControl(extensionsComposite).setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
-		
+
 		CLabel extensionLabel = factory.createCLabel(composite, "Fields:"); //$NON-NLS-1$
 		data = new FormData();
 		data.left = new FormAttachment(0, 0);
@@ -278,9 +280,10 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 			delegateExpressionText.removeFocusListener(listener);
 			resultVariableText.removeFocusListener(listener);
 			Object bo = getBusinessObject(pe);
-			if (bo == null)
-				return;
-			
+			if (bo == null) {
+        return;
+      }
+
 			ServiceTask serviceTask = (ServiceTask) bo;
 			String implementationName = serviceTask.getImplementation();
 			if(StringUtils.isEmpty(serviceTask.getImplementationType()) ||
@@ -300,13 +303,13 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 				setVisibleDelegateExpressionType(false);
 				expressionText.setText(implementationName == null ? "" : implementationName);
 			}
-			
+
 			if(StringUtils.isNotEmpty(serviceTask.getResultVariableName())) {
 			  resultVariableText.setText(serviceTask.getResultVariableName());
 			} else {
 			  resultVariableText.setText("");
 			}
-			
+
 			fieldEditor.pictogramElement = pe;
 			fieldEditor.diagramEditor = getDiagramEditor();
 			fieldEditor.diagram = getDiagram();
@@ -316,7 +319,7 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 			resultVariableText.addFocusListener(listener);
 		}
 	}
-	
+
 	private void saveImplementationType(final String type) {
 		PictogramElement pe = getSelectedPictogramElement();
 		if (pe != null) {
@@ -325,7 +328,8 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 				DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
 				TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
 				ActivitiUiUtil.runModelChange(new Runnable() {
-					public void run() {
+					@Override
+          public void run() {
 						ServiceTask serviceTask = (ServiceTask)  bo;
 						serviceTask.setImplementationType(type);
 						serviceTask.setImplementation("");
@@ -335,32 +339,34 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 
 		}
 	}
-	
+
 	private void setVisibleClassType(boolean visible) {
 		classTypeButton.setSelection(visible);
 		classNameText.setVisible(visible);
 		classSelectButton.setVisible(visible);
 		classSelectLabel.setVisible(visible);
 	}
-	
+
 	private void setVisibleExpressionType(boolean visible) {
 		expressionTypeButton.setSelection(visible);
 		expressionText.setVisible(visible);
 		expressionLabel.setVisible(visible);
 	}
-	
+
 	private void setVisibleDelegateExpressionType(boolean visible) {
 	  delegateExpressionTypeButton.setSelection(visible);
 	  delegateExpressionText.setVisible(visible);
 	  delegateExpressionLabel.setVisible(visible);
 	}
-	
+
 	private FocusListener listener = new FocusListener() {
 
-		public void focusGained(final FocusEvent e) {
+		@Override
+    public void focusGained(final FocusEvent e) {
 		}
 
-		public void focusLost(final FocusEvent e) {
+		@Override
+    public void focusLost(final FocusEvent e) {
 			PictogramElement pe = getSelectedPictogramElement();
 			if (pe != null) {
 				final Object bo = getBusinessObject(pe);
@@ -368,7 +374,8 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 					DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
 					TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
 					ActivitiUiUtil.runModelChange(new Runnable() {
-						public void run() {
+						@Override
+            public void run() {
 							ServiceTask serviceTask = (ServiceTask)  bo;
 							if (expressionText.isVisible() && expressionText.getText() != null) {
 								serviceTask.setImplementation(expressionText.getText());

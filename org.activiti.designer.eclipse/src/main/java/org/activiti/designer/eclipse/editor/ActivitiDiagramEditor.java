@@ -5,7 +5,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -34,6 +33,7 @@ import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.eclipse.ui.ActivitiEditorContextMenuProvider;
+import org.activiti.designer.eclipse.util.FileService;
 import org.activiti.designer.integration.servicetask.CustomServiceTask;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
@@ -44,18 +44,14 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.IWorkspaceRoot;
-import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.SWTGraphics;
 import org.eclipse.draw2d.geometry.Rectangle;
 import org.eclipse.emf.common.command.BasicCommandStack;
 import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.transaction.RecordingCommand;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
@@ -85,120 +81,106 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
-import org.eclipse.ui.IFileEditorInput;
-import org.eclipse.ui.IURIEditorInput;
 import org.eclipse.ui.PartInitException;
 
 public class ActivitiDiagramEditor extends DiagramEditor {
 
-  public final static String ID = "org.activiti.designer.editor.diagramEditor";
   private static GraphicalViewer activeGraphicalViewer;
 
-  private IFile modelFile;
-  private IFile diagramFile;
-  
+  private ActivitiBpmnModelChangeListener activitiBpmnModelChangeListener;
+
+  private TransactionalEditingDomain transactionalEditingDomain;
+
+  public ActivitiDiagramEditor() {
+    super();
+  }
+
   @Override
-  public void init(IEditorSite site, IEditorInput input) throws PartInitException {
+  protected void registerBusinessObjectsListener() {
+    activitiBpmnModelChangeListener = new ActivitiBpmnModelChangeListener(this);
 
-    try {
-      if (input instanceof IFileEditorInput) { // Opened from the Open with...
-                                               // menu
-        modelFile = ((IFileEditorInput) input).getFile();
-        input = createNewDiagramEditorInput();
-      } else if (input instanceof DiagramEditorInput) { // Opened by the default
-                                                        // associated file
-                                                        // extension .bpmn
-        getModelPathFromInput((DiagramEditorInput) input);
-        input = createNewDiagramEditorInput();
-      } else if (input instanceof IURIEditorInput) { // Opened external to
-                                                     // Eclipse
-        IWorkspaceRoot wsRoot = ResourcesPlugin.getWorkspace().getRoot();
-        java.net.URI uri = ((IURIEditorInput) input).getURI();
-        String path = uri.getPath();
-        if (wsRoot.getProject("import").exists() == false) {
-          wsRoot.getProject("import").create(null);
-        }
-        wsRoot.getProject("import").open(null);
-        try {
-          InputStream inputStream = new FileInputStream(path);
-          String fileName = null;
-          if (path.contains("/")) {
-            fileName = path.substring(path.lastIndexOf("/") + 1);
-          } else {
-            fileName = path.substring(path.lastIndexOf("\\") + 1);
-          }
+    final TransactionalEditingDomain ted = getEditingDomain();
+    ted.addResourceSetListener(activitiBpmnModelChangeListener);
+  }
 
-          if (wsRoot.getProject("import").getFile(fileName).exists()) {
-            wsRoot.getProject("import").getFile(fileName).delete(true, null);
-          }
+  @Override
+  public TransactionalEditingDomain getEditingDomain() {
+    TransactionalEditingDomain ted = super.getEditingDomain();
 
-          wsRoot.getProject("import").getFile(fileName).create(inputStream, true, null);
-          modelFile = wsRoot.getProject("import").getFile(fileName);
-          input = createNewDiagramEditorInput();
-        } catch (Exception e) {
-          e.printStackTrace();
-          return;
-        }
-      }
-
-    } catch (CoreException e) {
-      e.printStackTrace();
-      return;
+    if (ted == null) {
+      ted = transactionalEditingDomain;
     }
 
-    super.init(site, input);
+    return ted;
   }
 
-  private void getModelPathFromInput(DiagramEditorInput input) {
-    URI uri = input.getUri();
-    String uriString = uri.trimFragment().toPlatformString(true);
-    modelFile = Bpmn2DiagramCreator.getModelFile(new Path(uriString));
+  @Override
+  public void init(IEditorSite site, IEditorInput input) throws PartInitException {
+    IEditorInput finalInput = null;
+
+    try {
+      if (input instanceof ActivitiDiagramEditorInput) {
+        finalInput = input;
+      } else {
+        finalInput = createNewDiagramEditorInput(input);
+      }
+    } catch (CoreException exception) {
+      exception.printStackTrace();
+    }
+
+    super.init(site, finalInput);
   }
 
-  /**
-   * Beware, creates a new input and changes this editor!
-   */
-  private DiagramEditorInput createNewDiagramEditorInput() throws CoreException {
-    IPath fullPath = modelFile.getFullPath();
+  private ActivitiDiagramEditorInput createNewDiagramEditorInput(final IEditorInput input)
+          throws CoreException {
 
-    IFolder folder = Bpmn2DiagramCreator.getTempFolder(fullPath);
-    diagramFile = Bpmn2DiagramCreator.getTempFile(fullPath, folder);
+    final IFile dataFile = FileService.getDataFileForInput(input);
+
+    // now generate the temporary diagram file
+    final IPath dataFilePath = dataFile.getFullPath();
+
+    // get or create the corresponding temporary folder
+    final IFolder tempFolder = FileService.getOrCreateTempFolder(dataFilePath);
+
+    // finally get the diagram file that corresponds to the data file
+    final IFile diagramFile = FileService.getTemporaryDiagramFile(dataFilePath, tempFolder);
 
     // Create new temporary diagram file
     Bpmn2DiagramCreator creator = new Bpmn2DiagramCreator();
-    creator.setDiagramFile(diagramFile);
 
-    DiagramEditorInput input = creator.createDiagram(false, null);
-
-    return input;
+    return creator.createBpmnDiagram(dataFile, diagramFile, this, null, false);
   }
 
   @Override
   public void doSave(IProgressMonitor monitor) {
-    try {
+    super.doSave(monitor);
 
-      String diagramFileString = modelFile.getLocationURI().getPath();
+    final ActivitiDiagramEditorInput adei = (ActivitiDiagramEditorInput) getEditorInput();
+
+    try {
+      final IFile dataFile = adei.getDataFile();
+      final String diagramFileString = dataFile.getLocationURI().getPath();
 
       boolean saveImage = PreferencesUtil.getBooleanPreference(Preferences.SAVE_IMAGE);
       Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagramTypeProvider().getDiagram()));
-      
-      // add sequence flow bendpoints to the model
+
+      // add sequence flow bend-points to the model
       final IFeatureProvider featureProvider = getDiagramTypeProvider().getFeatureProvider();
       new GraphitiToBpmnDI(model, featureProvider).processGraphitiElements();
-      
+
       BpmnXMLConverter converter = new BpmnXMLConverter();
       byte[] xmlBytes = converter.convertToXML(model.getBpmnModel());
-      
+
       File objectsFile = new File(diagramFileString);
       FileOutputStream fos = new FileOutputStream(objectsFile);
       fos.write(xmlBytes);
       fos.close();
-      
+
       if (saveImage) {
         marshallImage(model, diagramFileString);
       }
 
-      modelFile.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
+      dataFile.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
 
     } catch (Exception e) {
       // TODO Auto-generated catch block
@@ -208,14 +190,15 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     ((BasicCommandStack) getEditingDomain().getCommandStack()).saveIsDone();
     updateDirtyState();
   }
-  
+
   private void marshallImage(Bpmn2MemoryModel model, String modelFileName) {
     try {
       final GraphicalViewer graphicalViewer =  (GraphicalViewer) ((DiagramEditor) model.getFeatureProvider()
               .getDiagramTypeProvider().getDiagramEditor()).getAdapter(GraphicalViewer.class);
 
-      if (graphicalViewer == null || graphicalViewer.getEditPartRegistry() == null)
+      if (graphicalViewer == null || graphicalViewer.getEditPartRegistry() == null) {
         return;
+      }
       final ScalableFreeformRootEditPart rootEditPart = (ScalableFreeformRootEditPart) graphicalViewer.getEditPartRegistry().get(LayerManager.ID);
       final IFigure rootFigure = ((LayerManager) rootEditPart).getLayer(LayerConstants.PRINTABLE_LAYERS);
       final IFigure gridFigure = ((LayerManager) rootEditPart).getLayer(LayerConstants.GRID_LAYER);
@@ -232,6 +215,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
       // Access UI thread from runnable to print the canvas to the image
       display.syncExec(new Runnable() {
 
+        @Override
         public void run() {
           if (toggleRequired) {
             // Disable any grids temporarily
@@ -256,6 +240,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
       // Access UI thread from runnable
       display.syncExec(new Runnable() {
 
+        @Override
         public void run() {
           if (toggleRequired) {
             // Re-enable any grids
@@ -292,17 +277,21 @@ public class ActivitiDiagramEditor extends DiagramEditor {
   @Override
   protected void setInput(IEditorInput input) {
     super.setInput(input);
-    final Bpmn2MemoryModel model = new Bpmn2MemoryModel(getDiagramTypeProvider().getFeatureProvider(), modelFile);
+
+    final ActivitiDiagramEditorInput adei = (ActivitiDiagramEditorInput) input;
+    final IFile dataFile = adei.getDataFile();
+
+    final Bpmn2MemoryModel model = new Bpmn2MemoryModel(getDiagramTypeProvider().getFeatureProvider(), dataFile);
     ModelHandler.addModel(EcoreUtil.getURI(getDiagramTypeProvider().getDiagram()), model);
 
-    String filePath = modelFile.getLocationURI().getPath();
+    String filePath = dataFile.getLocationURI().getPath();
     File bpmnFile = new File(filePath);
     try {
       if (bpmnFile.exists() == false) {
         model.setBpmnModel(new BpmnModel());
         model.addMainProcess();
         bpmnFile.createNewFile();
-        modelFile.refreshLocal(IResource.DEPTH_INFINITE, null);
+        dataFile.refreshLocal(IResource.DEPTH_INFINITE, null);
       } else {
         FileInputStream fileStream = new FileInputStream(bpmnFile);
         XMLInputFactory xif = XMLInputFactory.newInstance();
@@ -347,8 +336,9 @@ public class ActivitiDiagramEditor extends DiagramEditor {
         if (model.getBpmnModel().getPools().size() > 0) {
           for (Pool pool : model.getBpmnModel().getPools()) {
             PictogramElement poolElement = addContainerElement(pool, model, diagram);
-            if (poolElement == null)
+            if (poolElement == null) {
               continue;
+            }
 
             Process process = model.getBpmnModel().getProcess(pool.getId());
             for (Lane lane : process.getLanes()) {
@@ -368,8 +358,9 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 
   private PictogramElement addContainerElement(BaseElement element, Bpmn2MemoryModel model, ContainerShape parent) {
     GraphicInfo graphicInfo = model.getBpmnModel().getGraphicInfo(element.getId());
-    if (graphicInfo == null)
+    if (graphicInfo == null) {
       return null;
+    }
 
     final IFeatureProvider featureProvider = getDiagramTypeProvider().getFeatureProvider();
 
@@ -405,8 +396,10 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     List<FlowElement> noDIList = new ArrayList<FlowElement>();
     for (FlowElement flowElement : elementList) {
 
-      if (flowElement instanceof SequenceFlow) continue;
-      
+      if (flowElement instanceof SequenceFlow) {
+        continue;
+      }
+
       AddContext context = new AddContext(new AreaContext(), flowElement);
       IAddFeature addFeature = featureProvider.getAddFeature(context);
 
@@ -488,7 +481,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
         } else if (addFeature.canAdd(context)) {
           PictogramElement newContainer = addFeature.add(context);
           featureProvider.link(newContainer, new Object[] { flowElement });
-          
+
           if (flowElement instanceof SubProcess) {
             drawFlowElements(((SubProcess) flowElement).getFlowElements(), locationMap, (ContainerShape) newContainer, process);
           }
@@ -554,9 +547,11 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 
     final List<Artifact> artifactsWithoutDI = new ArrayList<Artifact>();
     for (final Artifact artifact : artifacts) {
-      
-      if (artifact instanceof Association) continue;
-      
+
+      if (artifact instanceof Association) {
+        continue;
+      }
+
       final AddContext context = new AddContext(new AreaContext(), artifact);
       final IAddFeature addFeature = featureProvider.getAddFeature(context);
 
@@ -602,20 +597,20 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 
   private void drawAllFlows(Bpmn2MemoryModel model) {
     BpmnModel bpmnModel = model.getBpmnModel();
-    
+
     for (Process process : bpmnModel.getProcesses()) {
       drawSequenceFlowsInList(process.getFlowElements(), model);
       drawAssociationsInList(process.getArtifacts(), model);
     }
   }
-  
+
   private void drawSequenceFlowsInList(Collection<FlowElement> flowList, Bpmn2MemoryModel model) {
     for (FlowElement flowElement : flowList) {
-      
+
       if (flowElement instanceof SubProcess) {
         drawSequenceFlowsInList(((SubProcess) flowElement).getFlowElements(), model);
         drawAssociationsInList(((SubProcess) flowElement).getArtifacts(), model);
-        
+
       } else if (flowElement instanceof SequenceFlow == false) {
         continue;
       } else {
@@ -624,15 +619,16 @@ public class ActivitiDiagramEditor extends DiagramEditor {
       }
     }
   }
-  
+
   private void drawSequenceFlow(SequenceFlow sequenceFlow, Bpmn2MemoryModel model) {
     Anchor sourceAnchor = null;
     Anchor targetAnchor = null;
     ContainerShape sourceShape = (ContainerShape) getDiagramTypeProvider().getFeatureProvider().getPictogramElementForBusinessObject(
             model.getFlowElement(sequenceFlow.getSourceRef()));
 
-    if (sourceShape == null)
+    if (sourceShape == null) {
       return;
+    }
 
     EList<Anchor> anchorList = sourceShape.getAnchors();
     for (Anchor anchor : anchorList) {
@@ -645,8 +641,9 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     ContainerShape targetShape = (ContainerShape) getDiagramTypeProvider().getFeatureProvider().getPictogramElementForBusinessObject(
             model.getFlowElement(sequenceFlow.getTargetRef()));
 
-    if (targetShape == null)
+    if (targetShape == null) {
       return;
+    }
 
     anchorList = targetShape.getAnchors();
     for (Anchor anchor : anchorList) {
@@ -673,10 +670,10 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     addContext.setNewObject(sequenceFlow);
     getDiagramTypeProvider().getFeatureProvider().addIfPossible(addContext);
   }
-  
+
   private void drawAssociationsInList(Collection<Artifact> artifactList, Bpmn2MemoryModel model) {
     for (Artifact artifact : artifactList) {
-      
+
       if (artifact instanceof Association == false) {
         continue;
       } else {
@@ -687,20 +684,22 @@ public class ActivitiDiagramEditor extends DiagramEditor {
   }
 
   private void drawAssociation(Association association, Bpmn2MemoryModel model) {
-    
+
     Anchor sourceAnchor = null;
     Anchor targetAnchor = null;
     BaseElement sourceElement = model.getFlowElement(association.getSourceRef());
     if (sourceElement == null) {
       sourceElement = model.getArtifact(association.getSourceRef());
     }
-    if (sourceElement == null)
+    if (sourceElement == null) {
       return;
+    }
     ContainerShape sourceShape = (ContainerShape) getDiagramTypeProvider().getFeatureProvider()
             .getPictogramElementForBusinessObject(sourceElement);
 
-    if (sourceShape == null)
+    if (sourceShape == null) {
       return;
+    }
 
     EList<Anchor> anchorList = sourceShape.getAnchors();
     for (Anchor anchor : anchorList) {
@@ -714,13 +713,15 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     if (targetElement == null) {
       targetElement = model.getArtifact(association.getTargetRef());
     }
-    if (targetElement == null)
+    if (targetElement == null) {
       return;
+    }
     ContainerShape targetShape = (ContainerShape) getDiagramTypeProvider().getFeatureProvider()
             .getPictogramElementForBusinessObject(targetElement);
 
-    if (targetShape == null)
+    if (targetShape == null) {
       return;
+    }
 
     anchorList = targetShape.getAnchors();
     for (Anchor anchor : anchorList) {
@@ -748,10 +749,6 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     getDiagramTypeProvider().getFeatureProvider().addIfPossible(addContext);
   }
 
-  public IFile getModelFile() {
-    return modelFile;
-  }
-
   @Override
   public void createPartControl(Composite parent) {
     super.createPartControl(parent);
@@ -776,7 +773,10 @@ public class ActivitiDiagramEditor extends DiagramEditor {
   @Override
   public void dispose() {
     super.dispose();
+
+    final ActivitiDiagramEditorInput adei = (ActivitiDiagramEditorInput) getEditorInput();
+
     ModelHandler.removeModel(EcoreUtil.getURI(getDiagramTypeProvider().getDiagram()));
-    Bpmn2DiagramCreator.dispose(diagramFile);
+    Bpmn2DiagramCreator.dispose(adei.getDiagramFile());
   }
 }

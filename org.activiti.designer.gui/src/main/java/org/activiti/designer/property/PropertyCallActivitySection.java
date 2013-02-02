@@ -5,23 +5,23 @@ import java.util.Set;
 import org.activiti.bpmn.model.CallActivity;
 import org.activiti.designer.Activator;
 import org.activiti.designer.PluginImage;
-import org.activiti.designer.eclipse.common.ActivitiBPMNDiagramConstants;
 import org.activiti.designer.eclipse.common.ActivitiPlugin;
+import org.activiti.designer.util.ActivitiConstants;
+import org.activiti.designer.util.dialog.ActivitiResourceSelectionDialog;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.activiti.designer.util.workspace.ActivitiWorkspaceUtil;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.jface.dialogs.ErrorDialog;
-import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.FocusEvent;
@@ -36,10 +36,10 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.part.FileEditorInput;
+import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
@@ -86,19 +86,20 @@ public class PropertyCallActivitySection extends ActivitiPropertySection impleme
     data.right = new FormAttachment(callElementText, -HSPACE);
     data.top = new FormAttachment(callElementText, 0, SWT.TOP);
     elementLabel.setLayoutData(data);
-
   }
 
   @Override
   public void refresh() {
+
     callElementText.removeFocusListener(listener);
 
     PictogramElement pe = getSelectedPictogramElement();
     if (pe != null) {
       Object bo = getBusinessObject(pe);
       // the filter assured, that it is a EClass
-      if (bo == null)
+      if (bo == null) {
         return;
+      }
 
       CallActivity callActivity = (CallActivity) bo;
       String calledElement = callActivity.getCalledElement();
@@ -106,6 +107,7 @@ public class PropertyCallActivitySection extends ActivitiPropertySection impleme
     }
     callElementText.addFocusListener(listener);
     evaluateCallElementButtonEnabled();
+
   }
 
   private void evaluateCallElementButtonEnabled() {
@@ -131,6 +133,19 @@ public class PropertyCallActivitySection extends ActivitiPropertySection impleme
     callElementButton.setToolTipText("Click to open the called element's process diagram");
   }
 
+  private static class DataFileLabelProvider extends LabelProvider
+  {
+
+    @Override
+    public String getText(Object element) {
+
+
+      return super.getText(element);
+    }
+
+  }
+
+
   private SelectionListener openListener = new SelectionListener() {
 
     @Override
@@ -143,44 +158,47 @@ public class PropertyCallActivitySection extends ActivitiPropertySection impleme
         // open diagram
         openDiagramForBpmnFile(resources.iterator().next());
       } else if (resources.size() > 1) {
-        // TODO open selection dialog, http://jira.codehaus.org/browse/ACT-895
-        MessageDialog.openInformation(Display.getCurrent().getActiveShell(), "Multiple processes found", String.format(
-                "There are multiple resources in the workspace that have the call element id of '%s'. Cannot determine which file should be opened.",
-                calledElement));
+        final ActivitiResourceSelectionDialog dialog = new ActivitiResourceSelectionDialog(
+                Display.getCurrent().getActiveShell(), resources.toArray(new IResource[] {}));
+
+        dialog.setTitle("Multiple Processes Found");
+        dialog.setMessage("Select a Process Model to use (* = any string, ? = any char):");
+        dialog.setBlockOnOpen(true);
+        dialog.setInitialPattern("*");
+
+        if (dialog.open() == Window.OK) {
+          final Object[] result = dialog.getResult();
+
+          openDiagramForBpmnFile((IFile) result[0]);
+        }
       } else {
         // The button should not have been enabled in the first place
         throw new IllegalStateException(String.format("Cannot open diagram for process id '%s' because it can't be found in the workspace", calledElement));
       }
     }
 
-    private void openDiagramForBpmnFile(IFile resource) {
+    /**
+     * Opens the given diagram specified by the given data file in a new editor. In case an error
+     * occurs while doing so, opens an error dialog.
+     *
+     * @param dataFile the data file to use for the new editor to open
+     */
+    private void openDiagramForBpmnFile(IFile dataFile) {
 
-      boolean openBpmnFile = true;
-      IFile activitiFile = null;
+      if (dataFile.exists())
+      {
+        final IWorkbenchPage activePage = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 
-      // Get the Activiti file to go with the provided resource
-      final IPath activitiFilePath = resource.getFullPath().removeFileExtension().removeFileExtension()
-              .addFileExtension(ActivitiBPMNDiagramConstants.DIAGRAM_EXTENSION_RAW);
+        try {
+          IDE.openEditor(activePage, dataFile, ActivitiConstants.DIAGRAM_EDITOR_ID, true);
+        } catch (PartInitException exception) {
+          final IStatus status = new Status(IStatus.ERROR, ActivitiPlugin.getID()
+                                          , "Error while opening new editor.", exception);
 
-      final IResource activitiResource = ResourcesPlugin.getWorkspace().getRoot().findMember(activitiFilePath);
-
-      if (activitiResource != null && activitiResource.exists() && activitiResource instanceof IFile) {
-        activitiFile = (IFile) activitiResource;
-        openBpmnFile = false;
-      }
-
-      try {
-        if (!openBpmnFile) {
-          IFileEditorInput input = new FileEditorInput(activitiFile);
-          PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(input, ActivitiBPMNDiagramConstants.DIAGRAM_EDITOR_ID);
+          ErrorDialog.openError(Display.getCurrent().getActiveShell()
+                              , "Error Opening Activiti Diagram", null, status);
         }
-      } catch (PartInitException e) {
-        String error = "Error while opening editor";
-        IStatus status = new Status(IStatus.ERROR, ActivitiPlugin.getID(), error, e);
-        ErrorDialog.openError(Display.getCurrent().getActiveShell(), "An error occured", null, status);
-        return;
       }
-
     }
 
     @Override
@@ -191,10 +209,13 @@ public class PropertyCallActivitySection extends ActivitiPropertySection impleme
 
   private FocusListener listener = new FocusListener() {
 
+    @Override
     public void focusGained(final FocusEvent e) {
     }
 
+    @Override
     public void focusLost(final FocusEvent e) {
+
       PictogramElement pe = getSelectedPictogramElement();
       if (pe != null) {
         final Object bo = getBusinessObject(pe);
@@ -203,6 +224,7 @@ public class PropertyCallActivitySection extends ActivitiPropertySection impleme
           TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
           ActivitiUiUtil.runModelChange(new Runnable() {
 
+            @Override
             public void run() {
               String calledElement = callElementText.getText();
               CallActivity callActivity = (CallActivity) bo;
@@ -212,6 +234,7 @@ public class PropertyCallActivitySection extends ActivitiPropertySection impleme
         }
 
       }
+
     }
   };
 }

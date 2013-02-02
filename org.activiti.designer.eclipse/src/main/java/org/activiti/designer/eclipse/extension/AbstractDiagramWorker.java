@@ -23,9 +23,9 @@ import java.util.List;
 import java.util.Map;
 
 import org.activiti.bpmn.model.FlowElement;
-import org.activiti.designer.eclipse.common.ActivitiBPMNDiagramConstants;
 import org.activiti.designer.eclipse.extension.export.ExportMarshaller;
 import org.activiti.designer.eclipse.extension.validation.ProcessValidator;
+import org.activiti.designer.util.ActivitiConstants;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
@@ -324,7 +324,7 @@ public abstract class AbstractDiagramWorker {
     final IFile file = workspace.getRoot().getFile(new Path(getURIForDiagram(diagram).toPlatformString(true)));
 
     // Determine marker id
-    String markerId = ActivitiBPMNDiagramConstants.ACTIVITI_GENERAL_MARKER_ID;
+    String markerId = ActivitiConstants.ACTIVITI_GENERAL_MARKER_ID;
     if (this instanceof ExportMarshaller) {
       markerId = ExportMarshaller.MARKER_ID;
     } else if (this instanceof ProcessValidator) {
@@ -353,7 +353,7 @@ public abstract class AbstractDiagramWorker {
   protected void clearMarkers(IResource resource) {
 
     // Determine marker id
-    String markerId = ActivitiBPMNDiagramConstants.ACTIVITI_GENERAL_MARKER_ID;
+    String markerId = ActivitiConstants.ACTIVITI_GENERAL_MARKER_ID;
     if (this instanceof ExportMarshaller) {
       markerId = ExportMarshaller.MARKER_ID;
     } else if (this instanceof ProcessValidator) {
@@ -375,7 +375,7 @@ public abstract class AbstractDiagramWorker {
   protected IMarker[] getMarkers(IResource resource) {
     IMarker[] markers = null;
     try {
-      markers = resource.findMarkers(ActivitiBPMNDiagramConstants.ACTIVITI_GENERAL_MARKER_ID, true, IResource.DEPTH_INFINITE);
+      markers = resource.findMarkers(ActivitiConstants.ACTIVITI_GENERAL_MARKER_ID, true, IResource.DEPTH_INFINITE);
     } catch (CoreException e) {
       e.printStackTrace();
     }

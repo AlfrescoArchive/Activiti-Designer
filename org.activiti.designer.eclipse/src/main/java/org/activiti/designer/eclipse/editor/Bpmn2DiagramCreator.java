@@ -1,14 +1,16 @@
 package org.activiti.designer.eclipse.editor;
 
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
-import org.activiti.designer.eclipse.common.ActivitiBPMNDiagramConstants;
+import org.activiti.designer.eclipse.util.FileService;
+import org.activiti.designer.util.ActivitiConstants;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -19,105 +21,110 @@ import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.services.Graphiti;
-import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 import org.eclipse.graphiti.ui.services.GraphitiUi;
+import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.ide.IDE;
 
 public class Bpmn2DiagramCreator {
 
-	private final static String TEMPFILE_EXTENSION = "bpmn2d";
-	private IFolder diagramFolder;
-	private IFile diagramFile;
-	private URI uri;
+	public ActivitiDiagramEditorInput createBpmnDiagram(final IFile dataFile
+	                                                  , final IFile diagramFile
+	                                                  , final ActivitiDiagramEditor diagramEditor
+	                                                  , final String templateContent
+	                                                  , final boolean openEditor) {
+	  IFile finalDataFile = dataFile;
 
-	public DiagramEditorInput createDiagram(boolean openEditor, String contentFileName) throws CoreException {
-		
-		if (diagramFolder != null && !diagramFolder.exists()) {
-			diagramFolder.create(false, true, null);
-		}
+	  final IPath diagramPath = diagramFile.getFullPath();
+	  final String diagramName = diagramPath.removeFileExtension().lastSegment();
+	  final URI uri = URI.createPlatformResourceURI(diagramPath.toString(), true);
 
-		final Diagram diagram = Graphiti.getPeCreateService().createDiagram(
-		    "BPMNdiagram", diagramFile.getFullPath().removeFileExtension().lastSegment(), true);
-		// permanently hide grid on diagram
-		//diagram.setGridUnit(0);
-		//diagram.setVerticalGridUnit(0);
-		uri = URI.createPlatformResourceURI(diagramFile.getFullPath().toString(), true);
-		
-		if(contentFileName != null) {
-			InputStream in = this.getClass().getClassLoader().getResourceAsStream(contentFileName);
-			IFile modelFile = getModelFile(new Path(uri.trimFragment().toPlatformString(true)));
-			String filePath = modelFile.getLocationURI().getRawPath();
-			filePath = filePath.replaceAll("%20", " ");
-			try {
-			  OutputStream out = new FileOutputStream(filePath);
-				
-				byte[] buf = new byte[1024];
-			  int len;
-			  while ((len = in.read(buf)) > 0){
-			  out.write(buf, 0, len);
-			  }
-			  in.close();
-			  out.close();
-			} catch(Exception e) {
-				e.printStackTrace();
-			}
-		}
-		
-		FileService.createEmfFileForDiagram(uri, diagram);
+	  if (templateContent != null) {
+	    // there is a template to use
+	    final InputStream is
+	      = Thread.currentThread().getContextClassLoader().getResourceAsStream(templateContent);
 
-		String providerId = GraphitiUi.getExtensionManager()
-		    .getDiagramTypeProviderId(diagram.getDiagramTypeId());
-		
-		final DiagramEditorInput editorInput = new DiagramEditorInput(EcoreUtil.getURI(diagram), providerId);
-		
-		if (openEditor) {
-			openEditor(editorInput);
-		}
+	    finalDataFile = FileService.recreateDataFile(new Path(uri.trimFragment().toPlatformString(true)));
 
-		return editorInput;
-	}
+	    final String filePath = finalDataFile.getLocationURI().getRawPath().replaceAll("%20", " ");
 
-	private void openEditor(final DiagramEditorInput editorInput) {
-		PlatformUI.getWorkbench().getDisplay().syncExec(new Runnable() {
+	    OutputStream os = null;
+	    try {
+        os = new FileOutputStream(filePath);
+
+        byte[] buffer = new byte[1024];
+        int len = is.read(buffer);
+        while (len > 0) {
+          os.write(buffer, 0, len);
+
+          len = is.read(buffer);
+        }
+
+      } catch (FileNotFoundException exception) {
+        exception.printStackTrace();
+      } catch (IOException exception) {
+        exception.printStackTrace();
+      } finally {
+        if (os != null) {
+          try {
+            os.close();
+          } catch (IOException exception) {
+            exception.printStackTrace();
+          }
+        }
+      }
+
+	    try {
+        is.close();
+      } catch (IOException exception) {
+        exception.printStackTrace();
+      }
+	  }
+
+	  final Diagram diagram
+	    = Graphiti.getPeCreateService().createDiagram("BPMNdiagram", diagramName, true);
+
+	  FileService.createEmfFileForDiagram(uri, diagram, diagramEditor, null, null);
+
+	  final String providerId
+	    = GraphitiUi.getExtensionManager().getDiagramTypeProviderId(diagram.getDiagramTypeId());
+
+	  final ActivitiDiagramEditorInput result
+	    = new ActivitiDiagramEditorInput(EcoreUtil.getURI(diagram), providerId);
+
+	  result.setDataFile(finalDataFile);
+	  result.setDiagramFile(diagramFile);
+
+	  if (openEditor) {
+	    openEditor(result);
+	  }
+
+    return result;
+  }
+
+	public void openEditor(final ActivitiDiagramEditorInput editorInput) {
+		final IWorkbench workbench = PlatformUI.getWorkbench();
+
+		workbench.getDisplay().syncExec(new Runnable() {
 			@Override
 			public void run() {
 				try {
-					PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage()
-					    .openEditor(editorInput, ActivitiBPMNDiagramConstants.DIAGRAM_EDITOR_ID);
+				  IDE.openEditor(workbench.getActiveWorkbenchWindow().getActivePage()
+				          , editorInput, ActivitiConstants.DIAGRAM_EDITOR_ID);
 
-				} catch (PartInitException e) {
-					e.printStackTrace();
+				} catch (PartInitException exception) {
+					exception.printStackTrace();
 				}
 			}
 		});
-	}
-
-	public IFolder getDiagramFolder() {
-		return diagramFolder;
-	}
-
-	public void setDiagramFolder(IFolder diagramFolder) {
-		this.diagramFolder = diagramFolder;
-	}
-
-	public IFile getDiagramFile() {
-		return diagramFile;
-	}
-
-	public void setDiagramFile(IFile diagramFile) {
-		this.diagramFile = diagramFile;
-	}
-
-	public URI getUri() {
-		return uri;
 	}
 
 	/**
 	 * Construct a temporary folder based on the given path. The folder is
 	 * constructed in the project root and its name will be the same as the given
 	 * path's file extension.
-	 * 
+	 *
 	 * @param fullPath
 	 *          - path of the actual BPMN2 model file
 	 * @return an IFolder for the temporary folder.
@@ -127,9 +134,10 @@ public class Bpmn2DiagramCreator {
 		IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 
 		String name = fullPath.getFileExtension();
-		if (name == null || name.length() == 0)
-			name = "bpmn";
-		
+		if (name == null || name.length() == 0) {
+      name = "bpmn";
+    }
+
 		String dir = fullPath.segment(0);
 		IFolder folder = root.getProject(dir).getFolder("." + name);
 		if (!folder.exists()) {
@@ -146,77 +154,11 @@ public class Bpmn2DiagramCreator {
 		return folder;
 	}
 
-	/**
-	 * Return the temporary file to be used as editor input. Conceptually, this is
-	 * the "diagramFile" mentioned here which is just a placeholder for use by
-	 * Graphiti as the DiagramEditorInput file.
-	 * 
-	 * @param fullPath
-	 *          - path of the actual BPMN2 model file
-	 * @param folder
-	 *          - folder containing the model file
-	 * @return an IFile for the temporary file. If the file exists, it is first
-	 *         deleted.
-	 */
-	public static IFile getTempFile(IPath fullPath, IFolder folder) {
-		IPath path = fullPath.removeFileExtension().addFileExtension(
-		    TEMPFILE_EXTENSION);
-		IFile tempFile = folder.getFile(path.lastSegment());
-
-		// We don't need anything from that file and to be sure there are no side
-		// effects we delete the file
-		if (tempFile.exists()) {
-			try {
-				tempFile.delete(true, null);
-			} catch (CoreException e) {
-				e.printStackTrace();
-			}
-		}
-		return tempFile;
-	}
-
-	/**
-	 * Return the BPMN2 model file given a path to either the "diagramFile"
-	 * temporary file, or the actual model file.
-	 * 
-	 * @param fullPath
-	 *          - path of the actual BPMN2 model file
-	 * @return an IFile for the model file.
-	 */
-	public static IFile getModelFile(IPath fullPath) {
-		IProject project = ResourcesPlugin.getWorkspace().getRoot().getFile(fullPath).getProject();
-		int matchingSegments = project.getFullPath().matchingFirstSegments(fullPath);
-		int totalSegments = fullPath.segmentCount();
-		String ext = fullPath.getFileExtension();
-		// sanity check: make sure the fullPath is not the project
-		if (totalSegments <= matchingSegments)
-			return null;
-
-		String[] segments = fullPath.segments();
-		IPath path = null;
-
-		if (TEMPFILE_EXTENSION.equals(ext)) {
-			// this is a tempFile - rebuild the BPMN2 model file name from its path
-			ext = fullPath.segment(matchingSegments);
-			if (ext.startsWith("."))
-				ext = ext.substring(1);
-			path = project.getFullPath();
-			for (int i = matchingSegments + 1; i < segments.length; ++i) {
-				path = path.append(segments[i]);
-			}
-			path = path.removeFileExtension().addFileExtension(ext);
-		} else {
-			// this is a model file - normalize path
-			path = fullPath.makeAbsolute();
-		}
-
-		return ResourcesPlugin.getWorkspace().getRoot().getFile(path);
-	}
 
 	/**
 	 * Delete the temporary diagram file. If the containing folder hierarchy is
 	 * empty, it will also be deleted.
-	 * 
+	 *
 	 * @param file
 	 *          - the temporary diagram file.
 	 */
@@ -237,7 +179,7 @@ public class Bpmn2DiagramCreator {
 	/**
 	 * Check if the given folder is empty. This is true if it contains no files,
 	 * or only empty folders.
-	 * 
+	 *
 	 * @param container
 	 *          - folder to check
 	 * @return true if the folder is empty.
@@ -248,14 +190,19 @@ public class Bpmn2DiagramCreator {
 			for (IResource res : members) {
 				int type = res.getType();
 				if (type == IResource.FILE || type == IResource.PROJECT
-				    || type == IResource.ROOT)
-					return false;
-				if (!isEmptyFolder((IContainer) res))
-					return false;
+				    || type == IResource.ROOT) {
+          return false;
+        }
+				if (!isEmptyFolder((IContainer) res)) {
+          return false;
+        }
 			}
 		} catch (CoreException e) {
 			return false;
 		}
 		return true;
 	}
+
+
+
 }
