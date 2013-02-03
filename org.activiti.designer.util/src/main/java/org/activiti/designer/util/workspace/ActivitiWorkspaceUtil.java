@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.activiti.bpmn.model.Process;
+import org.activiti.designer.util.ActivitiConstants;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -16,40 +17,45 @@ import org.eclipse.core.runtime.CoreException;
 
 public class ActivitiWorkspaceUtil {
 
+  /**
+   * A cache of all project data files and some useful cache data like process IDs within this
+   * project
+   */
   private static Map<IResource, CacheData> cache = new HashMap<IResource, CacheData>();
 
   /**
-   * Returns a Set of projects that have the provided project nature. The result
-   * contains only projects that are open and available for use.
+   * Returns a set of all open activiti projects found in the workspace.
    *
-   * @param natureId
-   *          the id of the project nature required
-   * @return a set of projects with the nature, or an empty set if none are
-   *         found
+   * @return a set of projects with the nature, or an empty set if none are found (which would be
+   *     weird as at least one should be open to call this method ;-)
    */
-  public static final Set<IProject> getOpenProjectsWithNature(final String natureId) {
+  public static final Set<IProject> getOpenProjects() {
     final Set<IProject> result = new HashSet<IProject>();
 
     final IProject[] projects = ResourcesPlugin.getWorkspace().getRoot().getProjects();
     for (final IProject project : projects) {
       try {
-        if (project.isOpen() && project.hasNature(natureId)) {
+        if (project.isOpen() && project.hasNature(ActivitiConstants.NATURE_ID)) {
           result.add(project);
         }
-      } catch (CoreException e) {
-        // don't handle; project may be closed and shouldn't be considered
+      } catch (CoreException exception) {
+        // intentionally left blank
       }
     }
     return result;
   }
 
-
-
-  private static Set<String> getProcessIds(IFile resource) {
+  /**
+   * Retrieves all process IDs in the given diagram data file resource. In case the resource does
+   * not reflect a data file for a BPMN process, the result will be empty.
+   *
+   * @param dataFile the data file of the diagram to use
+   * @return all process IDs the data file contains
+   */
+  private static Set<String> getProcessIds(final IFile dataFile) {
 
     final Set<String> result = new HashSet<String>();
-
-    final BpmnProcessParser parser = new BpmnProcessParser(resource);
+    final BpmnProcessParser parser = new BpmnProcessParser(dataFile);
 
     for (Process process : parser.getProcesses()) {
       result.add(process.getId());
@@ -57,48 +63,96 @@ public class ActivitiWorkspaceUtil {
 
     return result;
   }
-  public static final Set<IFile> getBPMNResources() {
-    final Set<IFile> result = new HashSet<IFile>();
 
-    final Set<IProject> projects = ActivitiWorkspaceUtil.getOpenProjectsWithNature("org.activiti.designer.nature");
+  /**
+   * Returns all found diagram data files over all open activiti projects. Additionally this method
+   * will build a cache for these data files, where for each entry all process IDs existing in the
+   * cache are saved for faster retrieval, as retrieving process IDs involves calling the
+   * {@link BpmnProcessParser}.
+   *
+   * @return a set of all diagram data files in all open projects
+   */
+  public static final Set<IFile> getAllDiagramDataFiles() {
+    final Set<IFile> result = new HashSet<IFile>();
+    final Set<IProject> projects = ActivitiWorkspaceUtil.getOpenProjects();
 
     for (final IProject project : projects) {
-      final BPMNResourceVisitor visitor = new BPMNResourceVisitor();
+      final DiagramDataFileFinder visitor = new DiagramDataFileFinder();
+
       try {
         project.accept(visitor);
-      } catch (CoreException e) {
-        e.printStackTrace();
+      } catch (CoreException exception) {
+        // intentionally ignored
       }
-      result.addAll(visitor.getResources());
+
+      for (final IFile resource : visitor.getResources()) {
+        result.add(resource);
+
+        CacheData cachedResourceData = cache.get(resource);
+        final long lastModified = resource.getModificationStamp();
+
+        if (cachedResourceData == null || cachedResourceData.cacheIsExpired(lastModified)) {
+          final Set<String> processIds = getProcessIds(resource);
+
+          if (cachedResourceData == null) {
+            cachedResourceData = new CacheData(processIds, lastModified);
+
+            cache.put(resource, cachedResourceData);
+          } else {
+            cachedResourceData.setProcessIds(processIds);
+            cachedResourceData.setLastModified(lastModified);
+          }
+        }
+      }
     }
 
     return result;
   }
 
-  public static final Set<IFile> getBPMNResourcesById(String callElement) {
+  /**
+   * Maps all currently found diagrams in all open activiti projects to their included process IDs.
+   *
+   * @return a map where the key is the data file resource of a diagram and the value is a set of
+   *    all processes defined in this diagram.
+   */
+  public static final Map<IFile, Set<String>> getAllProcessIdsByDiagramDataFile() {
+    final Map<IFile, Set<String>> result = new HashMap<IFile, Set<String>>();
+    final Set<IFile> projectResources = getAllDiagramDataFiles();
+
+    for (final IFile projectResource : projectResources) {
+      result.put(projectResource, cache.get(projectResource).getProcessIds());
+    }
+
+    return result;
+  }
+
+  /**
+   * Returns the diagram data files that match the given process ID.
+   *
+   * @param processId the process ID to look for
+   * @return a set of diagram data files or <code>null</code> in case no such process ID exists in
+   *    any diagram.
+   */
+  public static final Set<IFile> getDiagramDataFilesByProcessId(final String processId) {
     final Set<IFile> result = new HashSet<IFile>();
+    final Set<IFile> projectResources = getAllDiagramDataFiles();
 
-    final Set<IFile> allBPMNFiles = getBPMNResources();
-    for (final IFile resource : allBPMNFiles) {
-
-      if (!cache.containsKey(resource)) {
-        cache.put(resource, new CacheData(getProcessIds(resource), resource.getModificationStamp()));
-      }
-
+    for (final IFile resource : projectResources) {
       final CacheData data = cache.get(resource);
-      if (data.cacheIsExpired(resource.getModificationStamp())) {
-        data.setProcessIds(getProcessIds(resource));
-        data.setLastModified(resource.getModificationStamp());
-      }
 
-      if (data.hasProcessId(callElement)) {
+      if (data.hasProcessId(processId)) {
         result.add(resource);
       }
     }
+
     return result;
   }
 
-  private static class BPMNResourceVisitor implements IResourceVisitor {
+  /**
+   * A resource visitor to find all activiti diagram files within a project. This visitor is
+   * applied to each open Activiti project.
+   */
+  private static class DiagramDataFileFinder implements IResourceVisitor {
 
     private static final Set<String> IGNORED_ROOT_SEGMENTS = new HashSet<String>();
     private Set<IFile> visitResults = new HashSet<IFile>();
@@ -111,13 +165,15 @@ public class ActivitiWorkspaceUtil {
     @Override
     public boolean visit(IResource resource) throws CoreException {
 
-      // TODO externalize extension to method
       if (isIgnoredResource(resource)) {
         return false;
       }
-      if (resource instanceof IFile && resource.getName().endsWith(".bpmn")) {
+
+      if (resource instanceof IFile
+              && resource.getName().endsWith(ActivitiConstants.DATA_FILE_EXTENSION)) {
         visitResults.add((IFile) resource);
       }
+
       return true;
     }
 
@@ -126,6 +182,7 @@ public class ActivitiWorkspaceUtil {
 
       if (resource instanceof IFolder) {
         final String rootSegment = ((IFolder) resource).getFullPath().segment(1);
+
         if (IGNORED_ROOT_SEGMENTS.contains(rootSegment)) {
           result = true;
         }
@@ -133,12 +190,17 @@ public class ActivitiWorkspaceUtil {
 
       return result;
     }
+
     public Set<IFile> getResources() {
       return visitResults;
     }
 
   }
 
+  /**
+   * A data cache to cache process IDs for currently open diagrams as this involves calling the
+   * {@link BpmnProcessParser}, which is rather time consuming.
+   */
   private static class CacheData {
 
     private Set<String> processIds;
@@ -151,6 +213,10 @@ public class ActivitiWorkspaceUtil {
 
     public void setProcessIds(Set<String> processIds) {
       this.processIds = processIds;
+    }
+
+    public Set<String> getProcessIds() {
+      return processIds;
     }
 
     public void setLastModified(Long lastModified) {

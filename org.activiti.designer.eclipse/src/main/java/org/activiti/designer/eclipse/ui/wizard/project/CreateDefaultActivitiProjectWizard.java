@@ -7,7 +7,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import org.activiti.designer.eclipse.common.ActivitiPlugin;
-import org.activiti.designer.eclipse.common.ActivitiProjectNature;
 import org.activiti.designer.eclipse.common.PluginImage;
 import org.activiti.designer.util.ActivitiConstants;
 import org.eclipse.core.resources.IFile;
@@ -50,8 +49,9 @@ public class CreateDefaultActivitiProjectWizard extends BasicNewProjectResourceW
 
   @Override
   public boolean performFinish() {
-    if (!super.performFinish())
+    if (!super.performFinish()) {
       return false;
+    }
 
     IProject newProject = getNewProject();
 
@@ -60,7 +60,7 @@ public class CreateDefaultActivitiProjectWizard extends BasicNewProjectResourceW
       IProjectDescription description = newProject.getDescription();
       String[] newNatures = new String[2];
       newNatures[0] = JavaCore.NATURE_ID;
-      newNatures[1] = ActivitiProjectNature.NATURE_ID;
+      newNatures[1] = ActivitiConstants.NATURE_ID;
       description.setNatureIds(newNatures);
       newProject.setDescription(description, null);
 
@@ -89,18 +89,22 @@ public class CreateDefaultActivitiProjectWizard extends BasicNewProjectResourceW
         IPath containerPath = new Path(JavaCore.USER_LIBRARY_CONTAINER_ID);
         initializer.requestClasspathContainerUpdate(containerPath.append(ActivitiPlugin.USER_LIBRARY_NAME_EXTENSIONS), null, new IClasspathContainer() {
 
+          @Override
           public IPath getPath() {
             return new Path(JavaCore.USER_LIBRARY_CONTAINER_ID).append(ActivitiPlugin.USER_LIBRARY_NAME_EXTENSIONS);
           }
 
+          @Override
           public int getKind() {
             return K_APPLICATION;
           }
 
+          @Override
           public String getDescription() {
             return ActivitiPlugin.USER_LIBRARY_NAME_EXTENSIONS;
           }
 
+          @Override
           public IClasspathEntry[] getClasspathEntries() {
             return new IClasspathEntry[] {};
           }

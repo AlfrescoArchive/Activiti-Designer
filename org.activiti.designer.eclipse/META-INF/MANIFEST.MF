@@ -20,8 +20,7 @@ Require-Bundle: org.eclipse.graphiti,
  org.activiti.designer.util,
  org.activiti.designer.integration,
  org.eclipse.jdt.launching,
- org.activiti.designer.libs,
- org.slf4j.api;bundle-version="1.6.4"
+ org.activiti.designer.libs
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: 

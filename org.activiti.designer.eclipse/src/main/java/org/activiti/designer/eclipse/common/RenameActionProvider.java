@@ -18,6 +18,7 @@ package org.activiti.designer.eclipse.common;
 import java.io.IOException;
 import java.util.Collections;
 
+import org.activiti.designer.util.ActivitiConstants;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -47,8 +48,9 @@ public class RenameActionProvider extends CommonActionProvider {
 	public void fillContextMenu(IMenuManager menu) {
 		super.fillContextMenu(menu);
 		ISelection selection = getContext().getSelection();
-		if (selection.isEmpty())
-			return;
+		if (selection.isEmpty()) {
+      return;
+    }
 		if (selection instanceof IStructuredSelection) {
 			IStructuredSelection sel = (IStructuredSelection) selection;
 			Object el = sel.getFirstElement();
@@ -57,12 +59,14 @@ public class RenameActionProvider extends CommonActionProvider {
 				String platformString = eclass.eResource().getURI().toPlatformString(true);
 				Path path = new Path(platformString);
 				IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
-				if (file == null)
-					return;
+				if (file == null) {
+          return;
+        }
 				IProject project = file.getProject();
 				try {
-					if (!project.hasNature(ActivitiProjectNature.NATURE_ID))
-						return;
+					if (!project.hasNature(ActivitiConstants.NATURE_ID)) {
+            return;
+          }
 				} catch (CoreException e) {
 					e.printStackTrace();
 				}

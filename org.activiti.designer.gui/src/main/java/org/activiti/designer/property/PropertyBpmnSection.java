@@ -54,6 +54,7 @@ import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
+/** TODO: rename this to GeneralSection as it contains basic things on the 'General' tab. */
 public class PropertyBpmnSection extends ActivitiPropertySection implements ITabbedPropertyConstants {
 
   private Composite composite;

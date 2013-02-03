@@ -21,7 +21,7 @@ public class DeleteAssociationFeature extends AbstractCustomFeature {
   public DeleteAssociationFeature(IFeatureProvider fp) {
     super(fp);
   }
-  
+
   @Override
   public String getDescription() {
     return "Delete Association";
@@ -31,14 +31,14 @@ public class DeleteAssociationFeature extends AbstractCustomFeature {
   public String getName() {
     return "Delete Association";
   }
-  
+
   @Override
   public boolean canExecute(ICustomContext context) {
     final PictogramElement[] pictogramElements = context.getPictogramElements();
     if (context.getPictogramElements() == null) {
       return false;
     }
-    
+
     for (final PictogramElement pictogramElement : pictogramElements) {
       final Object bo = getBusinessObjectForPictogramElement(pictogramElement);
       if (bo == null) {
@@ -48,29 +48,29 @@ public class DeleteAssociationFeature extends AbstractCustomFeature {
         return false;
       }
     }
-    
+
     return true;
   }
 
   @Override
   public void execute(ICustomContext context) {
     final PictogramElement[] pictogramElements = context.getPictogramElements();
-    
+
     for (final PictogramElement pictogramElement : pictogramElements) {
       final Object bo = getBusinessObjectForPictogramElement(pictogramElement);
       if (bo == null) {
         continue;
       }
-      
+
       final Association association = (Association) bo;
-      
+
       getDiagram().getPictogramLinks().remove(pictogramElement.getLink());
       getDiagram().getConnections().remove(pictogramElement);
-      
+
       final List<Process> processes = ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getBpmnModel().getProcesses();
       for (final Process process : processes) {
         process.getArtifacts().remove(association);
-        
+
         removeArtifact(association, process);
       }
     }
@@ -83,12 +83,12 @@ public class DeleteAssociationFeature extends AbstractCustomFeature {
     } else if (parentElement instanceof SubProcess) {
       elementList = ((SubProcess) parentElement).getFlowElements();
     }
-    
+
     for (final FlowElement flowElement : elementList) {
       if (flowElement instanceof SubProcess) {
         final SubProcess subProcess = (SubProcess) flowElement;
         subProcess.removeArtifact(association.getId());
-        
+
         removeArtifact(association, subProcess);
       }
     }

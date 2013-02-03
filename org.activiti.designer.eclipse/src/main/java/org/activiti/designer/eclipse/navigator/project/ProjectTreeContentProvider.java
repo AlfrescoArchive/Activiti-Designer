@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,9 +16,9 @@ package org.activiti.designer.eclipse.navigator.project;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.designer.eclipse.common.ActivitiProjectNature;
 import org.activiti.designer.eclipse.navigator.AbstractTreeContentProvider;
 import org.activiti.designer.eclipse.navigator.TreeNode;
+import org.activiti.designer.util.ActivitiConstants;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
@@ -65,7 +65,7 @@ public class ProjectTreeContentProvider extends AbstractTreeContentProvider {
 
     if (parentElement instanceof IProject) {
       final IProject project = (IProject) parentElement;
-      if ((isActivitiProject(project))) {
+      if (isActivitiProject(project)) {
         result = getDataArray(project);
         if (result == null && !updateModel(project).isEmpty()) {
           result = getDataArray(project);
@@ -97,9 +97,11 @@ public class ProjectTreeContentProvider extends AbstractTreeContentProvider {
         updateModel(project);
         new UIJob("Update Project Model in CommonViewer") { //$NON-NLS-1$
 
+          @Override
           public IStatus runInUIThread(IProgressMonitor monitor) {
-            if (getStructuredViewer() != null && !getStructuredViewer().getControl().isDisposed())
+            if (getStructuredViewer() != null && !getStructuredViewer().getControl().isDisposed()) {
               getStructuredViewer().refresh(project);
+            }
             return Status.OK_STATUS;
           }
         }.schedule();
@@ -115,7 +117,7 @@ public class ProjectTreeContentProvider extends AbstractTreeContentProvider {
   private boolean isActivitiProject(final IProject project) {
     boolean result = false;
     try {
-      result = project.hasNature(ActivitiProjectNature.NATURE_ID);
+      result = project.hasNature(ActivitiConstants.NATURE_ID);
     } catch (CoreException e) {
       // no-op
     }
@@ -124,7 +126,7 @@ public class ProjectTreeContentProvider extends AbstractTreeContentProvider {
 
   /**
    * Load the model from the given project, if possible.
-   * 
+   *
    * @param project
    *          The IProject to get the model for
    */

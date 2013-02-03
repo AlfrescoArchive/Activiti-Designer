@@ -10,11 +10,17 @@ package org.activiti.designer.util;
  */
 public final class ActivitiConstants {
 
+  /** The project nature of Activiti projects */
+  public static final String NATURE_ID = "org.activiti.designer.nature";
+
+  /** A constant for an empty string */
+  public static final String EMPTY_STRING = "";
+
   /** The extension of the temporary diagram file */
-  public final static String DIAGRAM_FILE_EXTENSION_RAW = "bpmn2d";
+  public static final String DIAGRAM_FILE_EXTENSION_RAW = "bpmn2d";
 
   /** The extension of the data file */
-  public final static String DATA_FILE_EXTENSION_RAW = "bpmn";
+  public static final String DATA_FILE_EXTENSION_RAW = "bpmn";
 
   public static final String DIAGRAM_FOLDER = "src/main/resources/diagrams/";
   public static final String DATA_FILE_EXTENSION = "." + DATA_FILE_EXTENSION_RAW;
