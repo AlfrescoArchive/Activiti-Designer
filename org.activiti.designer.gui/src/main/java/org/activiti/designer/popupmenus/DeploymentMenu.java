@@ -11,7 +11,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.activiti.designer.eclipse.common.ActivitiBPMNDiagramConstants;
+import org.activiti.designer.util.ActivitiConstants;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -43,7 +43,7 @@ public class DeploymentMenu implements org.eclipse.ui.IObjectActionDelegate{
 		final IJavaProject javaProject = (IJavaProject) selection;
 		IFolder diagramFolder = null;
 		try {
-		  diagramFolder = javaProject.getProject().getFolder(ActivitiBPMNDiagramConstants.DIAGRAM_FOLDER);
+		  diagramFolder = javaProject.getProject().getFolder(ActivitiConstants.DIAGRAM_FOLDER);
 		  if(diagramFolder == null) {
 		    return;
 		  }

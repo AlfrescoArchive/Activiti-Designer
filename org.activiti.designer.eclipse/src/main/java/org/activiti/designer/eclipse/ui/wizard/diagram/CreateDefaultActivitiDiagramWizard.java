@@ -8,7 +8,6 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -70,7 +69,7 @@ public class CreateDefaultActivitiDiagramWizard extends BasicNewResourceWizard {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * org.eclipse.ui.wizards.newresource.BasicNewResourceWizard#init(org.eclipse
    * .ui.IWorkbench, org.eclipse.jface.viewers.IStructuredSelection)
@@ -90,35 +89,30 @@ public class CreateDefaultActivitiDiagramWizard extends BasicNewResourceWizard {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.eclipse.jface.wizard.Wizard#performFinish()
    */
   @Override
   public boolean performFinish() {
 
     final IFile diagramFile = getDiagramFile();
-    
+
     String tempFileName = null;
 		if(initialContentPage.contentSourceTemplate.getSelection() == true &&
         initialContentPage.templateTable.getSelectionIndex() >= 0) {
-			
-			tempFileName = this.getClass().getClassLoader().getResource("src/main/resources/templates/" + 
+
+			tempFileName = this.getClass().getClassLoader().getResource("src/main/resources/templates/" +
           TemplateInfo.templateFilenames[initialContentPage.templateTable.getSelectionIndex()]).getPath();
 		}
-		
+
 		final String contentFileName = tempFileName;
-    
+
 		IRunnableWithProgress op = new IRunnableWithProgress() {
 			@Override
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
 				try {
-					IPath path = diagramFile.getFullPath();
-					Bpmn2DiagramCreator factory = new Bpmn2DiagramCreator();
-					IFolder folder = Bpmn2DiagramCreator.getTempFolder(path);
-					factory.setDiagramFile(Bpmn2DiagramCreator.getTempFile(path, folder));
-					factory.setDiagramFolder(folder);
-					factory.createDiagram(true, contentFileName);
-
+				  Bpmn2DiagramCreator creator = new Bpmn2DiagramCreator();
+				  creator.createBpmnDiagram(null, diagramFile, null, contentFileName, true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				} finally {
@@ -140,7 +134,7 @@ public class CreateDefaultActivitiDiagramWizard extends BasicNewResourceWizard {
 
   /**
    * Gets the diagram.
-   * 
+   *
    * @return the diagram
    */
   public Diagram getDiagram() {

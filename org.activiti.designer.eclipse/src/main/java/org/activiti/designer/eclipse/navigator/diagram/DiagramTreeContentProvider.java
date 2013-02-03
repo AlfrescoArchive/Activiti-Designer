@@ -1,9 +1,9 @@
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -16,9 +16,9 @@ package org.activiti.designer.eclipse.navigator.diagram;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.designer.eclipse.common.ActivitiBPMNDiagramConstants;
 import org.activiti.designer.eclipse.navigator.AbstractTreeContentProvider;
 import org.activiti.designer.eclipse.navigator.TreeNode;
+import org.activiti.designer.util.ActivitiConstants;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.IResourceDelta;
@@ -52,7 +52,7 @@ public class DiagramTreeContentProvider extends AbstractTreeContentProvider {
   }
 
   private boolean isDiagramFile(IFile modelFile) {
-    return ActivitiBPMNDiagramConstants.DIAGRAM_EXTENSION_RAW.equals(modelFile.getFileExtension());
+    return ActivitiConstants.DATA_FILE_EXTENSION_RAW.equals(modelFile.getFileExtension());
   }
 
   @Override
@@ -105,9 +105,11 @@ public class DiagramTreeContentProvider extends AbstractTreeContentProvider {
         updateModel(file);
         new UIJob("Update Process Model in CommonViewer") { //$NON-NLS-1$
 
+          @Override
           public IStatus runInUIThread(IProgressMonitor monitor) {
-            if (getStructuredViewer() != null && !getStructuredViewer().getControl().isDisposed())
+            if (getStructuredViewer() != null && !getStructuredViewer().getControl().isDisposed()) {
               getStructuredViewer().refresh(file);
+            }
             return Status.OK_STATUS;
           }
         }.schedule();
@@ -119,7 +121,7 @@ public class DiagramTreeContentProvider extends AbstractTreeContentProvider {
 
   /**
    * Load the model from the given file, if possible.
-   * 
+   *
    * @param modelFile
    *          The IFile which contains the persisted model
    */

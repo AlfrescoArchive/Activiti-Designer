@@ -5,8 +5,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.activiti.bpmn.model.SubProcess;
-import org.activiti.designer.eclipse.common.FileService;
+import org.activiti.designer.eclipse.editor.ActivitiDiagramEditor;
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
+import org.activiti.designer.eclipse.util.FileService;
 import org.activiti.designer.eclipse.util.Util;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.preferences.Preferences;
@@ -52,7 +53,8 @@ public class ExpandCollapseSubProcessFeature extends AbstractDrillDownFeature {
 		return ActivitiUiUtil.contextPertainsToBusinessObject(context, SubProcess.class);
 	}
 
-	public void execute(ICustomContext context) {
+	@Override
+  public void execute(ICustomContext context) {
 		try {
 			SubProcess subprocess = (SubProcess) ActivitiUiUtil.getBusinessObjectFromContext(context, SubProcess.class);
 			this.subprocessId = subprocess.getId();
@@ -111,15 +113,18 @@ public class ExpandCollapseSubProcessFeature extends AbstractDrillDownFeature {
 		boolean createContent = PreferencesUtil
 				.getBooleanPreference(Preferences.EDITOR_ADD_DEFAULT_CONTENT_TO_DIAGRAMS);
 
+		final ActivitiDiagramEditor diagramEditor
+		  = (ActivitiDiagramEditor) getFeatureProvider().getDiagramTypeProvider().getDiagramEditor();
+
 		if (createContent) {
 			final InputStream contentStream = Util.getContentStream(Util.Content.NEW_SUBPROCESS_CONTENT);
 			InputStream replacedStream = Util.swapStreamContents(subprocessName, contentStream);
-			domain = FileService.createEmfFileForDiagram(uri, null, replacedStream, targetFile);
+			domain = FileService.createEmfFileForDiagram(uri, null, diagramEditor, replacedStream, targetFile);
 			diagram = org.eclipse.graphiti.ui.internal.services.GraphitiUiInternal.getEmfService().getDiagramFromFile(
 					targetFile, domain.getResourceSet());
 		} else {
 			diagram = Graphiti.getPeCreateService().createDiagram("BPMNdiagram", subprocessName, true);
-			domain = FileService.createEmfFileForDiagram(uri, diagram, null, null);
+			domain = FileService.createEmfFileForDiagram(uri, diagram, diagramEditor, null, null);
 		}
 
 		return diagram;

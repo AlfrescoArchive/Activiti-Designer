@@ -8,8 +8,8 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
-import org.activiti.designer.eclipse.common.ActivitiBPMNDiagramConstants;
 import org.activiti.designer.eclipse.extension.validation.AbstractProcessValidator;
+import org.activiti.designer.util.ActivitiConstants;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.designer.validation.bpmn20.bundle.PluginConstants;
 import org.activiti.designer.validation.bpmn20.validation.worker.ProcessValidationWorkerInfo;
@@ -43,12 +43,12 @@ public class BPMN20ProcessValidator extends AbstractProcessValidator {
 
   @Override
   public String getValidatorId() {
-    return ActivitiBPMNDiagramConstants.BPMN_VALIDATOR_ID;
+    return ActivitiConstants.BPMN_VALIDATOR_ID;
   }
 
   @Override
   public String getValidatorName() {
-    return ActivitiBPMNDiagramConstants.BPMN_VALIDATOR_NAME;
+    return ActivitiConstants.BPMN_VALIDATOR_NAME;
   }
 
   @Override
