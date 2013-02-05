@@ -12,8 +12,9 @@ import org.eclipse.graphiti.features.impl.AbstractFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
@@ -71,13 +72,13 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
 
   @Override
   public void refresh() {
-    assigneeText.removeModifyListener(listener);
-    candidateUsersText.removeModifyListener(listener);
-    candidateGroupsText.removeModifyListener(listener);
-    formKeyText.removeModifyListener(listener);
-    dueDateText.removeModifyListener(listener);
-    priorityText.removeModifyListener(listener);
-    documentationText.removeModifyListener(listener);
+    assigneeText.removeFocusListener(listener);
+    candidateUsersText.removeFocusListener(listener);
+    candidateGroupsText.removeFocusListener(listener);
+    formKeyText.removeFocusListener(listener);
+    dueDateText.removeFocusListener(listener);
+    priorityText.removeFocusListener(listener);
+    documentationText.removeFocusListener(listener);
     PictogramElement pe = getSelectedPictogramElement();
     if (pe != null) {
       Object bo = getBusinessObject(pe);
@@ -116,19 +117,22 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
         documentationText.setText(userTask.getDocumentation());
       }
 
-      assigneeText.addModifyListener(listener);
-      candidateUsersText.addModifyListener(listener);
-      candidateGroupsText.addModifyListener(listener);
-      formKeyText.addModifyListener(listener);
-      dueDateText.addModifyListener(listener);
-      priorityText.addModifyListener(listener);
-      documentationText.addModifyListener(listener);
+      assigneeText.addFocusListener(listener);
+      candidateUsersText.addFocusListener(listener);
+      candidateGroupsText.addFocusListener(listener);
+      formKeyText.addFocusListener(listener);
+      dueDateText.addFocusListener(listener);
+      priorityText.addFocusListener(listener);
+      documentationText.addFocusListener(listener);
     }
   }
 
-  private ModifyListener listener = new ModifyListener() {
+  private FocusListener listener = new FocusListener() {
 
-    public void modifyText(ModifyEvent e) {
+    public void focusGained(final FocusEvent e) {
+    }
+
+    public void focusLost(final FocusEvent e) {
 
       PictogramElement pe = getSelectedPictogramElement();
       if (pe != null) {
