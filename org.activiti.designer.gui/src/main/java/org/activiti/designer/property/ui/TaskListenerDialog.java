@@ -16,7 +16,7 @@ public class TaskListenerDialog extends AbstractListenerDialog {
 
   @Override
   protected String[] getEventList() {
-    return new String[] {"create", "assignment", "complete"};
+    return new String[] {"create", "assignment", "complete", "all"};
   }
 
   @Override
