@@ -31,15 +31,25 @@ public class CreateServiceTaskFeature extends AbstractCreateFastBPMNFeature {
     ServiceTask newServiceTask = new ServiceTask();
     newServiceTask.setName("Service Task");
     newServiceTask.setExtensionId(customServiceTaskId);
-
+    
     // Process custom service tasks
     if (newServiceTask.isExtended()) {
 
       CustomServiceTask targetTask = findCustomServiceTask(newServiceTask);
 
       if (targetTask != null) {
-        newServiceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
-        newServiceTask.setImplementation(targetTask.getRuntimeClassname());
+    	  
+    	// What should happen if the class contain more than one annotations?  
+    	if(!targetTask.getRuntimeClassname().isEmpty()) {
+            newServiceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
+            newServiceTask.setImplementation(targetTask.getRuntimeClassname());
+    	}
+
+    	if(!targetTask.getExpression().isEmpty()) {
+            newServiceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
+            newServiceTask.setImplementation(targetTask.getExpression());
+    	}
+
         newServiceTask.setName(targetTask.getName());
       }
     }
