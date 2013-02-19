@@ -5,8 +5,11 @@ Bundle-SymbolicName: org.activiti.designer.libs;singleton:=true
 Bundle-Version: 5.11.2
 Bundle-ClassPath: activiti-bpmn-converter-5.12-SNAPSHOT.jar,
  activiti-bpmn-model-5.12-SNAPSHOT.jar,
- slf4j-api-1.7.2.jar
-Export-Package: org.activiti.bpmn.constants,
+ slf4j-api-1.7.2.jar,
+ activiti-bpmn-layout-5.12-SNAPSHOT.jar,
+ jgraphx-1.10.4.2.jar
+Export-Package: org.activiti.bpmn,
+ org.activiti.bpmn.constants,
  org.activiti.bpmn.converter;
   uses:="javax.xml.stream,
    org.activiti.bpmn.constants,
