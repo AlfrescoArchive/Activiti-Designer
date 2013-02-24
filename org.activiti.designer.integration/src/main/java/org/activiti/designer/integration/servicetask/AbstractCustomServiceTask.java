@@ -77,6 +77,22 @@ public abstract class AbstractCustomServiceTask implements CustomServiceTask {
     }
     return null;
   }
+  
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.activiti.designer.integration.servicetask.CustomServiceTask#
+   * getExpression()
+   */
+  @Override
+	public String getExpression() {
+	    final Annotation annotation = this.getClass().getAnnotation(Runtime.class);
+
+	    if (annotation != null && Runtime.class.isAssignableFrom(annotation.getClass())) {
+	    	return ((Runtime) annotation).delegationExpression();
+	    }
+	    return null;
+	}
 
   public abstract String getName();
 

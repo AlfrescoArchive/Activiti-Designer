@@ -96,6 +96,16 @@ public interface CustomServiceTask {
    * @return the canonical name of the runtime class
    */
   String getRuntimeClassname();
+  
+  /**
+   * Gets the expression to be used at runtime for this
+   * {@link CustomServiceTask}. This class is determined by the task's
+   * {@link org.activiti.designer.integration.servicetask.annotation.Runtime}
+   * annotation
+   * 
+   * @return the canonical name of the expression
+   */
+  String getExpression();
 
   /**
    * Gets the order index for this {@link CustomServiceTask} within it's
