@@ -18,7 +18,7 @@ import org.activiti.designer.integration.servicetask.annotation.Runtime;
  * @version 1
  * @since 1.0.0
  */
-@Runtime(delegationClass = "org.acme.runtime.AcmeMoneyJavaDelegation")
+@Runtime(javaDelegateClass = "org.acme.runtime.AcmeMoneyJavaDelegation")
 @Help(displayHelpShort = "Creates a new account", displayHelpLong = "Creates a new account using the account number specified")
 public class AcmeMoneyTask extends AbstractCustomServiceTask {
 

@@ -31,24 +31,29 @@ public class CreateServiceTaskFeature extends AbstractCreateFastBPMNFeature {
     ServiceTask newServiceTask = new ServiceTask();
     newServiceTask.setName("Service Task");
     newServiceTask.setExtensionId(customServiceTaskId);
-    
+
     // Process custom service tasks
     if (newServiceTask.isExtended()) {
 
       CustomServiceTask targetTask = findCustomServiceTask(newServiceTask);
 
       if (targetTask != null) {
-    	  
-    	// What should happen if the class contain more than one annotations?  
-    	if(!targetTask.getRuntimeClassname().isEmpty()) {
-            newServiceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
-            newServiceTask.setImplementation(targetTask.getRuntimeClassname());
-    	}
 
-    	if(!targetTask.getExpression().isEmpty()) {
-            newServiceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
-            newServiceTask.setImplementation(targetTask.getExpression());
-    	}
+        // What should happen if the class contain more than one annotations?
+        switch (targetTask.getDelegateType()) {
+        case JAVA_DELEGATE_CLASS:
+          newServiceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
+          newServiceTask.setImplementation(targetTask.getDelegateSpecification());
+          break;
+        case EXPRESSION:
+          newServiceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
+          newServiceTask.setImplementation(targetTask.getDelegateSpecification());
+          break;
+        case JAVA_DELEGATE_EXPRESSION:
+          newServiceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
+          newServiceTask.setImplementation(targetTask.getDelegateSpecification());
+          break;
+        }
 
         newServiceTask.setName(targetTask.getName());
       }

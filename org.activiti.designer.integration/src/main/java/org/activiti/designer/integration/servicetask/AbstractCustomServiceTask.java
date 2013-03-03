@@ -29,10 +29,10 @@ import org.activiti.designer.integration.servicetask.annotation.Runtime;
  * Override to provide a more specific description.</li><li>Provides a default
  * order of 1. Override {@link #getOrder} if you wish to provide explicit
  * ordering of your {@link CustomServiceTask}s.</li><li>
- * Implements the {@link #getRuntimeClassname()} method using reflection
+ * Implements the {@link #getDelegateType()} method</li><li>
+ * Implements the {@link #getDelegateSpecification()} method</li>
  * 
  * @author Tiese Barrell
- * @version 2
  * @since 0.5.1
  * 
  */
@@ -66,33 +66,81 @@ public abstract class AbstractCustomServiceTask implements CustomServiceTask {
    * (non-Javadoc)
    * 
    * @see org.activiti.designer.integration.servicetask.CustomServiceTask#
-   * getRuntimeClassname()
+   * getDelegateType()
    */
   @Override
-  public final String getRuntimeClassname() {
-    final Annotation annotation = this.getClass().getAnnotation(Runtime.class);
-
-    if (annotation != null && Runtime.class.isAssignableFrom(annotation.getClass())) {
-      return ((Runtime) annotation).delegationClass();
-    }
-    return null;
+  public final DelegateType getDelegateType() {
+    return getDelegateType(getRuntimeAnnotation());
   }
-  
+
+  private DelegateType getDelegateType(final Runtime annotation) {
+
+    DelegateType result = DelegateType.NONE;
+
+    if (annotation != null) {
+      if (isDelegateDefined(annotation.javaDelegateClass())) {
+        result = DelegateType.JAVA_DELEGATE_CLASS;
+      } else if (isDelegateDefined(annotation.expression())) {
+        result = DelegateType.EXPRESSION;
+      } else if (isDelegateDefined(annotation.javaDelegateExpression())) {
+        result = DelegateType.JAVA_DELEGATE_EXPRESSION;
+      }
+    }
+
+    return result;
+  }
+
+  private boolean isDelegateDefined(final String definition) {
+    return definition != null && !definition.isEmpty() && !"".equals(definition);
+  }
+
   /*
    * (non-Javadoc)
    * 
    * @see org.activiti.designer.integration.servicetask.CustomServiceTask#
-   * getExpression()
+   * getDelegateSpecification()
    */
   @Override
-	public String getExpression() {
-	    final Annotation annotation = this.getClass().getAnnotation(Runtime.class);
+  public final String getDelegateSpecification() {
 
-	    if (annotation != null && Runtime.class.isAssignableFrom(annotation.getClass())) {
-	    	return ((Runtime) annotation).delegationExpression();
-	    }
-	    return null;
-	}
+    String result = "";
+
+    final DelegateType delegateType = getDelegateType();
+
+    if (!DelegateType.NONE.equals(delegateType)) {
+
+      Runtime runtimeAnnotation = getRuntimeAnnotation();
+      if (runtimeAnnotation != null) {
+        switch (delegateType) {
+        case JAVA_DELEGATE_CLASS:
+          result = runtimeAnnotation.javaDelegateClass();
+          break;
+        case EXPRESSION:
+          result = runtimeAnnotation.expression();
+          break;
+        case JAVA_DELEGATE_EXPRESSION:
+          result = runtimeAnnotation.javaDelegateExpression();
+          break;
+        }
+      }
+
+    }
+
+    return result;
+  }
+
+  private Runtime getRuntimeAnnotation() {
+
+    Runtime result = null;
+
+    final Annotation annotation = this.getClass().getAnnotation(Runtime.class);
+
+    if (annotation != null && Runtime.class.isAssignableFrom(annotation.getClass())) {
+      result = ((Runtime) annotation);
+    }
+
+    return result;
+  }
 
   public abstract String getName();
 

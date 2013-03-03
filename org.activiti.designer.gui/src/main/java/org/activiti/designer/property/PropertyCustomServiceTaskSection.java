@@ -9,6 +9,7 @@ import org.activiti.bpmn.model.ComplexDataType;
 import org.activiti.bpmn.model.CustomProperty;
 import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.designer.integration.servicetask.CustomServiceTask;
+import org.activiti.designer.integration.servicetask.DelegateType;
 import org.activiti.designer.integration.servicetask.annotation.Help;
 import org.activiti.designer.integration.servicetask.annotation.Property;
 import org.activiti.designer.property.extension.field.CustomPropertyBooleanChoiceField;
@@ -136,10 +137,13 @@ public class PropertyCustomServiceTaskSection extends ActivitiPropertySection im
           }
         }
 
-        for (final Class<CustomServiceTask> currentClass : classHierarchy) {
-          for (final Field field : currentClass.getDeclaredFields()) {
-            if (field.isAnnotationPresent(Property.class)) {
-              fieldInfoObjects.add(new FieldInfo(field));
+        // only process properties if the type is not an expression.
+        if (taskNotExpressionImplementationType(targetTask)) {
+          for (final Class<CustomServiceTask> currentClass : classHierarchy) {
+            for (final Field field : currentClass.getDeclaredFields()) {
+              if (field.isAnnotationPresent(Property.class)) {
+                fieldInfoObjects.add(new FieldInfo(field));
+              }
             }
           }
         }
@@ -325,11 +329,16 @@ public class PropertyCustomServiceTaskSection extends ActivitiPropertySection im
 
       }
     }
+
     this.workParent.getParent().getParent().layout(true, true);
   }
 
+  private boolean taskNotExpressionImplementationType(CustomServiceTask task) {
+    return !DelegateType.EXPRESSION.equals(task.getDelegateType());
+  }
+
   private boolean customPropertiesMustBeInitialized(final ServiceTask serviceTask) {
-    return customPropertyFields.size() > 0 && serviceTask.getCustomProperties().size() <= 1;
+    return customPropertyFields.size() > 0 && serviceTask.getCustomProperties().size() == 0;
   }
 
   @Override

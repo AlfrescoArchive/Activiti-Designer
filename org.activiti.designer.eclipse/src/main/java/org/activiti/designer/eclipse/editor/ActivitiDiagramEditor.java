@@ -25,7 +25,6 @@ import org.activiti.bpmn.model.CustomProperty;
 import org.activiti.bpmn.model.FieldExtension;
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.GraphicInfo;
-import org.activiti.bpmn.model.ImplementationType;
 import org.activiti.bpmn.model.Lane;
 import org.activiti.bpmn.model.Pool;
 import org.activiti.bpmn.model.Process;
@@ -132,8 +131,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     super.init(site, finalInput);
   }
 
-  private ActivitiDiagramEditorInput createNewDiagramEditorInput(final IEditorInput input)
-          throws CoreException {
+  private ActivitiDiagramEditorInput createNewDiagramEditorInput(final IEditorInput input) throws CoreException {
 
     final IFile dataFile = FileService.getDataFileForInput(input);
 
@@ -194,8 +192,8 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 
   private void marshallImage(Bpmn2MemoryModel model, String modelFileName) {
     try {
-      final GraphicalViewer graphicalViewer =  (GraphicalViewer) ((DiagramEditor) model.getFeatureProvider()
-              .getDiagramTypeProvider().getDiagramEditor()).getAdapter(GraphicalViewer.class);
+      final GraphicalViewer graphicalViewer = (GraphicalViewer) ((DiagramEditor) model.getFeatureProvider().getDiagramTypeProvider().getDiagramEditor())
+              .getAdapter(GraphicalViewer.class);
 
       if (graphicalViewer == null || graphicalViewer.getEditPartRegistry() == null) {
         return;
@@ -303,7 +301,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
         bpmnConverter.setStartEventFormTypes(PreferencesUtil.getStringArray(Preferences.ALFRESCO_FORMTYPES_STARTEVENT));
         BpmnModel bpmnModel = bpmnConverter.convertToBpmnModel(xtr);
         model.setBpmnModel(bpmnModel);
-        
+
         if (bpmnModel.getLocationMap().size() == 0) {
           BpmnAutoLayout layout = new BpmnAutoLayout(bpmnModel);
           layout.execute();
@@ -448,8 +446,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
             CustomServiceTask targetTask = findCustomServiceTask(serviceTask);
 
             if (targetTask != null) {
-              serviceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
-              serviceTask.setImplementation(targetTask.getRuntimeClassname());
+
               for (FieldExtension field : serviceTask.getFieldExtensions()) {
                 CustomProperty customFieldProperty = new CustomProperty();
                 customFieldProperty.setName(field.getFieldName());
@@ -508,8 +505,8 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     CustomServiceTask result = null;
     if (serviceTask.isExtended()) {
 
-      final List<CustomServiceTask> customServiceTasks = ExtensionUtil.getCustomServiceTasks(
-              ActivitiUiUtil.getProjectFromDiagram(getDiagramTypeProvider().getDiagram()));
+      final List<CustomServiceTask> customServiceTasks = ExtensionUtil.getCustomServiceTasks(ActivitiUiUtil.getProjectFromDiagram(getDiagramTypeProvider()
+              .getDiagram()));
 
       for (final CustomServiceTask customServiceTask : customServiceTasks) {
         if (serviceTask.getExtensionId().equals(customServiceTask.getId())) {
@@ -547,7 +544,8 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     return new Point(location.x + containerShape.getGraphicsAlgorithm().getX(), location.y + containerShape.getGraphicsAlgorithm().getY());
   }
 
-  private void drawArtifacts(final Collection<Artifact> artifacts, final Map<String, GraphicInfo> locationMap, final ContainerShape parent, final Process process) {
+  private void drawArtifacts(final Collection<Artifact> artifacts, final Map<String, GraphicInfo> locationMap, final ContainerShape parent,
+          final Process process) {
 
     final IFeatureProvider featureProvider = getDiagramTypeProvider().getFeatureProvider();
 
@@ -700,8 +698,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     if (sourceElement == null) {
       return;
     }
-    ContainerShape sourceShape = (ContainerShape) getDiagramTypeProvider().getFeatureProvider()
-            .getPictogramElementForBusinessObject(sourceElement);
+    ContainerShape sourceShape = (ContainerShape) getDiagramTypeProvider().getFeatureProvider().getPictogramElementForBusinessObject(sourceElement);
 
     if (sourceShape == null) {
       return;
@@ -722,8 +719,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     if (targetElement == null) {
       return;
     }
-    ContainerShape targetShape = (ContainerShape) getDiagramTypeProvider().getFeatureProvider()
-            .getPictogramElementForBusinessObject(targetElement);
+    ContainerShape targetShape = (ContainerShape) getDiagramTypeProvider().getFeatureProvider().getPictogramElementForBusinessObject(targetElement);
 
     if (targetShape == null) {
       return;
