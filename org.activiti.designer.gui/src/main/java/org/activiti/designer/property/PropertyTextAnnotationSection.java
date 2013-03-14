@@ -1,17 +1,19 @@
 package org.activiti.designer.property;
 
 import org.activiti.bpmn.model.TextAnnotation;
-import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
-import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.apache.commons.lang.StringUtils;
+import org.eclipse.graphiti.features.IFeature;
 import org.eclipse.graphiti.features.IUpdateFeature;
+import org.eclipse.graphiti.features.context.IContext;
+import org.eclipse.graphiti.features.context.impl.CustomContext;
 import org.eclipse.graphiti.features.context.impl.UpdateContext;
+import org.eclipse.graphiti.features.impl.AbstractFeature;
 import org.eclipse.graphiti.mm.algorithms.AbstractText;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
-import org.eclipse.graphiti.platform.IDiagramEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.FocusEvent;
@@ -44,48 +46,53 @@ public class PropertyTextAnnotationSection extends ActivitiPropertySection
 				final Object bo = getBusinessObject(pe);
 				
 				if (bo instanceof TextAnnotation) {
-					final IDiagramEditor diagramEditor = getDiagramEditor();
-					final TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
-					
-					ActivitiUiUtil.runModelChange(new Runnable() {
-
-						@Override
-						public void run() {
-							if (!(bo instanceof TextAnnotation)) {
-								return;
-							}
-							
-							final TextAnnotation ta = (TextAnnotation) bo;
-							final String annotationText = text.getText();
-							
-							ta.setText(annotationText);
-							
-							final UpdateContext updateContext = new UpdateContext(pe);
-							final IUpdateFeature updateFeature = getFeatureProvider(pe).getUpdateFeature(updateContext);
-							if (updateFeature != null) {
-								updateFeature.update(updateContext);
-							}
-							
-							if (pe instanceof ContainerShape) {
-								final ContainerShape cs = (ContainerShape) pe;
-								
-								for (final Shape shape : cs.getChildren()) {
-									final GraphicsAlgorithm graphicsAlgorithm = shape.getGraphicsAlgorithm();
-									if (graphicsAlgorithm instanceof AbstractText) {
-										final AbstractText textShape = (AbstractText) graphicsAlgorithm;
-										
-										textShape.setValue(annotationText);
-									}
-								}
-							}
-						}
-						
-					}, editingDomain, "Model Update");
+					final TextAnnotation ta = (TextAnnotation) bo;
+					final UpdateContext updateContext = new UpdateContext(pe);
+					final IUpdateFeature updateFeature = getFeatureProvider(pe).getUpdateFeature(updateContext);
+					updateText(ta, e.getSource(), pe, updateFeature, updateContext);
 				}
 			}
 		}
-		
 	};
+	
+	protected void updateText(final TextAnnotation annotation, final Object source, final PictogramElement pe, final IUpdateFeature updateFeature, final UpdateContext updateContext) {
+    String oldValue = annotation.getText();
+    final String newValue = ((Text) source).getText();
+    
+    if ((StringUtils.isEmpty(oldValue) && StringUtils.isNotEmpty(newValue)) || (StringUtils.isNotEmpty(oldValue) && newValue.equals(oldValue) == false)) {
+      IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
+        
+        @Override
+        public void execute(IContext context) {
+          annotation.setText(newValue);
+          
+          if (updateFeature != null) {
+            updateFeature.update(updateContext);
+          }
+          
+          if (pe instanceof ContainerShape) {
+            final ContainerShape cs = (ContainerShape) pe;
+            
+            for (final Shape shape : cs.getChildren()) {
+              final GraphicsAlgorithm graphicsAlgorithm = shape.getGraphicsAlgorithm();
+              if (graphicsAlgorithm instanceof AbstractText) {
+                final AbstractText textShape = (AbstractText) graphicsAlgorithm;
+                
+                textShape.setValue(newValue);
+              }
+            }
+          }
+        }
+        
+        @Override
+        public boolean canExecute(IContext context) {
+          return true;
+        }
+      };
+      CustomContext context = new CustomContext();
+      execute(feature, context);
+    }
+  }
 	
 	@Override
 	public void createControls(Composite parent,

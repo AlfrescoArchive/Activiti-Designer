@@ -21,6 +21,10 @@ import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.eclipse.graphiti.features.IFeature;
+import org.eclipse.graphiti.features.context.IContext;
+import org.eclipse.graphiti.features.context.impl.CustomContext;
+import org.eclipse.graphiti.features.impl.AbstractFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.swt.SWT;
@@ -129,12 +133,10 @@ public class PropertyMultiInstanceSection extends ActivitiPropertySection implem
 	  completionConditionText.removeFocusListener(listener);
 	  
     
-	  if(multiInstanceDef == null || (multiInstanceDef.isSequential() == true && yesButton.getSelection() == false)) {
+	  if(multiInstanceDef != null && multiInstanceDef.isSequential() == true) {
 	    yesButton.setSelection(true);
 	    noButton.setSelection(false);
-    }
-	  
-	  if(multiInstanceDef != null && multiInstanceDef.isSequential() == false && yesButton.getSelection() == true) {
+    } else {
       yesButton.setSelection(false);
       noButton.setSelection(true);
     }
@@ -176,15 +178,16 @@ public class PropertyMultiInstanceSection extends ActivitiPropertySection implem
     final Object bo = getBusinessObject(pe);
     if (bo instanceof Activity == false) return;
     final Activity activity = (Activity) bo;
-    
-    
-    DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
-    TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
-    ActivitiUiUtil.runModelChange(new Runnable() {
-      public void run() {
-        getMultiInstanceDef(activity).setSequential(sequential);
-      }
-    }, editingDomain, "Model Update");
+    MultiInstanceLoopCharacteristics multiInstance = getMultiInstanceDef(activity);
+    if (multiInstance.isSequential() != sequential) {
+      DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
+      TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
+      ActivitiUiUtil.runModelChange(new Runnable() {
+        public void run() {
+          getMultiInstanceDef(activity).setSequential(sequential);
+        }
+      }, editingDomain, "Model Update");
+    }
 	}
 
 	private FocusListener listener = new FocusListener() {
@@ -200,30 +203,48 @@ public class PropertyMultiInstanceSection extends ActivitiPropertySection implem
       if (bo instanceof Activity == false) return;
       final Activity activity = (Activity) bo;
       
-			DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
-			TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
-			ActivitiUiUtil.runModelChange(new Runnable() {
-				public void run() {
-				  
-					if (loopCardinaltyText.getText() != null) {
-					  getMultiInstanceDef(activity).setLoopCardinality(loopCardinaltyText.getText());
-					}
-					
-					if (collectionText.getText() != null) {
-            getMultiInstanceDef(activity).setInputDataItem(collectionText.getText());
-          }
-					
-					if (elementVariableText.getText() != null) {
-            getMultiInstanceDef(activity).setElementVariable(elementVariableText.getText());
-          }
-					
-					if (completionConditionText.getText() != null) {
-            getMultiInstanceDef(activity).setCompletionCondition(completionConditionText.getText());
-          }
-				}
-			}, editingDomain, "Model Update");
+			updateMultiInstance(getMultiInstanceDef(activity), e.getSource());
 		}
 	};
+	
+	protected void updateMultiInstance(final MultiInstanceLoopCharacteristics multiInstance, final Object source) {
+    String oldValue = null;
+    final String newValue = ((Text) source).getText();
+    if (source == loopCardinaltyText) {
+      oldValue = multiInstance.getLoopCardinality();
+    } else if (source == collectionText) {
+      oldValue = multiInstance.getInputDataItem();
+    } else if (source == elementVariableText) {
+      oldValue = multiInstance.getElementVariable();
+    } else if (source == completionConditionText) {
+      oldValue = multiInstance.getCompletionCondition();
+    }
+    
+    if ((StringUtils.isEmpty(oldValue) && StringUtils.isNotEmpty(newValue)) || (StringUtils.isNotEmpty(oldValue) && newValue.equals(oldValue) == false)) {
+      IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
+        
+        @Override
+        public void execute(IContext context) {
+          if (source == loopCardinaltyText) {
+            multiInstance.setLoopCardinality(newValue);
+          } else if (source == collectionText) {
+            multiInstance.setInputDataItem(newValue);
+          } else if (source == elementVariableText) {
+            multiInstance.setElementVariable(newValue);
+          } else if (source == completionConditionText) {
+            multiInstance.setCompletionCondition(newValue);
+          }
+        }
+        
+        @Override
+        public boolean canExecute(IContext context) {
+          return true;
+        }
+      };
+      CustomContext context = new CustomContext();
+      execute(feature, context);
+    }
+  }
 	
 	private MultiInstanceLoopCharacteristics getMultiInstanceDef(Activity activity) {
 	  if(activity.getLoopCharacteristics() == null) {

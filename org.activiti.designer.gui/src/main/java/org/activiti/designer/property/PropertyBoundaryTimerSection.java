@@ -5,12 +5,13 @@ import java.util.List;
 
 import org.activiti.bpmn.model.BoundaryEvent;
 import org.activiti.bpmn.model.TimerEventDefinition;
-import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.eclipse.graphiti.features.IFeature;
+import org.eclipse.graphiti.features.context.IContext;
+import org.eclipse.graphiti.features.context.impl.CustomContext;
+import org.eclipse.graphiti.features.impl.AbstractFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
@@ -127,50 +128,63 @@ public class PropertyBoundaryTimerSection extends ActivitiPropertySection implem
 			if (pe != null) {
 				final Object bo = getBusinessObject(pe);
 				if (bo instanceof BoundaryEvent) {
-					DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
-					TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
-					ActivitiUiUtil.runModelChange(new Runnable() {
-						public void run() {
-							
-							BoundaryEvent boundaryEvent = (BoundaryEvent) bo;
-							
-							int selection = cancelActivityCombo.getSelectionIndex();
-							if(selection == 0) {
-								boundaryEvent.setCancelActivity(true);
-							} else {
-								boundaryEvent.setCancelActivity(false);
-							}
-							
-              TimerEventDefinition timerDefinition = (TimerEventDefinition) boundaryEvent.getEventDefinitions().get(0);
-              
-							String timeDuration = timeDurationText.getText();
-							if (StringUtils.isNotEmpty(timeDuration)) {
-							  timerDefinition.setTimeDuration(timeDuration);
-							} else {
-								timerDefinition.setTimeDuration(null);
-							}
-							
-							String timeDate = timeDateText.getText();
-              if (StringUtils.isNotEmpty(timeDate)) {
-                timerDefinition.setTimeDate(timeDate);
-                
-              } else {
-              	timerDefinition.setTimeDate(null);
-              }
-              
-              String timeCycle = timeCycleText.getText();
-              if (StringUtils.isNotEmpty(timeCycle)) {
-                timerDefinition.setTimeCycle(timeCycle);
-              } else {
-              	timerDefinition.setTimeCycle(null);
-              }
-						}
-					}, editingDomain, "Model Update");
+					BoundaryEvent boundaryEvent = (BoundaryEvent) bo;
+					updateBoundaryEvent(boundaryEvent, e.getSource());
 				}
 
 			}
 		}
 	};
+	
+	protected void updateBoundaryEvent(final BoundaryEvent boundaryEvent, final Object source) {
+	  final TimerEventDefinition timerDefinition = (TimerEventDefinition) boundaryEvent.getEventDefinitions().get(0);
+    String oldValue = null;
+    String tempNewValue = null;
+    if (source == timeDurationText) {
+      oldValue = timerDefinition.getTimeDuration();
+      tempNewValue = ((Text) source).getText();
+    } else if (source == timeDateText) {
+      oldValue = timerDefinition.getTimeDate();
+      tempNewValue = ((Text) source).getText();
+    } else if (source == timeCycleText) {
+      oldValue = timerDefinition.getTimeCycle();
+      tempNewValue = ((Text) source).getText();
+    } else if (source == cancelActivityCombo) {
+      oldValue = "" + boundaryEvent.isCancelActivity();
+      tempNewValue = ((CCombo) source).getText();
+    }
+    
+    final String newValue = tempNewValue;
+    
+    if ((StringUtils.isEmpty(oldValue) && StringUtils.isNotEmpty(newValue)) || (StringUtils.isNotEmpty(oldValue) && newValue.equals(oldValue) == false)) {
+      IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
+        
+        @Override
+        public void execute(IContext context) {
+          if (source == timeDurationText) {
+            timerDefinition.setTimeDuration(newValue);
+          } else if (source == timeDateText) {
+            timerDefinition.setTimeDate(newValue);
+          } else if (source == timeCycleText) {
+            timerDefinition.setTimeCycle(newValue);
+          } else if (source == cancelActivityCombo) {
+            if ("true".equalsIgnoreCase(newValue)) {
+              boundaryEvent.setCancelActivity(true);
+            } else {
+              boundaryEvent.setCancelActivity(false);
+            }
+          }
+        }
+        
+        @Override
+        public boolean canExecute(IContext context) {
+          return true;
+        }
+      };
+      CustomContext context = new CustomContext();
+      execute(feature, context);
+    }
+  }
 	
 	private Text createText(Composite parent, TabbedPropertySheetWidgetFactory factory, Control top) {
     Text text = factory.createText(parent, ""); //$NON-NLS-1$

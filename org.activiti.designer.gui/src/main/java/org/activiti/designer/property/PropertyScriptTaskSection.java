@@ -4,11 +4,13 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.activiti.bpmn.model.ScriptTask;
-import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
-import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.apache.commons.lang.StringUtils;
+import org.eclipse.graphiti.features.IFeature;
+import org.eclipse.graphiti.features.context.IContext;
+import org.eclipse.graphiti.features.context.impl.CustomContext;
+import org.eclipse.graphiti.features.impl.AbstractFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
@@ -100,29 +102,44 @@ public class PropertyScriptTaskSection extends ActivitiPropertySection implement
 			if (pe != null) {
 				final Object bo = getBusinessObject(pe);
 				if (bo instanceof ScriptTask) {
-					DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
-					TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
-					ActivitiUiUtil.runModelChange(new Runnable() {
-						public void run() {
-							String scriptFormat = scriptFormatCombo.getText();
-							if (scriptFormat != null) {
-								if (bo instanceof ScriptTask) {
-
-									((ScriptTask) bo).setScriptFormat(scriptFormat);
-								}
-							}
-							String script = scriptText.getText();
-							if (script != null) {
-								if (bo instanceof ScriptTask) {
-
-									((ScriptTask) bo).setScript(script);
-								}
-							}
-						}
-					}, editingDomain, "Model Update");
+				   updateScriptTaskField((ScriptTask) bo, e.getSource());
 				}
-
 			}
 		}
 	};
+	
+	protected void updateScriptTaskField(final ScriptTask scriptTask, final Object source) {
+    String oldValue = null;
+    String tempNewValue = null;
+    if (source == scriptFormatCombo) {
+      oldValue = scriptTask.getScriptFormat();
+      tempNewValue = ((CCombo) source).getText();
+    } else if (source == scriptText) {
+      oldValue = scriptTask.getScript();
+      tempNewValue = ((Text) source).getText();
+    }
+    
+    final String newValue = tempNewValue;
+    
+    if ((StringUtils.isEmpty(oldValue) && StringUtils.isNotEmpty(newValue)) || (StringUtils.isNotEmpty(oldValue) && newValue.equals(oldValue) == false)) {
+      IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
+        
+        @Override
+        public void execute(IContext context) {
+          if (source == scriptFormatCombo) {
+            scriptTask.setScriptFormat(newValue);
+          } else if (source == scriptText) {
+            scriptTask.setScript(newValue);
+          }
+        }
+        
+        @Override
+        public boolean canExecute(IContext context) {
+          return true;
+        }
+      };
+      CustomContext context = new CustomContext();
+      execute(feature, context);
+    }
+  }
 }

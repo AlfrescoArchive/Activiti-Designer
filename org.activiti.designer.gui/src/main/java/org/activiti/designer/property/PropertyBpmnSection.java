@@ -45,8 +45,8 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
+import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
@@ -104,8 +104,8 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
   @Override
   public void refresh() {
 
-    nameText.removeModifyListener(listener);
-    idText.removeModifyListener(listener);
+    nameText.removeFocusListener(listener);
+    idText.removeFocusListener(listener);
 
     PictogramElement pe = getSelectedPictogramElement();
 
@@ -133,16 +133,18 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
       nameText.setText(name == null ? "" : name);
       idText.setText(id == null ? "" : id);
 
-      idText.addModifyListener(listener);
-      nameText.addModifyListener(listener);
+      idText.addFocusListener(listener);
+      nameText.addFocusListener(listener);
     }
 
   }
 
-  private ModifyListener listener = new ModifyListener() {
+  private FocusListener listener = new FocusListener() {
 
-    @Override
-    public void modifyText(ModifyEvent e) {
+    public void focusGained(final FocusEvent e) {
+    }
+
+    public void focusLost(final FocusEvent e) {
       final PictogramElement pe = getSelectedPictogramElement();
       if (pe == null) {
         return;
@@ -161,7 +163,7 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
       
       if (e.getSource() == idText) {
         String id = ((BaseElement) bo).getId();
-        if (StringUtils.isEmpty(id) || id.equals(idText.getText()) == false) {
+        if ((StringUtils.isEmpty(id) && StringUtils.isNotEmpty(idText.getText())) || (StringUtils.isNotEmpty(id) && idText.getText().equals(id) == false)) {
           IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
             
             @Override
@@ -182,7 +184,7 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
         }
       } else if (e.getSource() == nameText) {
         final String name = getName(bo);
-        if (StringUtils.isEmpty(name) || name.equals(nameText.getText()) == false) {
+        if ((StringUtils.isEmpty(name) && StringUtils.isNotEmpty(nameText.getText())) || (StringUtils.isNotEmpty(name) && nameText.getText().equals(name) == false)) {
           IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
             
             @Override

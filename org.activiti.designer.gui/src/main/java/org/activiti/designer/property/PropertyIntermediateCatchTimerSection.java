@@ -2,12 +2,13 @@ package org.activiti.designer.property;
 
 import org.activiti.bpmn.model.IntermediateCatchEvent;
 import org.activiti.bpmn.model.TimerEventDefinition;
-import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.eclipse.graphiti.features.IFeature;
+import org.eclipse.graphiti.features.context.IContext;
+import org.eclipse.graphiti.features.context.impl.CustomContext;
+import org.eclipse.graphiti.features.impl.AbstractFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.FocusEvent;
@@ -102,36 +103,48 @@ public class PropertyIntermediateCatchTimerSection extends ActivitiPropertySecti
 			if (pe != null) {
 				final Object bo = getBusinessObject(pe);
 				if (bo instanceof IntermediateCatchEvent) {
-					DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
-					TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
-					ActivitiUiUtil.runModelChange(new Runnable() {
-						public void run() {
-							
-							IntermediateCatchEvent catchEvent = (IntermediateCatchEvent) bo;
-							
-              TimerEventDefinition timerDefinition = (TimerEventDefinition) catchEvent.getEventDefinitions().get(0);
-              
-							String timeDuration = timeDurationText.getText();
-							if (timeDuration != null) {
-							  timerDefinition.setTimeDuration(timeDuration);
-							}
-							
-							String timeDate = timeDateText.getText();
-              if (timeDate != null) {
-                timerDefinition.setTimeDate(timeDate);
-              }
-              
-              String timeCycle = timeCycleText.getText();
-              if (timeCycle != null) {
-                timerDefinition.setTimeCycle(timeCycle);
-              }
-						}
-					}, editingDomain, "Model Update");
+					IntermediateCatchEvent catchEvent = (IntermediateCatchEvent) bo;
+					TimerEventDefinition timerDefinition = (TimerEventDefinition) catchEvent.getEventDefinitions().get(0);
+					updateTimerDef(timerDefinition, e.getSource());
 				}
-
 			}
 		}
 	};
+	
+	protected void updateTimerDef(final TimerEventDefinition timerDefinition, final Object source) {
+    String oldValue = null;
+    final String newValue = ((Text) source).getText();
+    if (source == timeDurationText) {
+      oldValue = timerDefinition.getTimeDuration();
+    } else if (source == timeDateText) {
+      oldValue = timerDefinition.getTimeDate();
+    } else if (source == timeCycleText) {
+      oldValue = timerDefinition.getTimeCycle();
+    }
+    
+    if ((StringUtils.isEmpty(oldValue) && StringUtils.isNotEmpty(newValue)) || (StringUtils.isNotEmpty(oldValue) && newValue.equals(oldValue) == false)) {
+      IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
+        
+        @Override
+        public void execute(IContext context) {
+          if (source == timeDurationText) {
+            timerDefinition.setTimeDuration(newValue);
+          } else if (source == timeDateText) {
+            timerDefinition.setTimeDate(newValue);
+          } else if (source == timeCycleText) {
+            timerDefinition.setTimeCycle(newValue);
+          }
+        }
+        
+        @Override
+        public boolean canExecute(IContext context) {
+          return true;
+        }
+      };
+      CustomContext context = new CustomContext();
+      execute(feature, context);
+    }
+  }
 	
 	private Text createText(Composite parent, TabbedPropertySheetWidgetFactory factory, Control top) {
     Text text = factory.createText(parent, ""); //$NON-NLS-1$

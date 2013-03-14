@@ -2,11 +2,13 @@ package org.activiti.designer.property;
 
 import org.activiti.bpmn.model.ErrorEventDefinition;
 import org.activiti.bpmn.model.StartEvent;
-import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
-import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.apache.commons.lang.StringUtils;
+import org.eclipse.graphiti.features.IFeature;
+import org.eclipse.graphiti.features.context.IContext;
+import org.eclipse.graphiti.features.context.impl.CustomContext;
+import org.eclipse.graphiti.features.impl.AbstractFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.FocusEvent;
@@ -78,24 +80,36 @@ public class PropertyErrorStartEventSection extends ActivitiPropertySection impl
 			if (pe != null) {
 				final Object bo = getBusinessObject(pe);
 				if (bo instanceof StartEvent) {
-					DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
-					TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
-					ActivitiUiUtil.runModelChange(new Runnable() {
-						public void run() {
-							
-							String errorCode = errorCodeText.getText();
-							if(bo instanceof StartEvent) {
-								StartEvent startEvent = (StartEvent) bo;
-							  ErrorEventDefinition errorDefinition = (ErrorEventDefinition) startEvent.getEventDefinitions().get(0);
-                errorDefinition.setErrorCode(errorCode);
-							}
-						}
-					}, editingDomain, "Model Update");
+					StartEvent startEvent = (StartEvent) bo;
+				  ErrorEventDefinition errorDefinition = (ErrorEventDefinition) startEvent.getEventDefinitions().get(0);
+          updateErrorDef(errorDefinition, e.getSource());
 				}
 
 			}
 		}
 	};
+	
+	protected void updateErrorDef(final ErrorEventDefinition errorDefinition, final Object source) {
+    String oldValue = errorDefinition.getErrorCode();
+    final String newValue = errorCodeText.getText();
+    
+    if ((StringUtils.isEmpty(oldValue) && StringUtils.isNotEmpty(newValue)) || (StringUtils.isNotEmpty(oldValue) && newValue.equals(oldValue) == false)) {
+      IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
+        
+        @Override
+        public void execute(IContext context) {
+          errorDefinition.setErrorCode(newValue);
+        }
+        
+        @Override
+        public boolean canExecute(IContext context) {
+          return true;
+        }
+      };
+      CustomContext context = new CustomContext();
+      execute(feature, context);
+    }
+  }
 	
 	private CLabel createLabel(Composite parent, String text, Control control, TabbedPropertySheetWidgetFactory factory) {
     CLabel label = factory.createCLabel(parent, text); //$NON-NLS-1$

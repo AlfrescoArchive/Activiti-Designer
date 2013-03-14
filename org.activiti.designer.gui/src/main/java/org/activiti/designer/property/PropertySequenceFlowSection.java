@@ -1,11 +1,13 @@
 package org.activiti.designer.property;
 
 import org.activiti.bpmn.model.SequenceFlow;
-import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
-import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.apache.commons.lang.StringUtils;
+import org.eclipse.graphiti.features.IFeature;
+import org.eclipse.graphiti.features.context.IContext;
+import org.eclipse.graphiti.features.context.impl.CustomContext;
+import org.eclipse.graphiti.features.impl.AbstractFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.FocusEvent;
@@ -79,27 +81,32 @@ public class PropertySequenceFlowSection extends ActivitiPropertySection impleme
 			if (pe != null) {
 				final Object bo = getBusinessObject(pe);
 				if (bo instanceof SequenceFlow) {
-					DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
-					TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
-					ActivitiUiUtil.runModelChange(new Runnable() {
-						public void run() {
-							if (bo instanceof SequenceFlow == false) {
-								return;
-							}
-							SequenceFlow sequenceFlow = (SequenceFlow) bo;
-							String condition = conditionExpressionText.getText();
-							if (condition != null && condition.length() > 0) {
-								sequenceFlow.setConditionExpression(condition);
-								
-							} else {
-								sequenceFlow.setConditionExpression(null);
-							}
-						}
-					}, editingDomain, "Model Update");
+					updateSequenceFlowField((SequenceFlow) bo, e.getSource());
 				}
-
 			}
 		}
 	};
+	
+	protected void updateSequenceFlowField(final SequenceFlow flow, final Object source) {
+    String oldValue = flow.getConditionExpression();
+    final String newValue = conditionExpressionText.getText();
+    
+    if ((StringUtils.isEmpty(oldValue) && StringUtils.isNotEmpty(newValue)) || (StringUtils.isNotEmpty(oldValue) && newValue.equals(oldValue) == false)) {
+      IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
+        
+        @Override
+        public void execute(IContext context) {
+          flow.setConditionExpression(newValue);
+        }
+        
+        @Override
+        public boolean canExecute(IContext context) {
+          return true;
+        }
+      };
+      CustomContext context = new CustomContext();
+      execute(feature, context);
+    }
+  }
 
 }

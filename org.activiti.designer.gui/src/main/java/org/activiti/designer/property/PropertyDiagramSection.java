@@ -15,17 +15,21 @@
  *******************************************************************************/
 package org.activiti.designer.property;
 
+import java.util.List;
+
+import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.bpmn.model.Pool;
 import org.activiti.bpmn.model.Process;
-import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.eclipse.graphiti.features.IFeature;
+import org.eclipse.graphiti.features.context.IContext;
+import org.eclipse.graphiti.features.context.impl.CustomContext;
+import org.eclipse.graphiti.features.impl.AbstractFeature;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
-import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.FocusEvent;
@@ -177,93 +181,113 @@ public class PropertyDiagramSection extends ActivitiPropertySection implements I
 		}
 
 		public void focusLost(final FocusEvent e) {
-			DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
-			TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
-			ActivitiUiUtil.runModelChange(new Runnable() {
-				public void run() {
-				  Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
-					if (model == null) {
-						return;
-					}
-					
-			    Process process = null;
-			    if(getSelectedPictogramElement() instanceof Diagram) {
-			      process = model.getBpmnModel().getMainProcess();
-			    
-			    } else {
-			      Pool pool = ((Pool) getBusinessObject(getSelectedPictogramElement()));
-			      process = model.getBpmnModel().getProcess(pool.getId());
-			    }
-					
-					String id = idText.getText();
-					if (id != null) {
-            process.setId(id);
-          } else {
-            process.setId("");
-          }
-					
-					if(getSelectedPictogramElement() instanceof Diagram == false) {
-					  Pool pool = ((Pool) getBusinessObject(getSelectedPictogramElement()));
-					  pool.setProcessRef(process.getId());
-					}
-					
-					String name = nameText.getText();
-					if (name != null) {
-					  process.setName(name);
-					} else {
-					  process.setName("");
-					}
-					
-					String namespace = namespaceText.getText();
-					if (namespace != null) {
-						model.getBpmnModel().setTargetNamespace(namespace);
-					} else {
-					  model.getBpmnModel().setTargetNamespace("");
-					}
-					
-					String documentation = documentationText.getText();
-					if (documentation != null) {
-					  process.setDocumentation(documentation);
-					} else {
-					  process.setDocumentation("");
-					}
-					
-					// read candidate users from control and insert them to the model
-					process.getCandidateStarterUsers().clear();
-					String candidateStartUsers = candidateStarterUsersText.getText();
-					if (StringUtils.isNotEmpty(candidateStartUsers)) {
-						String[] expressionList = null;
-            if (candidateStartUsers.contains(",")) {
-              expressionList = candidateStartUsers.split(",");
-            } else {
-              expressionList = new String[] { candidateStartUsers };
-            }
-            
-            for (String user : expressionList) {
-              process.getCandidateStarterUsers().add(user.trim());
-            }
-					}
-					
-					// read candidate groups from control and insert them to the model
-					String candidateStartGroups = candidateStarterGroupsText.getText();
-					process.getCandidateStarterGroups().clear();
-					if (StringUtils.isNotEmpty(candidateStartGroups)) {
-						String[] expressionList = null;
-            if (candidateStartGroups.contains(",")) {
-              expressionList = candidateStartGroups.split(",");
-            } else {
-              expressionList = new String[] { candidateStartGroups };
-            }
-            
-            for (String user : expressionList) {
-              process.getCandidateStarterGroups().add(user.trim());
-            }
-					}
-					
-				}
-			}, editingDomain, "Model Update");
+			Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+			if (model == null) {
+				return;
+			}
+			
+	    Process process = null;
+	    if(getSelectedPictogramElement() instanceof Diagram) {
+	      process = model.getBpmnModel().getMainProcess();
+	    
+	    } else {
+	      Pool pool = ((Pool) getBusinessObject(getSelectedPictogramElement()));
+	      process = model.getBpmnModel().getProcess(pool.getId());
+	    }
+	    
+	    updateProcess(process, model.getBpmnModel(), e.getSource());
 		}
 	};
+	
+	protected String getCandidatesString(List<String> candidateList) {
+    StringBuffer expressionBuffer = new StringBuffer();
+    if (candidateList.size() > 0) {
+      for (String candidate : candidateList) {
+        if (expressionBuffer.length() > 0) {
+          expressionBuffer.append(",");
+        }
+        expressionBuffer.append(candidate.trim());
+      }
+    }
+    return expressionBuffer.toString();
+  }
+	
+	protected void updateProcess(final Process process, final BpmnModel model, final Object source) {
+    String oldValue = null;
+    final String newValue = ((Text) source).getText();
+    if (source == idText) {
+      oldValue = process.getId();
+    } else if (source == nameText) {
+      oldValue = process.getName();
+    } else if (source == namespaceText) {
+      oldValue = model.getTargetNamespace();
+    } else if (source == documentationText) {
+      oldValue = process.getDocumentation();
+    } else if (source == candidateStarterUsersText) {
+      oldValue = getCandidatesString(process.getCandidateStarterUsers());
+    } else if (source == candidateStarterGroupsText) {
+      oldValue = getCandidatesString(process.getCandidateStarterGroups());
+    }
+    
+    if ((StringUtils.isEmpty(oldValue) && StringUtils.isNotEmpty(newValue)) || (StringUtils.isNotEmpty(oldValue) && newValue.equals(oldValue) == false)) {
+      IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
+        
+        @Override
+        public void execute(IContext context) {
+          if (source == idText) {
+            process.setId(newValue);
+            if(getSelectedPictogramElement() instanceof Diagram == false) {
+              Pool pool = ((Pool) getBusinessObject(getSelectedPictogramElement()));
+              pool.setProcessRef(process.getId());
+            }
+          } else if (source == nameText) {
+            process.setName(newValue);
+          } else if (source == namespaceText) {
+            model.setTargetNamespace(newValue);
+          } else if (source == documentationText) {
+            process.setDocumentation(newValue);
+          } else if (source == candidateStarterUsersText) {
+            updateCandidates(process, source);
+          } else if (source == candidateStarterGroupsText) {
+            updateCandidates(process, source);
+          }
+        }
+        
+        @Override
+        public boolean canExecute(IContext context) {
+          return true;
+        }
+      };
+      CustomContext context = new CustomContext();
+      execute(feature, context);
+    }
+  }
+	
+	protected void updateCandidates(Process process, Object source) {
+    String candidates = ((Text) source).getText();
+    if (StringUtils.isNotEmpty(candidates)) {
+      String[] expressionList = null;
+      if (candidates.contains(",")) {
+        expressionList = candidates.split(",");
+      } else {
+        expressionList = new String[] { candidates };
+      }
+      
+      if (source == candidateStarterUsersText) {
+        process.getCandidateStarterUsers().clear();
+      } else {
+        process.getCandidateStarterGroups().clear();
+      }
+
+      for (String user : expressionList) {
+        if (source == candidateStarterUsersText) {
+          process.getCandidateStarterUsers().add(user.trim());
+        } else {
+          process.getCandidateStarterGroups().add(user.trim());
+        }
+      }
+    }
+  }
 	
 	private Text createText(Composite parent, TabbedPropertySheetWidgetFactory factory, Control top) {
     Text text = factory.createText(parent, ""); //$NON-NLS-1$

@@ -14,7 +14,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
@@ -177,7 +176,7 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
       oldValue = userTask.getDocumentation();
     }
     
-    if (StringUtils.isEmpty(oldValue) || oldValue.equals(newValue) == false) {
+    if ((StringUtils.isEmpty(oldValue) && StringUtils.isNotEmpty(newValue)) || (StringUtils.isNotEmpty(oldValue) && newValue.equals(oldValue) == false)) {
       IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
         
         @Override

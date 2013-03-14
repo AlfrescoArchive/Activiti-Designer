@@ -1,21 +1,20 @@
 package org.activiti.designer.property;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
 import org.activiti.bpmn.model.BoundaryEvent;
-import org.activiti.bpmn.model.Signal;
 import org.activiti.bpmn.model.SignalEventDefinition;
-import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.eclipse.graphiti.features.IFeature;
+import org.eclipse.graphiti.features.context.IContext;
+import org.eclipse.graphiti.features.context.impl.CustomContext;
+import org.eclipse.graphiti.features.impl.AbstractFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
@@ -25,6 +24,7 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
@@ -33,7 +33,7 @@ public class PropertyBoundarySignalSection extends ActivitiPropertySection imple
 
 	private CCombo cancelActivityCombo;
 	private List<String> cancelFormats = Arrays.asList("true", "false");
-	private CCombo signalCombo;
+	private Text signalText;
 
 	@Override
 	public void createControls(Composite parent, TabbedPropertySheetPage tabbedPropertySheetPage) {
@@ -54,21 +54,21 @@ public class PropertyBoundarySignalSection extends ActivitiPropertySection imple
 		
 		createLabel(composite, "Cancel activity", cancelActivityCombo, factory); //$NON-NLS-1$
 
-		signalCombo = getWidgetFactory().createCCombo(composite, SWT.NONE);
+		signalText = getWidgetFactory().createText(composite, "");
     data = new FormData();
     data.left = new FormAttachment(0, 160);
     data.right = new FormAttachment(100, -HSPACE);
     data.top = new FormAttachment(cancelActivityCombo, VSPACE);
-    signalCombo.setLayoutData(data);
-    signalCombo.addFocusListener(listener);
+    signalText.setLayoutData(data);
+    signalText.addFocusListener(listener);
 
-		createLabel(composite, "Signal ref", signalCombo, factory); //$NON-NLS-1$
+		createLabel(composite, "Signal ref", signalText, factory); //$NON-NLS-1$
 	}
 
 	@Override
 	public void refresh() {
 		cancelActivityCombo.removeFocusListener(listener);
-		signalCombo.removeFocusListener(listener);
+		signalText.removeFocusListener(listener);
 
 		PictogramElement pe = getSelectedPictogramElement();
 		if (pe != null) {
@@ -89,34 +89,18 @@ public class PropertyBoundarySignalSection extends ActivitiPropertySection imple
 			}
 			
 			
-			String signalRef = null;
 			if(bo instanceof BoundaryEvent) {
   			BoundaryEvent boundaryEvent = (BoundaryEvent) bo;
   			if(boundaryEvent.getEventDefinitions().get(0) != null) {
   			  SignalEventDefinition signalDefinition = (SignalEventDefinition) boundaryEvent.getEventDefinitions().get(0);
           if(StringUtils.isNotEmpty(signalDefinition.getSignalRef())) {
-          	signalRef = signalDefinition.getSignalRef();
+          	signalText.setText(signalDefinition.getSignalRef());
           }
   			}
 			}
-			
-			String[] items = new String[model.getBpmnModel().getSignals().size() + 1];
-			items[0] = "";
-			int counter = 1;
-			int selectedCounter = 0;
-			for (Signal signal : model.getBpmnModel().getSignals()) {
-	      items[counter] = signal.getId() + " / " + signal.getName();
-	      if(signal.getId().equals(signalRef)) {
-	      	selectedCounter = counter;
-	      }
-	      counter++;
-      }
-			
-			signalCombo.setItems(items);
-			signalCombo.select(selectedCounter);
 		}
 		cancelActivityCombo.addFocusListener(listener);
-		signalCombo.addFocusListener(listener);
+		signalText.addFocusListener(listener);
 	}
 
 	private FocusListener listener = new FocusListener() {
@@ -134,36 +118,51 @@ public class PropertyBoundarySignalSection extends ActivitiPropertySection imple
 			if (pe != null) {
 				final Object bo = getBusinessObject(pe);
 				if (bo instanceof BoundaryEvent) {
-					DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
-					TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
-					ActivitiUiUtil.runModelChange(new Runnable() {
-						public void run() {
-							
-							if(bo instanceof BoundaryEvent) {
-  							BoundaryEvent boundaryEvent = (BoundaryEvent) bo;
-  							
-  							int selection = cancelActivityCombo.getSelectionIndex();
-  							if(selection == 0) {
-  								boundaryEvent.setCancelActivity(true);
-  							} else {
-  								boundaryEvent.setCancelActivity(false);
-  							}
-  							
-  							SignalEventDefinition signalDefinition = (SignalEventDefinition) boundaryEvent.getEventDefinitions().get(0);
-  							if(signalCombo.getSelectionIndex() > 0) {
-  							  List<Signal> signalList = new ArrayList<Signal>(model.getBpmnModel().getSignals());
-                  signalDefinition.setSignalRef(signalList.get(signalCombo.getSelectionIndex() - 1).getId());
-                } else {
-                  signalDefinition.setSignalRef("");
-                }
-							}
-						}
-					}, editingDomain, "Model Update");
+				  updateBoundaryEvent((BoundaryEvent) bo, e.getSource());
 				}
-
 			}
 		}
 	};
+	
+	protected void updateBoundaryEvent(final BoundaryEvent boundaryEvent, final Object source) {
+    final SignalEventDefinition signalDefinition = (SignalEventDefinition) boundaryEvent.getEventDefinitions().get(0);
+    String oldValue = null;
+    String tempNewValue = null;
+    if (source == cancelActivityCombo) {
+      oldValue = "" + boundaryEvent.isCancelActivity();
+      tempNewValue = ((CCombo) source).getText();
+    } else if (source == signalText) {
+      oldValue = signalDefinition.getSignalRef();
+      tempNewValue = ((Text) source).getText();
+    }
+    
+    final String newValue = tempNewValue;
+    
+    if ((StringUtils.isEmpty(oldValue) && StringUtils.isNotEmpty(newValue)) || (StringUtils.isNotEmpty(oldValue) && newValue.equals(oldValue) == false)) {
+      IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
+        
+        @Override
+        public void execute(IContext context) {
+          if (source == cancelActivityCombo) {
+            if ("true".equalsIgnoreCase(newValue)) {
+              boundaryEvent.setCancelActivity(true);
+            } else {
+              boundaryEvent.setCancelActivity(false);
+            }
+          } else if (source == signalText) {
+            signalDefinition.setSignalRef(newValue);
+          }
+        }
+        
+        @Override
+        public boolean canExecute(IContext context) {
+          return true;
+        }
+      };
+      CustomContext context = new CustomContext();
+      execute(feature, context);
+    }
+  }
 	
 	private CLabel createLabel(Composite parent, String text, Control control, TabbedPropertySheetWidgetFactory factory) {
     CLabel label = factory.createCLabel(parent, text); //$NON-NLS-1$

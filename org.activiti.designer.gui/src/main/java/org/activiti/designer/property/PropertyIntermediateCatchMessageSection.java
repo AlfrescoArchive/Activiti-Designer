@@ -1,22 +1,18 @@
 package org.activiti.designer.property;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.activiti.bpmn.model.IntermediateCatchEvent;
-import org.activiti.bpmn.model.Message;
 import org.activiti.bpmn.model.MessageEventDefinition;
-import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.eclipse.graphiti.features.IFeature;
+import org.eclipse.graphiti.features.context.IContext;
+import org.eclipse.graphiti.features.context.impl.CustomContext;
+import org.eclipse.graphiti.features.impl.AbstractFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
@@ -24,13 +20,14 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
 public class PropertyIntermediateCatchMessageSection extends ActivitiPropertySection implements ITabbedPropertyConstants {
 
-	private CCombo messageCombo;
+	private Text messageText;
 
 	@Override
 	public void createControls(Composite parent, TabbedPropertySheetPage tabbedPropertySheetPage) {
@@ -39,19 +36,19 @@ public class PropertyIntermediateCatchMessageSection extends ActivitiPropertySec
 		TabbedPropertySheetWidgetFactory factory = getWidgetFactory();
 		Composite composite = factory.createFlatFormComposite(parent);
 		
-		messageCombo = getWidgetFactory().createCCombo(composite, SWT.NONE);
+		messageText = getWidgetFactory().createText(composite, "");
     FormData data = new FormData();
     data.left = new FormAttachment(0, 160);
     data.right = new FormAttachment(100, -HSPACE);
     data.top = new FormAttachment(0, VSPACE);
-    messageCombo.setLayoutData(data);
-    messageCombo.addFocusListener(listener);
-    createLabel(composite, "Message Ref Id", messageCombo, factory); //$NON-NLS-1$
+    messageText.setLayoutData(data);
+    messageText.addFocusListener(listener);
+    createLabel(composite, "Message Ref Id", messageText, factory); //$NON-NLS-1$
 	}
 
 	@Override
 	public void refresh() {
-	  messageCombo.removeFocusListener(listener);
+	  messageText.removeFocusListener(listener);
 
 		PictogramElement pe = getSelectedPictogramElement();
 		if (pe != null) {
@@ -64,33 +61,17 @@ public class PropertyIntermediateCatchMessageSection extends ActivitiPropertySec
 	      return;
 	    }
 			
-	    String messageRef = null;
 	    if(bo instanceof IntermediateCatchEvent) {
         IntermediateCatchEvent catchEvent = (IntermediateCatchEvent) bo;
         if(catchEvent.getEventDefinitions().get(0) != null) {
           MessageEventDefinition messageDefinition = (MessageEventDefinition) catchEvent.getEventDefinitions().get(0);
           if(StringUtils.isNotEmpty(messageDefinition.getMessageRef())) {
-            messageRef = messageDefinition.getMessageRef();
+            messageText.setText(messageDefinition.getMessageRef());
           }
         }
 	    }
-      
-      String[] items = new String[model.getBpmnModel().getMessages().size() + 1];
-      items[0] = "";
-      int counter = 1;
-      int selectedCounter = 0;
-      for (Message message : model.getBpmnModel().getMessages()) {
-        items[counter] = message.getId() + " / " + message.getName();
-        if(message.getId().equals(messageRef)) {
-          selectedCounter = counter;
-        }
-        counter++;
-      }
-			
-			messageCombo.setItems(items);
-			messageCombo.select(selectedCounter);
 		}
-		messageCombo.addFocusListener(listener);
+		messageText.addFocusListener(listener);
 	}
 
 	private FocusListener listener = new FocusListener() {
@@ -108,25 +89,35 @@ public class PropertyIntermediateCatchMessageSection extends ActivitiPropertySec
 			if (pe != null) {
 				final Object bo = getBusinessObject(pe);
 				if (bo instanceof IntermediateCatchEvent) {
-					DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
-					TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
-					ActivitiUiUtil.runModelChange(new Runnable() {
-						public void run() {
-							
-						  MessageEventDefinition messageDefinition = (MessageEventDefinition) ((IntermediateCatchEvent) bo).getEventDefinitions().get(0);
-							if(messageCombo.getSelectionIndex() > 0) {
-							  List<Message> messageList = new ArrayList<Message>(model.getBpmnModel().getMessages());
-							  messageDefinition.setMessageRef(messageList.get(messageCombo.getSelectionIndex() - 1).getId());
-							} else {
-							  messageDefinition.setMessageRef("");
-							}
-						}
-					}, editingDomain, "Model Update");
+					MessageEventDefinition messageDefinition = (MessageEventDefinition) ((IntermediateCatchEvent) bo).getEventDefinitions().get(0);
+					updateMessageDef(messageDefinition, e.getSource());
 				}
 
 			}
 		}
 	};
+	
+	protected void updateMessageDef(final MessageEventDefinition messageDefinition, final Object source) {
+    String oldValue = messageDefinition.getMessageRef();
+    final String newValue = ((Text) source).getText();
+    
+    if ((StringUtils.isEmpty(oldValue) && StringUtils.isNotEmpty(newValue)) || (StringUtils.isNotEmpty(oldValue) && newValue.equals(oldValue) == false)) {
+      IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
+        
+        @Override
+        public void execute(IContext context) {
+          messageDefinition.setMessageRef(newValue);
+        }
+        
+        @Override
+        public boolean canExecute(IContext context) {
+          return true;
+        }
+      };
+      CustomContext context = new CustomContext();
+      execute(feature, context);
+    }
+  }
 	
 	private CLabel createLabel(Composite parent, String text, Control control, TabbedPropertySheetWidgetFactory factory) {
     CLabel label = factory.createCLabel(parent, text); //$NON-NLS-1$

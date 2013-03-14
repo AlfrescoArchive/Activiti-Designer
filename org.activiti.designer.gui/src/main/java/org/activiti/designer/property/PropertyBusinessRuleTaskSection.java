@@ -1,15 +1,22 @@
 package org.activiti.designer.property;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.activiti.bpmn.model.BusinessRuleTask;
-import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
-import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.apache.commons.lang.StringUtils;
+import org.eclipse.graphiti.features.IFeature;
+import org.eclipse.graphiti.features.context.IContext;
+import org.eclipse.graphiti.features.context.impl.CustomContext;
+import org.eclipse.graphiti.features.impl.AbstractFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.RowLayout;
@@ -103,8 +110,8 @@ public class PropertyBusinessRuleTaskSection extends ActivitiPropertySection imp
   @Override
   public void refresh() {
     ruleNamesText.removeFocusListener(listener);
-    excludedButton.removeFocusListener(listener);
-    nonExcludedButton.removeFocusListener(listener);
+    excludedButton.removeSelectionListener(buttonSelected);
+    nonExcludedButton.removeSelectionListener(buttonSelected);
     inputVariableNamesText.removeFocusListener(listener);
     resultVariableNameText.removeFocusListener(listener);
     PictogramElement pe = getSelectedPictogramElement();
@@ -115,29 +122,8 @@ public class PropertyBusinessRuleTaskSection extends ActivitiPropertySection imp
 
       BusinessRuleTask businessRuleTask = (BusinessRuleTask) bo;
       
-      ruleNamesText.setText("");
-      if(businessRuleTask.getRuleNames().size() > 0) {
-        StringBuilder ruleNameBuilder = new StringBuilder();
-        for (String ruleName: businessRuleTask.getRuleNames()) {
-          if(ruleNameBuilder.length() > 0) {
-            ruleNameBuilder.append(",");
-          }
-          ruleNameBuilder.append(ruleName);
-        }
-        ruleNamesText.setText(ruleNameBuilder.toString());
-      }
-      
-      inputVariableNamesText.setText("");
-      if(businessRuleTask.getInputVariables().size() > 0) {
-        StringBuilder inputBuilder = new StringBuilder();
-        for (String input: businessRuleTask.getInputVariables()) {
-          if(inputBuilder.length() > 0) {
-            inputBuilder.append(",");
-          }
-          inputBuilder.append(input);
-        }
-        inputVariableNamesText.setText(inputBuilder.toString());
-      }
+      ruleNamesText.setText(transformToString(businessRuleTask.getRuleNames()));
+      inputVariableNamesText.setText(transformToString(businessRuleTask.getInputVariables()));
       
       excludedButton.setSelection(businessRuleTask.isExclude());
       nonExcludedButton.setSelection(!businessRuleTask.isExclude());
@@ -148,11 +134,73 @@ public class PropertyBusinessRuleTaskSection extends ActivitiPropertySection imp
       }
       
       ruleNamesText.addFocusListener(listener);
-      excludedButton.addFocusListener(listener);
-      nonExcludedButton.addFocusListener(listener);
+      excludedButton.addSelectionListener(buttonSelected);
+      nonExcludedButton.addSelectionListener(buttonSelected);
       inputVariableNamesText.addFocusListener(listener);
       resultVariableNameText.addFocusListener(listener);
     }
+  }
+  
+  private SelectionListener buttonSelected = new SelectionListener() {
+
+    @Override
+    public void widgetSelected(final SelectionEvent event) {
+      final PictogramElement pe = getSelectedPictogramElement();
+      if (pe != null) {
+        final Object bo = getBusinessObject(pe);
+        if (bo instanceof BusinessRuleTask) {
+          BusinessRuleTask ruleTask = (BusinessRuleTask) bo;
+          if (event.getSource() == excludedButton) {
+            if (excludedButton.getSelection()) {
+              if (ruleTask.isExclude() == false) {
+                updateExclude(true, ruleTask);
+              }
+            }
+          } else if (event.getSource() == nonExcludedButton) {
+            if (nonExcludedButton.getSelection()) {
+              if (ruleTask.isExclude()) {
+                updateExclude(false, ruleTask);
+              }
+            }
+          }
+        }
+      }
+    }
+
+    @Override
+    public void widgetDefaultSelected(SelectionEvent event) {
+      widgetSelected(event);
+    }
+  };
+  
+  protected void updateExclude(final boolean exclude, final BusinessRuleTask ruleTask) {
+    IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
+      
+      @Override
+      public void execute(IContext context) {
+        ruleTask.setExclude(exclude);
+      }
+      
+      @Override
+      public boolean canExecute(IContext context) {
+        return true;
+      }
+    };
+    CustomContext context = new CustomContext();
+    execute(feature, context);
+  }
+  
+  protected String transformToString(List<String> nameList) {
+    StringBuilder nameBuilder = new StringBuilder();
+    if (nameList.size() > 0) {
+      for (String name: nameList) {
+        if(nameBuilder.length() > 0) {
+          nameBuilder.append(",");
+        }
+        nameBuilder.append(name);
+      }
+    }
+    return nameBuilder.toString();
   }
 
   private FocusListener listener = new FocusListener() {
@@ -165,50 +213,63 @@ public class PropertyBusinessRuleTaskSection extends ActivitiPropertySection imp
       if (pe != null) {
         final Object bo = getBusinessObject(pe);
         if (bo instanceof BusinessRuleTask) {
-          DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
-          TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
-          ActivitiUiUtil.runModelChange(new Runnable() {
-
-            public void run() {
-              BusinessRuleTask businessRuleTask = (BusinessRuleTask) bo;
-              String ruleNames = ruleNamesText.getText();
-              if (ruleNames != null && ruleNames.length() > 0) {
-                businessRuleTask.getRuleNames().clear();
-                if(ruleNames.contains(",") == false) {
-                  businessRuleTask.getRuleNames().add(ruleNames);
-                } else {
-                  String[] ruleNameList = ruleNames.split(",");
-                  for (String rule : ruleNameList) {
-                    businessRuleTask.getRuleNames().add(rule);
-                  }
-                }
-              }
-              String inputNames = inputVariableNamesText.getText();
-              if (inputNames != null && inputNames.length() > 0) {
-                businessRuleTask.getInputVariables().clear();
-                if(inputNames.contains(",") == false) {
-                  businessRuleTask.getInputVariables().add(inputNames);
-                } else {
-                  String[] inputNamesList = inputNames.split(",");
-                  for (String input : inputNamesList) {
-                    businessRuleTask.getInputVariables().add(input);
-                  }
-                }
-              }
-              businessRuleTask.setExclude(excludedButton.getSelection());
-              String resultVariable = resultVariableNameText.getText();
-              if (resultVariable != null) {
-                businessRuleTask.setResultVariableName(resultVariable);
-              } else {
-                businessRuleTask.setResultVariableName("");
-              }
-            }
-          }, editingDomain, "Model Update");
+          BusinessRuleTask businessRuleTask = (BusinessRuleTask) bo;
+          updateBusinessRuleField(businessRuleTask, e.getSource());
         }
-
       }
     }
-
   };
+  
+  protected void updateBusinessRuleField(final BusinessRuleTask businessRuleTask, final Object source) {
+    String oldValue = null;
+    final String newValue = ((Text) source).getText();
+    if (source == ruleNamesText) {
+      oldValue = transformToString(businessRuleTask.getRuleNames());
+    } else if (source == inputVariableNamesText) {
+      oldValue = transformToString(businessRuleTask.getInputVariables());
+    } else if (source == resultVariableNameText) {
+      oldValue = businessRuleTask.getResultVariableName();
+    }
+    
+    if ((StringUtils.isEmpty(oldValue) && StringUtils.isNotEmpty(newValue)) || (StringUtils.isNotEmpty(oldValue) && newValue.equals(oldValue) == false)) {
+      IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
+        
+        @Override
+        public void execute(IContext context) {
+          if (source == ruleNamesText) {
+            businessRuleTask.getRuleNames().clear();
+            businessRuleTask.getRuleNames().addAll(convertToList(newValue));
+          } else if (source == inputVariableNamesText) {
+            businessRuleTask.getInputVariables().clear();
+            businessRuleTask.getInputVariables().addAll(convertToList(newValue));
+          } else if (source == resultVariableNameText) {
+            businessRuleTask.setResultVariableName(newValue);
+          }
+        }
+        
+        @Override
+        public boolean canExecute(IContext context) {
+          return true;
+        }
+      };
+      CustomContext context = new CustomContext();
+      execute(feature, context);
+    }
+  }
+  
+  protected List<String> convertToList(String stringList) {
+    List<String> nameList = new ArrayList<String>();
+    if (StringUtils.isNotEmpty(stringList)) {
+      if(stringList.contains(",") == false) {
+        nameList.add(stringList);
+      } else {
+        String[] nameArray = stringList.split(",");
+        for (String name : nameArray) {
+          nameList.add(name);
+        }
+      }
+    }
+    return nameList;
+  }
 
 }
