@@ -33,7 +33,7 @@
 			<id>Graphiti</id>
 			<layout>p2</layout>
 			<!-- <url>http://download.eclipse.org/graphiti/updates/milestones/</url> -->
-			<url>http://download.eclipse.org/graphiti/updates/0.9.1</url>
+			<url>http://download.eclipse.org/graphiti/updates/0.9.2</url>
 		</repository>
 		<repository>
 			<id>Oribit</id>

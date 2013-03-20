@@ -18,13 +18,16 @@ package org.activiti.designer.property;
 import java.util.List;
 
 import org.activiti.bpmn.model.Activity;
+import org.activiti.bpmn.model.FlowNode;
 import org.activiti.bpmn.model.Gateway;
 import org.activiti.bpmn.model.SequenceFlow;
-import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
-import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.apache.commons.lang.StringUtils;
+import org.eclipse.graphiti.features.IFeature;
+import org.eclipse.graphiti.features.context.IContext;
+import org.eclipse.graphiti.features.context.impl.CustomContext;
+import org.eclipse.graphiti.features.impl.AbstractFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
@@ -118,20 +121,41 @@ public class PropertyDefaultFlowSection extends ActivitiPropertySection implemen
         return;
       final Object bo = getBusinessObject(pe);
 
-      DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
-      TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
-      ActivitiUiUtil.runModelChange(new Runnable() {
-
-        public void run() {
-          String defaultValue = defaultCombo.getText();
-          if(bo instanceof Activity) {
-            ((Activity) bo).setDefaultFlow(defaultValue);
-          } else if(bo instanceof Gateway) {
-            ((Gateway) bo).setDefaultFlow(defaultValue);
-          }
-        }
-      }, editingDomain, "Model Update");
+      if (bo instanceof FlowNode) {
+        updateFlowNode((FlowNode) bo, e.getSource());
+      }
     }
   };
+  
+  protected void updateFlowNode(final FlowNode flowNode, final Object source) {
+    String oldValue = null;
+    final String newValue = defaultCombo.getText();
+    if (flowNode instanceof Activity) {
+      oldValue = ((Activity) flowNode).getDefaultFlow();
+    } else if (flowNode instanceof Gateway) {
+      oldValue = ((Gateway) flowNode).getDefaultFlow();
+    }
+    
+    if ((StringUtils.isEmpty(oldValue) && StringUtils.isNotEmpty(newValue)) || (StringUtils.isNotEmpty(oldValue) && newValue.equals(oldValue) == false)) {
+      IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
+        
+        @Override
+        public void execute(IContext context) {
+          if (flowNode instanceof Activity) {
+            ((Activity) flowNode).setDefaultFlow(newValue);
+          } else if (flowNode instanceof Gateway) {
+            ((Gateway) flowNode).setDefaultFlow(newValue);
+          }
+        }
+        
+        @Override
+        public boolean canExecute(IContext context) {
+          return true;
+        }
+      };
+      CustomContext context = new CustomContext();
+      execute(feature, context);
+    }
+  }
 
 }

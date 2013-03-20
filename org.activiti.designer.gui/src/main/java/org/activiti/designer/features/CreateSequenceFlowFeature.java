@@ -40,8 +40,14 @@ public class CreateSequenceFlowFeature extends AbstractCreateBPMNConnectionFeatu
       } else if (source instanceof EndEvent) {
         // prevent adding outgoing connections from EndEvents
         return false;
+      } else {
+        for (SequenceFlow flow : source.getOutgoingFlows()) {
+          if (flow.getTargetRef().equals(target.getId())) {
+            return false;
+          }
+        }
+        return true;
       }
-      return true;
     }
     return false;
   }

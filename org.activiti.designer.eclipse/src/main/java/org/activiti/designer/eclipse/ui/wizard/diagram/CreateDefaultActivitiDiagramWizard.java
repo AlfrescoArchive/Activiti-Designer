@@ -3,11 +3,13 @@ package org.activiti.designer.eclipse.ui.wizard.diagram;
 import java.lang.reflect.InvocationTargetException;
 
 import org.activiti.designer.eclipse.editor.Bpmn2DiagramCreator;
+import org.activiti.designer.eclipse.util.FileService;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IWorkspaceRoot;
 import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -95,7 +97,7 @@ public class CreateDefaultActivitiDiagramWizard extends BasicNewResourceWizard {
   @Override
   public boolean performFinish() {
 
-    final IFile diagramFile = getDiagramFile();
+    final IFile dataFile = getDiagramFile();
 
     String tempFileName = null;
 		if(initialContentPage.contentSourceTemplate.getSelection() == true &&
@@ -111,8 +113,16 @@ public class CreateDefaultActivitiDiagramWizard extends BasicNewResourceWizard {
 			@Override
 			public void run(IProgressMonitor monitor) throws InvocationTargetException {
 				try {
+				  IPath path = dataFile.getFullPath();
+				  
+				  // get or create the corresponding temporary folder
+			    final IFolder tempFolder = FileService.getOrCreateTempFolder(path);
+
+			    // finally get the diagram file that corresponds to the data file
+			    final IFile diagramFile = FileService.getTemporaryDiagramFile(path, tempFolder);
+			    
 				  Bpmn2DiagramCreator creator = new Bpmn2DiagramCreator();
-				  creator.createBpmnDiagram(null, diagramFile, null, contentFileName, true);
+				  creator.createBpmnDiagram(dataFile, diagramFile, null, contentFileName, true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				} finally {

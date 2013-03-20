@@ -1,12 +1,17 @@
 package org.activiti.designer.property;
 
 import org.activiti.bpmn.model.SequenceFlow;
+import org.activiti.designer.util.TextUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.lang.math.NumberUtils;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.graphiti.features.IFeature;
 import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.features.context.impl.CustomContext;
 import org.eclipse.graphiti.features.impl.AbstractFeature;
+import org.eclipse.graphiti.mm.pictograms.ConnectionDecorator;
+import org.eclipse.graphiti.mm.pictograms.FreeFormConnection;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
@@ -22,7 +27,8 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
 public class PropertySequenceFlowSection extends ActivitiPropertySection implements ITabbedPropertyConstants {
 	
-	private Text conditionExpressionText;
+  protected Text flowLabelWidthText;
+  protected Text conditionExpressionText;
 	
 	@Override
 	public void createControls(Composite parent, TabbedPropertySheetPage tabbedPropertySheetPage) {
@@ -32,11 +38,25 @@ public class PropertySequenceFlowSection extends ActivitiPropertySection impleme
 		Composite composite = factory.createFlatFormComposite(parent);
 		FormData data;
 
+		flowLabelWidthText = getWidgetFactory().createText(composite, "");
+    data = new FormData();
+    data.left = new FormAttachment(0, 160);
+    data.right = new FormAttachment(100, -HSPACE);
+    data.top = new FormAttachment(0, VSPACE);
+    flowLabelWidthText.setLayoutData(data);
+    flowLabelWidthText.addFocusListener(listener);
+    CLabel widthLabel = factory.createCLabel(composite, "Label width (50-500)"); //$NON-NLS-1$
+    data = new FormData();
+    data.left = new FormAttachment(0, 0);
+    data.right = new FormAttachment(flowLabelWidthText, -HSPACE);
+    data.top = new FormAttachment(flowLabelWidthText, 0, SWT.TOP);
+    widthLabel.setLayoutData(data);
+		
 		conditionExpressionText = factory.createText(composite, "", SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL); //$NON-NLS-1$
 		data = new FormData(SWT.DEFAULT, 100);
-		data.left = new FormAttachment(0, 120);
+		data.left = new FormAttachment(0, 160);
 		data.right = new FormAttachment(100, 0);
-		data.top = new FormAttachment(0, VSPACE);
+		data.top = new FormAttachment(flowLabelWidthText, VSPACE);
 		conditionExpressionText.setLayoutData(data);
 		conditionExpressionText.addFocusListener(listener);
 
@@ -51,6 +71,9 @@ public class PropertySequenceFlowSection extends ActivitiPropertySection impleme
 
 	@Override
 	public void refresh() {
+	  flowLabelWidthText.removeFocusListener(listener);
+	  conditionExpressionText.removeFocusListener(listener);
+	  
 		PictogramElement pe = getSelectedPictogramElement();
 		if (pe != null) {
 			Object bo = getBusinessObject(pe);
@@ -59,6 +82,16 @@ public class PropertySequenceFlowSection extends ActivitiPropertySection impleme
 				return;
 
 			SequenceFlow sequenceFlow = ((SequenceFlow) bo);
+			
+      EList<ConnectionDecorator> decoratorList = ((FreeFormConnection) getSelectedPictogramElement()).getConnectionDecorators();
+      for (ConnectionDecorator decorator : decoratorList) {
+        if (decorator.getGraphicsAlgorithm() instanceof org.eclipse.graphiti.mm.algorithms.MultiText) {
+          org.eclipse.graphiti.mm.algorithms.MultiText text = (org.eclipse.graphiti.mm.algorithms.MultiText) decorator.getGraphicsAlgorithm();
+          flowLabelWidthText.setText("" + text.getWidth());
+          break;
+        }
+      }
+			
 			if(sequenceFlow.getConditionExpression() != null) {
 				
 				conditionExpressionText.removeFocusListener(listener);
@@ -69,6 +102,9 @@ public class PropertySequenceFlowSection extends ActivitiPropertySection impleme
 				conditionExpressionText.setText("");
 			}
 		}
+		
+		flowLabelWidthText.addFocusListener(listener);
+    conditionExpressionText.addFocusListener(listener);
 	}
 
 	private FocusListener listener = new FocusListener() {
@@ -88,25 +124,61 @@ public class PropertySequenceFlowSection extends ActivitiPropertySection impleme
 	};
 	
 	protected void updateSequenceFlowField(final SequenceFlow flow, final Object source) {
-    String oldValue = flow.getConditionExpression();
-    final String newValue = conditionExpressionText.getText();
-    
-    if ((StringUtils.isEmpty(oldValue) && StringUtils.isNotEmpty(newValue)) || (StringUtils.isNotEmpty(oldValue) && newValue.equals(oldValue) == false)) {
-      IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
-        
-        @Override
-        public void execute(IContext context) {
-          flow.setConditionExpression(newValue);
+	  if (source == conditionExpressionText) {
+      String oldValue = flow.getConditionExpression();
+      final String newValue = conditionExpressionText.getText();
+      
+      if ((StringUtils.isEmpty(oldValue) && StringUtils.isNotEmpty(newValue)) || (StringUtils.isNotEmpty(oldValue) && newValue.equals(oldValue) == false)) {
+        IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
+          
+          @Override
+          public void execute(IContext context) {
+            flow.setConditionExpression(newValue);
+          }
+          
+          @Override
+          public boolean canExecute(IContext context) {
+            return true;
+          }
+        };
+        CustomContext context = new CustomContext();
+        execute(feature, context);
+      }
+	  } else if (source == flowLabelWidthText) {
+	    if (!(getSelectedPictogramElement() instanceof FreeFormConnection)) {
+        return;
+      }
+      EList<ConnectionDecorator> decoratorList = ((FreeFormConnection) getSelectedPictogramElement()).getConnectionDecorators();
+      for (ConnectionDecorator decorator : decoratorList) {
+        if (decorator.getGraphicsAlgorithm() instanceof org.eclipse.graphiti.mm.algorithms.MultiText) {
+          final org.eclipse.graphiti.mm.algorithms.MultiText text = (org.eclipse.graphiti.mm.algorithms.MultiText) decorator.getGraphicsAlgorithm();
+          final String widthText = flowLabelWidthText.getText();
+          
+          IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
+            
+            @Override
+            public void execute(IContext context) {
+              if (NumberUtils.isNumber(widthText)) {
+                long width = Long.valueOf(widthText);
+                if (width >= 50 || width <= 500) {
+                  TextUtil.setTextSize((int) width, text);
+                }
+              }
+              flowLabelWidthText.setText("" + text.getWidth());
+            }
+            
+            @Override
+            public boolean canExecute(IContext context) {
+              return true;
+            }
+          };
+          CustomContext context = new CustomContext();
+          execute(feature, context);
+          
+          break;
         }
-        
-        @Override
-        public boolean canExecute(IContext context) {
-          return true;
-        }
-      };
-      CustomContext context = new CustomContext();
-      execute(feature, context);
-    }
+      }
+	  }
   }
 
 }

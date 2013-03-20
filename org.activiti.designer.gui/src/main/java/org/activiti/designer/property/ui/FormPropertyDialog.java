@@ -49,7 +49,7 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
 
 	public FormPropertyDialog(Shell parent, TableItem[] fieldList) {
 		// Pass the default styles here
-		this(parent, fieldList, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+		this(parent, fieldList, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
 	}
 	
 	public FormPropertyDialog(Shell parent, TableItem[] fieldList, String savedId, 
@@ -57,7 +57,7 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
 	        String savedDefaultExpression, String savedDatePattern, String savedRequired, String savedReadable, 
 	        String savedWriteable, String savedFormValues) {
     // Pass the default styles here
-    this(parent, fieldList, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+    this(parent, fieldList, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
     this.savedId = savedId;
     this.savedName = savedName;
     this.savedType = savedType;
@@ -87,7 +87,7 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
 		Shell shell = new Shell(getParent(), getStyle());
 		shell.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
 		shell.setText(getText());
-		shell.setSize(700, 650);
+		shell.setSize(700, 700);
 		Point location = getParent().getShell().getLocation();
 		Point size = getParent().getShell().getSize();
 		shell.setLocation((location.x + size.x - 300) / 2, (location.y + size.y - 150) / 2);

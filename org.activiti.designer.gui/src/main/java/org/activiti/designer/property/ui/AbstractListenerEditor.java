@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.activiti.bpmn.model.ActivitiListener;
 import org.activiti.bpmn.model.FieldExtension;
+import org.activiti.bpmn.model.UserTask;
 import org.activiti.bpmn.model.alfresco.AlfrescoScriptTask;
 import org.activiti.bpmn.model.alfresco.AlfrescoUserTask;
 import org.activiti.designer.util.BpmnBOUtil;
@@ -21,18 +22,24 @@ import org.eclipse.swt.widgets.TableItem;
 
 public abstract class AbstractListenerEditor extends TableFieldEditor {
 	
+  protected static final int EXECUTION_LISTENER = 1;
+  protected static final int TASK_LISTENER = 2;
+  
 	protected Composite parent;
+	protected int listenerType;
+	
 	public PictogramElement pictogramElement;
 	public IDiagramEditor diagramEditor;
 	public Diagram diagram;
 	public boolean isSequenceFlow;
 	private List<ActivitiListener> listenerList;
 	
-	public AbstractListenerEditor(String key, Composite parent) {
+	public AbstractListenerEditor(String key, Composite parent, int listenerType) {
 		
     super(key, "", new String[] {"Listener implementation", "Type", "Event", "Fields"},
     		new int[] {200, 150, 100, 300}, parent);
     this.parent = parent;
+    this.listenerType = listenerType;
 	}
 	
 	public void initialize(List<ActivitiListener> listenerList) {
@@ -172,7 +179,11 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
           } else {
             setFieldsInListener(newListener, dialog.fieldExtensionList);
           }
-				  BpmnBOUtil.addListener(bo, newListener, diagram);
+				  if (listenerType == EXECUTION_LISTENER) {
+				    BpmnBOUtil.addExecutionListener(bo, newListener, diagram);
+				  } else {
+				    ((UserTask) bo).getTaskListeners().add(newListener);
+				  }
 				}
 			}, editingDomain, "Model Update");
 		}
@@ -239,7 +250,11 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
 					  } else {
 					    setFieldsInListener(listener, dialog.fieldExtensionList);
 					  }
-					  BpmnBOUtil.setListener(bo, listener, index, diagram);
+					  if (listenerType == EXECUTION_LISTENER) {
+					    BpmnBOUtil.setExecutionListener(bo, listener, index, diagram);
+					  } else {
+					    ((UserTask) bo).getTaskListeners().set(index, listener);
+					  }
 					}
 					
 				}
@@ -256,7 +271,11 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
 			TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
 			ActivitiUiUtil.runModelChange(new Runnable() {
 				public void run() {
-					BpmnBOUtil.removeListener(bo, listener, diagram);
+				  if (listenerType == EXECUTION_LISTENER) {
+				    BpmnBOUtil.removeExecutionListener(bo, listener, diagram);
+				  } else {
+				    ((UserTask) bo).getTaskListeners().remove(listener);
+				  }
 				}
 			}, editingDomain, "Model Update");
 		}

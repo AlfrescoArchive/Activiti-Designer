@@ -8,6 +8,10 @@ import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.eclipse.graphiti.features.IFeature;
+import org.eclipse.graphiti.features.context.IContext;
+import org.eclipse.graphiti.features.context.impl.CustomContext;
+import org.eclipse.graphiti.features.impl.AbstractFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.jdt.core.IJavaProject;
@@ -371,26 +375,45 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 			if (pe != null) {
 				final Object bo = getBusinessObject(pe);
 				if (bo instanceof ServiceTask) {
-					DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
-					TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
-					ActivitiUiUtil.runModelChange(new Runnable() {
-						@Override
-            public void run() {
-							ServiceTask serviceTask = (ServiceTask)  bo;
-							if (expressionText.isVisible() && expressionText.getText() != null) {
-								serviceTask.setImplementation(expressionText.getText());
-							}
-							if (delegateExpressionText.isVisible() && delegateExpressionText.getText() != null) {
-							  serviceTask.setImplementation(delegateExpressionText.getText());
-							}
-							if (resultVariableText.getText() != null) {
-							  serviceTask.setResultVariableName(resultVariableText.getText());
-							}
-						}
-					}, editingDomain, "Model Update");
+					updateServiceTask((ServiceTask) bo, e.getSource());
 				}
 
 			}
 		}
 	};
+	
+	protected void updateServiceTask(final ServiceTask serviceTask, final Object source) {
+    String oldValue = null;
+    final String newValue = ((Text) source).getText();
+    if (source == expressionText) {
+      oldValue = serviceTask.getImplementation();
+    } else if (source == delegateExpressionText) {
+      oldValue = serviceTask.getImplementation();
+    } else if (source == resultVariableText) {
+      oldValue = serviceTask.getResultVariableName();
+    }
+    
+    if ((StringUtils.isEmpty(oldValue) && StringUtils.isNotEmpty(newValue)) || (StringUtils.isNotEmpty(oldValue) && newValue.equals(oldValue) == false)) {
+      IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
+        
+        @Override
+        public void execute(IContext context) {
+          if (source == expressionText) {
+            serviceTask.setImplementation(newValue);
+          } else if (source == delegateExpressionText) {
+            serviceTask.setImplementation(newValue);
+          } else if (source == resultVariableText) {
+            serviceTask.setResultVariableName(newValue);
+          }
+        }
+        
+        @Override
+        public boolean canExecute(IContext context) {
+          return true;
+        }
+      };
+      CustomContext context = new CustomContext();
+      execute(feature, context);
+    }
+  }
 }

@@ -33,7 +33,7 @@ public class PropertyExecutionListenerSection extends ActivitiPropertySection im
 		
 		Composite listenersComposite = factory.createComposite(composite, SWT.WRAP);
 		data = new FormData();
-		data.left = new FormAttachment(0, 120);
+		data.left = new FormAttachment(0, 140);
 		data.right = new FormAttachment(100, 0);
 		data.top = new FormAttachment(0, VSPACE);
 		listenersComposite.setLayoutData(data);
@@ -44,7 +44,7 @@ public class PropertyExecutionListenerSection extends ActivitiPropertySection im
 		listenerEditor = new ExecutionListenerEditor("executionListenerEditor", listenersComposite);
 		listenerEditor.getLabelControl(listenersComposite).setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
 		
-		CLabel listenersLabel = factory.createCLabel(composite, "Listeners:"); //$NON-NLS-1$
+		CLabel listenersLabel = factory.createCLabel(composite, "Execution listeners:"); //$NON-NLS-1$
 		data = new FormData();
 		data.left = new FormAttachment(0, 0);
 		data.right = new FormAttachment(listenersComposite, -HSPACE);
@@ -62,7 +62,7 @@ public class PropertyExecutionListenerSection extends ActivitiPropertySection im
       if (bo == null)
         return;
       
-      List<ActivitiListener> executionListenerList = BpmnBOUtil.getListeners(bo, getDiagram());
+      List<ActivitiListener> executionListenerList = BpmnBOUtil.getExecutionListeners(bo, getDiagram());
       
       listenerEditor.pictogramElement = pe;
       listenerEditor.diagramEditor = getDiagramEditor();

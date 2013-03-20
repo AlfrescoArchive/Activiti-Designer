@@ -1,11 +1,13 @@
 package org.activiti.designer.property;
 
 import org.activiti.bpmn.model.ServiceTask;
-import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
-import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.apache.commons.lang.StringUtils;
+import org.eclipse.graphiti.features.IFeature;
+import org.eclipse.graphiti.features.context.IContext;
+import org.eclipse.graphiti.features.context.impl.CustomContext;
+import org.eclipse.graphiti.features.impl.AbstractFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.FocusEvent;
@@ -136,24 +138,65 @@ public class PropertyMailTaskSection extends ActivitiPropertySection implements 
 			if (pe != null) {
 				final Object bo = getBusinessObject(pe);
 				if (bo instanceof ServiceTask) {
-					DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
-					TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
-					ActivitiUiUtil.runModelChange(new Runnable() {
-						public void run() {
-						  ServiceTask mailTask = (ServiceTask) bo;
-						  setFieldString("to", toText.getText(), mailTask);
-						  setFieldString("from", fromText.getText(), mailTask);
-						  setFieldString("subject", subjectText.getText(), mailTask);
-						  setFieldString("cc", ccText.getText(), mailTask);
-						  setFieldString("bcc", bccText.getText(), mailTask);
-              setFieldString("charset", charsetText.getText(), mailTask);
-              setFieldString("html", htmlText.getText(), mailTask);
-              setFieldString("text", nonHtmlText.getText(), mailTask);
-						}
-					}, editingDomain, "Model Update");
+					ServiceTask mailTask = (ServiceTask) bo;
+					updateMailField(mailTask, e.getSource());
 				}
-
 			}
 		}
 	};
+	
+	protected void updateMailField(final ServiceTask mailTask, final Object source) {
+    String oldValue = null;
+    final String newValue = ((Text) source).getText();
+    if (source == toText) {
+      oldValue = getFieldString("to", mailTask);
+    } else if (source == fromText) {
+      oldValue = getFieldString("from", mailTask);
+    } else if (source == subjectText) {
+      oldValue = getFieldString("subject", mailTask);
+    } else if (source == ccText) {
+      oldValue = getFieldString("cc", mailTask);
+    } else if (source == bccText) {
+      oldValue = getFieldString("bcc", mailTask);
+    } else if (source == charsetText) {
+      oldValue = getFieldString("charset", mailTask);
+    } else if (source == htmlText) {
+      oldValue = getFieldString("html", mailTask);
+    } else if (source == nonHtmlText) {
+      oldValue = getFieldString("text", mailTask);
+    }
+    
+    if ((StringUtils.isEmpty(oldValue) && StringUtils.isNotEmpty(newValue)) || (StringUtils.isNotEmpty(oldValue) && newValue.equals(oldValue) == false)) {
+      IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
+        
+        @Override
+        public void execute(IContext context) {
+          if (source == toText) {
+            setFieldString("to", toText.getText(), mailTask);
+          } else if (source == fromText) {
+            setFieldString("from", fromText.getText(), mailTask);
+          } else if (source == subjectText) {
+            setFieldString("subject", subjectText.getText(), mailTask);
+          } else if (source == ccText) {
+            setFieldString("cc", ccText.getText(), mailTask);
+          } else if (source == bccText) {
+            setFieldString("bcc", bccText.getText(), mailTask);
+          } else if (source == charsetText) {
+            setFieldString("charset", charsetText.getText(), mailTask);
+          } else if (source == htmlText) {
+            setFieldString("html", htmlText.getText(), mailTask);
+          } else if (source == nonHtmlText) {
+            setFieldString("text", nonHtmlText.getText(), mailTask);
+          }
+        }
+        
+        @Override
+        public boolean canExecute(IContext context) {
+          return true;
+        }
+      };
+      CustomContext context = new CustomContext();
+      execute(feature, context);
+    }
+  }
 }

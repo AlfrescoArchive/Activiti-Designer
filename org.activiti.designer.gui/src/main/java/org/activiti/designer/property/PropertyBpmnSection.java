@@ -219,7 +219,7 @@ public class PropertyBpmnSection extends ActivitiPropertySection implements ITab
                 if (decorator.getGraphicsAlgorithm() instanceof org.eclipse.graphiti.mm.algorithms.MultiText) {
                   org.eclipse.graphiti.mm.algorithms.MultiText text = (org.eclipse.graphiti.mm.algorithms.MultiText) decorator.getGraphicsAlgorithm();
                   text.setValue(nameText.getText());
-                  TextUtil.setTextSize(nameText.getText(), text);
+                  TextUtil.setTextSize(text);
                 }
               }
             }

@@ -9,7 +9,7 @@ import org.eclipse.swt.widgets.TableItem;
 public class ExecutionListenerEditor extends AbstractListenerEditor {
 	
 	public ExecutionListenerEditor(String key, Composite parent) {
-    super(key, parent);
+    super(key, parent, EXECUTION_LISTENER);
   }
 
   @Override

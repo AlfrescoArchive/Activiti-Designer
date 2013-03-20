@@ -208,19 +208,21 @@ public class AddSequenceFlowFeature extends AbstractAddFeature {
       text.setFont(gaService.manageFont(getDiagram(), text.getFont().getName(), 11));
     }
     
+    // set reference name in the text decorator
+    text.setValue(addedSequenceFlow.getName());
+    
     if(addConContext.getProperty("org.activiti.designer.connectionlabel") != null) {
       GraphicInfo labelLocation = (GraphicInfo) addConContext.getProperty("org.activiti.designer.connectionlabel");
       gaService.setLocation(text, (int)labelLocation.getX(), (int)labelLocation.getY());
+      if (StringUtils.isNotEmpty(addedSequenceFlow.getName())) {
+        TextUtil.setTextSize((int) labelLocation.getWidth(), text);
+      }
     } else {
       gaService.setLocation(text, 10, 0);
+      if (StringUtils.isNotEmpty(addedSequenceFlow.getName())) {
+        TextUtil.setTextSize(text);
+      }
     }
-		
-		if (StringUtils.isNotEmpty(addedSequenceFlow.getName())) {
-		  TextUtil.setTextSize(addedSequenceFlow.getName(), text);
-		}
-
-		// set reference name in the text decorator
-		text.setValue(addedSequenceFlow.getName());
 
 		// add static graphical decorators (composition and navigable)
 		ConnectionDecorator cd = peCreateService.createConnectionDecorator(connection, false, 1.0, true);

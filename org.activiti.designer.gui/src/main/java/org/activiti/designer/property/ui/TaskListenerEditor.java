@@ -10,7 +10,7 @@ import org.eclipse.swt.widgets.TableItem;
 public class TaskListenerEditor extends AbstractListenerEditor {
 
   public TaskListenerEditor(String key, Composite parent) {
-    super(key, parent);
+    super(key, parent, TASK_LISTENER);
   }
 
   @Override

@@ -32,7 +32,7 @@ public class PropertyTaskListenerSection extends ActivitiPropertySection impleme
 		
 		Composite listenersComposite = factory.createComposite(composite, SWT.WRAP);
 		data = new FormData();
-		data.left = new FormAttachment(0, 120);
+		data.left = new FormAttachment(0, 140);
 		data.right = new FormAttachment(100, 0);
 		data.top = new FormAttachment(0, VSPACE);
 		listenersComposite.setLayoutData(data);
@@ -43,7 +43,7 @@ public class PropertyTaskListenerSection extends ActivitiPropertySection impleme
 		listenerEditor = new TaskListenerEditor("taskListenerEditor", listenersComposite);
 		listenerEditor.getLabelControl(listenersComposite).setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
 		
-		CLabel listenersLabel = factory.createCLabel(composite, "Listeners:"); //$NON-NLS-1$
+		CLabel listenersLabel = factory.createCLabel(composite, "Task listeners:"); //$NON-NLS-1$
 		data = new FormData();
 		data.left = new FormAttachment(0, 0);
 		data.right = new FormAttachment(listenersComposite, -HSPACE);

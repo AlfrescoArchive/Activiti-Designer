@@ -299,7 +299,12 @@ public class ActivitiDiagramEditor extends DiagramEditor {
         BpmnXMLConverter bpmnConverter = new BpmnXMLConverter();
         bpmnConverter.setUserTaskFormTypes(PreferencesUtil.getStringArray(Preferences.ALFRESCO_FORMTYPES_USERTASK));
         bpmnConverter.setStartEventFormTypes(PreferencesUtil.getStringArray(Preferences.ALFRESCO_FORMTYPES_STARTEVENT));
-        BpmnModel bpmnModel = bpmnConverter.convertToBpmnModel(xtr);
+        BpmnModel bpmnModel = null;
+        try {
+          bpmnModel = bpmnConverter.convertToBpmnModel(xtr);
+        } catch(Exception e) {
+          bpmnModel = new BpmnModel();
+        }
         model.setBpmnModel(bpmnModel);
 
         if (bpmnModel.getLocationMap().size() == 0) {
