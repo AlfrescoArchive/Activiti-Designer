@@ -1,11 +1,13 @@
 package com.alfresco.designer.gui.property;
 
 import org.activiti.bpmn.model.ServiceTask;
-import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
-import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.apache.commons.lang.StringUtils;
+import org.eclipse.graphiti.features.IFeature;
+import org.eclipse.graphiti.features.context.IContext;
+import org.eclipse.graphiti.features.context.impl.CustomContext;
+import org.eclipse.graphiti.features.impl.AbstractFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.FocusEvent;
@@ -86,21 +88,46 @@ public class PropertyAlfrescoScriptTaskSection extends ActivitiPropertySection i
 			if (pe != null) {
 				final Object bo = getBusinessObject(pe);
 				if (bo instanceof ServiceTask) {
-					DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
-					TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
-					ActivitiUiUtil.runModelChange(new Runnable() {
-						public void run() {
-							ServiceTask scriptTask = (ServiceTask) bo;
-							setFieldString("script", scriptText.getText(), scriptTask);
-							setFieldString("runAs", runAsText.getText(), scriptTask);
-							setFieldString("scriptProcessor", scriptProcessorText.getText(), scriptTask);
-						}
-					}, editingDomain, "Model Update");
+					updateScriptTaskField((ServiceTask) bo, e.getSource());
 				}
-
 			}
 		}
 	};
+	
+	protected void updateScriptTaskField(final ServiceTask scriptTask, final Object source) {
+    String oldValue = null;
+    final String newValue = ((Text) source).getText();
+    if (source == scriptText) {
+      oldValue = getFieldString("script", scriptTask);
+    } else if (source == runAsText) {
+      oldValue = getFieldString("runAs", scriptTask);
+    } else if (source == scriptProcessorText) {
+      oldValue = getFieldString("scriptProcessor", scriptTask);
+    }
+    
+    if ((StringUtils.isEmpty(oldValue) && StringUtils.isNotEmpty(newValue)) || (StringUtils.isNotEmpty(oldValue) && newValue.equals(oldValue) == false)) {
+      IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
+        
+        @Override
+        public void execute(IContext context) {
+          if (source == scriptText) {
+            setFieldString("script", newValue, scriptTask);
+          } else if (source == runAsText) {
+            setFieldString("runAs", newValue, scriptTask);
+          } else if (source == scriptProcessorText) {
+            setFieldString("scriptProcessor", newValue, scriptTask);
+          }
+        }
+        
+        @Override
+        public boolean canExecute(IContext context) {
+          return true;
+        }
+      };
+      CustomContext context = new CustomContext();
+      execute(feature, context);
+    }
+  }
 	
 	private Text createText(Composite parent, TabbedPropertySheetWidgetFactory factory, Control top) {
     Text text = factory.createText(parent, ""); //$NON-NLS-1$

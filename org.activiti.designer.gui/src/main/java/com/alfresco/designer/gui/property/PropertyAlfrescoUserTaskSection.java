@@ -147,7 +147,7 @@ public class PropertyAlfrescoUserTaskSection extends ActivitiPropertySection imp
 
     public void focusLost(final FocusEvent e) {
       final String performerType = performerTypeCombo.getText();
-      if (e.getSource() instanceof CCombo && !currentType.equalsIgnoreCase(performerType)) {
+      if (e.getSource() instanceof CCombo && currentType.equalsIgnoreCase(performerType) == false) {
         expressionText.setText("");
       }
       currentType = performerType;

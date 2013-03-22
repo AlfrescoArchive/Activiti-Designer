@@ -1,11 +1,13 @@
 package com.alfresco.designer.gui.property;
 
 import org.activiti.bpmn.model.ServiceTask;
-import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
-import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.apache.commons.lang.StringUtils;
+import org.eclipse.graphiti.features.IFeature;
+import org.eclipse.graphiti.features.context.IContext;
+import org.eclipse.graphiti.features.context.impl.CustomContext;
+import org.eclipse.graphiti.features.impl.AbstractFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.FocusEvent;
@@ -142,25 +144,65 @@ public class PropertyAlfrescoMailTaskSection extends ActivitiPropertySection imp
 			if (pe != null) {
 				final Object bo = getBusinessObject(pe);
 				if (bo instanceof ServiceTask) {
-					DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
-					TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
-					ActivitiUiUtil.runModelChange(new Runnable() {
-						public void run() {
-							ServiceTask mailTask = (ServiceTask)  bo;
-							setFieldString("mail.parameters.to", toText.getText(), mailTask);
-							setFieldString("mail.parameters.to_many", toManyText.getText(), mailTask);
-							setFieldString("mail.parameters.from", fromText.getText(), mailTask);
-							setFieldString("mail.parameters.subject", subjectText.getText(), mailTask);
-							setFieldString("mail.parameters.template", templateText.getText(), mailTask);
-							setFieldString("mail.parameters.template_model", templateModelText.getText(), mailTask);
-							setFieldString("mail.parameters.html", htmlText.getText(), mailTask);
-							setFieldString("mail.parameters.text", nonHtmlText.getText(), mailTask);
-						}
-					}, editingDomain, "Model Update");
+				  updateMailField((ServiceTask) bo, e.getSource());
 				}
-
 			}
 		}
 	};
+	
+	protected void updateMailField(final ServiceTask mailTask, final Object source) {
+    String oldValue = null;
+    final String newValue = ((Text) source).getText();
+    if (source == toText) {
+      oldValue = getFieldString("mail.parameters.to", mailTask);
+    } else if (source == toManyText) {
+      oldValue = getFieldString("mail.parameters.to_many", mailTask);
+    } else if (source == fromText) {
+      oldValue = getFieldString("mail.parameters.from", mailTask);
+    } else if (source == subjectText) {
+      oldValue = getFieldString("mail.parameters.subject", mailTask);
+    } else if (source == templateText) {
+      oldValue = getFieldString("mail.parameters.template", mailTask);
+    } else if (source == templateModelText) {
+      oldValue = getFieldString("mail.parameters.template_model", mailTask);
+    } else if (source == htmlText) {
+      oldValue = getFieldString("mail.parameters.html", mailTask);
+    } else if (source == nonHtmlText) {
+      oldValue = getFieldString("mail.parameters.text", mailTask);
+    }
+    
+    if ((StringUtils.isEmpty(oldValue) && StringUtils.isNotEmpty(newValue)) || (StringUtils.isNotEmpty(oldValue) && newValue.equals(oldValue) == false)) {
+      IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
+        
+        @Override
+        public void execute(IContext context) {
+          if (source == toText) {
+            setFieldString("mail.parameters.to", newValue, mailTask);
+          } else if (source == toManyText) {
+            setFieldString("mail.parameters.to_many", newValue, mailTask);
+          } else if (source == fromText) {
+            setFieldString("mail.parameters.from", newValue, mailTask);
+          } else if (source == subjectText) {
+            setFieldString("mail.parameters.subject", newValue, mailTask);
+          } else if (source == templateText) {
+            setFieldString("mail.parameters.template", newValue, mailTask);
+          } else if (source == templateModelText) {
+            setFieldString("mail.parameters.template_model", newValue, mailTask);
+          } else if (source == htmlText) {
+            setFieldString("mail.parameters.html", newValue, mailTask);
+          } else if (source == nonHtmlText) {
+            setFieldString("mail.parameters.text", newValue, mailTask);
+          }
+        }
+        
+        @Override
+        public boolean canExecute(IContext context) {
+          return true;
+        }
+      };
+      CustomContext context = new CustomContext();
+      execute(feature, context);
+    }
+  }
 
 }

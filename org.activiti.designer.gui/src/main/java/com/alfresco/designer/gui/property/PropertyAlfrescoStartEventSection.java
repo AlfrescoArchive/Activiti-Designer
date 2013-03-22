@@ -7,7 +7,12 @@ import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.preferences.Preferences;
 import org.activiti.designer.util.property.ActivitiPropertySection;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.eclipse.graphiti.features.IFeature;
+import org.eclipse.graphiti.features.context.IContext;
+import org.eclipse.graphiti.features.context.impl.CustomContext;
+import org.eclipse.graphiti.features.impl.AbstractFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.swt.SWT;
@@ -107,4 +112,25 @@ public class PropertyAlfrescoStartEventSection extends ActivitiPropertySection i
 		}
 	};
 
+	protected void updateStartEventField(final StartEvent startEvent, final Object source) {
+    String oldValue = startEvent.getFormKey();
+    final String newValue = ((CCombo) source).getText();
+    
+    if ((StringUtils.isEmpty(oldValue) && StringUtils.isNotEmpty(newValue)) || (StringUtils.isNotEmpty(oldValue) && newValue.equals(oldValue) == false)) {
+      IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
+        
+        @Override
+        public void execute(IContext context) {
+          startEvent.setFormKey(newValue);
+        }
+        
+        @Override
+        public boolean canExecute(IContext context) {
+          return true;
+        }
+      };
+      CustomContext context = new CustomContext();
+      execute(feature, context);
+    }
+  }
 }

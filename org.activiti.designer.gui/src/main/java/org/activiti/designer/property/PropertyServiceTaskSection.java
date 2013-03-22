@@ -43,18 +43,19 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
 public class PropertyServiceTaskSection extends ActivitiPropertySection implements ITabbedPropertyConstants {
 
-	private Button expressionTypeButton;
-	private Button delegateExpressionTypeButton;
-	private Button classTypeButton;
-	private Text classNameText;
-	private Button classSelectButton;
-	private CLabel classSelectLabel;
-	private Text expressionText;
-	private CLabel expressionLabel;
-	private Text delegateExpressionText;
-	private CLabel delegateExpressionLabel;
-	private Text resultVariableText;
-	private FieldExtensionEditor fieldEditor;
+	protected Button expressionTypeButton;
+	protected Button delegateExpressionTypeButton;
+	protected Button classTypeButton;
+	protected Text classNameText;
+	protected Button classSelectButton;
+	protected CLabel classSelectLabel;
+	protected Text expressionText;
+	protected CLabel expressionLabel;
+	protected Text delegateExpressionText;
+	protected CLabel delegateExpressionLabel;
+	protected Text resultVariableText;
+	protected FieldExtensionEditor fieldEditor;
+	protected Text documentationText;
 
 	@Override
 	public void createControls(Composite parent, TabbedPropertySheetPage tabbedPropertySheetPage) {
@@ -82,7 +83,7 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 				setVisibleClassType(true);
 				setVisibleExpressionType(false);
 				setVisibleDelegateExpressionType(false);
-				saveImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
+				saveImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS, classNameText.getText());
 			}
 
 			@Override
@@ -100,7 +101,7 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 				setVisibleClassType(false);
 				setVisibleExpressionType(true);
 				setVisibleDelegateExpressionType(false);
-				saveImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
+				saveImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION, expressionText.getText());
 			}
 
 			@Override
@@ -119,7 +120,7 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 		    setVisibleClassType(false);
 		    setVisibleExpressionType(false);
 		    setVisibleDelegateExpressionType(true);
-		    saveImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
+		    saveImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION, delegateExpressionText.getText());
 		  }
 
 		  @Override
@@ -273,7 +274,21 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 		data.right = new FormAttachment(extensionsComposite, -HSPACE);
 		data.top = new FormAttachment(extensionsComposite, 0, SWT.TOP);
 		extensionLabel.setLayoutData(data);
-
+		
+		documentationText = factory.createText(composite, "", SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL); //$NON-NLS-1$
+    data = new FormData(SWT.DEFAULT, 100);
+    data.left = new FormAttachment(0, 160);
+    data.right = new FormAttachment(100, 0);
+    data.top = new FormAttachment(extensionsComposite, VSPACE);
+    documentationText.setLayoutData(data);
+    documentationText.addFocusListener(listener);
+    
+    CLabel documentationLabel = factory.createCLabel(composite, "Documentation:"); //$NON-NLS-1$
+    data = new FormData();
+    data.left = new FormAttachment(0, 0);
+    data.right = new FormAttachment(documentationText, -HSPACE);
+    data.top = new FormAttachment(documentationText, 0, SWT.TOP);
+    documentationLabel.setLayoutData(data);
 	}
 
 	@Override
@@ -283,6 +298,7 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 			expressionText.removeFocusListener(listener);
 			delegateExpressionText.removeFocusListener(listener);
 			resultVariableText.removeFocusListener(listener);
+			documentationText.removeFocusListener(listener);
 			Object bo = getBusinessObject(pe);
 			if (bo == null) {
         return;
@@ -313,18 +329,26 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 			} else {
 			  resultVariableText.setText("");
 			}
+			
+			if (StringUtils.isNotEmpty(serviceTask.getDocumentation())) {
+			  documentationText.setText(serviceTask.getDocumentation());
+      } else {
+        documentationText.setText("");
+			}
 
 			fieldEditor.pictogramElement = pe;
 			fieldEditor.diagramEditor = getDiagramEditor();
 			fieldEditor.diagram = getDiagram();
 			fieldEditor.initialize(serviceTask.getFieldExtensions());
+			
 			expressionText.addFocusListener(listener);
 			delegateExpressionText.addFocusListener(listener);
 			resultVariableText.addFocusListener(listener);
+			documentationText.addFocusListener(listener);
 		}
 	}
 
-	private void saveImplementationType(final String type) {
+	private void saveImplementationType(final String type, final String value) {
 		PictogramElement pe = getSelectedPictogramElement();
 		if (pe != null) {
 			final Object bo = getBusinessObject(pe);
@@ -336,7 +360,7 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
           public void run() {
 						ServiceTask serviceTask = (ServiceTask)  bo;
 						serviceTask.setImplementationType(type);
-						serviceTask.setImplementation("");
+						serviceTask.setImplementation(value);
 					}
 				}, editingDomain, "Model Update");
 			}
@@ -391,6 +415,8 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
       oldValue = serviceTask.getImplementation();
     } else if (source == resultVariableText) {
       oldValue = serviceTask.getResultVariableName();
+    } else if (source == documentationText) {
+      oldValue = serviceTask.getDocumentation();
     }
     
     if ((StringUtils.isEmpty(oldValue) && StringUtils.isNotEmpty(newValue)) || (StringUtils.isNotEmpty(oldValue) && newValue.equals(oldValue) == false)) {
@@ -404,6 +430,8 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
             serviceTask.setImplementation(newValue);
           } else if (source == resultVariableText) {
             serviceTask.setResultVariableName(newValue);
+          } else if (source == documentationText) {
+            serviceTask.setDocumentation(newValue);
           }
         }
         
