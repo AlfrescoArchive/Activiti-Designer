@@ -9,7 +9,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.activiti.bpmn.model.Association;
 import org.activiti.bpmn.model.BoundaryEvent;
 import org.activiti.bpmn.model.BusinessRuleTask;
 import org.activiti.bpmn.model.CallActivity;
@@ -26,7 +25,6 @@ import org.activiti.bpmn.model.ParallelGateway;
 import org.activiti.bpmn.model.Pool;
 import org.activiti.bpmn.model.ReceiveTask;
 import org.activiti.bpmn.model.ScriptTask;
-import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.bpmn.model.SignalEventDefinition;
 import org.activiti.bpmn.model.StartEvent;
@@ -74,9 +72,7 @@ import org.activiti.designer.features.CreateTextAnnotationFeature;
 import org.activiti.designer.features.CreateTimerCatchingEventFeature;
 import org.activiti.designer.features.CreateTimerStartEventFeature;
 import org.activiti.designer.features.CreateUserTaskFeature;
-import org.activiti.designer.features.DeleteAssociationFeature;
 import org.activiti.designer.features.DeletePoolFeature;
-import org.activiti.designer.features.DeleteSequenceFlowFeature;
 import org.activiti.designer.features.contextmenu.OpenCalledElementForCallActivity;
 import org.activiti.designer.integration.palette.PaletteEntry;
 import org.activiti.designer.util.ActivitiConstants;
@@ -510,17 +506,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
           continue;
         }
         Object object = getFeatureProvider().getBusinessObjectForPictogramElement(pictogramElement);
-        if (object instanceof SequenceFlow) {
-          ContextMenuEntry subMenuDelete = new ContextMenuEntry(new DeleteSequenceFlowFeature(getFeatureProvider()), context);
-          subMenuDelete.setText("Delete sequence flow"); //$NON-NLS-1$
-          subMenuDelete.setSubmenu(false);
-          menuList.add(subMenuDelete);
-        } else if (object instanceof Association) {
-          final ContextMenuEntry subMenuDelete = new ContextMenuEntry(new DeleteAssociationFeature(getFeatureProvider()), context);
-          subMenuDelete.setText(subMenuDelete.getFeature().getDescription());
-          subMenuDelete.setSubmenu(false);
-          menuList.add(subMenuDelete);
-        } else if (object instanceof Pool) {
+        if (object instanceof Pool) {
           ContextMenuEntry subMenuDelete = new ContextMenuEntry(new DeletePoolFeature(getFeatureProvider()), context);
           subMenuDelete.setText("Delete pool"); //$NON-NLS-1$
           subMenuDelete.setSubmenu(false);

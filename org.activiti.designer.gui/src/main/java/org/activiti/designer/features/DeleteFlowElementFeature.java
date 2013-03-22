@@ -5,11 +5,15 @@ import java.util.Collection;
 import java.util.List;
 
 import org.activiti.bpmn.model.Activity;
+import org.activiti.bpmn.model.Artifact;
+import org.activiti.bpmn.model.Association;
 import org.activiti.bpmn.model.BaseElement;
 import org.activiti.bpmn.model.BoundaryEvent;
+import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.bpmn.model.CallActivity;
 import org.activiti.bpmn.model.Event;
 import org.activiti.bpmn.model.FlowElement;
+import org.activiti.bpmn.model.FlowElementsContainer;
 import org.activiti.bpmn.model.FlowNode;
 import org.activiti.bpmn.model.Gateway;
 import org.activiti.bpmn.model.Lane;
@@ -19,7 +23,6 @@ import org.activiti.bpmn.model.SubProcess;
 import org.activiti.bpmn.model.Task;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
-import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.ui.features.DefaultDeleteFeature;
@@ -33,6 +36,11 @@ public class DeleteFlowElementFeature extends DefaultDeleteFeature {
 	protected void deleteBusinessObject(Object bo) {
 		if (bo instanceof Task || bo instanceof Gateway || bo instanceof Event || bo instanceof SubProcess || bo instanceof CallActivity) {
 		  deleteSequenceFlows((FlowNode) bo);
+		  deleteAssociations((FlowNode) bo);
+		}
+		
+		if (bo instanceof SequenceFlow) {
+		  deletedConnectingFlows((SequenceFlow) bo);
 		}
 
 		if (bo instanceof SubProcess || bo instanceof Task) {
@@ -120,29 +128,83 @@ public class DeleteFlowElementFeature extends DefaultDeleteFeature {
 	}
 	
 	private void deletedConnectingFlows(SequenceFlow sequenceFlow) {
-	  for (EObject diagramObject : getDiagram().eResource().getContents()) {
-  	  if(diagramObject instanceof FlowNode) {
-        SequenceFlow foundIncoming = null;
-        SequenceFlow foundOutgoing = null;
-        for(SequenceFlow flow : ((FlowNode) diagramObject).getIncomingFlows()) {
-          if(flow.getId().equals(sequenceFlow.getId())) {
-            foundIncoming = flow;
-          }
-        }
-        for(SequenceFlow flow : ((FlowNode) diagramObject).getOutgoingFlows()) {
-          if(flow.getId().equals(sequenceFlow.getId())) {
-            foundOutgoing = flow;
-          }
-        }
-        if(foundIncoming != null) {
-          ((FlowNode) diagramObject).getIncomingFlows().remove(foundIncoming);
-        }
-        if(foundOutgoing != null) {
-          ((FlowNode) diagramObject).getOutgoingFlows().remove(foundOutgoing);
+	  BpmnModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getBpmnModel();
+	  FlowElement sourceElement = model.getFlowElement(sequenceFlow.getSourceRef());
+	  FlowElement targetElement = model.getFlowElement(sequenceFlow.getTargetRef());
+	  if (sourceElement != null) {
+      ((FlowNode) sourceElement).getOutgoingFlows().remove(sequenceFlow);
+    }
+    if (targetElement != null) {
+      ((FlowNode) targetElement).getIncomingFlows().remove(sequenceFlow);
+    }
+	}
+	
+	private void deleteAssociations(FlowNode flowNode) {
+    List<Process> processes = ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getBpmnModel().getProcesses();
+    for (Process process : processes) {
+      removeAssociation(process.getArtifacts(), flowNode);
+      removeAssociationInProcess(process, flowNode);
+    }
+  }
+  
+  private void removeAssociationInProcess(FlowElementsContainer parentElement, FlowNode flowNode) {
+    Collection<FlowElement> elementList = parentElement.getFlowElements();
+    for (FlowElement flowElement : elementList) {
+      if(flowElement instanceof SubProcess) {
+        SubProcess subProcess = (SubProcess) flowElement;
+        removeAssociation(subProcess.getArtifacts(), flowNode);
+        removeAssociationInProcess(subProcess, flowNode);
+      }
+    }
+  }
+  
+  protected void removeAssociation(Collection<Artifact> artifacts, FlowNode flowNode) {
+    List<Association> toDeleteAssociations = new ArrayList<Association>();
+    for (Artifact artifact : artifacts) {
+      if (artifact instanceof Association) {
+        Association association = (Association) artifact;
+        if (association.getSourceRef().equals(flowNode.getId()) || association.getTargetRef().equals(flowNode.getId())) {
+          toDeleteAssociations.add(association);
         }
       }
-	  }
-	}
+    }
+    
+    for (Association deleteObject : toDeleteAssociations) {
+      deletedConnectingFlows(deleteObject);
+      removeArtifact(deleteObject);
+    }
+  }
+  
+  private void deletedConnectingFlows(Association association) {
+    BpmnModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getBpmnModel();
+    FlowElement sourceElement = model.getFlowElement(association.getSourceRef());
+    FlowElement targetElement = model.getFlowElement(association.getTargetRef());
+    if (sourceElement != null) {
+      ((FlowNode) sourceElement).getOutgoingFlows().remove(association);
+    }
+    if (targetElement != null) {
+      ((FlowNode) targetElement).getIncomingFlows().remove(association);
+    }
+  }
+  
+  private void removeArtifact(Artifact element) {
+    List<Process> processes = ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getBpmnModel().getProcesses();
+    for (Process process : processes) {
+      process.removeArtifact(element.getId());
+      removeArtifactInProcess(element, process);
+    }
+  }
+  
+  private void removeArtifactInProcess(Artifact element, FlowElementsContainer parentElement) {
+    Collection<FlowElement> elementList = parentElement.getFlowElements();
+    for (FlowElement flowElement : elementList) {
+      if(flowElement instanceof SubProcess) {
+        SubProcess subProcess = (SubProcess) flowElement;
+        subProcess.removeArtifact(element.getId());
+        removeArtifactInProcess(element, subProcess);
+      }
+    }
+  }
 
 	private FlowElement getFlowElement(FlowElement flowElement) {
 	  Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));

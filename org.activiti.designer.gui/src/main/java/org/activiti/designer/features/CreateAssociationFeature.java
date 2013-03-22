@@ -53,16 +53,15 @@ public class CreateAssociationFeature extends AbstractCreateBPMNConnectionFeatur
       // create new association
       final Association association = createAssociation(sourceBo, targetBo, context);
       
-      final AddConnectionContext addContext = new AddConnectionContext(sourceAnchor
-                                                                     , targetAnchor);
+      final AddConnectionContext addContext = new AddConnectionContext(sourceAnchor, targetAnchor);
       addContext.setNewObject(association);
       
       return (Connection) getFeatureProvider().addIfPossible(addContext);
     }
   }
   
-  private Association createAssociation(final BaseElement sourceBo, final BaseElement targetBo
-                                      , final ICreateConnectionContext context) {
+  private Association createAssociation(final BaseElement sourceBo, final BaseElement targetBo, 
+          final ICreateConnectionContext context) {
     
     final Association association = new Association();
     

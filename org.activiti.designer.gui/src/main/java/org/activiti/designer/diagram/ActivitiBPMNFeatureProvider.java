@@ -1,6 +1,7 @@
 package org.activiti.designer.diagram;
 
 import org.activiti.bpmn.model.Activity;
+import org.activiti.bpmn.model.Artifact;
 import org.activiti.bpmn.model.Association;
 import org.activiti.bpmn.model.BoundaryEvent;
 import org.activiti.bpmn.model.BusinessRuleTask;
@@ -111,11 +112,10 @@ import org.activiti.designer.features.CreateTextAnnotationFeature;
 import org.activiti.designer.features.CreateTimerCatchingEventFeature;
 import org.activiti.designer.features.CreateTimerStartEventFeature;
 import org.activiti.designer.features.CreateUserTaskFeature;
-import org.activiti.designer.features.DeleteAssociationFeature;
 import org.activiti.designer.features.DeleteFlowElementFeature;
 import org.activiti.designer.features.DeleteLaneFeature;
 import org.activiti.designer.features.DeletePoolFeature;
-import org.activiti.designer.features.DeleteSequenceFlowFeature;
+import org.activiti.designer.features.DeleteArtifactFeature;
 import org.activiti.designer.features.DirectEditFlowElementFeature;
 import org.activiti.designer.features.DirectEditTextAnnotationFeature;
 import org.activiti.designer.features.LayoutTextAnnotationFeature;
@@ -357,6 +357,8 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
       return new DeleteFlowElementFeature(this);
     } else if(bo instanceof Lane || bo instanceof Pool) {
       return new DeleteLaneFeature(this);
+    } else if(bo instanceof Artifact) {
+      return new DeleteArtifactFeature(this);
     }
 	  return super.getDeleteFeature(context);
 	}
@@ -469,8 +471,7 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
   @Override
 	public ICustomFeature[] getCustomFeatures(ICustomContext context) {
 		return new ICustomFeature[] { new SaveBpmnModelFeature(this),
-				new DeleteSequenceFlowFeature(this), new DeletePoolFeature(this), new ChangeElementTypeFeature(this),
-				new DeleteAssociationFeature(this) };
+				new DeletePoolFeature(this), new ChangeElementTypeFeature(this) };
 	}
 
   public POJOIndependenceSolver getPojoIndependenceSolver() {
