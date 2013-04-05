@@ -39,7 +39,9 @@ public class GraphitiToBpmnDI {
   }
 
   public void processGraphitiElements() throws Exception {
-    
+    model.getBpmnModel().getFlowLocationMap().clear();
+    model.getBpmnModel().getLocationMap().clear();
+    model.getBpmnModel().getLabelLocationMap().clear();
     List<Pool> toDeletePoolList = new ArrayList<Pool>();
     for (Pool pool : model.getBpmnModel().getPools()) {
       PictogramElement pictElementPool = featureProvider.getPictogramElementForBusinessObject(pool);
