@@ -210,6 +210,13 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
   
   protected void updateCandidates(UserTask userTask, Object source) {
     String candidates = ((Text) source).getText();
+    
+    if (source == candidateUsersText) {
+      userTask.getCandidateUsers().clear();
+    } else {
+      userTask.getCandidateGroups().clear();
+    }
+    
     if (StringUtils.isNotEmpty(candidates)) {
       String[] expressionList = null;
       if (candidates.contains(",")) {
@@ -218,12 +225,6 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
         expressionList = new String[] { candidates };
       }
       
-      if (source == candidateUsersText) {
-        userTask.getCandidateUsers().clear();
-      } else {
-        userTask.getCandidateGroups().clear();
-      }
-
       for (String user : expressionList) {
         if (source == candidateUsersText) {
           userTask.getCandidateUsers().add(user.trim());
