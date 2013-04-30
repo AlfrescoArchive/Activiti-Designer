@@ -3,10 +3,10 @@
 <schema targetNamespace="org.activiti.designer.eclipse" xmlns="http://www.w3.org/2001/XMLSchema">
 <annotation>
       <appinfo>
-         <meta.schema plugin="org.activiti.designer.eclipse" id="org.activiti.designer.eclipse.extension.validation.ProcessValidator" name="ProcessValidator"/>
+         <meta.schema plugin="org.activiti.designer.eclipse" id="org.activiti.designer.extension.ExportMarshaller" name="Activiti Designer Export Marshaller"/>
       </appinfo>
       <documentation>
-         [Enter description of this extension point.]
+         Use this extension point to provide custom output marshallers when Activiti diagrams are exported.
       </documentation>
    </annotation>
 
@@ -18,7 +18,7 @@
       </annotation>
       <complexType>
          <sequence>
-            <element ref="ProcessValidator"/>
+            <element ref="ExportMarshaller"/>
          </sequence>
          <attribute name="point" type="string" use="required">
             <annotation>
@@ -47,15 +47,15 @@
       </complexType>
    </element>
 
-   <element name="ProcessValidator">
+   <element name="ExportMarshaller">
       <complexType>
          <attribute name="class" type="string" use="required">
             <annotation>
                <documentation>
-                  Provide a class that implements the ProcessValidator interface. An instance of this class will be created and invoked when the user chooses to validate the diagram (or, when this is done automatically by Activiti Designer).
+                  Provide a class that implements the ExportMarshaller interface. An instance of this class will be created and invoked when the user chooses to export to your format.
                </documentation>
                <appinfo>
-                  <meta.attribute kind="java" basedOn=":org.activiti.designer.eclipse.extension.validation.ProcessValidator"/>
+                  <meta.attribute kind="java" basedOn=":org.activiti.designer.eclipse.extension.export.ExportMarshaller"/>
                </appinfo>
             </annotation>
          </attribute>
@@ -67,7 +67,7 @@
          <meta.section type="since"/>
       </appinfo>
       <documentation>
-         [Enter the first release in which this extension point appears.]
+         0.5.1
       </documentation>
    </annotation>
 

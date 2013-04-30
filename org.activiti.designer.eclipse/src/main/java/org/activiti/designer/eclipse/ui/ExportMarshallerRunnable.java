@@ -17,12 +17,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.activiti.designer.eclipse.extension.export.ExportMarshaller;
+import org.activiti.designer.eclipse.extension.export.ExportMarshallerContext;
 import org.activiti.designer.eclipse.util.ExtensionPointUtil;
+import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.SafeRunner;
 import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.jface.operation.IRunnableWithProgress;
 
 /**
@@ -39,22 +40,22 @@ public class ExportMarshallerRunnable implements IRunnableWithProgress {
    */
   private static final int WORK_UNITS_PER_MARSHALLER = 100;
 
-  private Diagram diagram;
+  private Bpmn2MemoryModel model;
   private Collection<ExportMarshaller> marshallers;
 
-  public ExportMarshallerRunnable(final Diagram diagram, final Collection<ExportMarshaller> marshallers) {
-    this.diagram = diagram;
+  public ExportMarshallerRunnable(final Bpmn2MemoryModel model, final Collection<ExportMarshaller> marshallers) {
+    this.model = model;
     this.marshallers = marshallers;
   }
 
-  public ExportMarshallerRunnable(final Diagram diagram, final ExportMarshaller marshaller) {
-    this.diagram = diagram;
+  public ExportMarshallerRunnable(final Bpmn2MemoryModel model, final ExportMarshaller marshaller) {
+    this.model = model;
     this.marshallers = new ArrayList<ExportMarshaller>();
     this.marshallers.add(marshaller);
   }
 
-  public ExportMarshallerRunnable(final Diagram diagram, final String marshallerName) {
-    this.diagram = diagram;
+  public ExportMarshallerRunnable(final Bpmn2MemoryModel model, final String marshallerName) {
+    this.model = model;
     this.marshallers = new ArrayList<ExportMarshaller>();
     final ExportMarshaller marshaller = ExtensionPointUtil.getExportMarshaller(marshallerName);
     if (marshaller == null) {
@@ -76,7 +77,7 @@ public class ExportMarshallerRunnable implements IRunnableWithProgress {
           final IProgressMonitor subMonitor = new SubProgressMonitor(monitor, WORK_UNITS_PER_MARSHALLER);
           try {
             monitor.subTask(String.format("Saving diagram to %s format", marshaller.getFormatName()));
-            invokeExportMarshaller(marshaller, diagram, subMonitor);
+            invokeExportMarshaller(marshaller, model, subMonitor);
           } finally {
             // enforce calling of done() if the client hasn't
             // done so itself
@@ -89,7 +90,7 @@ public class ExportMarshallerRunnable implements IRunnableWithProgress {
     }
   }
 
-  private void invokeExportMarshaller(final ExportMarshaller exportMarshaller, final Diagram diagram, final IProgressMonitor monitor) {
+  private void invokeExportMarshaller(final ExportMarshaller exportMarshaller, final Bpmn2MemoryModel model, final IProgressMonitor monitor) {
 
     ISafeRunnable runnable = new ISafeRunnable() {
 
@@ -100,7 +101,19 @@ public class ExportMarshallerRunnable implements IRunnableWithProgress {
 
       @Override
       public void run() throws Exception {
-        exportMarshaller.marshallDiagram(diagram, monitor);
+        final ExportMarshallerContext context = new ExportMarshallerContext() {
+
+          @Override
+          public IProgressMonitor getProgressMonitor() {
+            return monitor;
+          }
+
+          @Override
+          public Bpmn2MemoryModel getBpmnModel() {
+            return model;
+          }
+        };
+        exportMarshaller.marshallDiagram(context);
       }
     };
     SafeRunner.run(runnable);

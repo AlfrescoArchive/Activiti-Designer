@@ -31,8 +31,11 @@ import org.activiti.bpmn.model.Process;
 import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.bpmn.model.SubProcess;
+import org.activiti.designer.eclipse.extension.export.ExportMarshaller;
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.eclipse.ui.ActivitiEditorContextMenuProvider;
+import org.activiti.designer.eclipse.ui.ExportMarshallerRunnable;
+import org.activiti.designer.eclipse.util.ExtensionPointUtil;
 import org.activiti.designer.eclipse.util.FileService;
 import org.activiti.designer.integration.servicetask.CustomServiceTask;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
@@ -82,6 +85,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.progress.IProgressService;
 
 public class ActivitiDiagramEditor extends DiagramEditor {
 
@@ -178,6 +183,12 @@ public class ActivitiDiagramEditor extends DiagramEditor {
       if (saveImage) {
         marshallImage(model, diagramFileString);
       }
+
+      // invoke marshallers
+      final Collection<ExportMarshaller> marshallers = ExtensionPointUtil.getExportMarshallers();
+      final ExportMarshallerRunnable runnable = new ExportMarshallerRunnable(model, marshallers);
+      final IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+      progressService.busyCursorWhile(runnable);
 
       dataFile.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
 
@@ -302,7 +313,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
         BpmnModel bpmnModel = null;
         try {
           bpmnModel = bpmnConverter.convertToBpmnModel(xtr);
-        } catch(Exception e) {
+        } catch (Exception e) {
           bpmnModel = new BpmnModel();
         }
         model.setBpmnModel(bpmnModel);

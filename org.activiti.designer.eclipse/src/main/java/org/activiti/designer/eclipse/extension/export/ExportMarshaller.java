@@ -3,13 +3,13 @@
  */
 package org.activiti.designer.eclipse.extension.export;
 
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.graphiti.mm.pictograms.Diagram;
 
 /**
+ * Produces customized output when exporting diagrams. ExportMarshallers are
+ * invoked (if the user has the preference set in Eclipse's settings) when
+ * diagrams are saved.
+ * 
  * @author Tiese Barrell
- * @since 0.5.1
- * @version 1
  * 
  */
 public interface ExportMarshaller {
@@ -59,20 +59,13 @@ public interface ExportMarshaller {
   String getFormatName();
 
   /**
-   * Transforms content in the original diagram into this marshaller's own
-   * format.
+   * Transforms content in the model into this marshaller's own format.
    * 
-   * <p>
-   * The {@link IProgressMonitor} provided should be used to indicate progress
-   * made in the marshaller and will be reported to the user.
-   * 
-   * @param diagram
-   *          the diagram to be marshalled
-   * @param monitor
-   *          the monitor used to indicate progress of this marshaller
+   * @param context
+   *          the context for marshalling
    * 
    * @return the transformed diagram as a byte[]
    */
-  void marshallDiagram(Diagram diagram, IProgressMonitor monitor);
+  void marshallDiagram(ExportMarshallerContext context);
 
 }

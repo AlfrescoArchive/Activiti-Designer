@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.7"?>
+<plugin>
+   <extension
+         point="org.activiti.designer.eclipse.extension.ExportMarshaller">
+      <ExportMarshaller
+            class="org.activiti.designer.examples.textexportmarshaller.impl.TextExportMarshaller">
+      </ExportMarshaller>
+   </extension>
+</plugin>
