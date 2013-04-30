@@ -10,20 +10,20 @@ import org.eclipse.ui.PartInitException;
 
 public class ActivitiDiagramMatchingStrategy implements IEditorMatchingStrategy {
 
-	@Override
+  @Override
   public boolean matches(final IEditorReference editorRef, final IEditorInput input) {
 
-	  try {
-  	  final IFile newDataFile = FileService.getDataFileForInput(input);
-  	  final IFile openEditorDataFile = FileService.getDataFileForInput(editorRef.getEditorInput());
+    try {
+      final IFile newDataFile = FileService.getDataFileForInput(input);
+      final IFile openEditorDataFile = FileService.getDataFileForInput(editorRef.getEditorInput());
 
-  	  if (newDataFile.equals(openEditorDataFile)) {
-  	    return true;
-  	  }
-	  } catch (PartInitException exception) {
+      if (null != newDataFile && newDataFile.equals(openEditorDataFile)) {
+        return true;
+      }
+    } catch (PartInitException exception) {
       exception.printStackTrace();
     }
 
-	  return new DiagramEditorMatchingStrategy().matches(editorRef, input);
-	}
+    return new DiagramEditorMatchingStrategy().matches(editorRef, input);
+  }
 }
