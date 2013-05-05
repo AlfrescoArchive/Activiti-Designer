@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -164,31 +165,16 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     try {
       final IFile dataFile = adei.getDataFile();
       final String diagramFileString = dataFile.getLocationURI().getPath();
-
-      boolean saveImage = PreferencesUtil.getBooleanPreference(Preferences.SAVE_IMAGE);
       Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagramTypeProvider().getDiagram()));
 
-      // add sequence flow bend-points to the model
-      final IFeatureProvider featureProvider = getDiagramTypeProvider().getFeatureProvider();
-      new GraphitiToBpmnDI(model, featureProvider).processGraphitiElements();
+      // Save the bpmn diagram file
+      doSaveToBpmn(model, diagramFileString);
 
-      BpmnXMLConverter converter = new BpmnXMLConverter();
-      byte[] xmlBytes = converter.convertToXML(model.getBpmnModel());
+      // Save an image of the diagram
+      doSaveImage(diagramFileString, model);
 
-      File objectsFile = new File(diagramFileString);
-      FileOutputStream fos = new FileOutputStream(objectsFile);
-      fos.write(xmlBytes);
-      fos.close();
-
-      if (saveImage) {
-        marshallImage(model, diagramFileString);
-      }
-
-      // invoke marshallers
-      final Collection<ExportMarshaller> marshallers = ExtensionPointUtil.getExportMarshallers();
-      final ExportMarshallerRunnable runnable = new ExportMarshallerRunnable(model, marshallers);
-      final IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
-      progressService.busyCursorWhile(runnable);
+      // Invoke export marshallers to produce additional output
+      doInvokeExportMarshallers(model);
 
       dataFile.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
 
@@ -199,6 +185,29 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 
     ((BasicCommandStack) getEditingDomain().getCommandStack()).saveIsDone();
     updateDirtyState();
+  }
+
+  private void doSaveToBpmn(final Bpmn2MemoryModel model, final String diagramFileString) throws Exception {
+
+    // add sequence flow bend-points to the model
+    final IFeatureProvider featureProvider = getDiagramTypeProvider().getFeatureProvider();
+    new GraphitiToBpmnDI(model, featureProvider).processGraphitiElements();
+
+    BpmnXMLConverter converter = new BpmnXMLConverter();
+    byte[] xmlBytes = converter.convertToXML(model.getBpmnModel());
+
+    File objectsFile = new File(diagramFileString);
+    FileOutputStream fos = new FileOutputStream(objectsFile);
+    fos.write(xmlBytes);
+    fos.close();
+
+  }
+
+  private void doSaveImage(final String diagramFileString, Bpmn2MemoryModel model) {
+    boolean saveImage = PreferencesUtil.getBooleanPreference(Preferences.SAVE_IMAGE);
+    if (saveImage) {
+      marshallImage(model, diagramFileString);
+    }
   }
 
   private void marshallImage(Bpmn2MemoryModel model, String modelFileName) {
@@ -272,6 +281,13 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     } catch (Exception e) {
       e.printStackTrace();
     }
+  }
+
+  private void doInvokeExportMarshallers(final Bpmn2MemoryModel model) throws InvocationTargetException, InterruptedException {
+    final Collection<ExportMarshaller> marshallers = ExtensionPointUtil.getExportMarshallers();
+    final ExportMarshallerRunnable runnable = new ExportMarshallerRunnable(model, marshallers);
+    final IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+    progressService.busyCursorWhile(runnable);
   }
 
   @Override
