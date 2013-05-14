@@ -1,13 +1,8 @@
 Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
-Bundle-Name: Activiti Designer - External libs
+Bundle-Name: Activiti Designer - Libs
 Bundle-SymbolicName: org.activiti.designer.libs;singleton:=true
-Bundle-Version: 5.12.1.qualifier
-Bundle-ClassPath: activiti-bpmn-model-5.13-SNAPSHOT.jar,
- activiti-bpmn-layout-5.12.jar,
- activiti-bpmn-converter-5.13-SNAPSHOT.jar,
- slf4j-api-1.7.2.jar,
- jgraphx-1.10.4.2.jar
+Bundle-Version: 5.12.1.SNAPSHOT
 Export-Package: org.activiti.bpmn,
  org.activiti.bpmn.constants,
  org.activiti.bpmn.converter;
@@ -31,3 +26,9 @@ Export-Package: org.activiti.bpmn,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.apache.commons.lang
 Bundle-Vendor: Activiti
+Bundle-ClassPath: .,
+ activiti-bpmn-converter-5.13-SNAPSHOT.jar,
+ activiti-bpmn-layout-5.12.jar,
+ activiti-bpmn-model-5.13-SNAPSHOT.jar,
+ jgraphx-1.10.4.2.jar,
+ slf4j-api-1.7.2.jar

@@ -28,19 +28,21 @@ public class TextUtil {
     IDimension textDimension = GraphitiUi.getUiLayoutService().calculateTextSize(textComponent.getValue(), textComponent.getFont());
     int lineCount = 1;
     double textWidth;
-    if (textDimension.getWidth() > width) {
-      textWidth = width;
-      double lines = textDimension.getWidth() / (double) width;
-      lineCount = (int) Math.floor(lines);
-      if(lineCount < lines) {
+    if (textDimension != null) {
+      if (textDimension.getWidth() > width) {
+        textWidth = width;
+        double lines = textDimension.getWidth() / (double) width;
+        lineCount = (int) Math.floor(lines);
+        if(lineCount < lines) {
+          lineCount++;
+        }
         lineCount++;
+      } else {
+        textWidth = textDimension.getWidth();
       }
-      lineCount++;
-    } else {
-      textWidth = textDimension.getWidth();
+      
+      IGaService gaService = Graphiti.getGaService();
+      gaService.setSize(textComponent, (int) textWidth, lineCount * textDimension.getHeight());
     }
-    
-    IGaService gaService = Graphiti.getGaService();
-    gaService.setSize(textComponent, (int) textWidth, lineCount * textDimension.getHeight());
   }
 }

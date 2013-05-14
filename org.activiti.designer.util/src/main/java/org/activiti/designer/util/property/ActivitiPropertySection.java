@@ -130,8 +130,10 @@ public abstract class ActivitiPropertySection extends GFPropertySection {
 
     if (fieldValue != null && fieldValue.contains("${") || fieldValue.contains("#{")) {
       fieldExtension.setExpression(fieldValue);
+      fieldExtension.setStringValue(null);
     } else {
       fieldExtension.setStringValue(fieldValue);
+      fieldExtension.setExpression(null);
     }
   }
 

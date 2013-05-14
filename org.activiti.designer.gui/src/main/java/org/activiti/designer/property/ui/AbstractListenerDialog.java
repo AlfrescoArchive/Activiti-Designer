@@ -58,7 +58,8 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
 	protected Button classTypeButton;
 	protected Button expressionTypeButton;
 	protected Button delegateExpressionTypeButton;
-	protected Button alfrescoTypeButton;
+	protected Button alfrescoTaskTypeButton;
+	protected Button alfrescoExecutionTypeButton;
 	protected Text classNameText;
 	protected Button classSelectButton;
 	protected CLabel classSelectLabel;
@@ -102,7 +103,7 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
 		Shell shell = new Shell(getParent(), getStyle());
 		shell.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
 		shell.setText(getText());
-		shell.setSize(700, 400);
+		shell.setSize(900, 400);
 		Point location = getParent().getShell().getLocation();
 		Point size = getParent().getShell().getSize();
 		shell.setLocation((location.x + size.x - 300) / 2, (location.y + size.y - 150) / 2);
@@ -202,13 +203,28 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
     });
     
     if(PreferencesUtil.getBooleanPreference(Preferences.ALFRESCO_ENABLE)) {
-      alfrescoTypeButton = new Button(radioTypeComposite, SWT.RADIO);
-      alfrescoTypeButton.setText("Alfresco script");
-      alfrescoTypeButton.addSelectionListener(new SelectionListener() {
+      alfrescoExecutionTypeButton = new Button(radioTypeComposite, SWT.RADIO);
+      alfrescoExecutionTypeButton.setText("Alfresco execution script");
+      alfrescoExecutionTypeButton.addSelectionListener(new SelectionListener() {
         
         @Override
         public void widgetSelected(SelectionEvent event) {
-          enableAlfrescoType();
+          enableAlfrescoType(false);
+        }
+      
+        @Override
+        public void widgetDefaultSelected(SelectionEvent event) {
+        }
+        
+      });
+      
+      alfrescoTaskTypeButton = new Button(radioTypeComposite, SWT.RADIO);
+      alfrescoTaskTypeButton.setText("Alfresco task script");
+      alfrescoTaskTypeButton.addSelectionListener(new SelectionListener() {
+        
+        @Override
+        public void widgetSelected(SelectionEvent event) {
+          enableAlfrescoType(true);
         }
       
         @Override
@@ -442,10 +458,12 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
 		if(savedListener == null || savedListener.getImplementationType() == null) {
 		  classTypeButton.setSelection(true);
       enableClassType();
-		} else if (PreferencesUtil.getBooleanPreference(Preferences.ALFRESCO_ENABLE) && (AlfrescoUserTask.ALFRESCO_SCRIPT_TASK_LISTENER.equalsIgnoreCase(savedListener.getImplementation()) ||
-            AlfrescoScriptTask.ALFRESCO_SCRIPT_EXECUTION_LISTENER.equalsIgnoreCase(savedListener.getImplementation()))) {
-		  alfrescoTypeButton.setSelection(true);
-      enableAlfrescoType();
+		} else if (PreferencesUtil.getBooleanPreference(Preferences.ALFRESCO_ENABLE) && AlfrescoUserTask.ALFRESCO_SCRIPT_TASK_LISTENER.equalsIgnoreCase(savedListener.getImplementation())) {
+		  alfrescoTaskTypeButton.setSelection(true);
+      enableAlfrescoType(true);
+		} else if (PreferencesUtil.getBooleanPreference(Preferences.ALFRESCO_ENABLE) && AlfrescoScriptTask.ALFRESCO_SCRIPT_EXECUTION_LISTENER.equalsIgnoreCase(savedListener.getImplementation())) {
+      alfrescoExecutionTypeButton.setSelection(true);
+      enableAlfrescoType(false);
 		} else if(ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(savedListener.getImplementationType())) {
       classTypeButton.setSelection(true);
       enableClassType();
@@ -470,7 +488,7 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
 	  setVisibleClassType(true);
     setVisibleExpressionType(false);
     setVisibleDelegateExpressionType(false);
-    setVisibleAlfrescoType(false);
+    setVisibleAlfrescoType(false, false);
     setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
 	}
 	
@@ -478,7 +496,7 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
 	  setVisibleClassType(false);
     setVisibleExpressionType(true);
     setVisibleDelegateExpressionType(false);
-    setVisibleAlfrescoType(false);
+    setVisibleAlfrescoType(false, false);
     setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
   }
 	
@@ -486,16 +504,20 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
 	  setVisibleClassType(false);
     setVisibleExpressionType(false);
     setVisibleDelegateExpressionType(true);
-    setVisibleAlfrescoType(false);
+    setVisibleAlfrescoType(false, false);
     setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
   }
 	
-	private void enableAlfrescoType() {
+	private void enableAlfrescoType(boolean isTask) {
     setVisibleClassType(false);
     setVisibleExpressionType(false);
     setVisibleDelegateExpressionType(false);
-    setVisibleAlfrescoType(true);
-    implementation = AlfrescoUserTask.ALFRESCO_SCRIPT_TASK_LISTENER;
+    setVisibleAlfrescoType(true, isTask);
+    if (isTask) {
+      implementation = AlfrescoUserTask.ALFRESCO_SCRIPT_TASK_LISTENER;
+    } else {
+      implementation = AlfrescoScriptTask.ALFRESCO_SCRIPT_EXECUTION_LISTENER;
+    }
     setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
   }
 	
@@ -518,9 +540,18 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
     delegateExpressionLabel.setVisible(visible);
   }
   
-  private void setVisibleAlfrescoType(boolean visible) {
+  private void setVisibleAlfrescoType(boolean visible, boolean isTask) {
     if(PreferencesUtil.getBooleanPreference(Preferences.ALFRESCO_ENABLE)) {
-      alfrescoTypeButton.setSelection(visible);
+      if (visible) {
+        if (isTask) {
+          alfrescoTaskTypeButton.setSelection(visible);
+        } else {
+          alfrescoExecutionTypeButton.setSelection(visible);
+        }
+      } else {
+        alfrescoTaskTypeButton.setSelection(visible);
+        alfrescoExecutionTypeButton.setSelection(visible);
+      }
     }
     scriptText.setVisible(visible);
     scriptLabel.setVisible(visible);
