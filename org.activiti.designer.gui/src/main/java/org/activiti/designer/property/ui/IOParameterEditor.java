@@ -12,7 +12,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.platform.IDiagramEditor;
+import org.eclipse.graphiti.platform.IDiagramContainer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TableItem;
@@ -22,7 +22,7 @@ public class IOParameterEditor extends TableFieldEditor {
   
   protected Composite parent;
   public PictogramElement pictogramElement;
-  public IDiagramEditor diagramEditor;
+  public IDiagramContainer diagramEditor;
   public Diagram diagram;
   public boolean isInputParameters = false;
 	
@@ -109,7 +109,7 @@ public class IOParameterEditor extends TableFieldEditor {
         return;
       }
       
-      TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
+      TransactionalEditingDomain editingDomain = diagramEditor.getDiagramBehavior().getEditingDomain();
       ActivitiUiUtil.runModelChange(new Runnable() {
         public void run() {
         	List<IOParameter> newParameterList = new ArrayList<IOParameter>();

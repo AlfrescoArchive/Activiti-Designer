@@ -11,7 +11,7 @@ import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.platform.IDiagramEditor;
+import org.eclipse.graphiti.platform.IDiagramContainer;
 import org.eclipse.graphiti.ui.platform.GFPropertySection;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.part.IContributedContentsView;
@@ -19,10 +19,10 @@ import org.eclipse.ui.part.IContributedContentsView;
 public abstract class ActivitiPropertySection extends GFPropertySection {
 
 	/**
-	 * @return the {@link IDiagramEditor} diagram editor.
+	 * @return the {@link IDiagramContainer} diagram editor.
 	 */
 	@Override
-  protected IDiagramEditor getDiagramEditor() {
+  protected IDiagramContainer getDiagramEditor() {
 		IWorkbenchPart part = getPart();
 		if (part instanceof IContributedContentsView) {
 		  IContributedContentsView contributedView = (IContributedContentsView) part
@@ -32,8 +32,8 @@ public abstract class ActivitiPropertySection extends GFPropertySection {
       }
 		}
 
-		if (part instanceof IDiagramEditor) {
-			return (IDiagramEditor) part;
+		if (part instanceof IDiagramContainer) {
+			return (IDiagramContainer) part;
 		}
 		return null;
 	}
@@ -44,9 +44,9 @@ public abstract class ActivitiPropertySection extends GFPropertySection {
 	 * @return the transactional editing domain of the diagram editor.
 	 */
 	protected TransactionalEditingDomain getTransactionalEditingDomain() {
-	  final IDiagramEditor de = getDiagramEditor();
+	  final IDiagramContainer de = getDiagramEditor();
 	  if (de != null) {
-	    return de.getEditingDomain();
+	    return de.getDiagramBehavior().getEditingDomain();
 	  }
 
 	  return null;

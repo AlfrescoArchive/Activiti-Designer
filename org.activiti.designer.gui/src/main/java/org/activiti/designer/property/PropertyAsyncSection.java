@@ -21,7 +21,7 @@ import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.platform.IDiagramEditor;
+import org.eclipse.graphiti.platform.IDiagramContainer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.SelectionEvent;
@@ -59,8 +59,8 @@ public class PropertyAsyncSection extends ActivitiPropertySection implements ITa
       final PictogramElement pe = getSelectedPictogramElement();
       if (pe != null) {
         final Object bo = getBusinessObject(pe);
-        final IDiagramEditor de = getDiagramEditor();
-        final TransactionalEditingDomain ted = de.getEditingDomain();
+        final IDiagramContainer de = getDiagramEditor();
+        final TransactionalEditingDomain ted = de.getDiagramBehavior().getEditingDomain();
 
         ActivitiUiUtil.runModelChange(new Runnable() {
 

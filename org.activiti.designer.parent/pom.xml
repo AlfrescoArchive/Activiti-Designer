@@ -8,7 +8,7 @@
 	<name>Activiti Designer - Parent project</name>
 
 	<properties>
-		<tycho-version>0.16.0</tycho-version>
+		<tycho-version>0.18.0</tycho-version>
 	</properties>
 
 	<modules>
@@ -27,18 +27,18 @@
 		<repository>
 			<id>eclipse-indigo</id>
 			<layout>p2</layout>
-			<url>http://download.eclipse.org/releases/indigo</url>
+			<url>http://download.eclipse.org/releases/kepler/</url>
 		</repository>
 		<repository>
 			<id>Graphiti</id>
 			<layout>p2</layout>
-			<!-- <url>http://download.eclipse.org/graphiti/updates/milestones/</url> -->
-			<url>http://download.eclipse.org/graphiti/updates/0.9.2</url>
+			<url>http://download.eclipse.org/graphiti/updates/milestones/</url>
+			<!-- <url>http://download.eclipse.org/graphiti/updates/0.9.2</url> -->
 		</repository>
 		<repository>
 			<id>Oribit</id>
 			<layout>p2</layout>
-			<url>http://download.eclipse.org/tools/orbit/downloads/drops/R20120119162704/repository</url>
+			<url>http://download.eclipse.org/tools/orbit/downloads/drops/R20130517111416//repository</url>
 			<!-- <url>http://download.eclipse.org/tools/orbit/downloads/drops/R20100519200754/updateSite/</url> -->
 		</repository>
 	</repositories>
@@ -50,7 +50,7 @@
         		<plugin>
           			<groupId>org.eclipse.tycho</groupId>
          			<artifactId>tycho-versions-plugin</artifactId>
-          			<version>0.16.0</version>
+          			<version>${tycho-version}</version>
         		</plugin>
       		</plugins>
    		</pluginManagement>
@@ -64,7 +64,6 @@
 			<plugin>
         		<groupId>org.eclipse.tycho</groupId>
         		<artifactId>tycho-versions-plugin</artifactId>
-        		<version>${tycho-version}</version>
       		</plugin>
 			<plugin>
 				<groupId>org.eclipse.tycho</groupId>
@@ -87,17 +86,17 @@
 							<os>win32</os>
 							<ws>win32</ws>
 							<arch>x86</arch>
-						</environment>
+						</environment> -->
 						<environment>
 							<os>win32</os>
 							<ws>win32</ws>
 							<arch>x86_64</arch>
-						</environment> -->
-						<environment>
+						</environment>
+						<!-- <environment>
 							<os>macosx</os>
 							<ws>cocoa</ws>
 							<arch>x86_64</arch>
-						</environment>
+						</environment> -->
 					</environments>
 				</configuration>
 			</plugin>
