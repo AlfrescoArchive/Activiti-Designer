@@ -93,4 +93,9 @@ public abstract class AbstractExportMarshaller extends AbstractDiagramWorker imp
     return invokeValidators(validatorIds, diagram, monitor);
   }
 
+  @Override
+  protected String getMarkerId() {
+    return ExportMarshaller.MARKER_ID;
+  }
+
 }

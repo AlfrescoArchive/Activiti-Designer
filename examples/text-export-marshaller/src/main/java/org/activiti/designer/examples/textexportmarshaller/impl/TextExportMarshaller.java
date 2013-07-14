@@ -27,7 +27,7 @@ public class TextExportMarshaller extends AbstractExportMarshaller {
         context.getProgressMonitor().worked(1);
       }
 
-      getRelativeURIForDiagram(diagram, relativePath);
+      // getRelativeURIForDiagram(diagram, relativePath);
 
     } catch (InterruptedException e) {
       // TODO Auto-generated catch block

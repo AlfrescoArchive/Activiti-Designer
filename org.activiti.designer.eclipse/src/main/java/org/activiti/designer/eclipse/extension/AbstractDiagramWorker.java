@@ -14,18 +14,15 @@
 package org.activiti.designer.eclipse.extension;
 
 import java.io.InputStream;
-import java.text.SimpleDateFormat;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.designer.eclipse.extension.export.ExportMarshaller;
-import org.activiti.designer.eclipse.extension.validation.ProcessValidator;
-import org.activiti.designer.util.ActivitiConstants;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.resources.IResource;
@@ -34,18 +31,13 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.Path;
-import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 
 /**
- * Abstract base class for diagram workers, such as {@link ExportMarshaller}s
- * and {@link ProcessValidator}s.
+ * Abstract base class for diagram workers.
  * 
  * @author Tiese Barrell
- * @since 0.6.1
- * @version 2
  */
 public abstract class AbstractDiagramWorker {
 
@@ -54,64 +46,67 @@ public abstract class AbstractDiagramWorker {
 
   private static final String DATE_TIME_PATTERN = "yyyy-MM-dd-HH-mm-ss";
 
-  private static final SimpleDateFormat SDF = new SimpleDateFormat(DATE_TIME_PATTERN);
+  // private static final SimpleDateFormat SDF = new
+  // SimpleDateFormat(DATE_TIME_PATTERN);
 
-  private static final String REGEX_DATE_TIME = "\\" + ExportMarshaller.PLACEHOLDER_DATE_TIME + "";
-  private static final String REGEX_FILENAME = "\\" + ExportMarshaller.PLACEHOLDER_ORIGINAL_FILENAME + "";
-  private static final String REGEX_FILENAME_WITHOUT_EXTENSION = "\\" + ExportMarshaller.PLACEHOLDER_ORIGINAL_FILENAME_WITHOUT_EXTENSION + "";
-  private static final String REGEX_EXTENSION = "\\" + ExportMarshaller.PLACEHOLDER_ORIGINAL_FILE_EXTENSION + "";
+  // private static final String REGEX_DATE_TIME = "\\" +
+  // ExportMarshaller.PLACEHOLDER_DATE_TIME + "";
+  // private static final String REGEX_FILENAME = "\\" +
+  // ExportMarshaller.PLACEHOLDER_ORIGINAL_FILENAME + "";
+  // private static final String REGEX_FILENAME_WITHOUT_EXTENSION = "\\" +
+  // ExportMarshaller.PLACEHOLDER_ORIGINAL_FILENAME_WITHOUT_EXTENSION + "";
+  // private static final String REGEX_EXTENSION = "\\" +
+  // ExportMarshaller.PLACEHOLDER_ORIGINAL_FILE_EXTENSION + "";
 
   private static final int EXTRACTION_WORK_UNIT = 1;
 
   /**
-   * Gets an {@link InputStream} to the contents of the provided {@link Diagram}
-   * .
+   * Gets an {@link InputStream} to the contents of the provided
+   * {@link DiagramWorkerContext} .
    * 
-   * @param diagram
-   *          the diagram to get the input stream for
+   * @param context
+   *          the context to get the input stream for
    * @return an input stream to the diagram's contents
    */
-  protected InputStream getInputStreamForDiagram(final Diagram diagram) {
-
-    InputStream result = null;
-
-    final IWorkspace workspace = ResourcesPlugin.getWorkspace();
-    final IFile file = workspace.getRoot().getFile(new Path(getResourceForDiagram(diagram).getURI().toPlatformString(true)));
-
-    try {
-      result = file.getContents();
-    } catch (CoreException e) {
-
+  protected InputStream getDiagramInputStream(final DiagramWorkerContext context) {
+    final IFile file = (IFile) getDiagramResource(context);
+    if (file != null) {
+      try {
+        return file.getContents();
+      } catch (CoreException e) {
+        throw new IllegalArgumentException("Unable to get input stream for diagram worker context", e);
+      }
+    } else {
+      throw new IllegalArgumentException("Unable to get input stream for diagram worker context because the file referenced for the diagram is null");
     }
-    return result;
   }
-
   /**
-   * Gets the {@link Resource} associated with the provided {@link Diagram}.
+   * Gets the {@link IResource} associated with the provided
+   * {@link DiagramWorkerContext}.
    * 
-   * @param diagram
-   *          the diagram to find the resource for
+   * @param context
+   *          the context to find the resource for
    * @return the resource associated with the diagram
    */
-  protected Resource getResourceForDiagram(final Diagram diagram) {
-    return diagram.eResource();
+  protected IResource getDiagramResource(final DiagramWorkerContext context) {
+    return context.getBpmnModel().getModelFile();
   }
 
   /**
-   * Gets the {@link URI} associated with the provided {@link Diagram}'s
-   * resource.
+   * Gets the {@link URI} associated with the provided
+   * {@link DiagramWorkerContext}'s resource.
    * 
-   * @param diagram
-   *          the diagram to find the URI for
+   * @param context
+   *          the context to find the URI for
    * @return the URI for the resource associated with the diagram
    */
-  protected URI getURIForDiagram(final Diagram diagram) {
-    return getResourceForDiagram(diagram).getURI();
+  protected URI getDiagramURI(final DiagramWorkerContext context) {
+    return getDiagramResource(context).getLocationURI();
   }
 
   /**
-   * Gets a new URI based on the provided {@link Diagram}s location and relative
-   * to the resource associated to the {@link Diagram}.
+   * Gets a new URI based on the provided {@link DiagramWorkerContext} and
+   * relative to the resource associated to the {@link DiagramWorkerContext}.
    * 
    * <p>
    * If replacement of {@link ExportMarshaller}'s replacement variables is
@@ -135,14 +130,14 @@ public abstract class AbstractDiagramWorker {
    * {@link #getRelativeURIForDiagram(diagram, "my-dir/my-file." +
    * ExportMarshaller.PLACEHOLDER_ORIGINAL_FILE_EXTENSION)}.
    * 
-   * @param diagram
-   *          the diagram to find the URI for
+   * @param context
+   *          the context to find the URI for
    * @param relativePath
    *          the relative path to the diagram provided
    * @return the URI for the resource associated with the diagram
    */
-  protected URI getRelativeURIForDiagram(final Diagram diagram, final String relativePath) {
-    final URI originalURI = getResourceForDiagram(diagram).getURI();
+  protected URI getURIRelativeToDiagram(final DiagramWorkerContext context, final String relativePath) {
+    final URI originalURI = getDiagramURI(context);
 
     String finalSegment = relativePath;
     final URI parentURI = originalURI.trimSegments(1);
@@ -163,11 +158,11 @@ public abstract class AbstractDiagramWorker {
    * the workspace.
    * 
    * @param resourceURI
-   * @return
+   *          the URI for the resource
+   * @return true if the resource exists, false otherwise
    */
-  protected boolean resourceExists(URI resourceURI) {
-    final IResource fileResource = ResourcesPlugin.getWorkspace().getRoot().findMember(resourceURI.toPlatformString(true));
-
+  protected boolean resourceExists(final URI resourceURI) {
+    final IResource fileResource = ResourcesPlugin.getWorkspace().getRoot().findMember(resourceURI.getPath());
     return fileResource != null && fileResource.exists();
   }
 
@@ -181,7 +176,7 @@ public abstract class AbstractDiagramWorker {
   protected IResource getResource(URI resourceURI) {
     IResource result = null;
     if (resourceExists(resourceURI)) {
-      result = ResourcesPlugin.getWorkspace().getRoot().findMember(resourceURI.toPlatformString(true));
+      result = ResourcesPlugin.getWorkspace().getRoot().findMember(resourceURI.getPath());
     }
     return result;
   }
@@ -216,7 +211,7 @@ public abstract class AbstractDiagramWorker {
 
     final IWorkspace workspace = ResourcesPlugin.getWorkspace();
 
-    final IFile file = workspace.getRoot().getFile(new Path(uri.toPlatformString(true)));
+    final IFile file = workspace.getRoot().getFile(new Path(uri.getPath()));
 
     // TODO
     try {
@@ -252,7 +247,7 @@ public abstract class AbstractDiagramWorker {
    *         and the value is a list of all constructs of that type found in the
    *         diagram.
    */
-  protected Map<String, List<Object>> extractProcessConstructs(final Collection<FlowElement> objects, final IProgressMonitor monitor) {
+  protected Map<String, List<Object>> extractProcessConstructs(final DiagramWorkerContext context, final IProgressMonitor monitor) {
 
     monitor.beginTask("Analyzing process constructs", objects.size() * EXTRACTION_WORK_UNIT);
 
@@ -294,46 +289,36 @@ public abstract class AbstractDiagramWorker {
     return result;
   }
   /**
-   * Adds a marker to the {@link Diagram} provided that has an
-   * {@link IMarker#SEVERITY_INFO} severity (info).
+   * Adds a marker to the diagram that has an {@link IMarker#SEVERITY_INFO}
+   * severity (info).
    */
-  protected void addInfoToDiagram(Diagram diagram, String message, String nodeId) {
-    addMarkerToDiagram(diagram, message, nodeId, IMarker.SEVERITY_INFO);
+  protected void addInfoToDiagram(DiagramWorkerContext context, String message, String nodeId) {
+    addMarkerToDiagram(context, message, nodeId, IMarker.SEVERITY_INFO);
   }
 
   /**
-   * Adds a marker to the {@link Diagram} provided that has an
-   * {@link IMarker#SEVERITY_WARNING} severity (warning).
+   * Adds a marker to the diagram that has a {@link IMarker#SEVERITY_WARNING}
+   * severity (warning).
    */
-  protected void addWarningToDiagram(Diagram diagram, String message, String nodeId) {
-    addMarkerToDiagram(diagram, message, nodeId, IMarker.SEVERITY_WARNING);
+  protected void addWarningToDiagram(DiagramWorkerContext context, String message, String nodeId) {
+    addMarkerToDiagram(context, message, nodeId, IMarker.SEVERITY_WARNING);
   }
 
   /**
-   * Adds a marker to the {@link Diagram} provided that has an
-   * {@link IMarker#SEVERITY_ERROR} severity (error).
+   * Adds a marker to the diagram that has an {@link IMarker#SEVERITY_ERROR}
+   * severity (error).
    */
-  protected void addProblemToDiagram(Diagram diagram, String message, String nodeId) {
-    addMarkerToDiagram(diagram, message, nodeId, IMarker.SEVERITY_ERROR);
+  protected void addProblemToDiagram(DiagramWorkerContext context, String message, String nodeId) {
+    addMarkerToDiagram(context, message, nodeId, IMarker.SEVERITY_ERROR);
   }
 
-  private void addMarkerToDiagram(Diagram diagram, String message, String nodeId, final int severity) {
-
-    final IWorkspace workspace = ResourcesPlugin.getWorkspace();
-
-    final IFile file = workspace.getRoot().getFile(new Path(getURIForDiagram(diagram).toPlatformString(true)));
-
-    // Determine marker id
-    String markerId = ActivitiConstants.ACTIVITI_GENERAL_MARKER_ID;
-    if (this instanceof ExportMarshaller) {
-      markerId = ExportMarshaller.MARKER_ID;
-    } else if (this instanceof ProcessValidator) {
-      markerId = ProcessValidator.MARKER_ID;
-    }
+  private void addMarkerToDiagram(final DiagramWorkerContext context, final String message, final String nodeId, final int severity) {
+    final IResource resource = getDiagramResource(context);
+    String markerId = getMarkerId();
 
     IMarker m;
     try {
-      m = file.createMarker(markerId);
+      m = resource.createMarker(markerId);
       if (nodeId != null) {
         m.setAttribute(ATTRIBUTE_NODE_ID, nodeId);
       }
@@ -350,18 +335,38 @@ public abstract class AbstractDiagramWorker {
 
   }
 
-  protected void clearMarkers(IResource resource) {
+  /**
+   * Gets the id to be used for markers created by this diagram worker.
+   * 
+   * @return the marker id
+   */
+  protected abstract String getMarkerId();
 
-    // Determine marker id
-    String markerId = ActivitiConstants.ACTIVITI_GENERAL_MARKER_ID;
-    if (this instanceof ExportMarshaller) {
-      markerId = ExportMarshaller.MARKER_ID;
-    } else if (this instanceof ProcessValidator) {
-      markerId = ProcessValidator.MARKER_ID;
-    }
+  /**
+   * Clears markers for the diagram associated with the provided
+   * {@link DiagramWorkerContext}.
+   * 
+   * <p>
+   * <strong>Note</strong>: this will only clean markers of the type of the
+   * diagram worker as defined by {@link #getMarkerId()}.
+   * 
+   * @param context
+   *          the context to clear diagram markers for
+   */
+  protected void clearMarkersForDiagram(final DiagramWorkerContext context) {
+    clearMarkers(getDiagramResource(context));
+  }
 
+  /**
+   * Clears markers for the provided {@link IResource}.
+   * 
+   * <p>
+   * <strong>Note</strong>: this will only clean markers of the type of the
+   * diagram worker as defined by {@link #getMarkerId()}.
+   */
+  protected void clearMarkers(final IResource resource) {
     try {
-      final IMarker[] markers = resource.findMarkers(markerId, true, IResource.DEPTH_INFINITE);
+      final IMarker[] markers = resource.findMarkers(getMarkerId(), true, IResource.DEPTH_INFINITE);
       for (final IMarker marker : markers) {
         if (marker.getAttribute(ATTRIBUTE_WORKER_ID).equals(this.getClass().getCanonicalName())) {
           marker.delete();
@@ -372,10 +377,37 @@ public abstract class AbstractDiagramWorker {
     }
   }
 
-  protected IMarker[] getMarkers(IResource resource) {
+  /**
+   * Gets all markers for the diagram associated with the provided
+   * {@link DiagramWorkerContext}.
+   * 
+   * <p>
+   * <strong>Note</strong>: this will only get markers of the type of the
+   * diagram worker as defined by {@link #getMarkerId()}.
+   * 
+   * @param context
+   *          the context to get diagram markers for
+   * @return the markers for the diagram
+   */
+  protected IMarker[] getMarkers(final DiagramWorkerContext context) {
+    return getMarkers(getDiagramResource(context));
+  }
+
+  /**
+   * Gets all markers for the provided {@link IResource}.
+   * 
+   * <p>
+   * <strong>Note</strong>: this will only get markers of the type of the
+   * diagram worker as defined by {@link #getMarkerId()}.
+   * 
+   * @param resource
+   *          the resource to get the markers for
+   * @return the markers for the resource
+   */
+  protected IMarker[] getMarkers(final IResource resource) {
     IMarker[] markers = null;
     try {
-      markers = resource.findMarkers(ActivitiConstants.ACTIVITI_GENERAL_MARKER_ID, true, IResource.DEPTH_INFINITE);
+      markers = resource.findMarkers(getMarkerId(), true, IResource.DEPTH_INFINITE);
     } catch (CoreException e) {
       e.printStackTrace();
     }
