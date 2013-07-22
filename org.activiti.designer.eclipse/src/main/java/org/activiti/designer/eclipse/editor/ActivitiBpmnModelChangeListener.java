@@ -21,12 +21,12 @@ import org.eclipse.swt.widgets.Display;
 
 public class ActivitiBpmnModelChangeListener implements ResourceSetListener {
 
-  private final IDiagramContainer diagramEditor;
+  private final IDiagramContainer diagramContainer;
 
-  public ActivitiBpmnModelChangeListener(final IDiagramContainer diagramEditor) {
+  public ActivitiBpmnModelChangeListener(final IDiagramContainer diagramContainer) {
     super();
 
-    this.diagramEditor = diagramEditor;
+    this.diagramContainer = diagramContainer;
   }
 
   @Override
@@ -51,7 +51,7 @@ public class ActivitiBpmnModelChangeListener implements ResourceSetListener {
 
   @Override
   public void resourceSetChanged(ResourceSetChangeEvent event) {
-    final IDiagramTypeProvider provider = diagramEditor.getDiagramTypeProvider();
+    final IDiagramTypeProvider provider = diagramContainer.getDiagramTypeProvider();
     final Diagram diagram = provider.getDiagram();
 
     if (diagram != null && diagram.getPictogramLinks().isEmpty()) {

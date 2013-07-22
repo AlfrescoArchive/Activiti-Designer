@@ -12,7 +12,7 @@ import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.ui.editor.DiagramEditor;
+import org.eclipse.graphiti.platform.IDiagramContainer;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.custom.CLabel;
@@ -155,8 +155,8 @@ public class PropertyAlfrescoUserTaskSection extends ActivitiPropertySection imp
       if (pe != null) {
         final Object bo = getBusinessObject(pe);
         if (bo instanceof UserTask) {
-          DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
-          TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
+          IDiagramContainer diagramContainer = getDiagramContainer();
+          TransactionalEditingDomain editingDomain = diagramContainer.getDiagramBehavior().getEditingDomain();
           ActivitiUiUtil.runModelChange(new Runnable() {
 
             public void run() {

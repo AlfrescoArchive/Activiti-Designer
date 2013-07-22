@@ -22,7 +22,7 @@ public class FieldExtensionEditor extends TableFieldEditor {
 	
 	private Composite parent;
 	public PictogramElement pictogramElement;
-	public IDiagramContainer diagramEditor;
+	public IDiagramContainer diagramContainer;
 	public Diagram diagram;
 	
 	public FieldExtensionEditor(String key, Composite parent) {
@@ -126,7 +126,7 @@ public class FieldExtensionEditor extends TableFieldEditor {
 		if (pictogramElement != null) {
 			final Object bo = ModelHandler.getModel(EcoreUtil.getURI(diagram)).getFeatureProvider().getBusinessObjectForPictogramElement(pictogramElement);
 			if (bo instanceof ServiceTask) {
-				TransactionalEditingDomain editingDomain = diagramEditor.getDiagramBehavior().getEditingDomain();
+				TransactionalEditingDomain editingDomain = diagramContainer.getDiagramBehavior().getEditingDomain();
 				ActivitiUiUtil.runModelChange(new Runnable() {
 					public void run() {
 						ServiceTask serviceTask = (ServiceTask)  bo;

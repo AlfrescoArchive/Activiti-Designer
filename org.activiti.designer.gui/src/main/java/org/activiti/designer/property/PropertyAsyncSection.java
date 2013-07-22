@@ -59,8 +59,8 @@ public class PropertyAsyncSection extends ActivitiPropertySection implements ITa
       final PictogramElement pe = getSelectedPictogramElement();
       if (pe != null) {
         final Object bo = getBusinessObject(pe);
-        final IDiagramContainer de = getDiagramEditor();
-        final TransactionalEditingDomain ted = de.getDiagramBehavior().getEditingDomain();
+        final IDiagramContainer dc = getDiagramContainer();
+        final TransactionalEditingDomain ted = dc.getDiagramBehavior().getEditingDomain();
 
         ActivitiUiUtil.runModelChange(new Runnable() {
 

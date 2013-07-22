@@ -13,7 +13,7 @@ import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.features.context.impl.CustomContext;
 import org.eclipse.graphiti.features.impl.AbstractFeature;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.ui.editor.DiagramEditor;
+import org.eclipse.graphiti.platform.IDiagramContainer;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.search.SearchEngine;
@@ -168,8 +168,8 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 							classNameText.setText(className);
 						}
 
-						DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
-						TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
+						IDiagramContainer diagramContainer = getDiagramContainer();
+						TransactionalEditingDomain editingDomain = diagramContainer.getDiagramBehavior().getEditingDomain();
 
 						ActivitiUiUtil.runModelChange(new Runnable() {
 							@Override
@@ -337,7 +337,7 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 			}
 
 			fieldEditor.pictogramElement = pe;
-			fieldEditor.diagramEditor = getDiagramEditor();
+			fieldEditor.diagramContainer = getDiagramContainer();
 			fieldEditor.diagram = getDiagram();
 			fieldEditor.initialize(serviceTask.getFieldExtensions());
 			
@@ -353,8 +353,8 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 		if (pe != null) {
 			final Object bo = getBusinessObject(pe);
 			if (bo instanceof ServiceTask) {
-				DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
-				TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
+				IDiagramContainer diagramContainer = getDiagramContainer();
+				TransactionalEditingDomain editingDomain = diagramContainer.getDiagramBehavior().getEditingDomain();
 				ActivitiUiUtil.runModelChange(new Runnable() {
 					@Override
           public void run() {

@@ -24,7 +24,7 @@ public class FormPropertyEditor extends TableFieldEditor {
   
   protected Composite parent;
   public PictogramElement pictogramElement;
-  public IDiagramContainer diagramEditor;
+  public IDiagramContainer diagramContainer;
   public Diagram diagram;
 	
   public FormPropertyEditor(String key, Composite parent) {
@@ -149,7 +149,7 @@ public class FormPropertyEditor extends TableFieldEditor {
       final List<FormProperty> formPropertyList = getFormProperties(bo);
       if(formPropertyList == null) return;
       
-      TransactionalEditingDomain editingDomain = diagramEditor.getDiagramBehavior().getEditingDomain();
+      TransactionalEditingDomain editingDomain = diagramContainer.getDiagramBehavior().getEditingDomain();
       ActivitiUiUtil.runModelChange(new Runnable() {
         public void run() {
         	List<FormProperty> newFormList = new ArrayList<FormProperty>();

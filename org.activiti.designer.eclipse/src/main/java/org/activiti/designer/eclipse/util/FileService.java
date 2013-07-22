@@ -239,7 +239,7 @@ public class FileService {
 		TransactionalEditingDomain editingDomain = null;
 		ResourceSet resourceSet = null;
 
-		if (diagramEditor == null || diagramEditor.getDiagramBehavior().getResourceSet() == null || diagramEditor.getEditingDomain() == null) {
+		if (diagramEditor == null || diagramEditor.getDiagramBehavior() == null || diagramEditor.getDiagramBehavior().getResourceSet() == null || diagramEditor.getEditingDomain() == null) {
 		  // nothing found, create a new one
 		  resourceSet = new ResourceSetImpl();
 

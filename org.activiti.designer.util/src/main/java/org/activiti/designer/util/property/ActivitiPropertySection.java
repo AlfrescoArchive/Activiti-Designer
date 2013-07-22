@@ -22,7 +22,7 @@ public abstract class ActivitiPropertySection extends GFPropertySection {
 	 * @return the {@link IDiagramContainer} diagram editor.
 	 */
 	@Override
-  protected IDiagramContainer getDiagramEditor() {
+  protected IDiagramContainer getDiagramContainer() {
 		IWorkbenchPart part = getPart();
 		if (part instanceof IContributedContentsView) {
 		  IContributedContentsView contributedView = (IContributedContentsView) part
@@ -44,7 +44,7 @@ public abstract class ActivitiPropertySection extends GFPropertySection {
 	 * @return the transactional editing domain of the diagram editor.
 	 */
 	protected TransactionalEditingDomain getTransactionalEditingDomain() {
-	  final IDiagramContainer de = getDiagramEditor();
+	  final IDiagramContainer de = getDiagramContainer();
 	  if (de != null) {
 	    return de.getDiagramBehavior().getEditingDomain();
 	  }

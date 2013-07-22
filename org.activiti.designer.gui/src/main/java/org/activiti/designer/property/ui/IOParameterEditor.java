@@ -22,7 +22,7 @@ public class IOParameterEditor extends TableFieldEditor {
   
   protected Composite parent;
   public PictogramElement pictogramElement;
-  public IDiagramContainer diagramEditor;
+  public IDiagramContainer diagramContainer;
   public Diagram diagram;
   public boolean isInputParameters = false;
 	
@@ -109,7 +109,7 @@ public class IOParameterEditor extends TableFieldEditor {
         return;
       }
       
-      TransactionalEditingDomain editingDomain = diagramEditor.getDiagramBehavior().getEditingDomain();
+      TransactionalEditingDomain editingDomain = diagramContainer.getDiagramBehavior().getEditingDomain();
       ActivitiUiUtil.runModelChange(new Runnable() {
         public void run() {
         	List<IOParameter> newParameterList = new ArrayList<IOParameter>();

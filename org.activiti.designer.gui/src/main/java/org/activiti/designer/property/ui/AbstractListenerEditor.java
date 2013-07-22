@@ -29,7 +29,7 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
 	protected int listenerType;
 	
 	public PictogramElement pictogramElement;
-	public IDiagramContainer diagramEditor;
+	public IDiagramContainer diagramContainer;
 	public Diagram diagram;
 	public boolean isSequenceFlow;
 	private List<ActivitiListener> listenerList;
@@ -151,7 +151,7 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
 		  if (bo == null) {
         return;
       }
-			TransactionalEditingDomain editingDomain = diagramEditor.getDiagramBehavior().getEditingDomain();
+			TransactionalEditingDomain editingDomain = diagramContainer.getDiagramBehavior().getEditingDomain();
 			ActivitiUiUtil.runModelChange(new Runnable() {
 				public void run() {
 				  ActivitiListener newListener = new ActivitiListener();
@@ -195,7 +195,7 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
 		  if (bo == null) {
         return;
       }
-			TransactionalEditingDomain editingDomain = diagramEditor.getDiagramBehavior().getEditingDomain();
+			TransactionalEditingDomain editingDomain = diagramContainer.getDiagramBehavior().getEditingDomain();
 			ActivitiUiUtil.runModelChange(new Runnable() {
 				public void run() {
 					ActivitiListener listener = listenerList.get(index);
@@ -268,7 +268,7 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
 		  if (bo == null) {
         return;
 		  }
-			TransactionalEditingDomain editingDomain = diagramEditor.getDiagramBehavior().getEditingDomain();
+			TransactionalEditingDomain editingDomain = diagramContainer.getDiagramBehavior().getEditingDomain();
 			ActivitiUiUtil.runModelChange(new Runnable() {
 				public void run() {
 				  if (listenerType == EXECUTION_LISTENER) {
@@ -286,7 +286,7 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
 	  final int index = table.getSelectionIndex();
     final Object bo = BpmnBOUtil.getExecutionListenerBO(pictogramElement, diagram);
     if (bo != null) {
-      TransactionalEditingDomain editingDomain = diagramEditor.getDiagramBehavior().getEditingDomain();
+      TransactionalEditingDomain editingDomain = diagramContainer.getDiagramBehavior().getEditingDomain();
       ActivitiUiUtil.runModelChange(new Runnable() {
         public void run() {
           ActivitiListener listener = listenerList.remove(index);
@@ -302,7 +302,7 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
     final int index = table.getSelectionIndex();
     final Object bo = BpmnBOUtil.getExecutionListenerBO(pictogramElement, diagram);
     if (bo != null) {
-      TransactionalEditingDomain editingDomain = diagramEditor.getDiagramBehavior().getEditingDomain();
+      TransactionalEditingDomain editingDomain = diagramContainer.getDiagramBehavior().getEditingDomain();
       ActivitiUiUtil.runModelChange(new Runnable() {
         public void run() {
           ActivitiListener listener = listenerList.remove(index);
