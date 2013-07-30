@@ -341,17 +341,58 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 
       @Override
       protected void doExecute() {
-
         if (model.getBpmnModel().getPools().size() > 0) {
           for (Pool pool : model.getBpmnModel().getPools()) {
-            PictogramElement poolElement = addContainerElement(pool, model, diagram);
-            if (poolElement == null) {
-              continue;
+            GraphicInfo graphicInfo = model.getBpmnModel().getGraphicInfo(pool.getId());
+            
+            // if no graphic info is present we can try to calculate it from the lane DI info
+            if (graphicInfo == null && StringUtils.isNotEmpty(pool.getProcessRef())) {
+              Process process = model.getBpmnModel().getProcess(pool.getId());
+              
+              if (process != null && process.getLanes().size() > 0) {
+                Double minX = null, minY = null, width = null, height = null;
+                for (Lane lane : process.getLanes()) {
+                  GraphicInfo laneInfo = model.getBpmnModel().getGraphicInfo(lane.getId());
+                  if (laneInfo != null) {
+                    if (minX == null || laneInfo.getX() < minX) {
+                      minX = laneInfo.getX();
+                    }
+                    if (minY == null || laneInfo.getY() < minY) {
+                      minY = laneInfo.getY();
+                    }
+                    
+                    if (width == null || laneInfo.getWidth() > width) {
+                      width = laneInfo.getWidth();
+                    }
+                    if (height == null) {
+                      height = laneInfo.getHeight();
+                    } else {
+                      height += laneInfo.getHeight();
+                    }
+                  }
+                }
+                
+                if (width != null && width > 0) {
+                  graphicInfo = new GraphicInfo();
+                  graphicInfo.setX(minX);
+                  graphicInfo.setY(minY);
+                  graphicInfo.setWidth(width);
+                  graphicInfo.setHeight(height);
+                  model.getBpmnModel().addGraphicInfo(pool.getId(), graphicInfo);
+                }
+              }
             }
-
-            Process process = model.getBpmnModel().getProcess(pool.getId());
-            for (Lane lane : process.getLanes()) {
-              addContainerElement(lane, model, (ContainerShape) poolElement);
+            
+            if (graphicInfo != null) {
+              PictogramElement poolElement = addContainerElement(pool, model, diagram);
+              if (poolElement == null) {
+                continue;
+              }
+  
+              Process process = model.getBpmnModel().getProcess(pool.getId());
+              for (Lane lane : process.getLanes()) {
+                addContainerElement(lane, model, (ContainerShape) poolElement);
+              }
             }
           }
         }
@@ -433,7 +474,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
         } else {
           parentContainer = parentShape;
         }
-
+        
         context.setTargetContainer(parentContainer);
         if (parentContainer instanceof Diagram == false) {
           Point location = getLocation(parentContainer);
