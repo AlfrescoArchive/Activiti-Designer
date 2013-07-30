@@ -38,7 +38,7 @@ Export-Package:
  org.activiti.designer.eclipse.ui,
  org.activiti.designer.eclipse.util
 Bundle-Activator: org.activiti.designer.eclipse.common.ActivitiPlugin
+Bundle-Vendor: Activiti
 Bundle-ClassPath: .,
  jdi.jar,
  jdimodel.jar
-Bundle-Vendor: Activiti
