@@ -30,7 +30,6 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.NullProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.graphiti.mm.pictograms.Diagram;
 
 /**
  * Abstract base class for diagram workers.
@@ -53,7 +52,7 @@ public abstract class AbstractDiagramWorker {
 
   /**
    * Gets an {@link InputStream} to the contents of the
-   * {@link DiagramWorkerContext} .
+   * {@link DiagramWorkerContext}'s diagram resource.
    * 
    * @return an input stream to the diagram's contents
    */
@@ -91,33 +90,32 @@ public abstract class AbstractDiagramWorker {
 
   /**
    * Gets a new URI based on the {@link DiagramWorkerContext} and relative to
-   * the resource associated to the {@link DiagramWorkerContext}.
+   * the resource associated with the {@link DiagramWorkerContext}.
    * 
    * <p>
-   * If replacement of {@link ExportMarshaller}'s replacement variables is
-   * required, the provided relativePath should contain these variables in the
-   * final segment of the path. Replacement variables in other segments will not
-   * be parsed and will result in exceptions.
+   * If replacement of {@link ExportMarshaller}'s replacement placeholders is
+   * required, the provided relativePath should contain these placeholders.
    * 
    * <p>
    * <strong> Example usage: </strong>
    * <p>
    * if you wish to get a URI for a file named "my-file.xml" to be saved in the
    * same directory as the original diagram, you would use:<br>
-   * {@link #getRelativeURIForDiagram(diagram, "my-file.xml")}.
+   * {@link #getURIRelativeToDiagram("my-file.xml")}.
    * <p>
    * To store the same file in a subdirectory called "my-dir" of the original
    * diagram's directory, you would use<br>
-   * {@link #getRelativeURIForDiagram(diagram, "my-dir/my-file.xml")}.
+   * {@link #getURIRelativeToDiagram("my-dir/my-file.xml")}.
    * <p>
    * To store the same file in the same subdirectory and use the original
    * diagram's extension as the extension for the new resource you would use<br>
-   * {@link #getRelativeURIForDiagram(diagram, "my-dir/my-file." +
+   * {@link #getURIRelativeToDiagram("my-dir/my-file." +
    * ExportMarshaller.PLACEHOLDER_ORIGINAL_FILE_EXTENSION)}.
    * 
    * @param relativePath
-   *          the relative path to the diagram provided
-   * @return the URI for the resource associated with the diagram
+   *          the relative path to the diagram associated with the
+   *          DiagramWorkerContext.
+   * @return the resolved relative URI
    */
   protected URI getURIRelativeToDiagram(final String relativePath) {
 
@@ -137,8 +135,13 @@ public abstract class AbstractDiagramWorker {
 
   /**
    * Resolves placeholders on the provided path as substitutions. Placeholders
-   * that are supported are defined by the {@link ExportMarshaller}. All
-   * occurences of matching placeholders are replaced.
+   * that are supported are defined by the {@link ExportMarshaller} interface.
+   * All occurences of matching placeholders are replaced.
+   * 
+   * <p>
+   * Note that if you are constructing a relative URI for a
+   * {@link DiagramWorkerContext}, {@link #getURIRelativeToDiagram(String)} will
+   * provide this functionality for you.
    * 
    * @param path
    *          the path to substitute placeholders for
@@ -193,52 +196,50 @@ public abstract class AbstractDiagramWorker {
 
   /**
    * Saves a resource at the provided URI. Use this method to create or update
-   * resources created by {@link ExportMarshaller}s. This method adheres to the
-   * overwrite flag provided.
+   * resources.
    * 
    * <p>
    * The URI provided is <strong>not</strong> parsed for replacements and is
-   * considered final when invoking this method. When obtaining the URI for a
-   * resource, replacements will be parsed if
-   * {@link #getRelativeURIForDiagram(Diagram, String)} is used.
+   * considered final when invoking this method.
    * 
    * <p>
    * To obtain a URI for the new resource you wish to create, invoke
-   * {@link #getRelativeURIForDiagram(Diagram, String)}.
+   * {@link #getURIRelativeToDiagram(String)}.
    * 
-   * @see #getRelativeURIForDiagram(Diagram, String)
+   * @see #getURIRelativeToDiagram(String)
    * 
    * @param uri
    *          the URI the resource should be saved to
    * @param content
    *          a stream to the content for the resource
-   * @param overwriteFlag
-   *          the flag for overwrite behavior
    * @param monitor
    *          the progress monitor to use
    */
   protected void saveResource(final URI uri, final InputStream content, final IProgressMonitor monitor) {
 
+    monitor.beginTask("Saving resource", 10);
+
     final IWorkspace workspace = ResourcesPlugin.getWorkspace();
     final IFile file = (IFile) workspace.getRoot().findFilesForLocationURI(uri)[0];
 
-    // TODO monitor
+    monitor.worked(2);
+
     try {
       if (file.exists()) {
-        monitor.beginTask("update content", 10);
         file.setContents(content, true, true, new SubProgressMonitor(monitor, 5));
       } else {
-        monitor.beginTask("create", 10);
         IFolder folder = (IFolder) file.getParent();
         prepareFolder(folder);
-        file.create(content, true, monitor);
+        file.create(content, true, new SubProgressMonitor(monitor, 5));
       }
       file.refreshLocal(IResource.DEPTH_INFINITE, null);
-      monitor.worked(10);
+      monitor.worked(3);
     } catch (final CoreException e) {
       e.printStackTrace();
       addProblemToDiagram("A problem occured while saving a resource in the export marshaller: " + e.getMessage(), null);
     }
+
+    monitor.done();
   }
 
   private void prepareFolder(final IFolder folder) throws CoreException {
@@ -247,7 +248,6 @@ public abstract class AbstractDiagramWorker {
       prepareFolder((IFolder) parent);
     }
     if (!folder.exists()) {
-      // TODO monitor
       folder.create(true, false, new NullProgressMonitor());
     }
   }
@@ -293,7 +293,6 @@ public abstract class AbstractDiagramWorker {
       m.setAttribute(IMarker.PRIORITY, IMarker.PRIORITY_HIGH);
       m.setAttribute(IMarker.SEVERITY, severity);
     } catch (CoreException e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
 

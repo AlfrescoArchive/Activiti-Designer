@@ -173,6 +173,8 @@ public class ActivitiDiagramEditor extends DiagramEditor {
       // Save an image of the diagram
       doSaveImage(diagramFileString, model);
 
+      // Refresh the resources in the workspace before invoking export
+      // marshallers, as they may need access to resources
       dataFile.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
 
       // Invoke export marshallers to produce additional output

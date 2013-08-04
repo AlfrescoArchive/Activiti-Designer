@@ -1,3 +1,16 @@
+/* Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package org.activiti.designer.examples.textexportmarshaller.impl;
 
 import java.io.ByteArrayInputStream;
@@ -9,6 +22,7 @@ import java.net.URI;
 import org.activiti.designer.eclipse.extension.export.AbstractExportMarshaller;
 import org.activiti.designer.eclipse.extension.export.ExportMarshaller;
 import org.eclipse.core.resources.IResource;
+import org.eclipse.core.runtime.SubProgressMonitor;
 
 public class TextExportMarshaller extends AbstractExportMarshaller {
 
@@ -33,9 +47,10 @@ public class TextExportMarshaller extends AbstractExportMarshaller {
     final StringBuilder builder = new StringBuilder();
 
     try {
-      getDiagramWorkerContext().getProgressMonitor().beginTask("Text output", 5);
+      getDiagramWorkerContext().getProgressMonitor().beginTask("Text output", 25);
 
-      for (int i = 0; i < 3; i++) {
+      // Demonstrates progress using the monitor
+      for (int i = 0; i < 5; i++) {
         Thread.currentThread().sleep(500l);
         getDiagramWorkerContext().getProgressMonitor().worked(1);
       }
@@ -43,15 +58,18 @@ public class TextExportMarshaller extends AbstractExportMarshaller {
       // Demonstrates getDiagramResource() method usage
       final IResource diagramResource = getDiagramResource();
       builder.append("Text generated from resource ").append(diagramResource.getName());
+      getDiagramWorkerContext().getProgressMonitor().worked(5);
 
       final InputStream diagramInputStream = getDiagramInputStream();
-      builder.append("\n\n").append("The original diagram stream is ").append(getStreamLength(getDiagramInputStream())).append(" bytes in size");
+      builder.append("\n\n").append("The original diagram stream is ").append(getStreamLength(diagramInputStream)).append(" bytes in size");
+      getDiagramWorkerContext().getProgressMonitor().worked(5);
 
       final URI diagramURI = getDiagramURI();
       builder.append("\n\n").append("The original diagram URI is: ").append(diagramURI.toString());
+      getDiagramWorkerContext().getProgressMonitor().worked(5);
 
-      saveResource(getURIRelativeToDiagram(OUTPUT_FILE_NAME_PATTERN), new ByteArrayInputStream(builder.toString().getBytes()), getDiagramWorkerContext()
-              .getProgressMonitor());
+      saveResource(getURIRelativeToDiagram(OUTPUT_FILE_NAME_PATTERN), new ByteArrayInputStream(builder.toString().getBytes()), new SubProgressMonitor(
+              getDiagramWorkerContext().getProgressMonitor(), 5));
 
     } catch (InterruptedException e) {
       e.printStackTrace();
@@ -60,7 +78,6 @@ public class TextExportMarshaller extends AbstractExportMarshaller {
     }
 
   }
-
   private int getStreamLength(final InputStream diagramInputStream) {
     final ByteArrayOutputStream baos = new ByteArrayOutputStream();
 
