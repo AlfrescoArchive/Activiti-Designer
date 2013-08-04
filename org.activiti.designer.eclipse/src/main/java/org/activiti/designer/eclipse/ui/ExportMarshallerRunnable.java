@@ -18,6 +18,7 @@ import java.util.Collection;
 
 import org.activiti.designer.eclipse.extension.export.ExportMarshaller;
 import org.activiti.designer.eclipse.extension.export.ExportMarshallerContext;
+import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.eclipse.util.ExtensionPointUtil;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
 import org.eclipse.core.runtime.IProgressMonitor;
@@ -45,7 +46,17 @@ public class ExportMarshallerRunnable implements IRunnableWithProgress {
 
   public ExportMarshallerRunnable(final Bpmn2MemoryModel model, final Collection<ExportMarshaller> marshallers) {
     this.model = model;
-    this.marshallers = marshallers;
+    this.marshallers = checkMarshallers(marshallers);
+  }
+
+  private Collection<ExportMarshaller> checkMarshallers(final Collection<ExportMarshaller> marshallers) {
+    final Collection<ExportMarshaller> result = new ArrayList<ExportMarshaller>();
+    for (final ExportMarshaller exportMarshaller : marshallers) {
+      if (PreferencesUtil.getBooleanPreference(PreferencesUtil.getExportMarshallerPreferenceId(exportMarshaller.getMarshallerName()))) {
+        result.add(exportMarshaller);
+      }
+    }
+    return result;
   }
 
   public ExportMarshallerRunnable(final Bpmn2MemoryModel model, final ExportMarshaller marshaller) {

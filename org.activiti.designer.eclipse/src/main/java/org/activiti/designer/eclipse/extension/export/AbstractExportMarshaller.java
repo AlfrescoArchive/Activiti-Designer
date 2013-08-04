@@ -26,6 +26,14 @@ public abstract class AbstractExportMarshaller extends AbstractDiagramWorker imp
 
   private static final int WORK_INVOKE_VALIDATORS_VALIDATOR = 10;
 
+  @Override
+  public void marshallDiagram(final ExportMarshallerContext context) {
+    super.setDiagramWorkerContext(context);
+    doMarshallDiagram();
+  }
+
+  protected abstract void doMarshallDiagram();
+
   /**
    * Invokes validators marked by the provided validatorIds. If no validator is
    * registered by one of the validatorIds, that validator is skipped. Make sure

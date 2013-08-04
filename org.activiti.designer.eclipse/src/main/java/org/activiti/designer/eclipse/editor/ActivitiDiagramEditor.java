@@ -173,10 +173,10 @@ public class ActivitiDiagramEditor extends DiagramEditor {
       // Save an image of the diagram
       doSaveImage(diagramFileString, model);
 
+      dataFile.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
+
       // Invoke export marshallers to produce additional output
       doInvokeExportMarshallers(model);
-
-      dataFile.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
 
     } catch (Exception e) {
       // TODO Auto-generated catch block

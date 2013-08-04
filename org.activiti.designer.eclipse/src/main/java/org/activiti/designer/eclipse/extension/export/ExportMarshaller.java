@@ -3,7 +3,6 @@
  */
 package org.activiti.designer.eclipse.extension.export;
 
-
 /**
  * Produces customized output when exporting diagrams. ExportMarshallers are
  * invoked (if the user has the preference set in Eclipse's settings) when
@@ -66,6 +65,6 @@ public interface ExportMarshaller {
    * 
    * @return the transformed diagram as a byte[]
    */
-  void marshallDiagram(ExportMarshallerContext context);
+  void marshallDiagram(final ExportMarshallerContext context);
 
 }
