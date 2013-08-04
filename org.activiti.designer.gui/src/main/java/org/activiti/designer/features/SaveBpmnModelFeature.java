@@ -1,7 +1,5 @@
 package org.activiti.designer.features;
 
-import org.activiti.designer.eclipse.ui.ExportMarshallerRunnable;
-import org.activiti.designer.util.ActivitiConstants;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -53,8 +51,10 @@ public class SaveBpmnModelFeature extends AbstractCustomFeature {
 
       final IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
 
-      final ExportMarshallerRunnable runnable = new ExportMarshallerRunnable(getDiagram(), ActivitiConstants.BPMN_MARSHALLER_NAME);
-      progressService.busyCursorWhile(runnable);
+      // final ExportMarshallerRunnable runnable = new
+      // ExportMarshallerRunnable(getDiagram(),
+      // ActivitiConstants.BPMN_MARSHALLER_NAME);
+      // progressService.busyCursorWhile(runnable);
 
     } catch (Exception e) {
       e.printStackTrace();

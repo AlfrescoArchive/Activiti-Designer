@@ -19,6 +19,7 @@ public enum Preferences {
   ALFRESCO_FORMTYPES_USERTASK("com.alfresco.designer.preferences.formtypes.usertask"),
   EDITOR_ADD_LABELS_TO_NEW_SEQUENCEFLOWS("org.activiti.designer.preferences.editor.addLabelsToNewSequenceFlows"), 
   EDITOR_ADD_DEFAULT_CONTENT_TO_DIAGRAMS("org.activiti.designer.preferences.editor.addDefaultContentToDiagrams"), 
+  SAVE_TO_FORMAT("org.activiti.designer.preferences.save.saveToFormat"), 
   SAVE_IMAGE("org.activiti.designer.preferences.save.imageFormat");
 
   private String preferenceId;

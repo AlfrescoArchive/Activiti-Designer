@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.activiti.designer.eclipse.common.ActivitiPlugin;
+import org.activiti.designer.eclipse.extension.export.ExportMarshaller;
 import org.activiti.designer.util.preferences.Preferences;
 import org.eclipse.jface.preference.IPreferenceStore;
 
@@ -75,11 +76,11 @@ public final class PreferencesUtil {
     final IPreferenceStore store = ActivitiPlugin.getDefault().getPreferenceStore();
     return store.getBoolean(preferenceId);
   }
-  
+
   public static final List<String> getStringArray(final Preferences preferenceName) {
     List<String> resultList = new ArrayList<String>();
     String defaultFormTypes = PreferencesUtil.getStringPreference(preferenceName);
-    if(defaultFormTypes != null && defaultFormTypes.length() > 0) {
+    if (defaultFormTypes != null && defaultFormTypes.length() > 0) {
       String[] formList = defaultFormTypes.split("±");
       if (formList != null) {
         for (String formKey : formList) {
@@ -88,5 +89,29 @@ public final class PreferencesUtil {
       }
     }
     return resultList;
+  }
+
+  /**
+   * Returns the preference id to be used for an {@link ExportMarshaller}
+   * extension.
+   * 
+   * @param marshaller
+   *          the {@link ExportMarshaller} to get the property for
+   * @return the id of the preference
+   */
+  public static final String getPreferenceId(final ExportMarshaller marshaller) {
+    return getExportMarshallerPreferenceId(marshaller.getMarshallerName());
+  }
+
+  /**
+   * Returns the preference id to be used for an {@link ExportMarshaller}
+   * extension based on the marshaller's name.
+   * 
+   * @param marshallerName
+   *          the name of the {@link ExportMarshaller} to get the property for
+   * @return the id of the preference
+   */
+  public static final String getExportMarshallerPreferenceId(final String marshallerName) {
+    return Preferences.SAVE_TO_FORMAT.getPreferenceId() + "." + marshallerName;
   }
 }
