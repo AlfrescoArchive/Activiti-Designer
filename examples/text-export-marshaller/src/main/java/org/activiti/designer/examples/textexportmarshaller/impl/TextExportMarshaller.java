@@ -42,6 +42,10 @@ public class TextExportMarshaller extends AbstractExportMarshaller {
 
   @Override
   public void doMarshallDiagram() {
+
+    // Clear markers first
+    clearMarkersForDiagram();
+
     System.out.println("Marshalling to Text Format!");
 
     final StringBuilder builder = new StringBuilder();
@@ -68,11 +72,17 @@ public class TextExportMarshaller extends AbstractExportMarshaller {
       builder.append("\n\n").append("The original diagram URI is: ").append(diagramURI.toString());
       getDiagramWorkerContext().getProgressMonitor().worked(5);
 
-      saveResource(getURIRelativeToDiagram(OUTPUT_FILE_NAME_PATTERN), new ByteArrayInputStream(builder.toString().getBytes()), new SubProgressMonitor(
-              getDiagramWorkerContext().getProgressMonitor(), 5));
+      final URI newResourceURI = getURIRelativeToDiagram(OUTPUT_FILE_NAME_PATTERN);
 
-    } catch (InterruptedException e) {
+      saveResource(newResourceURI, new ByteArrayInputStream(builder.toString().getBytes()), new SubProgressMonitor(getDiagramWorkerContext()
+              .getProgressMonitor(), 5));
+
+      // Add an example marker
+      addInfoToDiagram("Additional information was saved for this diagram, at: " + newResourceURI.getPath(), null);
+
+    } catch (Exception e) {
       e.printStackTrace();
+      addProblemToDiagram(e.getMessage(), null);
     } finally {
       getDiagramWorkerContext().getProgressMonitor().done();
     }
