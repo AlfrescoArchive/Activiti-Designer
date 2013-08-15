@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="org.activiti.designer.kickstart.eclipse.category"
+            name="Kickstart">
+      </category>
+      <wizard
+            category="org.activiti.designer.kickstart.eclipse.category"
+            class="org.activiti.designer.kickstart.eclipse.ui.wizard.project.CreateDefaultKickstartProjectWizard"
+            icon="icons/logo/activiti.logo.gradients.16x16.png"
+            id="org.activiti.designer.eclipse.ui.wizard.project.CreateDefaultActivitiProjectWizard"
+            name="Kickstart Project"
+            project="true">
+            <description>
+               Create a new Kickstart Project with a basic folder structure.
+            </description>
+      </wizard>
+      
+       <wizard
+            category="org.activiti.designer.kickstart.eclipse.category"
+            class="org.activiti.designer.kickstart.eclipse.ui.wizard.diagram.CreateDefaultKickstartDiagramWizard"
+            icon="icons/logo/activiti.logo.gradients.16x16.png"
+            id="org.activiti.designer.eclipse.ui.wizard.diagram.CreateDefaultActivitiDiagramWizard"
+            name="Kickstart Process Diagram">
+             <description>
+               Create a new Kickstart Process Diagram.
+            </description>
+      </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.graphiti.ui.imageProviders">
+      <imageProvider
+            class="org.activiti.designer.kickstart.eclipse.common.ActivitiEclipseImageProvider"
+            id="org.activiti.designer.eclipse.common.ActivitiImageProvider">
+      </imageProvider>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+   <editor
+         class="org.activiti.designer.kickstart.eclipse.editor.KickstartProcessDiagramEditor"
+         contributorClass="org.eclipse.graphiti.ui.editor.DiagramEditorActionBarContributor"
+         default="true"
+         extensions="kickproc"
+         icon="community_icon.png"
+         id="org.activiti.designer.kickstart.editor.processEditor"
+         matchingStrategy="org.activiti.designer.kickstart.eclipse.editor.KickstartProcessDiagramMatchingStrategy"
+         name="Kickstart Process Editor">
+      <contentTypeBinding
+            contentTypeId="org.activiti.designer.kickstart.editor.process.contenttype">
+      </contentTypeBinding>
+   </editor>
+   </extension>
+ <extension
+       point="org.eclipse.core.contenttype.contentTypes">
+    <content-type
+          base-type="org.eclipse.core.runtime.xml"
+          file-extensions="kickproc"
+          id="org.activiti.designer.kickstart.editor.process.contenttype"
+          name="Kickstart Process Editor File"
+          priority="normal">
+    </content-type>
+ </extension>
+</plugin>

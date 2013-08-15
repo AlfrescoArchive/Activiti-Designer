@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.graphiti.ui.diagramTypes">
+      <diagramType
+            description="The Kickstart process diagram"
+            id="org.activiti.designer.kickstart.DiagramTypeProcess"
+            name="Kickstart Process diagram type"
+            type="KickstartProcessDiagram">
+      </diagramType>
+   </extension>
+   <extension
+         point="org.eclipse.graphiti.ui.diagramTypeProviders">
+      <diagramTypeProvider
+            class="org.activiti.designer.kickstart.process.diagram.KickstartProcessDiagramTypeProvider"
+            id="org.activiti.designer.kickstart.process.diagram.KickstartProcessDiagramTypeProvider"
+            name="Kickstart Process editor">
+         <diagramType
+               id="org.activiti.designer.kickstart.DiagramTypeProcess">
+         </diagramType>
+         <imageProvider
+               id="org.activiti.designer.kickstart.process.KickstartImageProvider">
+         </imageProvider>
+      </diagramTypeProvider>
+   </extension>
+   <extension
+         point="org.eclipse.graphiti.ui.imageProviders">
+      <imageProvider
+            class="org.activiti.designer.kickstart.process.KickstartImageProvider"
+            id="org.activiti.designer.kickstart.process.KickstartImageProvider">
+      </imageProvider>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views.properties.tabbed.propertyContributor">
+      <propertyContributor
+            contributorId="KickstartProcessDiagram.PropertyContributor">
+         <propertyCategory
+               category="Kickstart process"></propertyCategory>
+      </propertyContributor>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views.properties.tabbed.propertyTabs">
+      <propertyTabs
+            contributorId="KickstartProcessDiagram.PropertyContributor">
+         <propertyTab
+               category="Kickstart"
+               id="org.activiti.designer.kickstart.generalTab"
+               label="General">
+         </propertyTab>
+         <propertyTab
+               afterTab="org.activiti.designer.kickstart.generalTab"
+               category="Kickstart"
+               id="org.activiti.designer.kickstart.processTab"
+               label="Process">
+         </propertyTab>
+         <propertyTab
+               afterTab="org.activiti.designer.kickstart.generalTab"
+               category="Kickstart"
+               id="org.activiti.designer.kickstart.mainConfigTab"
+               label="Main config">
+         </propertyTab>
+         
+      </propertyTabs>
+   </extension>
+   <extension
+         point="org.eclipse.ui.views.properties.tabbed.propertySections">
+      <propertySections
+            contributorId="KickstartProcessDiagram.PropertyContributor">
+         <propertySection
+               class="org.activiti.designer.kickstart.process.property.PropertyDiagramSection"
+               filter="org.activiti.designer.kickstart.process.property.PropertyDiagramFilter"
+               id="org.activiti.designer.kickstart.processTab.diagram"
+               tab="org.activiti.designer.kickstart.processTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.kickstart.process.property.PropertySequenceFlowSection"
+               filter="org.activiti.designer.kickstart.process.property.PropertySequenceFlowFilter"
+               id="org.activiti.designer.kickstart.mainConfigTab.sequenceflow"
+               tab="org.activiti.designer.kickstart.mainConfigTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.kickstart.process.property.PropertyServiceTaskSection"
+               filter="org.activiti.designer.kickstart.process.property.PropertyServiceTaskFilter"
+               id="org.activiti.designer.kickstart.mainConfigTab.servicetask"
+               tab="org.activiti.designer.kickstart.mainConfigTab">
+         </propertySection>
+         
+      </propertySections>
+   </extension>
+   <extension
+         id="org.activiti.designer.kickstart.iconProvider"
+         name="Kickstart Process Icon Provider"
+         point="org.activiti.designer.eclipse.extension.IconProvider">
+      <ImageProvider
+            class="org.activiti.designer.kickstart.process.diagram.DefaultIconProvider">
+      </ImageProvider>
+   </extension>
+
+</plugin>
