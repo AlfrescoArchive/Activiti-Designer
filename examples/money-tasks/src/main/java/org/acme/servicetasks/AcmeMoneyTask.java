@@ -99,16 +99,4 @@ public class AcmeMoneyTask extends AbstractCustomServiceTask {
     return "Money node";
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.activiti.designer.integration.servicetask.AbstractCustomServiceTask
-   * #getSmallIconPath()
-   */
-  @Override
-  public String getSmallIconPath() {
-    return "icons/coins.png";
-  }
-
 }

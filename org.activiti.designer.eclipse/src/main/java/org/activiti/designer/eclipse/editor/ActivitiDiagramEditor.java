@@ -6,6 +6,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -31,8 +32,11 @@ import org.activiti.bpmn.model.Process;
 import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.bpmn.model.SubProcess;
+import org.activiti.designer.eclipse.extension.export.ExportMarshaller;
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.eclipse.ui.ActivitiEditorContextMenuProvider;
+import org.activiti.designer.eclipse.ui.ExportMarshallerRunnable;
+import org.activiti.designer.eclipse.util.ExtensionPointUtil;
 import org.activiti.designer.eclipse.util.FileService;
 import org.activiti.designer.integration.servicetask.CustomServiceTask;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
@@ -82,6 +86,8 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
+import org.eclipse.ui.PlatformUI;
+import org.eclipse.ui.progress.IProgressService;
 
 public class ActivitiDiagramEditor extends DiagramEditor {
 
@@ -159,27 +165,20 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     try {
       final IFile dataFile = adei.getDataFile();
       final String diagramFileString = dataFile.getLocationURI().getPath();
-
-      boolean saveImage = PreferencesUtil.getBooleanPreference(Preferences.SAVE_IMAGE);
       Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagramTypeProvider().getDiagram()));
 
-      // add sequence flow bend-points to the model
-      final IFeatureProvider featureProvider = getDiagramTypeProvider().getFeatureProvider();
-      new GraphitiToBpmnDI(model, featureProvider).processGraphitiElements();
+      // Save the bpmn diagram file
+      doSaveToBpmn(model, diagramFileString);
 
-      BpmnXMLConverter converter = new BpmnXMLConverter();
-      byte[] xmlBytes = converter.convertToXML(model.getBpmnModel());
+      // Save an image of the diagram
+      doSaveImage(diagramFileString, model);
 
-      File objectsFile = new File(diagramFileString);
-      FileOutputStream fos = new FileOutputStream(objectsFile);
-      fos.write(xmlBytes);
-      fos.close();
-
-      if (saveImage) {
-        marshallImage(model, diagramFileString);
-      }
-
+      // Refresh the resources in the workspace before invoking export
+      // marshallers, as they may need access to resources
       dataFile.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
+
+      // Invoke export marshallers to produce additional output
+      doInvokeExportMarshallers(model);
 
     } catch (Exception e) {
       // TODO Auto-generated catch block
@@ -188,6 +187,29 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 
     ((BasicCommandStack) getEditingDomain().getCommandStack()).saveIsDone();
     updateDirtyState();
+  }
+
+  private void doSaveToBpmn(final Bpmn2MemoryModel model, final String diagramFileString) throws Exception {
+
+    // add sequence flow bend-points to the model
+    final IFeatureProvider featureProvider = getDiagramTypeProvider().getFeatureProvider();
+    new GraphitiToBpmnDI(model, featureProvider).processGraphitiElements();
+
+    BpmnXMLConverter converter = new BpmnXMLConverter();
+    byte[] xmlBytes = converter.convertToXML(model.getBpmnModel());
+
+    File objectsFile = new File(diagramFileString);
+    FileOutputStream fos = new FileOutputStream(objectsFile);
+    fos.write(xmlBytes);
+    fos.close();
+
+  }
+
+  private void doSaveImage(final String diagramFileString, Bpmn2MemoryModel model) {
+    boolean saveImage = PreferencesUtil.getBooleanPreference(Preferences.SAVE_IMAGE);
+    if (saveImage) {
+      marshallImage(model, diagramFileString);
+    }
   }
 
   private void marshallImage(Bpmn2MemoryModel model, String modelFileName) {
@@ -263,6 +285,13 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     }
   }
 
+  private void doInvokeExportMarshallers(final Bpmn2MemoryModel model) throws InvocationTargetException, InterruptedException {
+    final Collection<ExportMarshaller> marshallers = ExtensionPointUtil.getExportMarshallers();
+    final ExportMarshallerRunnable runnable = new ExportMarshallerRunnable(model, marshallers);
+    final IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
+    progressService.busyCursorWhile(runnable);
+  }
+
   @Override
   public boolean isDirty() {
     TransactionalEditingDomain editingDomain = getEditingDomain();
@@ -302,7 +331,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
         BpmnModel bpmnModel = null;
         try {
           bpmnModel = bpmnConverter.convertToBpmnModel(xtr);
-        } catch(Exception e) {
+        } catch (Exception e) {
           bpmnModel = new BpmnModel();
         }
         model.setBpmnModel(bpmnModel);
