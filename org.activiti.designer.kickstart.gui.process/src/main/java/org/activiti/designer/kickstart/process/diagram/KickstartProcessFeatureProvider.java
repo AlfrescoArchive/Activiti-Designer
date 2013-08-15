@@ -24,7 +24,6 @@ import org.activiti.designer.kickstart.process.features.LayoutTextAnnotationFeat
 import org.activiti.designer.kickstart.process.features.MoveActivityFeature;
 import org.activiti.designer.kickstart.process.features.PasteFlowElementFeature;
 import org.activiti.designer.kickstart.process.features.ReconnectSequenceFlowFeature;
-import org.activiti.designer.kickstart.process.features.SaveBpmnModelFeature;
 import org.activiti.designer.kickstart.process.features.TaskResizeFeature;
 import org.activiti.designer.kickstart.process.features.UpdateFlowElementFeature;
 import org.activiti.designer.util.editor.POJOIndependenceSolver;
@@ -189,8 +188,7 @@ public class KickstartProcessFeatureProvider extends DefaultFeatureProvider {
 
   @Override
 	public ICustomFeature[] getCustomFeatures(ICustomContext context) {
-		return new ICustomFeature[] { new SaveBpmnModelFeature(this),
-				new ChangeElementTypeFeature(this) };
+		return new ICustomFeature[] { new ChangeElementTypeFeature(this) };
 	}
 
   public POJOIndependenceSolver getPojoIndependenceSolver() {
