@@ -88,7 +88,7 @@ public class FileService {
 
     String name = dataFilePath.getFileExtension();
     if (name == null || name.length() == 0) {
-      name = "bpmn";
+      name = "kickproc";
     }
 
     String dir = dataFilePath.segment(0);

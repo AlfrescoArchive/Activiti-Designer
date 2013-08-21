@@ -24,7 +24,7 @@ public class CreateDefaultActivitiDiagramNameWizardPage extends WizardNewFileCre
     setTitle("New Activiti Diagram");
     setImageDescriptor(KickstartPlugin.getImageDescriptor(PluginImage.ACTIVITI_LOGO_64x64));
     setDescription("Create a new Activiti BPMN 2.0 Diagram.");
-    setFileExtension(StringUtils.substringAfter(ActivitiConstants.DATA_FILE_EXTENSION, "."));
+    setFileExtension(StringUtils.substringAfter(".kickproc", "."));
 
     // Set selection to the default folder if the project itself was selected
     final IProject project = getProjectFromSelection(selection);

@@ -300,7 +300,7 @@ public class KickstartProcessToolBehaviorProvider extends DefaultToolBehaviorPro
         IProject project = fileResource.getProject();
         final String parentDiagramName = uriTrimmed.trimFileExtension().lastSegment();
 
-        IFile file = project.getFile(String.format(ActivitiConstants.DIAGRAM_FOLDER + "%s.%s" + ActivitiConstants.DATA_FILE_EXTENSION,
+        IFile file = project.getFile(String.format(ActivitiConstants.DIAGRAM_FOLDER + "%s.%s" + ".kickproc",
                 parentDiagramName, subProcess.getId()));
 
         Diagram diagram = GraphitiUiInternal.getEmfService().getDiagramFromFile(file, new ResourceSetImpl());
