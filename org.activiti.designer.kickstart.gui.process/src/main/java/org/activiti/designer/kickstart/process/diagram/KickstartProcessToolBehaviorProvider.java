@@ -1,11 +1,7 @@
 package org.activiti.designer.kickstart.process.diagram;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 import org.activiti.bpmn.model.CallActivity;
 import org.activiti.bpmn.model.Gateway;
@@ -13,14 +9,12 @@ import org.activiti.bpmn.model.StartEvent;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.bpmn.model.Task;
 import org.activiti.bpmn.model.UserTask;
-import org.activiti.designer.integration.palette.PaletteEntry;
 import org.activiti.designer.kickstart.process.PluginImage;
 import org.activiti.designer.kickstart.process.features.AbstractCreateBPMNFeature;
 import org.activiti.designer.kickstart.process.features.ChangeElementTypeFeature;
-import org.activiti.designer.kickstart.process.features.CreateServiceTaskFeature;
+import org.activiti.designer.kickstart.process.features.CreateHumanStepFeature;
 import org.activiti.designer.util.ActivitiConstants;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
-import org.activiti.designer.util.extension.ExtensionUtil;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -30,7 +24,6 @@ import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.ICreateConnectionFeature;
-import org.eclipse.graphiti.features.ICreateFeature;
 import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.context.IDoubleClickContext;
 import org.eclipse.graphiti.features.context.IPictogramElementContext;
@@ -45,7 +38,6 @@ import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.palette.IPaletteCompartmentEntry;
 import org.eclipse.graphiti.palette.IToolEntry;
-import org.eclipse.graphiti.palette.impl.ObjectCreationToolEntry;
 import org.eclipse.graphiti.palette.impl.PaletteCompartmentEntry;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.tb.ContextButtonEntry;
@@ -56,13 +48,8 @@ import org.eclipse.graphiti.ui.internal.services.GraphitiUiInternal;
 
 public class KickstartProcessToolBehaviorProvider extends DefaultToolBehaviorProvider {
 
-  private static final Map<Class< ? extends ICreateFeature>, PaletteEntry> toolMapping = new HashMap<Class< ? extends ICreateFeature>, PaletteEntry>();
-
   public KickstartProcessToolBehaviorProvider(IDiagramTypeProvider dtp) {
     super(dtp);
-
-    // Setup tool mappings to palette entries
-    toolMapping.put(CreateServiceTaskFeature.class, PaletteEntry.SERVICE_TASK);
   }
 
   @Override
@@ -104,7 +91,7 @@ public class KickstartProcessToolBehaviorProvider extends DefaultToolBehaviorPro
 
     if (bo instanceof StartEvent || bo instanceof Task || bo instanceof CallActivity || bo instanceof Gateway) {
 
-      CreateServiceTaskFeature userTaskfeature = new CreateServiceTaskFeature(getFeatureProvider());
+      CreateHumanStepFeature userTaskfeature = new CreateHumanStepFeature(getFeatureProvider());
       ContextButtonEntry newUserTaskButton = new ContextButtonEntry(userTaskfeature, taskContext);
       newUserTaskButton.setText("new user task"); //$NON-NLS-1$
       newUserTaskButton.setDescription("Create a new task"); //$NON-NLS-1$
@@ -144,7 +131,7 @@ public class KickstartProcessToolBehaviorProvider extends DefaultToolBehaviorPro
       otherElementButton.setIconId(PluginImage.NEW_ICON.getImageKey());
       data.getDomainSpecificContextButtons().add(otherElementButton);
 
-      addContextButton(otherElementButton, new CreateServiceTaskFeature(getFeatureProvider()), taskContext, "Create service task", "Create a new service task",
+      addContextButton(otherElementButton, new CreateHumanStepFeature(getFeatureProvider()), taskContext, "Create service task", "Create a new service task",
               PluginImage.IMG_SERVICETASK);
     }
 
@@ -218,15 +205,7 @@ public class KickstartProcessToolBehaviorProvider extends DefaultToolBehaviorPro
 
     // create new compartments
     IPaletteCompartmentEntry connectionCompartmentEntry = new PaletteCompartmentEntry("Connection", null);
-    IPaletteCompartmentEntry taskCompartmentEntry = new PaletteCompartmentEntry("Task", null);
-
-    for (final IPaletteCompartmentEntry entry : superCompartments) {
-
-      // Prune any disabled palette entries in the Objects compartment
-      if ("Objects".equals(entry.getLabel())) {
-        pruneDisabledPaletteEntries(project, entry);
-      }
-    }
+    IPaletteCompartmentEntry stepCompartmentEntry = new PaletteCompartmentEntry("Step", null);
 
     for (IPaletteCompartmentEntry iPaletteCompartmentEntry : superCompartments) {
       final List<IToolEntry> toolEntries = iPaletteCompartmentEntry.getToolEntries();
@@ -234,54 +213,19 @@ public class KickstartProcessToolBehaviorProvider extends DefaultToolBehaviorPro
       for (IToolEntry toolEntry : toolEntries) {
         if ("sequenceflow".equalsIgnoreCase(toolEntry.getLabel())) {
           connectionCompartmentEntry.getToolEntries().add(toolEntry);
-        } else if ("servicetask".equalsIgnoreCase(toolEntry.getLabel())) {
-          taskCompartmentEntry.getToolEntries().add(toolEntry);
+        } else if ("human step".equalsIgnoreCase(toolEntry.getLabel())) {
+          stepCompartmentEntry.getToolEntries().add(toolEntry);
         }
       }
     }
     // Always add the connection compartment
     ret.add(connectionCompartmentEntry);
 
-    if (taskCompartmentEntry.getToolEntries().size() > 0) {
-      ret.add(taskCompartmentEntry);
+    if (stepCompartmentEntry.getToolEntries().size() > 0) {
+      ret.add(stepCompartmentEntry);
     }
 
     return ret.toArray(new IPaletteCompartmentEntry[ret.size()]);
-  }
-
-  /**
-   * Prunes the disabled palette entries from the
-   * {@link IPaletteCompartmentEntry}.
-   *
-   * @param entry
-   *          the compartment being pruned
-   */
-  private void pruneDisabledPaletteEntries(final IProject project, final IPaletteCompartmentEntry entry) {
-
-    final Set<PaletteEntry> disabledPaletteEntries = ExtensionUtil.getDisabledPaletteEntries(project);
-
-    if (!disabledPaletteEntries.isEmpty()) {
-
-      final Iterator<IToolEntry> entryIterator = entry.getToolEntries().iterator();
-
-      while (entryIterator.hasNext()) {
-
-        final IToolEntry toolEntry = entryIterator.next();
-
-        if (disabledPaletteEntries.contains(PaletteEntry.ALL)) {
-          entryIterator.remove();
-        } else {
-          if (toolEntry instanceof ObjectCreationToolEntry) {
-            final ObjectCreationToolEntry objToolEntry = (ObjectCreationToolEntry) toolEntry;
-            if (toolMapping.containsKey(objToolEntry.getCreateFeature().getClass())) {
-              if (disabledPaletteEntries.contains(toolMapping.get(objToolEntry.getCreateFeature().getClass()))) {
-                entryIterator.remove();
-              }
-            }
-          }
-        }
-      }
-    }
   }
 
   private boolean subProcessDiagramExists(SubProcess subProcess) {

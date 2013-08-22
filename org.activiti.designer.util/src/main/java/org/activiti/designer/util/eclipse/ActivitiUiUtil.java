@@ -15,7 +15,9 @@ import org.activiti.bpmn.model.Process;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.bpmn.model.TextAnnotation;
 import org.activiti.designer.util.editor.Bpmn2MemoryModel;
+import org.activiti.designer.util.editor.KickstartProcessMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
+import org.activiti.workflow.simple.definition.StepDefinition;
 import org.apache.commons.lang.ArrayUtils;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IProjectDescription;
@@ -296,6 +298,20 @@ public class ActivitiUiUtil {
       }
     }
     return newdId;
+  }
+  
+  public static final String getNextStepId(final Class<? extends StepDefinition> featureClass, final String featureIdKey, final Diagram diagram) {
+    KickstartProcessMemoryModel model = ModelHandler.getKickstartProcessModel(EcoreUtil.getURI(diagram));
+    int determinedId = 0;
+    
+    for (StepDefinition step : model.getWorkflowDefinition().getSteps()) {
+      if (step.getClass() == featureClass) {
+        String contentObjectId = step.getId().replace(featureIdKey, "");
+        determinedId = getId(contentObjectId, determinedId);
+      }
+    }
+    determinedId++;
+    return String.format(ID_PATTERN, featureIdKey, determinedId);
   }
 
 }

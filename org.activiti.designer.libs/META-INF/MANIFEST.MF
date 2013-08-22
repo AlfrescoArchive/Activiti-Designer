@@ -22,7 +22,14 @@ Export-Package: org.activiti.bpmn,
  org.activiti.bpmn.converter.util;uses:="javax.xml.stream,org.activiti.bpmn.constants,org.activiti.bpmn.model",
  org.activiti.bpmn.exceptions,
  org.activiti.bpmn.model;uses:="javax.xml.stream",
- org.activiti.bpmn.model.alfresco;uses:="org.activiti.bpmn.model"
+ org.activiti.bpmn.model.alfresco;uses:="org.activiti.bpmn.model",
+ org.activiti.workflow.simple.converter,
+ org.activiti.workflow.simple.converter.json,
+ org.activiti.workflow.simple.converter.listener,
+ org.activiti.workflow.simple.converter.step,
+ org.activiti.workflow.simple.definition,
+ org.activiti.workflow.simple.definition.form,
+ org.activiti.workflow.simple.util
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.apache.commons.lang
 Bundle-Vendor: Activiti
@@ -32,4 +39,9 @@ Bundle-ClassPath: .,
  commons-lang3-3.1.jar,
  activiti-bpmn-model-5.14-SNAPSHOT.jar,
  activiti-bpmn-converter-5.14-SNAPSHOT.jar,
- activiti-bpmn-layout-5.13.jar
+ activiti-bpmn-layout-5.13.jar,
+ activiti-simple-workflow-5.14-SNAPSHOT.jar,
+ jackson-core-asl-1.9.9.jar,
+ jackson-mapper-asl-1.9.9.jar,
+ slf4j-log4j12-1.7.2.jar,
+ log4j-1.2.17.jar

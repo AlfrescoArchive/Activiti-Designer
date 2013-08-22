@@ -5,18 +5,15 @@ import org.activiti.bpmn.model.CallActivity;
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.Lane;
 import org.activiti.bpmn.model.Pool;
-import org.activiti.bpmn.model.SequenceFlow;
-import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.bpmn.model.Task;
 import org.activiti.bpmn.model.TextAnnotation;
-import org.activiti.designer.kickstart.process.features.AddSequenceFlowFeature;
-import org.activiti.designer.kickstart.process.features.AddServiceTaskFeature;
+import org.activiti.designer.kickstart.process.features.AddHumanStepFeature;
 import org.activiti.designer.kickstart.process.features.ChangeElementTypeFeature;
 import org.activiti.designer.kickstart.process.features.ContainerResizeFeature;
 import org.activiti.designer.kickstart.process.features.CopyFlowElementFeature;
+import org.activiti.designer.kickstart.process.features.CreateHumanStepFeature;
 import org.activiti.designer.kickstart.process.features.CreateSequenceFlowFeature;
-import org.activiti.designer.kickstart.process.features.CreateServiceTaskFeature;
 import org.activiti.designer.kickstart.process.features.DeleteFlowElementFeature;
 import org.activiti.designer.kickstart.process.features.DirectEditFlowElementFeature;
 import org.activiti.designer.kickstart.process.features.DirectEditTextAnnotationFeature;
@@ -26,7 +23,8 @@ import org.activiti.designer.kickstart.process.features.PasteFlowElementFeature;
 import org.activiti.designer.kickstart.process.features.ReconnectSequenceFlowFeature;
 import org.activiti.designer.kickstart.process.features.TaskResizeFeature;
 import org.activiti.designer.kickstart.process.features.UpdateFlowElementFeature;
-import org.activiti.designer.util.editor.POJOIndependenceSolver;
+import org.activiti.designer.util.editor.KickstartProcessIndependenceSolver;
+import org.activiti.workflow.simple.definition.HumanStepDefinition;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.ICopyFeature;
@@ -61,22 +59,18 @@ import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
 
 public class KickstartProcessFeatureProvider extends DefaultFeatureProvider {
 
-	public POJOIndependenceSolver independenceResolver;
+	public KickstartProcessIndependenceSolver independenceResolver;
 
 	public KickstartProcessFeatureProvider(IDiagramTypeProvider dtp) {
 		super(dtp);
-		setIndependenceSolver(new POJOIndependenceSolver());
-		independenceResolver = (POJOIndependenceSolver) getIndependenceSolver();
+		setIndependenceSolver(new KickstartProcessIndependenceSolver());
+		independenceResolver = (KickstartProcessIndependenceSolver) getIndependenceSolver();
 	}
 
 	@Override
 	public IAddFeature getAddFeature(IAddContext context) {
-		if (context.getNewObject() instanceof SequenceFlow) {
-		  return new AddSequenceFlowFeature(this);
-		  
-		} else if (context.getNewObject() instanceof ServiceTask) {
-		  ServiceTask serviceTask = (ServiceTask) context.getNewObject();
-		  return new AddServiceTaskFeature(this);
+		if (context.getNewObject() instanceof HumanStepDefinition) {
+		  return new AddHumanStepFeature(this);
     } 
 		return super.getAddFeature(context);
 	}
@@ -84,7 +78,7 @@ public class KickstartProcessFeatureProvider extends DefaultFeatureProvider {
 	@Override
 	public ICreateFeature[] getCreateFeatures() {
 		return new ICreateFeature[] {
-		        new CreateServiceTaskFeature(this)};
+		        new CreateHumanStepFeature(this)};
 	}
 
 	@Override
@@ -191,7 +185,7 @@ public class KickstartProcessFeatureProvider extends DefaultFeatureProvider {
 		return new ICustomFeature[] { new ChangeElementTypeFeature(this) };
 	}
 
-  public POJOIndependenceSolver getPojoIndependenceSolver() {
+  public KickstartProcessIndependenceSolver getPojoIndependenceSolver() {
     return independenceResolver;
   }
 }

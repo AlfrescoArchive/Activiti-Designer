@@ -67,24 +67,6 @@
          point="org.eclipse.ui.views.properties.tabbed.propertySections">
       <propertySections
             contributorId="KickstartProcessDiagram.PropertyContributor">
-         <propertySection
-               class="org.activiti.designer.kickstart.process.property.PropertyDiagramSection"
-               filter="org.activiti.designer.kickstart.process.property.PropertyDiagramFilter"
-               id="org.activiti.designer.kickstart.processTab.diagram"
-               tab="org.activiti.designer.kickstart.processTab">
-         </propertySection>
-         <propertySection
-               class="org.activiti.designer.kickstart.process.property.PropertySequenceFlowSection"
-               filter="org.activiti.designer.kickstart.process.property.PropertySequenceFlowFilter"
-               id="org.activiti.designer.kickstart.mainConfigTab.sequenceflow"
-               tab="org.activiti.designer.kickstart.mainConfigTab">
-         </propertySection>
-         <propertySection
-               class="org.activiti.designer.kickstart.process.property.PropertyServiceTaskSection"
-               filter="org.activiti.designer.kickstart.process.property.PropertyServiceTaskFilter"
-               id="org.activiti.designer.kickstart.mainConfigTab.servicetask"
-               tab="org.activiti.designer.kickstart.mainConfigTab">
-         </propertySection>
          
       </propertySections>
    </extension>

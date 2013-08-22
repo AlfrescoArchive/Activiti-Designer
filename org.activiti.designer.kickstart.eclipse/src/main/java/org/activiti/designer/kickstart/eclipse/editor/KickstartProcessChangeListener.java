@@ -19,11 +19,11 @@ import org.eclipse.graphiti.platform.IDiagramEditor;
 import org.eclipse.swt.widgets.Display;
 
 
-public class ActivitiBpmnModelChangeListener implements ResourceSetListener {
+public class KickstartProcessChangeListener implements ResourceSetListener {
 
   private final IDiagramEditor diagramEditor;
 
-  public ActivitiBpmnModelChangeListener(final IDiagramEditor diagramEditor) {
+  public KickstartProcessChangeListener(final IDiagramEditor diagramEditor) {
     super();
 
     this.diagramEditor = diagramEditor;

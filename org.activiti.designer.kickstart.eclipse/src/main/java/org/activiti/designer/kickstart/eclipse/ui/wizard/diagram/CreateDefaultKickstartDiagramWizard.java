@@ -122,7 +122,7 @@ public class CreateDefaultKickstartDiagramWizard extends BasicNewResourceWizard 
 			    final IFile diagramFile = FileService.getTemporaryDiagramFile(path, tempFolder);
 			    
 				  KickstartProcessDiagramCreator creator = new KickstartProcessDiagramCreator();
-				  creator.createBpmnDiagram(dataFile, diagramFile, null, contentFileName, true);
+				  creator.creatProcessDiagram(dataFile, diagramFile, null, contentFileName, true);
 				} catch (Exception e) {
 					e.printStackTrace();
 				} finally {

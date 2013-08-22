@@ -11,9 +11,9 @@ import org.eclipse.graphiti.ui.editor.DiagramEditor;
  *
  * @author Heiko Kopp
  */
-public class ActivitiEditorUpdateBehavior extends DefaultUpdateBehavior {
+public class KickstartProcessEditorUpdateBehavior extends DefaultUpdateBehavior {
 
-  public ActivitiEditorUpdateBehavior(final DiagramEditor diagramEditor) {
+  public KickstartProcessEditorUpdateBehavior(final DiagramEditor diagramEditor) {
     super(diagramEditor);
   }
 

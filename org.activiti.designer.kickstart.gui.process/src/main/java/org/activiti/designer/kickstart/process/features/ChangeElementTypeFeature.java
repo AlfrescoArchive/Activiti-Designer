@@ -76,7 +76,7 @@ public class ChangeElementTypeFeature extends AbstractCustomFeature {
     }
 	  
 	  if("servicetask".equals(newType)) {
-	  	new CreateServiceTaskFeature(getFeatureProvider()).create(taskContext);
+	  	new CreateHumanStepFeature(getFeatureProvider()).create(taskContext);
 	  } 
   }
 	

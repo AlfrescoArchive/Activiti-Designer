@@ -26,7 +26,7 @@ import org.activiti.bpmn.model.ScriptTask;
 import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.bpmn.model.StartEvent;
 import org.activiti.bpmn.model.UserTask;
-import org.activiti.designer.kickstart.process.features.CreateServiceTaskFeature;
+import org.activiti.designer.kickstart.process.features.CreateHumanStepFeature;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.designer.util.extension.ExtensionUtil;
@@ -164,7 +164,7 @@ public final class CloneUtil {
 
     ServiceTask result = new ServiceTask();
 
-    result.setId(ActivitiUiUtil.getNextId(result.getClass(), CreateServiceTaskFeature.FEATURE_ID_KEY, diagram));
+    result.setId(ActivitiUiUtil.getNextId(result.getClass(), CreateHumanStepFeature.FEATURE_ID_KEY, diagram));
     result.setImplementation(original.getImplementation());
     result.setExtensionId(original.getExtensionId());
 

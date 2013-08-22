@@ -25,7 +25,7 @@ import org.eclipse.ui.ide.IDE;
 
 public class KickstartProcessDiagramCreator {
   
-  public KickstartProcessDiagramEditorInput createBpmnDiagram(final IFile dataFile, final IFile diagramFile, final KickstartProcessDiagramEditor diagramEditor,
+  public KickstartProcessDiagramEditorInput creatProcessDiagram(final IFile dataFile, final IFile diagramFile, final KickstartProcessDiagramEditor diagramEditor,
           final String templateContent, final boolean openEditor) {
     
     IFile finalDataFile = dataFile;

@@ -2,9 +2,7 @@ package org.activiti.designer.kickstart.process.features;
 
 import java.util.List;
 
-import org.activiti.bpmn.model.Lane;
 import org.activiti.bpmn.model.ServiceTask;
-import org.activiti.bpmn.model.SubProcess;
 import org.activiti.bpmn.model.Task;
 import org.activiti.designer.integration.servicetask.CustomServiceTask;
 import org.activiti.designer.integration.servicetask.DiagramBaseShape;
@@ -13,6 +11,7 @@ import org.activiti.designer.util.extension.ExtensionUtil;
 import org.activiti.designer.util.platform.OSEnum;
 import org.activiti.designer.util.platform.OSUtil;
 import org.activiti.designer.util.style.StyleUtil;
+import org.activiti.workflow.simple.definition.WorkflowDefinition;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddContext;
@@ -27,18 +26,17 @@ import org.eclipse.graphiti.mm.algorithms.RoundedRectangle;
 import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
 import org.eclipse.graphiti.mm.pictograms.BoxRelativeAnchor;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
-import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
 
-public abstract class AddTaskFeature extends AbstractAddShapeFeature {
+public abstract class AddStepFeature extends AbstractAddShapeFeature {
 
   private static final int IMAGE_SIZE = 16;
 
-  public AddTaskFeature(IFeatureProvider fp) {
+  public AddStepFeature(IFeatureProvider fp) {
     super(fp);
   }
 
@@ -228,12 +226,8 @@ public abstract class AddTaskFeature extends AbstractAddShapeFeature {
   @Override
   public boolean canAdd(IAddContext context) {
     if (context.getNewObject() instanceof Task) {
-      
       Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-      
-      if (context.getTargetContainer() instanceof Diagram || 
-              parentObject instanceof SubProcess || parentObject instanceof Lane) {
-        
+      if (parentObject instanceof WorkflowDefinition) {
         return true;
       }
     }
