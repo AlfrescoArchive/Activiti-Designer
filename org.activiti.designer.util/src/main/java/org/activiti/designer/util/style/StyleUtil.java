@@ -172,7 +172,7 @@ public class StyleUtil {
     return agca;
   }
 	
-	protected static void addGradientColoredArea(EList<GradientColoredArea> gcas, String colorStart, int locationValueStart,
+	public static void addGradientColoredArea(EList<GradientColoredArea> gcas, String colorStart, int locationValueStart,
 	        LocationType locationTypeStart, String colorEnd, int locationValueEnd, LocationType locationTypeEnd
 	        , Diagram diagram) {
     final GradientColoredArea gca = StylesFactory.eINSTANCE.createGradientColoredArea();
@@ -185,11 +185,6 @@ public class StyleUtil {
                           , ColorUtil.getGreenFromHex(colorStart)
                           , ColorUtil.getBlueFromHex(colorStart));
     gca.getStart().setColor(startColor);
-    
-//    gca.getStart().setColor(StylesFactory.eINSTANCE.createColor());
-//    gca.getStart().getColor().setBlue(ColorUtil.getBlueFromHex(colorStart));
-//    gca.getStart().getColor().setGreen(ColorUtil.getGreenFromHex(colorStart));
-//    gca.getStart().getColor().setRed(ColorUtil.getRedFromHex(colorStart));
     gca.getStart().setLocationType(locationTypeStart);
     gca.getStart().setLocationValue(locationValueStart);
     gca.setEnd(StylesFactory.eINSTANCE.createGradientColoredLocation());

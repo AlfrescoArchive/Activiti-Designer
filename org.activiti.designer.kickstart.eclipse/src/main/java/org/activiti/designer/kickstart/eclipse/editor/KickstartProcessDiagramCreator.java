@@ -25,7 +25,7 @@ import org.eclipse.ui.ide.IDE;
 
 public class KickstartProcessDiagramCreator {
   
-  public KickstartProcessDiagramEditorInput creatProcessDiagram(final IFile dataFile, final IFile diagramFile, final KickstartProcessDiagramEditor diagramEditor,
+  public KickstartDiagramEditorInput creatProcessDiagram(final IFile dataFile, final IFile diagramFile, final KickstartProcessDiagramEditor diagramEditor,
           final String templateContent, final boolean openEditor) {
     
     IFile finalDataFile = dataFile;
@@ -78,7 +78,7 @@ public class KickstartProcessDiagramCreator {
     FileService.createEmfFileForDiagram(uri, diagram, diagramEditor, null, null);
 
     final String providerId = GraphitiUi.getExtensionManager().getDiagramTypeProviderId(diagram.getDiagramTypeId());
-    final KickstartProcessDiagramEditorInput result = new KickstartProcessDiagramEditorInput(EcoreUtil.getURI(diagram), providerId);
+    final KickstartDiagramEditorInput result = new KickstartDiagramEditorInput(EcoreUtil.getURI(diagram), providerId);
     result.setDataFile(finalDataFile);
     result.setDiagramFile(diagramFile);
 
@@ -89,7 +89,7 @@ public class KickstartProcessDiagramCreator {
     return result;
   }
 
-  public void openEditor(final KickstartProcessDiagramEditorInput editorInput) {
+  public void openEditor(final KickstartDiagramEditorInput editorInput) {
     final IWorkbench workbench = PlatformUI.getWorkbench();
 
     workbench.getDisplay().syncExec(new Runnable() {

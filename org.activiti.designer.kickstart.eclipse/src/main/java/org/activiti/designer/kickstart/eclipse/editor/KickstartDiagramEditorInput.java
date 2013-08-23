@@ -4,12 +4,12 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 
-public class KickstartProcessDiagramEditorInput extends DiagramEditorInput {
+public class KickstartDiagramEditorInput extends DiagramEditorInput {
 
   private IFile diagramFile;
   private IFile dataFile;
 
-  public KickstartProcessDiagramEditorInput(URI diagramUri, String providerId) {
+  public KickstartDiagramEditorInput(URI diagramUri, String providerId) {
     super(diagramUri, providerId);
   }
 
@@ -37,8 +37,8 @@ public class KickstartProcessDiagramEditorInput extends DiagramEditorInput {
       return result;
     }
 
-    if (obj instanceof KickstartProcessDiagramEditorInput) {
-      final KickstartProcessDiagramEditorInput otherInput = (KickstartProcessDiagramEditorInput) obj;
+    if (obj instanceof KickstartDiagramEditorInput) {
+      final KickstartDiagramEditorInput otherInput = (KickstartDiagramEditorInput) obj;
 
       if (diagramFile.equals(otherInput.diagramFile)) {
         result = true;

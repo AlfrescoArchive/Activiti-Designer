@@ -29,6 +29,16 @@
                Create a new Kickstart Process Diagram.
             </description>
       </wizard>
+       <wizard
+             category="org.activiti.designer.kickstart.eclipse.category"
+             class="org.activiti.designer.kickstart.eclipse.ui.wizard.form.CreateKickstartFormWizard"
+             icon="icons/logo/activiti.logo.gradients.16x16.png"
+             id="org.activiti.designer.kickstart.eclipse.ui.wizard.diagram.CreateKickstartFormWizard"
+             name="Kickstart Form">
+          <description>
+             Create a new Kickstart Process Diagram.
+          </description>
+       </wizard>
    </extension>
    <extension
          point="org.eclipse.graphiti.ui.imageProviders">
@@ -52,6 +62,19 @@
             contentTypeId="org.activiti.designer.kickstart.editor.process.contenttype">
       </contentTypeBinding>
    </editor>
+   <editor
+         class="org.activiti.designer.kickstart.eclipse.editor.KickstartFormEditor"
+         contributorClass="org.eclipse.graphiti.ui.editor.DiagramEditorActionBarContributor"
+         default="true"
+         extensions="kickform"
+         icon="community_icon.png"
+         id="org.activiti.designer.kickstart.editor.formEditor"
+         matchingStrategy="org.activiti.designer.kickstart.eclipse.editor.KickstartProcessDiagramMatchingStrategy"
+         name="Kickstart Form Editor">
+      <contentTypeBinding
+            contentTypeId="org.activiti.designer.kickstart.editor.process.contenttype">
+      </contentTypeBinding>
+   </editor>
    </extension>
  <extension
        point="org.eclipse.core.contenttype.contentTypes">
@@ -60,6 +83,13 @@
           file-extensions="kickproc"
           id="org.activiti.designer.kickstart.editor.process.contenttype"
           name="Kickstart Process Editor File"
+          priority="normal">
+    </content-type>
+    <content-type
+          base-type="org.eclipse.core.runtime.json"
+          file-extensions="kickproc"
+          id="org.activiti.designer.kickstart.editor.form.contenttype"
+          name="Kickstart Form Editor File"
           priority="normal">
     </content-type>
  </extension>

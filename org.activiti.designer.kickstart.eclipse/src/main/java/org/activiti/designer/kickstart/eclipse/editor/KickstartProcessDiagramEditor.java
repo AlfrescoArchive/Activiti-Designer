@@ -95,7 +95,7 @@ public class KickstartProcessDiagramEditor extends DiagramEditor {
     IEditorInput finalInput = null;
 
     try {
-      if (input instanceof KickstartProcessDiagramEditorInput) {
+      if (input instanceof KickstartDiagramEditorInput) {
         finalInput = input;
       } else {
         finalInput = createNewDiagramEditorInput(input);
@@ -107,7 +107,7 @@ public class KickstartProcessDiagramEditor extends DiagramEditor {
     super.init(site, finalInput);
   }
 
-  private KickstartProcessDiagramEditorInput createNewDiagramEditorInput(final IEditorInput input) throws CoreException {
+  private KickstartDiagramEditorInput createNewDiagramEditorInput(final IEditorInput input) throws CoreException {
 
     final IFile dataFile = FileService.getDataFileForInput(input);
 
@@ -130,7 +130,7 @@ public class KickstartProcessDiagramEditor extends DiagramEditor {
   public void doSave(IProgressMonitor monitor) {
     super.doSave(monitor);
 
-    final KickstartProcessDiagramEditorInput adei = (KickstartProcessDiagramEditorInput) getEditorInput();
+    final KickstartDiagramEditorInput adei = (KickstartDiagramEditorInput) getEditorInput();
 
     try {
       final IFile dataFile = adei.getDataFile();
@@ -169,7 +169,7 @@ public class KickstartProcessDiagramEditor extends DiagramEditor {
   protected void setInput(IEditorInput input) {
     super.setInput(input);
 
-    final KickstartProcessDiagramEditorInput adei = (KickstartProcessDiagramEditorInput) input;
+    final KickstartDiagramEditorInput adei = (KickstartDiagramEditorInput) input;
     final IFile dataFile = adei.getDataFile();
 
     final KickstartProcessMemoryModel model = new KickstartProcessMemoryModel(getDiagramTypeProvider().getFeatureProvider(), dataFile);
@@ -377,7 +377,7 @@ public class KickstartProcessDiagramEditor extends DiagramEditor {
   public void dispose() {
     super.dispose();
 
-    final KickstartProcessDiagramEditorInput adei = (KickstartProcessDiagramEditorInput) getEditorInput();
+    final KickstartDiagramEditorInput adei = (KickstartDiagramEditorInput) getEditorInput();
 
     ModelHandler.getKickstartProcessModel(EcoreUtil.getURI(getDiagramTypeProvider().getDiagram()));
     KickstartProcessDiagramCreator.dispose(adei.getDiagramFile());

@@ -13,8 +13,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import org.activiti.designer.kickstart.eclipse.editor.KickstartProcessDiagramEditor;
-import org.activiti.designer.kickstart.eclipse.editor.KickstartProcessDiagramEditorInput;
+import org.activiti.designer.kickstart.eclipse.editor.KickstartDiagramEditorInput;
 import org.activiti.designer.util.ActivitiConstants;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -39,6 +38,7 @@ import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.emf.transaction.impl.TransactionalEditingDomainImpl;
 import org.eclipse.emf.transaction.util.TransactionUtil;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
+import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IURIEditorInput;
@@ -161,7 +161,7 @@ public class FileService {
    * editor input versions:
    *
    * <ul>
-   *     <li>the special {@link KickstartProcessDiagramEditorInput} that directly references the data file</li>
+   *     <li>the special {@link KickstartDiagramEditorInput} that directly references the data file</li>
    *     <li>a {@link DiagramEditorInput} that may either point to a data- or diagram file</li>
    *     <li>a {@link FileEditorInput} that points to a data file</li>
    *     <li>a {@link IURIEditorInput} that points to an external file outside Eclipse</li>
@@ -173,8 +173,8 @@ public class FileService {
   public static IFile getDataFileForInput(final IEditorInput input) {
     final IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
 
-    if (input instanceof KickstartProcessDiagramEditorInput) {
-      final KickstartProcessDiagramEditorInput adei = (KickstartProcessDiagramEditorInput) input;
+    if (input instanceof KickstartDiagramEditorInput) {
+      final KickstartDiagramEditorInput adei = (KickstartDiagramEditorInput) input;
 
       return adei.getDataFile();
     } else if (input instanceof DiagramEditorInput) {
@@ -232,7 +232,7 @@ public class FileService {
 
 	public static TransactionalEditingDomain createEmfFileForDiagram(final URI diagramResourceUri
 	                                                               , final Diagram diagram
-	                                                               , final KickstartProcessDiagramEditor diagramEditor
+	                                                               , final DiagramEditor diagramEditor
 	                                                               , final InputStream contentStream
 	                                                               , final IFile resourceFile) {
 
