@@ -1,7 +1,7 @@
 package org.activiti.designer.kickstart.form.features;
 
+import org.activiti.designer.kickstart.form.diagram.KickstartFormFeatureProvider;
 import org.activiti.designer.kickstart.form.diagram.SingleColumnFormLayout;
-import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IMoveShapeContext;
 import org.eclipse.graphiti.features.impl.DefaultMoveShapeFeature;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
@@ -13,9 +13,9 @@ import org.eclipse.graphiti.mm.pictograms.Diagram;
  * 
  * @author Frederik Heremans
  */
-public class FormPropertyMoveFeature extends DefaultMoveShapeFeature {
+public class MoveFormComponentFeature extends DefaultMoveShapeFeature {
 
-  public FormPropertyMoveFeature(IFeatureProvider fp) {
+  public MoveFormComponentFeature(KickstartFormFeatureProvider fp) {
     super(fp);
   }
 
@@ -31,7 +31,8 @@ public class FormPropertyMoveFeature extends DefaultMoveShapeFeature {
     if(targetContainer != null) {
       // TODO: use shared instance for diagram?
       SingleColumnFormLayout layout = new SingleColumnFormLayout();
-      layout.moveShape(context);
+      layout.moveShape(context.getTargetContainer(), context.getSourceContainer(), context.getShape(), context.getX(),
+          context.getY());
     }
   }
   

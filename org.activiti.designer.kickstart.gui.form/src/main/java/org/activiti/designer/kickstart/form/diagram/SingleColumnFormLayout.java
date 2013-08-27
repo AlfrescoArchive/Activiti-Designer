@@ -1,6 +1,5 @@
 package org.activiti.designer.kickstart.form.diagram;
 
-import org.eclipse.graphiti.features.context.IMoveShapeContext;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
@@ -10,16 +9,19 @@ import org.eclipse.graphiti.services.Graphiti;
  * 
  * @author Frederik Heremans
  */
-public class SingleColumnFormLayout {
+public class SingleColumnFormLayout implements FormComponentLayout {
 
   private int leftPadding = 20;
   private int verticalSpacing = 10;
 
-  public void moveShape(IMoveShapeContext context) {
-    moveShape(context.getTargetContainer(), context.getSourceContainer(), context.getShape(), context.getX(),
-        context.getY());
+  public void relayout(ContainerShape targetContainer) {
+    int yPosition = verticalSpacing;
+    for (Shape child : targetContainer.getChildren()) {
+      Graphiti.getGaService().setLocation(child.getGraphicsAlgorithm(), leftPadding, yPosition);
+      yPosition = yPosition + child.getGraphicsAlgorithm().getHeight() + verticalSpacing;
+    }
   }
-
+  
   /**
    * Moves the given shape to the right location in the given container, based on the position the shape should be moved
    * to. Other shapes in the container may be moved as well.
@@ -62,11 +64,7 @@ public class SingleColumnFormLayout {
       }
       
       // Finally, re-position all shapes according to their order in the container
-      int yPosition = verticalSpacing;
-      for (Shape child : targetContainer.getChildren()) {
-        Graphiti.getGaService().setLocation(child.getGraphicsAlgorithm(), leftPadding, yPosition);
-        yPosition = yPosition + child.getGraphicsAlgorithm().getHeight() + verticalSpacing;
-      }
+      relayout(targetContainer);
     }
   }
 

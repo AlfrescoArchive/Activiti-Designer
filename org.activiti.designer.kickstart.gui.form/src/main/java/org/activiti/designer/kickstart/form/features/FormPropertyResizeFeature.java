@@ -1,6 +1,6 @@
 package org.activiti.designer.kickstart.form.features;
 
-import org.eclipse.graphiti.features.IFeatureProvider;
+import org.activiti.designer.kickstart.form.diagram.KickstartFormFeatureProvider;
 import org.eclipse.graphiti.features.IResizeShapeFeature;
 import org.eclipse.graphiti.features.context.IResizeShapeContext;
 import org.eclipse.graphiti.features.impl.DefaultResizeShapeFeature;
@@ -11,7 +11,7 @@ import org.eclipse.graphiti.features.impl.DefaultResizeShapeFeature;
  */
 public class FormPropertyResizeFeature extends DefaultResizeShapeFeature {
 
-  public FormPropertyResizeFeature(IFeatureProvider fp) {
+  public FormPropertyResizeFeature(KickstartFormFeatureProvider fp) {
     super(fp);
   }
   
