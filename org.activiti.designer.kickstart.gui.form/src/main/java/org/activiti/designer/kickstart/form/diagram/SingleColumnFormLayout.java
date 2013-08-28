@@ -27,6 +27,10 @@ public class SingleColumnFormLayout implements FormComponentLayout {
    * to. Other shapes in the container may be moved as well.
    */
   public void moveShape(ContainerShape targetContainer, ContainerShape sourceContainer, Shape shape, int x, int y) {
+    // First, make sure the target container is a valid target. if not, find first container
+    // that can in the parent chain and adjust X and Y accordingly
+    
+    
     boolean inSameContainer = targetContainer.equals(sourceContainer);
     
     if(targetContainer.getChildren().size() == 0) {

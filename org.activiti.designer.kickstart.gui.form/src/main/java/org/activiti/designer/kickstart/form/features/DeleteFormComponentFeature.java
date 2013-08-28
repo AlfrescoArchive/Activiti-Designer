@@ -1,6 +1,5 @@
 package org.activiti.designer.kickstart.form.features;
 
-import org.activiti.designer.kickstart.form.diagram.FormComponentLayout;
 import org.activiti.designer.kickstart.form.diagram.KickstartFormFeatureProvider;
 import org.activiti.designer.kickstart.form.diagram.KickstartFormLayouter;
 import org.eclipse.graphiti.features.context.IDeleteContext;
@@ -15,13 +14,18 @@ public class DeleteFormComponentFeature extends DefaultDeleteFeature {
   
   @Override
   public void delete(IDeleteContext context) {
-    super.delete(context);
+    ContainerShape parent = null;
     if(context.getPictogramElement() instanceof ContainerShape) {
-      ContainerShape layoutParent = getFormLayouter().getLayoutContainerShape((ContainerShape) context.getPictogramElement());
-      FormComponentLayout layout = getFormLayouter().getLayoutForContainer(layoutParent);
-      if(layout != null) {
-        layout.relayout(layoutParent);
+      parent = ((ContainerShape)context.getPictogramElement()).getContainer();
+      
+      super.delete(context);
+      
+      // When deleting, force a re-layout of the parent container after shape has been removed
+      if(context.getPictogramElement() instanceof ContainerShape) {
+        getFormLayouter().relayout(parent);
       }
+    } else {
+      super.delete(context);
     }
   }
   
