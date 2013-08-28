@@ -6,6 +6,7 @@ import java.util.Map;
 import org.activiti.designer.util.style.StyleUtil;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.graphiti.mm.algorithms.styles.AdaptedGradientColoredAreas;
+import org.eclipse.graphiti.mm.algorithms.styles.Color;
 import org.eclipse.graphiti.mm.algorithms.styles.GradientColoredArea;
 import org.eclipse.graphiti.mm.algorithms.styles.GradientColoredAreas;
 import org.eclipse.graphiti.mm.algorithms.styles.LocationType;
@@ -29,6 +30,7 @@ public final class FormComponentStyles {
   
   // Colors
   private static final IColorConstant DEFAULT_FOREGROUND_COLOR = new ColorConstant(0, 0, 0);
+  private static final IColorConstant FIELD_DECORATION_COLOR = new ColorConstant(220, 220, 220);
   
   private static Map<String, Style> styleMap = new HashMap<String, Style>();
   
@@ -51,6 +53,10 @@ public final class FormComponentStyles {
       styleMap.put(INPUT_FIELD_RECTANGLE_STYLE_ID, style);
     }
     return style;
+  }
+  
+  public static Color getFieldDecorationColor(Diagram diagram) {
+    return Graphiti.getGaService().manageColor(diagram, FIELD_DECORATION_COLOR);
   }
   
   private static AdaptedGradientColoredAreas getDefaultInputFieldColor(Diagram diagram) {

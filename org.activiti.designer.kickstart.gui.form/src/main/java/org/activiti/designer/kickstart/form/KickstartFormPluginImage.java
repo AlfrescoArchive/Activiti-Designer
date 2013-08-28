@@ -20,8 +20,7 @@ package org.activiti.designer.kickstart.form;
  */
 public enum KickstartFormPluginImage {
 
-  NEW_ICON("new.icon", "new.png") //$NON-NLS-1$
-  
+  NEW_ICON("new.icon", "new.png"),
   ;
 
   private static final String KEY_PREFIX = KickstartFormActivator.PLUGIN_ID;

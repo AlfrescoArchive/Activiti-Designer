@@ -23,7 +23,10 @@ import org.eclipse.graphiti.services.IPeCreateService;
 public class AddTextPropertyFeature extends AbstractAddFormComponentFeature {
 
   protected static final int DEFAULT_COMPONENT_WIDTH = 500;
-  protected static final int DEFAULT_LABEL_WIDTH = 150;
+  protected static final int DEFAULT_LABEL_HEIGHT = 20;
+  protected static final int DEFAULT_SINGLE_LINE_HEIGHT = 25;
+  protected static final int DEFAULT_MULTI_LINE_HEIGHT = 75;
+  protected static final int TEXTAREA_DECORATION_SIZE = 10;
   
   public AddTextPropertyFeature(KickstartFormFeatureProvider fp) {
     super(fp);
@@ -36,6 +39,7 @@ public class AddTextPropertyFeature extends AbstractAddFormComponentFeature {
   
   @Override
   protected ContainerShape createContainerShape(Object newObject, ContainerShape layoutParent, int width, int height) {
+    
     final IPeCreateService peCreateService = Graphiti.getPeCreateService();
     final ContainerShape containerShape = peCreateService.createContainerShape(layoutParent, true);
     final IGaService gaService = Graphiti.getGaService();
@@ -46,8 +50,11 @@ public class AddTextPropertyFeature extends AbstractAddFormComponentFeature {
     if(width < 0) {
       width = DEFAULT_COMPONENT_WIDTH;
     }
-    if(height < 0) {
-      height = 25;
+    // Multi-line cannot be altered through properties
+    if(definition.isMultiline()) {
+      height = DEFAULT_LABEL_HEIGHT + DEFAULT_MULTI_LINE_HEIGHT;
+    } else {
+      height = DEFAULT_LABEL_HEIGHT + DEFAULT_SINGLE_LINE_HEIGHT;
     }
 
     RoundedRectangle rectangle; 
@@ -58,10 +65,14 @@ public class AddTextPropertyFeature extends AbstractAddFormComponentFeature {
     rectangle = gaService.createRoundedRectangle(invisibleRectangle, 2, 2);
     rectangle.setStyle(FormComponentStyles.getInputFieldStyle(getDiagram()));
     rectangle.setParentGraphicsAlgorithm(invisibleRectangle);
-    gaService.setLocationAndSize(rectangle, DEFAULT_LABEL_WIDTH, 0, width - DEFAULT_LABEL_WIDTH, height);
+    gaService.setLocationAndSize(rectangle, 0, DEFAULT_LABEL_HEIGHT, width, height - DEFAULT_LABEL_HEIGHT);
     
     // Add label
     final Shape shape = peCreateService.createShape(containerShape, false);
+    String value =  definition.getName() != null ?  definition.getName() : "";
+    if(definition.isMandatory()) {
+      value = value + " *";
+    }
     final MultiText text = gaService.createDefaultMultiText(getDiagram(), shape, definition.getName());
     text.setHorizontalAlignment(Orientation.ALIGNMENT_LEFT);
     text.setVerticalAlignment(Orientation.ALIGNMENT_TOP);
@@ -69,8 +80,17 @@ public class AddTextPropertyFeature extends AbstractAddFormComponentFeature {
       text.setFont(gaService.manageFont(getDiagram(), text.getFont().getName(), 11));
     }
     
-    gaService.setLocationAndSize(text, 0, 0, width - DEFAULT_LABEL_WIDTH, 25);
-    gaService.setLocationAndSize(shape.getGraphicsAlgorithm(), 0, 0, width - DEFAULT_LABEL_WIDTH, 25);
+    gaService.setLocationAndSize(text, 0, 0, width, DEFAULT_LABEL_HEIGHT);
+    gaService.setLocationAndSize(shape.getGraphicsAlgorithm(), 0, 0, width, DEFAULT_LABEL_HEIGHT);
+    
+    if(definition.isMultiline()) {
+      Shape textareaDecorationShape = peCreateService.createShape(containerShape, false);
+      RoundedRectangle polygon = gaService.createRoundedRectangle(textareaDecorationShape, TEXTAREA_DECORATION_SIZE, TEXTAREA_DECORATION_SIZE);
+      gaService.setLocationAndSize(polygon, width - 2 - TEXTAREA_DECORATION_SIZE, DEFAULT_LABEL_HEIGHT + 2, TEXTAREA_DECORATION_SIZE, height - DEFAULT_LABEL_HEIGHT - 5);
+      polygon.setBackground(FormComponentStyles.getFieldDecorationColor(getDiagram()));
+      polygon.setForeground(null);
+      polygon.setLineVisible(false);
+    }
     
     // Allow quick-edit
     final IDirectEditingInfo directEditingInfo = getFeatureProvider().getDirectEditingInfo();

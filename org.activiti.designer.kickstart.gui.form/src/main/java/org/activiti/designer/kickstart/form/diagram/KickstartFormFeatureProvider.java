@@ -1,6 +1,7 @@
 package org.activiti.designer.kickstart.form.diagram;
 
 import org.activiti.designer.kickstart.form.features.AddTextPropertyFeature;
+import org.activiti.designer.kickstart.form.features.CreateTextAreaPropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateTextInputPropertyFeature;
 import org.activiti.designer.kickstart.form.features.DeleteFormComponentFeature;
 import org.activiti.designer.kickstart.form.features.DirectEditFormComponentFeature;
@@ -39,7 +40,7 @@ public class KickstartFormFeatureProvider extends DefaultFeatureProvider {
 
 	@Override
 	public ICreateFeature[] getCreateFeatures() {
-	  return new ICreateFeature[]{new CreateTextInputPropertyFeature(this)};
+	  return new ICreateFeature[]{ new CreateTextInputPropertyFeature(this), new CreateTextAreaPropertyFeature(this)};
 	}
 	
 	@Override

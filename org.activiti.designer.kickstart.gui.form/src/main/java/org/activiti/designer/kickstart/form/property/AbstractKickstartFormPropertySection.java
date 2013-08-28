@@ -3,18 +3,18 @@ package org.activiti.designer.kickstart.form.property;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.activiti.designer.kickstart.form.command.KickstartModelUpdater;
+import org.activiti.designer.kickstart.form.command.UpdateBusinessObjectCommand;
 import org.activiti.designer.util.editor.KickstartFormMemoryModel;
+import org.activiti.designer.util.editor.KickstartFormMemoryModel.KickstartFormModelListener;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.graphiti.features.IFeature;
-import org.eclipse.graphiti.features.IUpdateFeature;
-import org.eclipse.graphiti.features.context.IContext;
-import org.eclipse.graphiti.features.context.impl.CustomContext;
-import org.eclipse.graphiti.features.context.impl.UpdateContext;
-import org.eclipse.graphiti.features.impl.AbstractFeature;
+import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
+import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.graphiti.ui.platform.GFPropertySection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
@@ -50,6 +50,8 @@ public abstract class AbstractKickstartFormPropertySection extends GFPropertySec
    */
   protected FocusListener focusListener;
   protected SelectionListener selectionListener;
+  protected KickstartFormModelListener modelListener;
+  protected boolean modelChangesEnabled = true;
   
   protected Composite formComposite;
   
@@ -88,12 +90,36 @@ public abstract class AbstractKickstartFormPropertySection extends GFPropertySec
         }
       }
     };
+    
+    modelListener = new KickstartFormModelListener() {
+      @Override
+      public void objectUpdated(Object updatedObject) {
+        if(modelChangesEnabled) {
+          System.out.println("Changes enabled!");
+          Object bo = getBusinessObject(getSelectedPictogramElement());
+          if(bo != null && bo.equals(updatedObject)) {
+            refresh();
+          }
+        } else {
+          // TODO: remove
+          System.out.println("Changes enabled!");
+        }
+      }
+    };
   }
   
   @Override
   public void refresh() {
-    Object bo = getBusinessObject(getSelectedPictogramElement());
+    PictogramElement element = getSelectedPictogramElement();
+    Object bo = getBusinessObject(element);
     if(bo != null) {
+      // Make sure the model is wired with the listener
+      Diagram diagram = getContainer(element);
+      KickstartFormMemoryModel model = (ModelHandler.getKickstartFormMemoryModel(EcoreUtil.getURI(diagram)));
+      if (model != null) {
+         model.addModelListener(modelListener);
+      }
+      
       // Populate all controls, based on the model
       for(Control control : controls) {
         populateControl(control, bo);
@@ -145,37 +171,39 @@ public abstract class AbstractKickstartFormPropertySection extends GFPropertySec
     if (bo != null) {
       // Get the current value from the model
       Object oldValue = getModelValueForControl(control, bo);
-      
+
       // Compare the old value with the new value from the control
       Object newValue = getValueFromControl(control);
-      if(hasChanged(oldValue, newValue)) {
+      if (hasChanged(oldValue, newValue)) {
+        try {
+          modelChangesEnabled = false;
+          
+          // Make sure the update of the model is done in the transactional editing domain
+          // to allow for "undoing" changes
+          DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
+          TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
+          KickstartModelUpdater<?> updater = getModelUpdater();
 
-        // The value in the control has changed, request update of model, including UI
-        IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
-          @Override
-          public void execute(IContext context) {
-            storeValueInModel(control, bo);
-            
-            UpdateContext updateContext = new UpdateContext(getSelectedPictogramElement());
-            IUpdateFeature updateFeature = getDiagramTypeProvider().getFeatureProvider().getUpdateFeature(updateContext);
-            if(updateFeature != null) {
-              updateFeature.update(updateContext);
-            }
-          }
+          // Perform the changes on the updatable BO instead of the original
+          Object updatableBo = updater.getUpdatableBusinessObject();
+          storeValueInModel(control, updatableBo);
 
-          @Override
-          public boolean canExecute(IContext context) {
-            return true;
-          }
-        };
-        
-        // Actually execute the feature
-        CustomContext context = new CustomContext();
-        execute(feature, context);
+          // Do the actual changes to the business-object in a command
+          editingDomain.getCommandStack().execute(new UpdateBusinessObjectCommand(editingDomain, updater));
+          
+        } finally {
+          // Re-enable model-change listener after our change has been applied
+          modelChangesEnabled = true;
+        }
       }
     }
   }
   
+  /**
+   * @return an {@link UpdateBusinessObjectCommand} that will be used to record model updates. 
+   */
+  protected abstract KickstartModelUpdater<?> getModelUpdater();
+
   protected boolean hasChanged(Object oldValue, Object newValue) {
     if(oldValue == null) {
       return newValue != null;
