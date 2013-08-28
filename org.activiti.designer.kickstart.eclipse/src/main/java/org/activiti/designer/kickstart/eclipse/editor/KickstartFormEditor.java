@@ -1,16 +1,23 @@
 package org.activiti.designer.kickstart.eclipse.editor;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.activiti.designer.kickstart.eclipse.ui.ActivitiEditorContextMenuProvider;
 import org.activiti.designer.kickstart.eclipse.util.FileService;
 import org.activiti.designer.util.editor.KickstartFormMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
+import org.activiti.workflow.simple.definition.form.FormPropertyDefinition;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.gef.ContextMenuProvider;
 import org.eclipse.gef.GraphicalViewer;
+import org.eclipse.graphiti.mm.pictograms.Diagram;
+import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
@@ -28,7 +35,13 @@ public class KickstartFormEditor extends DiagramEditor {
   public static GraphicalViewer getActiveGraphicalViewer() {
     return activeGraphicalViewer;
   }
-
+  
+  @Override
+  public void doSave(IProgressMonitor monitor) {
+    super.doSave(monitor);
+    
+  }
+ 
   @Override
   public void dispose() {
     super.dispose();

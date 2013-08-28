@@ -1,6 +1,14 @@
 package org.activiti.designer.kickstart.form.diagram;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.activiti.designer.util.editor.KickstartFormMemoryModel;
+import org.activiti.designer.util.editor.ModelHandler;
+import org.activiti.workflow.simple.definition.form.FormPropertyDefinition;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
+import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
 
@@ -16,12 +24,34 @@ public class SingleColumnFormLayout implements FormComponentLayout {
 
   public void relayout(ContainerShape targetContainer) {
     int yPosition = verticalSpacing;
+    
+    Diagram diagram = getDiagram(targetContainer);
+    KickstartFormMemoryModel model = (ModelHandler.getKickstartFormMemoryModel(EcoreUtil.getURI(diagram)));
+    List<FormPropertyDefinition> definitionsInNewOrder = new ArrayList<FormPropertyDefinition>();
+    
     for (Shape child : targetContainer.getChildren()) {
       Graphiti.getGaService().setLocation(child.getGraphicsAlgorithm(), leftPadding, yPosition);
       yPosition = yPosition + child.getGraphicsAlgorithm().getHeight() + verticalSpacing;
+      Object businessObject = model.getFeatureProvider().getBusinessObjectForPictogramElement(child);
+      if(businessObject instanceof FormPropertyDefinition) {
+        definitionsInNewOrder.add((FormPropertyDefinition) businessObject);
+      }
     }
+    
+    // Set the properties list in the new order after re-layouting
+    model.getFormDefinition().setFormProperties(definitionsInNewOrder);
   }
   
+  protected Diagram getDiagram(ContainerShape targetContainer) {
+    while(targetContainer != null) {
+      if(targetContainer instanceof Diagram) {
+        return (Diagram) targetContainer;
+      }
+      targetContainer = targetContainer.getContainer();
+    }
+    throw new IllegalArgumentException("Used container is not part of a diagram");
+  }
+
   /**
    * Moves the given shape to the right location in the given container, based on the position the shape should be moved
    * to. Other shapes in the container may be moved as well.

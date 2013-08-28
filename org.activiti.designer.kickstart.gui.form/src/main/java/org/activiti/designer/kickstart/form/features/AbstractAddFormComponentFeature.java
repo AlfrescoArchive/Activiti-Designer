@@ -22,9 +22,6 @@ public abstract class AbstractAddFormComponentFeature extends AbstractAddShapeFe
   public PictogramElement add(IAddContext context) {
     final ContainerShape parent = context.getTargetContainer();
 
-    // Make sure parent container is a valid container. If not, traverse tree to find first suitable
-    // target for adding this
-
     // Get actual shape from subclass
     final ContainerShape containerShape = createContainerShape(context.getNewObject(), parent, -1, -1);
 

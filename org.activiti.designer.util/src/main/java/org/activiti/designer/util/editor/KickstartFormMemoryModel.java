@@ -22,7 +22,7 @@ public class KickstartFormMemoryModel {
     this.featureProvider = featureProvider;
     this.modelFile = modelFile;
     objectMap = new HashMap<String, Object>();
-    
+    formDefinition = new FormDefinition();
     modelListeners = new ArrayList<KickstartFormMemoryModel.KickstartFormModelListener>();
   }
   

@@ -11,7 +11,6 @@ import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
-import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
@@ -95,14 +94,10 @@ public abstract class AbstractKickstartFormPropertySection extends GFPropertySec
       @Override
       public void objectUpdated(Object updatedObject) {
         if(modelChangesEnabled) {
-          System.out.println("Changes enabled!");
           Object bo = getBusinessObject(getSelectedPictogramElement());
           if(bo != null && bo.equals(updatedObject)) {
             refresh();
           }
-        } else {
-          // TODO: remove
-          System.out.println("Changes enabled!");
         }
       }
     };
