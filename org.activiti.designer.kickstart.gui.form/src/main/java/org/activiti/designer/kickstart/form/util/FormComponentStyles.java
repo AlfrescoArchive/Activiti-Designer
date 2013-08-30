@@ -31,6 +31,9 @@ public final class FormComponentStyles {
   // Colors
   private static final IColorConstant DEFAULT_FOREGROUND_COLOR = new ColorConstant(0, 0, 0);
   private static final IColorConstant FIELD_DECORATION_COLOR = new ColorConstant(220, 220, 220);
+  private static final IColorConstant GROUP_BORDER_COLOR = new ColorConstant(180, 180, 180);
+  private static final IColorConstant CALENDAR_DECORATION_TOP_COLOR = new ColorConstant(255, 145, 145);
+  private static final IColorConstant CALENDAR_DECORATION_COLOR = new ColorConstant(255, 255, 255);
   
   private static Map<String, Style> styleMap = new HashMap<String, Style>();
   
@@ -57,6 +60,22 @@ public final class FormComponentStyles {
   
   public static Color getFieldDecorationColor(Diagram diagram) {
     return Graphiti.getGaService().manageColor(diagram, FIELD_DECORATION_COLOR);
+  }
+  
+  public static Color getGroupBorderColor(Diagram diagram) {
+    return Graphiti.getGaService().manageColor(diagram, GROUP_BORDER_COLOR);
+  }
+  
+  public static Color getDefaultForegroundColor(Diagram diagram) {
+    return Graphiti.getGaService().manageColor(diagram, DEFAULT_FOREGROUND_COLOR);
+  }
+  
+  public static Color getCalandarDecorationColor(Diagram diagram) {
+    return Graphiti.getGaService().manageColor(diagram, CALENDAR_DECORATION_COLOR);
+  }
+  
+  public static Color getCalandarTopDecorationColor(Diagram diagram) {
+    return Graphiti.getGaService().manageColor(diagram, CALENDAR_DECORATION_TOP_COLOR);
   }
   
   private static AdaptedGradientColoredAreas getDefaultInputFieldColor(Diagram diagram) {

@@ -32,6 +32,6 @@ public class CreateTextAreaPropertyFeature extends AbstractCreateFormPropertyFea
 
   @Override
   public String getCreateImageId() {
-    return KickstartFormPluginImage.NEW_ICON.getImageKey();
+    return KickstartFormPluginImage.NEW_TEXT_AREA.getImageKey();
   }
 }

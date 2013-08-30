@@ -20,7 +20,8 @@ package org.activiti.designer.kickstart.form;
  */
 public enum KickstartFormPluginImage {
 
-  NEW_ICON("new.icon", "new.png"),
+  NEW_TEXT_INPUT("new.textinput.icon", "textinput-16.png"),
+  NEW_TEXT_AREA("new.textarea.icon", "textarea-16.png")
   ;
 
   private static final String KEY_PREFIX = KickstartFormActivator.PLUGIN_ID;

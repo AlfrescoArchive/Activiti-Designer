@@ -104,17 +104,28 @@ public abstract class AbstractKickstartFormPropertySection extends GFPropertySec
   }
   
   @Override
+  public void aboutToBeHidden() {
+    super.aboutToBeHidden();
+    KickstartFormMemoryModel model = (ModelHandler.getKickstartFormMemoryModel(EcoreUtil.getURI(getDiagram())));
+    if (model != null) {
+       model.removeModelListener(modelListener);
+    }
+  }
+  
+  @Override
+  public void aboutToBeShown() {
+    super.aboutToBeHidden();
+    KickstartFormMemoryModel model = (ModelHandler.getKickstartFormMemoryModel(EcoreUtil.getURI(getDiagram())));
+    if (model != null) {
+       model.addModelListener(modelListener);
+    }
+  }
+  
+  @Override
   public void refresh() {
     PictogramElement element = getSelectedPictogramElement();
     Object bo = getBusinessObject(element);
     if(bo != null) {
-      // Make sure the model is wired with the listener
-      Diagram diagram = getContainer(element);
-      KickstartFormMemoryModel model = (ModelHandler.getKickstartFormMemoryModel(EcoreUtil.getURI(diagram)));
-      if (model != null) {
-         model.addModelListener(modelListener);
-      }
-      
       // Populate all controls, based on the model
       for(Control control : controls) {
         populateControl(control, bo);
@@ -349,6 +360,9 @@ public abstract class AbstractKickstartFormPropertySection extends GFPropertySec
   }
 
   protected Diagram getContainer(EObject container) {
+    if(container == null) {
+      return null;
+    }
     if (container instanceof Diagram) {
       return (Diagram) container;
     } else {

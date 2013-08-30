@@ -1,5 +1,9 @@
 package org.activiti.designer.kickstart.form.diagram;
 
+import org.activiti.designer.util.editor.KickstartFormMemoryModel;
+import org.activiti.designer.util.editor.ModelHandler;
+import org.activiti.workflow.simple.definition.form.FormPropertyGroup;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.Shape;
@@ -12,9 +16,11 @@ import org.eclipse.graphiti.mm.pictograms.Shape;
 public class KickstartFormLayouter {
 
   private SingleColumnFormLayout defaultLayout;
+  private SingleColumnGroupFormLayout defaultGroupLayout;
   
   public KickstartFormLayouter() {
     defaultLayout = new SingleColumnFormLayout();
+    defaultGroupLayout = new SingleColumnGroupFormLayout();
   }
   
   /**
@@ -22,11 +28,27 @@ public class KickstartFormLayouter {
    * is found in the parent hierarchy, if the given {@link ContainerShape} is not suited.
    */
   protected ContainerShape getValidLayoutContainerShape(ContainerShape containerShape) {
+    return this.getValidLayoutContainerShape(containerShape, ModelHandler.getKickstartFormMemoryModel(
+        EcoreUtil.getURI(getDiagram(containerShape))));
+  }
+  
+  /**
+   * @return the {@link ContainerShape} that can be used to add children to. An appropriate container
+   * is found in the parent hierarchy, if the given {@link ContainerShape} is not suited.
+   */
+  protected ContainerShape getValidLayoutContainerShape(ContainerShape containerShape, KickstartFormMemoryModel model) {
     if(containerShape instanceof Diagram) {
       return containerShape;
-    } else if(containerShape.getContainer() != null) {
-      // Go one level up the hierarchy to find a container that is able to do layout
-      return getValidLayoutContainerShape(containerShape.getContainer());
+    } else {
+      Object businessObject = model.getFeatureProvider().getBusinessObjectForPictogramElement(containerShape);
+      if(businessObject instanceof FormPropertyGroup) {
+        return containerShape;
+      } else {
+        if(containerShape.getContainer() != null) {
+          // Go one level up the hierarchy to find a container that is able to do layout
+          return getValidLayoutContainerShape(containerShape.getContainer(), model);
+        }
+      }
     }
     return null;
   }
@@ -55,7 +77,8 @@ public class KickstartFormLayouter {
       }
     }
     
-    getLayoutForContainer(actualTargetContainer).moveShape(actualTargetContainer, sourceContainer, shape, x, y);
+    
+    getLayoutForContainer(actualTargetContainer).moveShape(this, actualTargetContainer, sourceContainer, shape, x, y);
     return actualTargetContainer;
   }
 
@@ -66,7 +89,20 @@ public class KickstartFormLayouter {
    */
   public void relayout(ContainerShape targetContainer) {
     ContainerShape actualTargetContainer = getValidLayoutContainerShape(targetContainer);
-    getLayoutForContainer(actualTargetContainer).relayout(actualTargetContainer);
+    getLayoutForContainer(actualTargetContainer).relayout(this, actualTargetContainer);
+  }
+  
+  /**
+   * @return the diagram the given container is used in.
+   */
+  public Diagram getDiagram(ContainerShape container) {
+    if(container instanceof Diagram) {
+      return (Diagram) container;
+    }
+    if(container.getContainer() != null) {
+      return getDiagram(container.getContainer());
+    }
+    return null;
   }
   
   protected FormComponentLayout getLayoutForContainer(ContainerShape container) {
@@ -74,7 +110,12 @@ public class KickstartFormLayouter {
     if(container instanceof Diagram) {
       return defaultLayout;
     } else {
-      throw new IllegalArgumentException("No layout available for this container");
+      Object businessObject = ModelHandler.getKickstartFormMemoryModel(EcoreUtil.getURI(getDiagram(container)))
+          .getFeatureProvider().getBusinessObjectForPictogramElement(container);
+      if(businessObject instanceof FormPropertyGroup) {
+        return defaultGroupLayout;
+      }
+      return null;
     }
   }
 }

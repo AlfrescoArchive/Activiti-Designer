@@ -31,7 +31,7 @@ public abstract class AbstractCreateFormPropertyFeature extends AbstractCreateFe
     
     // Add the new property-definition to the model
     KickstartFormMemoryModel model = (ModelHandler.getKickstartFormMemoryModel(EcoreUtil.getURI(getDiagram())));
-    if (model != null) {
+    if (model != null && model.isInitialized()) {
       model.getFormDefinition().addFormProperty(createdDefinition);
     }
     
@@ -53,7 +53,7 @@ public abstract class AbstractCreateFormPropertyFeature extends AbstractCreateFe
   @Override
   public void undo(IContext context) {
     KickstartFormMemoryModel model = (ModelHandler.getKickstartFormMemoryModel(EcoreUtil.getURI(getDiagram())));
-    if (model != null && createdDefinition != null) {
+    if (model != null && model.isInitialized() && createdDefinition != null) {
       model.getFormDefinition().getFormProperties().remove(createdDefinition);
     }
   }
@@ -61,7 +61,7 @@ public abstract class AbstractCreateFormPropertyFeature extends AbstractCreateFe
   @Override
   public void redo(IContext context) {
     KickstartFormMemoryModel model = (ModelHandler.getKickstartFormMemoryModel(EcoreUtil.getURI(getDiagram())));
-    if (model != null && createdDefinition != null) {
+    if (model != null && model.isInitialized() && createdDefinition != null) {
       model.getFormDefinition().addFormProperty(createdDefinition);
     }
   }

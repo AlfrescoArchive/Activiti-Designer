@@ -13,26 +13,31 @@ public class PropertyDefinitionPropertyFilter extends AbstractPropertySectionFil
 
   @Override
   protected boolean accept(PictogramElement pictogramElement) {
-    Object bo = getBusinessObject(pictogramElement); 
+    Object bo = getBusinessObject(pictogramElement);
     return bo instanceof FormPropertyDefinition;
   }
-  
+
   protected Object getBusinessObject(PictogramElement element) {
     if (element == null)
       return null;
     Diagram diagram = getContainer(element);
-    KickstartFormMemoryModel model = (ModelHandler.getKickstartFormMemoryModel(EcoreUtil.getURI(diagram)));
-    if (model != null) {
-      return model.getFeatureProvider().getBusinessObjectForPictogramElement(element);
+    if(diagram != null) {
+     KickstartFormMemoryModel model = (ModelHandler.getKickstartFormMemoryModel(EcoreUtil.getURI(diagram)));
+      if (model != null) {
+        return model.getFeatureProvider().getBusinessObjectForPictogramElement(element);
+      }
     }
     return null;
   }
-  
+
   private Diagram getContainer(EObject container) {
-      if(container instanceof Diagram) {
-          return (Diagram) container;
-      } else {
-          return getContainer(container.eContainer());
-      }
+    if (container == null) {
+      return null;
+    }
+    if (container instanceof Diagram) {
+      return (Diagram) container;
+    } else {
+      return getContainer(container.eContainer());
+    }
   }
-  }
+}

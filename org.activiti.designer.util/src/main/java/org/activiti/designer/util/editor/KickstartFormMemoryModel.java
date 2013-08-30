@@ -17,6 +17,7 @@ public class KickstartFormMemoryModel {
   protected FormDefinition formDefinition;
   protected Map<String, Object> objectMap;
   protected List<KickstartFormModelListener> modelListeners;
+  protected boolean initialized = false;
 
   public KickstartFormMemoryModel(IFeatureProvider featureProvider, IFile modelFile) {
     this.featureProvider = featureProvider;
@@ -24,6 +25,19 @@ public class KickstartFormMemoryModel {
     objectMap = new HashMap<String, Object>();
     formDefinition = new FormDefinition();
     modelListeners = new ArrayList<KickstartFormMemoryModel.KickstartFormModelListener>();
+  }
+  
+  public void setInitialized(boolean initialized) {
+    this.initialized = initialized;
+  }
+  
+  /**
+   * @return true, if the model can be used to be updated. If false is returned,
+   * no changes should be made to this model and an exception will be thrown when
+   * the {@link FormDefinition} is accessed.
+   */
+  public boolean isInitialized() {
+    return initialized;
   }
   
   public void addModelListener(KickstartFormModelListener listener) {
@@ -72,6 +86,9 @@ public class KickstartFormMemoryModel {
   }
 
   public FormDefinition getFormDefinition() {
+    if(!initialized) {
+      throw new IllegalStateException("The model is currently being initialized");
+    }
     return formDefinition;
   }
 

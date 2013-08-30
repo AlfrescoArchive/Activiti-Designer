@@ -14,10 +14,10 @@ public interface FormComponentLayout {
    * Shape was requested to move to the given location in the target container, and should be positioned
    * using this layout implementation.
    */
-  void moveShape(ContainerShape targetContainer, ContainerShape sourceContainer, Shape shape, int x, int y);
+  void moveShape(KickstartFormLayouter layouter, ContainerShape targetContainer, ContainerShape sourceContainer, Shape shape, int x, int y);
   
   /**
    * Request to re-layout all components in this container.
    */
-  void relayout(ContainerShape targetContainer);
+  void relayout(KickstartFormLayouter layouter, ContainerShape targetContainer);
 }

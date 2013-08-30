@@ -7,7 +7,9 @@ import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.features.impl.AbstractUpdateFeature;
 import org.eclipse.graphiti.features.impl.Reason;
 import org.eclipse.graphiti.mm.algorithms.MultiText;
+import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
+import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 
 /**
@@ -66,9 +68,31 @@ public class UpdateFormPropertyFeature extends AbstractUpdateFeature {
     if(shape.getGraphicsAlgorithm() instanceof MultiText) {
       return (MultiText) shape.getGraphicsAlgorithm();
     }
+    
+    MultiText foundtext = null;
     if(shape instanceof ContainerShape) {
       for(Shape child : ((ContainerShape) shape).getChildren()) {
-        return findNameMultiText(child);
+        foundtext = findNameMultiText(child);
+        if(foundtext != null) {
+          return foundtext;
+        }
+      }
+    }
+    return null;
+  }
+  
+  protected Text findFieldText(PictogramElement shape) {
+    if(shape.getGraphicsAlgorithm() instanceof Text) {
+      return (Text) shape.getGraphicsAlgorithm();
+    }
+    
+    Text foundText = null;
+    if(shape instanceof ContainerShape) {
+      for(Shape child : ((ContainerShape) shape).getChildren()) {
+        foundText = findFieldText(child);
+        if(foundText != null) {
+          return foundText;
+        }
       }
     }
     return null;

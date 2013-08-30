@@ -6,6 +6,7 @@ import java.util.List;
 import org.activiti.designer.util.editor.KickstartFormMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.workflow.simple.definition.form.FormPropertyDefinition;
+import org.activiti.workflow.simple.definition.form.FormPropertyGroup;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -19,86 +20,105 @@ import org.eclipse.graphiti.services.Graphiti;
  */
 public class SingleColumnFormLayout implements FormComponentLayout {
 
+  private static final int GROUP_INSET_SIZE = 5;
   private int leftPadding = 20;
   private int verticalSpacing = 10;
 
-  public void relayout(ContainerShape targetContainer) {
+  
+  public void relayout(KickstartFormLayouter layouter, ContainerShape targetContainer) {
     int yPosition = verticalSpacing;
+    int xPosition = leftPadding;
     
-    Diagram diagram = getDiagram(targetContainer);
+    Diagram diagram = layouter.getDiagram(targetContainer);
     KickstartFormMemoryModel model = (ModelHandler.getKickstartFormMemoryModel(EcoreUtil.getURI(diagram)));
+    
     List<FormPropertyDefinition> definitionsInNewOrder = new ArrayList<FormPropertyDefinition>();
+    List<FormPropertyGroup> groupsInNewOrder = new ArrayList<FormPropertyGroup>();
     
     for (Shape child : targetContainer.getChildren()) {
-      Graphiti.getGaService().setLocation(child.getGraphicsAlgorithm(), leftPadding, yPosition);
-      yPosition = yPosition + child.getGraphicsAlgorithm().getHeight() + verticalSpacing;
       Object businessObject = model.getFeatureProvider().getBusinessObjectForPictogramElement(child);
       if(businessObject instanceof FormPropertyDefinition) {
         definitionsInNewOrder.add((FormPropertyDefinition) businessObject);
+        xPosition = leftPadding; 
+      } else if(businessObject instanceof FormPropertyGroup) {
+        groupsInNewOrder.add((FormPropertyGroup) businessObject);
+        xPosition = leftPadding -  GROUP_INSET_SIZE;
       }
+      
+      Graphiti.getGaService().setLocation(child.getGraphicsAlgorithm(), xPosition, yPosition);
+      yPosition = yPosition + child.getGraphicsAlgorithm().getHeight() + verticalSpacing;
     }
     
-    // Set the properties list in the new order after re-layouting
-    model.getFormDefinition().setFormProperties(definitionsInNewOrder);
+    if(model.isInitialized()) {
+      // Set the properties list in the new order after re-layouting
+      model.getFormDefinition().setFormProperties(definitionsInNewOrder);
+      model.getFormDefinition().setFormGroups(groupsInNewOrder);
+    }
   }
   
-  protected Diagram getDiagram(ContainerShape targetContainer) {
-    while(targetContainer != null) {
-      if(targetContainer instanceof Diagram) {
-        return (Diagram) targetContainer;
-      }
-      targetContainer = targetContainer.getContainer();
-    }
-    throw new IllegalArgumentException("Used container is not part of a diagram");
-  }
 
   /**
    * Moves the given shape to the right location in the given container, based on the position the shape should be moved
    * to. Other shapes in the container may be moved as well.
    */
-  public void moveShape(ContainerShape targetContainer, ContainerShape sourceContainer, Shape shape, int x, int y) {
-    // First, make sure the target container is a valid target. if not, find first container
-    // that can in the parent chain and adjust X and Y accordingly
-    
-    
+  public void moveShape(KickstartFormLayouter layouter, ContainerShape targetContainer, ContainerShape sourceContainer, Shape shape, int x, int y) {
     boolean inSameContainer = targetContainer.equals(sourceContainer);
+    
+    KickstartFormMemoryModel model = (ModelHandler.getKickstartFormMemoryModel(EcoreUtil.getURI(layouter.getDiagram(targetContainer))));
+    Object businessObject = model.getFeatureProvider().getBusinessObjectForPictogramElement(shape);
+    
+    int xPosition = leftPadding;
+    boolean movedShapeIsGroup = false;
+    
+    // Custom padding is required when layouting a group
+    if(businessObject instanceof FormPropertyGroup) {
+      xPosition = leftPadding - GROUP_INSET_SIZE;
+      movedShapeIsGroup = true;
+    }
     
     if(targetContainer.getChildren().size() == 0) {
       // First element in the container
-      Graphiti.getGaService().setLocation(shape.getGraphicsAlgorithm(), leftPadding, verticalSpacing);
+      Graphiti.getGaService().setLocation(shape.getGraphicsAlgorithm(), xPosition, verticalSpacing);
       targetContainer.getChildren().add(shape);
     } else if(inSameContainer && targetContainer.getChildren().size() == 1) {
       // Already added to container, re-set the initial location
-      Graphiti.getGaService().setLocation(shape.getGraphicsAlgorithm(), leftPadding, verticalSpacing);
+      Graphiti.getGaService().setLocation(shape.getGraphicsAlgorithm(), xPosition, verticalSpacing);
     } else {
       // Only move when the shape is not already present as the only one in the container
-      Shape shapeToReplace = null;
+      int shapeIndex = 0;
+      int targetShapeIndex = -1;
       // Loop over all children to find the appropriate position to insert the shape
       for (Shape child : targetContainer.getChildren()) {
-        if(y < child.getGraphicsAlgorithm().getY()) {
-          shapeToReplace = child;
+        boolean childShapeGroup = model.getFeatureProvider().getBusinessObjectForPictogramElement(child) instanceof FormPropertyGroup;
+        if((!movedShapeIsGroup && childShapeGroup)) {
+          targetShapeIndex = Math.max(shapeIndex - 1, 0); 
+          break;
+        } else if(movedShapeIsGroup == childShapeGroup && child.getGraphicsAlgorithm().getY() > y) {
+          targetShapeIndex = shapeIndex;
           break;
         }
+        shapeIndex++;
       }
       
-      if(shapeToReplace != null) {
-        int index = targetContainer.getChildren().indexOf(shapeToReplace);
-        if(inSameContainer) {
-          targetContainer.getChildren().move(index, shape);
-        } else {
-          targetContainer.getChildren().add(index, shape);
-        }
+      // No index specified, add at end of the container
+      if(targetShapeIndex < 0) {
+        targetShapeIndex = targetContainer.getChildren().size() - 1;
+      }
+      if(inSameContainer) {
+        targetContainer.getChildren().move(targetShapeIndex, shape);
       } else {
-        if(inSameContainer) {
-          targetContainer.getChildren().move(targetContainer.getChildren().size() - 1, shape);
-        } else {
-          // Shape needs to be added as last one, no shape to replace
-          targetContainer.getChildren().add(shape);
-        }
+        sourceContainer.getChildren().remove(shape);
+        targetContainer.getChildren().add(targetShapeIndex, shape);
       }
       
       // Finally, re-position all shapes according to their order in the container
-      relayout(targetContainer);
+      relayout(layouter, targetContainer);
+    }
+      
+    // Request the other container to be re-layouted, since an element has
+    // been moved
+    if(!inSameContainer) {
+      layouter.relayout(sourceContainer);
     }
   }
 
