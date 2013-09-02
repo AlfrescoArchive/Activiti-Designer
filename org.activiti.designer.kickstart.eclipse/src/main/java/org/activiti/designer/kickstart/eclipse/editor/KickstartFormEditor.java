@@ -12,6 +12,7 @@ import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.workflow.simple.converter.json.SimpleWorkflowJsonConverter;
 import org.activiti.workflow.simple.definition.form.FormDefinition;
 import org.activiti.workflow.simple.definition.form.FormPropertyDefinition;
+import org.activiti.workflow.simple.definition.form.FormPropertyGroup;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
@@ -27,6 +28,8 @@ import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.impl.AddContext;
 import org.eclipse.graphiti.features.context.impl.AreaContext;
+import org.eclipse.graphiti.mm.pictograms.ContainerShape;
+import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -166,6 +169,9 @@ public class KickstartFormEditor extends DiagramEditor {
             @Override
             protected void doExecute() {
               importDiagram(definitionInModel);
+              
+              // Hide the grid
+              getDiagramTypeProvider().getDiagram().setGridUnit(-1);
             }
           });
         }
@@ -190,11 +196,29 @@ public class KickstartFormEditor extends DiagramEditor {
     // Loop over definitions backwards and add at y-location 0 to retain the actual order
     // they appear in the diagram
     FormPropertyDefinition definition = null;
-    for(int i=formDefinition.getFormProperties().size() - 1 ; i>=0; i--) {
-      definition = formDefinition.getFormProperties().get(i);
+    for(int i=formDefinition.getFormPropertyDefinitions().size() - 1 ; i>=0; i--) {
+      definition = formDefinition.getFormPropertyDefinitions().get(i);
       addContext = new AddContext(areaContext, definition);
       addContext.setTargetContainer(getDiagramTypeProvider().getDiagram());
       featureProvider.getAddFeature(addContext).execute(addContext);
+    }
+    
+    FormPropertyGroup group = null;
+    // Loop over the groups backwards and add y-location of 0 to retain the actual order
+    for(int i=formDefinition.getFormGroups().size() - 1; i>=0; i--) {
+      group = formDefinition.getFormGroups().get(i);
+      addContext = new AddContext(areaContext, group);
+      addContext.setTargetContainer(getDiagramTypeProvider().getDiagram());
+      PictogramElement addedGroupPE = featureProvider.getAddFeature(addContext).add(addContext);
+      
+      // Add properties to the group
+      FormPropertyDefinition defInGroup = null;
+      for(int j=group.getFormPropertyDefinitions().size() - 1 ; j>=0; j--) {
+        defInGroup = group.getFormPropertyDefinitions().get(j);
+        addContext = new AddContext(areaContext, defInGroup);
+        addContext.setTargetContainer((ContainerShape) addedGroupPE);
+        featureProvider.getAddFeature(addContext).execute(addContext);
+      }
     }
   }
 

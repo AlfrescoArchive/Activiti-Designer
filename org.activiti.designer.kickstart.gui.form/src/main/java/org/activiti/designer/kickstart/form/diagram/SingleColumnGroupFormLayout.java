@@ -8,6 +8,9 @@ import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.workflow.simple.definition.form.FormPropertyDefinition;
 import org.activiti.workflow.simple.definition.form.FormPropertyGroup;
 import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.eclipse.emf.transaction.impl.InternalTransactionalEditingDomain;
+import org.eclipse.emf.transaction.util.TransactionUtil;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.Shape;
@@ -76,6 +79,11 @@ public class SingleColumnGroupFormLayout implements FormComponentLayout {
     Diagram diagram = layouter.getDiagram(targetContainer);
     KickstartFormMemoryModel model = (ModelHandler.getKickstartFormMemoryModel(EcoreUtil.getURI(diagram)));
     
+    TransactionalEditingDomain editingDomain = TransactionUtil.getEditingDomain(targetContainer);
+    
+    boolean updateGraphicsAllowed = editingDomain != null && editingDomain instanceof InternalTransactionalEditingDomain 
+        && ((InternalTransactionalEditingDomain) editingDomain).getActiveTransaction() != null;
+    
     List<FormPropertyDefinition> definitionsInNewOrder = new ArrayList<FormPropertyDefinition>();
     FormPropertyGroup group = (FormPropertyGroup) model.getFeatureProvider().getBusinessObjectForPictogramElement(targetContainer);
     
@@ -90,13 +98,17 @@ public class SingleColumnGroupFormLayout implements FormComponentLayout {
        if(definition != null) {
          definitionsInNewOrder.add(definition);
        }
-      Graphiti.getGaService().setLocation(child.getGraphicsAlgorithm(), xPosition, yPosition);
+       if(updateGraphicsAllowed) {
+         Graphiti.getGaService().setLocation(child.getGraphicsAlgorithm(), xPosition, yPosition);
+       }
       yPosition = yPosition + child.getGraphicsAlgorithm().getHeight() + verticalSpacing;
     }
     
-    // Update this container shape's height
-    Graphiti.getGaService().setSize(targetContainer.getGraphicsAlgorithm(), 
-        targetContainer.getGraphicsAlgorithm().getWidth(), Math.max(yPosition, MIN_BOX_HEIGHT));
+    if(updateGraphicsAllowed) {
+      // Update this container shape's height
+      Graphiti.getGaService().setSize(targetContainer.getGraphicsAlgorithm(), 
+          targetContainer.getGraphicsAlgorithm().getWidth(), Math.max(yPosition, MIN_BOX_HEIGHT));
+    }
     
     if(model.isInitialized()) {
       group.setFormPropertyDefinitions(definitionsInNewOrder);

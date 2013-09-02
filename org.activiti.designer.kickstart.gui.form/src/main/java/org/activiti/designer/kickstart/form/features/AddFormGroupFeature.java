@@ -20,7 +20,7 @@ import org.eclipse.graphiti.services.IPeCreateService;
  */
 public class AddFormGroupFeature extends AbstractAddFormComponentFeature {
 
-  protected static final int DEFAULT_COMPONENT_WIDTH = 510;
+  protected static final int DEFAULT_COMPONENT_WIDTH = 505;
   protected static final int DEFAULT_LABEL_HEIGHT = 25;
   protected static final int DEFAULT_BOX_HEIGHT = 60;
 
@@ -70,12 +70,9 @@ public class AddFormGroupFeature extends AbstractAddFormComponentFeature {
     
     
     final Polygon topLine = gaService.createPlainPolygon(rectangle, new int[]
-        {5, DEFAULT_LABEL_HEIGHT, width - 5, DEFAULT_LABEL_HEIGHT});
+        {5, DEFAULT_LABEL_HEIGHT, width, DEFAULT_LABEL_HEIGHT});
     topLine.setForeground(FormComponentStyles.getDefaultForegroundColor(getDiagram()));
     
-    
-    
-
     // Allow quick-edit
     final IDirectEditingInfo directEditingInfo = getFeatureProvider().getDirectEditingInfo();
     // set container shape for direct editing after object creation

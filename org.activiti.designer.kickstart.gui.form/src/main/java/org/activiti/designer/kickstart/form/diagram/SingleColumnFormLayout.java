@@ -8,6 +8,9 @@ import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.workflow.simple.definition.form.FormPropertyDefinition;
 import org.activiti.workflow.simple.definition.form.FormPropertyGroup;
 import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.eclipse.emf.transaction.impl.InternalTransactionalEditingDomain;
+import org.eclipse.emf.transaction.util.TransactionUtil;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.Shape;
@@ -29,6 +32,11 @@ public class SingleColumnFormLayout implements FormComponentLayout {
     int yPosition = verticalSpacing;
     int xPosition = leftPadding;
     
+    TransactionalEditingDomain editingDomain = TransactionUtil.getEditingDomain(targetContainer);
+    
+    boolean updateGraphicsAllowed = editingDomain != null && editingDomain instanceof InternalTransactionalEditingDomain 
+        && ((InternalTransactionalEditingDomain) editingDomain).getActiveTransaction() != null;
+    
     Diagram diagram = layouter.getDiagram(targetContainer);
     KickstartFormMemoryModel model = (ModelHandler.getKickstartFormMemoryModel(EcoreUtil.getURI(diagram)));
     
@@ -44,14 +52,15 @@ public class SingleColumnFormLayout implements FormComponentLayout {
         groupsInNewOrder.add((FormPropertyGroup) businessObject);
         xPosition = leftPadding -  GROUP_INSET_SIZE;
       }
-      
-      Graphiti.getGaService().setLocation(child.getGraphicsAlgorithm(), xPosition, yPosition);
+      if(updateGraphicsAllowed) {
+        Graphiti.getGaService().setLocation(child.getGraphicsAlgorithm(), xPosition, yPosition);
+      }
       yPosition = yPosition + child.getGraphicsAlgorithm().getHeight() + verticalSpacing;
     }
     
     if(model.isInitialized()) {
       // Set the properties list in the new order after re-layouting
-      model.getFormDefinition().setFormProperties(definitionsInNewOrder);
+      model.getFormDefinition().getFormPropertyDefinitions(definitionsInNewOrder);
       model.getFormDefinition().setFormGroups(groupsInNewOrder);
     }
   }

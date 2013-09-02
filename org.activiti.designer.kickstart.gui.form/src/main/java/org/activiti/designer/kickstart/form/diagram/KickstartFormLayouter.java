@@ -77,7 +77,6 @@ public class KickstartFormLayouter {
       }
     }
     
-    
     getLayoutForContainer(actualTargetContainer).moveShape(this, actualTargetContainer, sourceContainer, shape, x, y);
     return actualTargetContainer;
   }
@@ -106,7 +105,6 @@ public class KickstartFormLayouter {
   }
   
   protected FormComponentLayout getLayoutForContainer(ContainerShape container) {
-    // TODO: support of other layouts for FormGroups
     if(container instanceof Diagram) {
       return defaultLayout;
     } else {

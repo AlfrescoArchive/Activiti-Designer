@@ -5,6 +5,7 @@ import org.activiti.designer.kickstart.form.diagram.KickstartFormLayouter;
 import org.activiti.designer.util.editor.KickstartFormMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.workflow.simple.definition.form.FormPropertyDefinition;
+import org.activiti.workflow.simple.definition.form.FormPropertyDefinitionContainer;
 import org.activiti.workflow.simple.definition.form.FormPropertyGroup;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.ICustomUndoableFeature;
@@ -16,6 +17,7 @@ import org.eclipse.graphiti.ui.features.DefaultDeleteFeature;
 public class DeleteFormComponentFeature extends DefaultDeleteFeature implements ICustomUndoableFeature {
 
   protected Object deletedObject;
+  protected FormPropertyDefinitionContainer definitionContainer;
   
   public DeleteFormComponentFeature(KickstartFormFeatureProvider fp) {
     super(fp);
@@ -27,7 +29,9 @@ public class DeleteFormComponentFeature extends DefaultDeleteFeature implements 
     if(context.getPictogramElement() instanceof ContainerShape) {
       parent = ((ContainerShape)context.getPictogramElement()).getContainer();
       
+      definitionContainer = (FormPropertyDefinitionContainer) getBusinessObjectForPictogramElement(parent);
       deletedObject = getBusinessObjectForPictogramElement(context.getPictogramElement());
+      
       super.delete(context);
       
       // Call redo, which contains the model-update only
@@ -53,13 +57,14 @@ public class DeleteFormComponentFeature extends DefaultDeleteFeature implements 
       // Just add the definition to the model at the end, relayouting of the container
       // will cause the right order to be restored as it was before the delete 
       if(deletedObject instanceof FormPropertyDefinition) {
-        model.getFormDefinition().getFormProperties().add((FormPropertyDefinition) deletedObject);
+        definitionContainer.addFormProperty((FormPropertyDefinition) deletedObject);
       } else if(deletedObject instanceof FormPropertyGroup) {
         model.getFormDefinition().getFormGroups().add((FormPropertyGroup) deletedObject);
       }
     }
     
     if(((IDeleteContext)context).getPictogramElement() instanceof ContainerShape) {
+      // Perform the re-layout as part of the transaction
       getFormLayouter().relayout((ContainerShape) ((IDeleteContext)context).getPictogramElement());
     }
   }
@@ -74,7 +79,7 @@ public class DeleteFormComponentFeature extends DefaultDeleteFeature implements 
     KickstartFormMemoryModel model = (ModelHandler.getKickstartFormMemoryModel(EcoreUtil.getURI(getDiagram())));
     if(model != null && model.isInitialized()) {
       if(deletedObject instanceof FormPropertyDefinition) {
-        model.getFormDefinition().getFormProperties().remove(deletedObject);
+        definitionContainer.removeFormProperty((FormPropertyDefinition) deletedObject);
       } else if(deletedObject instanceof FormPropertyGroup) {
         model.getFormDefinition().getFormGroups().remove(deletedObject);
       }

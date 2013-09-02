@@ -3,6 +3,7 @@ package org.activiti.designer.kickstart.form.features;
 import org.activiti.designer.util.editor.KickstartFormMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.workflow.simple.definition.form.FormPropertyDefinition;
+import org.activiti.workflow.simple.definition.form.FormPropertyDefinitionContainer;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.ICustomUndoableFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -20,6 +21,7 @@ import org.eclipse.graphiti.features.impl.AbstractCreateFeature;
 public abstract class AbstractCreateFormPropertyFeature extends AbstractCreateFeature implements ICustomUndoableFeature {
 
   protected FormPropertyDefinition createdDefinition;
+  protected FormPropertyDefinitionContainer definitionContainer;
   
   public AbstractCreateFormPropertyFeature(IFeatureProvider fp, String name, String description) {
     super(fp, name, description);
@@ -32,7 +34,11 @@ public abstract class AbstractCreateFormPropertyFeature extends AbstractCreateFe
     // Add the new property-definition to the model
     KickstartFormMemoryModel model = (ModelHandler.getKickstartFormMemoryModel(EcoreUtil.getURI(getDiagram())));
     if (model != null && model.isInitialized()) {
-      model.getFormDefinition().addFormProperty(createdDefinition);
+      Object businessObject = getFeatureProvider().getBusinessObjectForPictogramElement(context.getTargetContainer());
+      if(businessObject instanceof FormPropertyDefinitionContainer) {
+        definitionContainer = (FormPropertyDefinitionContainer) businessObject; 
+        definitionContainer.addFormProperty(createdDefinition);
+      }
     }
     
     // Add graphical information for the definition
@@ -42,19 +48,19 @@ public abstract class AbstractCreateFormPropertyFeature extends AbstractCreateFe
   
   @Override
   public boolean canUndo(IContext context) {
-    return createdDefinition != null;
+    return createdDefinition != null && definitionContainer != null;
   }
   
   @Override
   public boolean canRedo(IContext context) {
-    return createdDefinition != null;
+    return createdDefinition != null && definitionContainer != null;
   }
   
   @Override
   public void undo(IContext context) {
     KickstartFormMemoryModel model = (ModelHandler.getKickstartFormMemoryModel(EcoreUtil.getURI(getDiagram())));
     if (model != null && model.isInitialized() && createdDefinition != null) {
-      model.getFormDefinition().getFormProperties().remove(createdDefinition);
+      definitionContainer.removeFormProperty(createdDefinition);
     }
   }
   
@@ -62,10 +68,9 @@ public abstract class AbstractCreateFormPropertyFeature extends AbstractCreateFe
   public void redo(IContext context) {
     KickstartFormMemoryModel model = (ModelHandler.getKickstartFormMemoryModel(EcoreUtil.getURI(getDiagram())));
     if (model != null && model.isInitialized() && createdDefinition != null) {
-      model.getFormDefinition().addFormProperty(createdDefinition);
+      definitionContainer.addFormProperty(createdDefinition);
     }
   }
-  
   
   protected abstract FormPropertyDefinition createFormPropertyDefinition(ICreateContext context);
 }
