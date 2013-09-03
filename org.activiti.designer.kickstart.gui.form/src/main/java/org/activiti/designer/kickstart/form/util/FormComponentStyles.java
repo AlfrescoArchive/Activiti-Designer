@@ -21,6 +21,8 @@ import org.eclipse.graphiti.util.IGradientType;
 import org.eclipse.graphiti.util.IPredefinedRenderingStyle;
 
 /**
+ * Class containing style constants and component sizes.
+ * 
  * @author Frederik Heremans
  */
 public final class FormComponentStyles {
@@ -34,6 +36,15 @@ public final class FormComponentStyles {
   private static final IColorConstant GROUP_BORDER_COLOR = new ColorConstant(180, 180, 180);
   private static final IColorConstant CALENDAR_DECORATION_TOP_COLOR = new ColorConstant(255, 145, 145);
   private static final IColorConstant CALENDAR_DECORATION_COLOR = new ColorConstant(255, 255, 255);
+
+  // Sizes for components
+  public static final int DEFAULT_COMPONENT_WIDTH = 600;
+  public static final int DEFAULT_LABEL_HEIGHT = 20;
+  public static final int DEFAULT_COMPONENT_BOX_HEIGHT = 25;
+  public static final int DEFAULT_SCROLLBAR_DECORATION_WIDTH = 10;
+  public static final int DEFAULT_GROUP_HEIGHT = 100;
+  public static final int DEFAULT_GROUP_LABEL_HEIGHT = 25;
+
   
   private static Map<String, Style> styleMap = new HashMap<String, Style>();
   

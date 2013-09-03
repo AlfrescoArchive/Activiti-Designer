@@ -1,8 +1,14 @@
 package org.activiti.designer.kickstart.form.diagram;
 
-import org.activiti.designer.kickstart.form.features.AddDatePropertyFeature;
-import org.activiti.designer.kickstart.form.features.AddFormGroupFeature;
-import org.activiti.designer.kickstart.form.features.AddTextPropertyFeature;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.activiti.designer.kickstart.form.diagram.layout.KickstartFormLayouter;
+import org.activiti.designer.kickstart.form.diagram.shape.BusinessObjectShapeController;
+import org.activiti.designer.kickstart.form.diagram.shape.DatePropertyShapeController;
+import org.activiti.designer.kickstart.form.diagram.shape.PropertyGroupShapeController;
+import org.activiti.designer.kickstart.form.diagram.shape.TextPropertyShapeController;
+import org.activiti.designer.kickstart.form.features.AddFormComponentFeature;
 import org.activiti.designer.kickstart.form.features.CreateDatePropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateFormGroupFeature;
 import org.activiti.designer.kickstart.form.features.CreateTextAreaPropertyFeature;
@@ -11,15 +17,10 @@ import org.activiti.designer.kickstart.form.features.DeleteFormComponentFeature;
 import org.activiti.designer.kickstart.form.features.DirectEditFormComponentFeature;
 import org.activiti.designer.kickstart.form.features.FormPropertyResizeFeature;
 import org.activiti.designer.kickstart.form.features.MoveFormComponentFeature;
-import org.activiti.designer.kickstart.form.features.UpdateDateFormPropertyFeature;
-import org.activiti.designer.kickstart.form.features.UpdateFormPropertyFeature;
+import org.activiti.designer.kickstart.form.features.UpdateFormComponentFeature;
 import org.activiti.designer.util.editor.KickstartFormIndependenceSolver;
 import org.activiti.designer.util.editor.KickstartFormMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
-import org.activiti.workflow.simple.definition.form.DatePropertyDefinition;
-import org.activiti.workflow.simple.definition.form.FormPropertyDefinition;
-import org.activiti.workflow.simple.definition.form.FormPropertyGroup;
-import org.activiti.workflow.simple.definition.form.TextPropertyDefinition;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.IAddFeature;
@@ -42,12 +43,45 @@ import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
 public class KickstartFormFeatureProvider extends DefaultFeatureProvider {
 
     protected KickstartFormLayouter formLayouter;
+    protected List<BusinessObjectShapeController> shapeControllers;
     
 	public KickstartFormFeatureProvider(IDiagramTypeProvider dtp) {
 		super(dtp);
 		// Use resolver based on the memory-model for the form
 		setIndependenceSolver(new KickstartFormIndependenceSolver(dtp));
 		this.formLayouter = new KickstartFormLayouter();
+		
+		this.shapeControllers = new ArrayList<BusinessObjectShapeController>();
+		shapeControllers.add(new DatePropertyShapeController(this));
+		shapeControllers.add(new TextPropertyShapeController(this));
+		shapeControllers.add(new PropertyGroupShapeController(this));
+	}
+	
+	/**
+	 * @param businessObject object to get a {@link BusinessObjectShapeController} for
+	 * @return a {@link BusinessObjectShapeController} capable of creating/updating shapes
+	 * of for the given businessObject.
+	 * @throws IllegalArgumentException When no controller can be found for the given object.
+	 */
+	public BusinessObjectShapeController getShapeController(Object businessObject) {
+	  for(BusinessObjectShapeController controller : shapeControllers) {
+	    if(controller.canControlShapeFor(businessObject)) {
+	      return controller;
+	    }
+	  }
+	  throw new IllegalArgumentException("No controller can be found for object: " + businessObject);
+	}
+	
+	/**
+	 * @return true, if a {@link BusinessObjectShapeController} is available for the given business object.
+	 */
+	public boolean hasShapeController(Object businessObject) {
+	  for(BusinessObjectShapeController controller : shapeControllers) {
+        if(controller.canControlShapeFor(businessObject)) {
+          return true;
+        }
+      }
+	  return false;
 	}
 
 	@Override
@@ -60,27 +94,12 @@ public class KickstartFormFeatureProvider extends DefaultFeatureProvider {
 	
 	@Override
 	public IAddFeature getAddFeature(IAddContext context) {
-	  IAddFeature addFeature = null;
-	  if(context.getNewObject() instanceof TextPropertyDefinition) {
-	    addFeature = new AddTextPropertyFeature(this);
-	  } else if(context.getNewObject() instanceof DatePropertyDefinition) {
-	    addFeature = new AddDatePropertyFeature(this);
-	  } else if(context.getNewObject() instanceof FormPropertyGroup) {
-	    addFeature = new AddFormGroupFeature(this);
-	  }
-	  return addFeature;
+	  return new AddFormComponentFeature(this);
 	}
 	
 	@Override
 	public IUpdateFeature getUpdateFeature(IUpdateContext context) {
-	  Object bo = getBusinessObjectForPictogramElement(context.getPictogramElement());
-	  if(bo instanceof DatePropertyDefinition) {
-	    return new UpdateDateFormPropertyFeature(this);
-	  } else if(bo instanceof FormPropertyDefinition) {
-	    return new UpdateFormPropertyFeature(this);
-	  } else {
-	    return super.getUpdateFeature(context);
-	  }
+	  return new UpdateFormComponentFeature(this);
 	}
 	
 	@Override

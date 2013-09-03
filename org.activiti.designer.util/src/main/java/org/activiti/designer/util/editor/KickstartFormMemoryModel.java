@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.activiti.workflow.simple.definition.form.FormDefinition;
 import org.activiti.workflow.simple.definition.form.FormPropertyDefinition;
+import org.activiti.workflow.simple.definition.form.FormPropertyGroup;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.graphiti.features.IFeatureProvider;
 
@@ -57,7 +58,7 @@ public class KickstartFormMemoryModel {
    */
   public void modelObjectUpdated(Object modelObject) {
     if(modelObject != null) {
-      if(modelObject instanceof FormPropertyDefinition) {
+      if(modelObject instanceof FormPropertyDefinition || modelObject instanceof FormPropertyGroup) {
         if(!modelListeners.isEmpty()) {
           // Create a copy of the listener-list, to prevent ConcurrentModificationExcepcions
           // when iterating the listeners and a listener is added/removed during this process

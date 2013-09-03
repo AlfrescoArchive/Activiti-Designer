@@ -25,6 +25,7 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
@@ -36,7 +37,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
  * 
  * @author Frederik heremans
  */
-public abstract class AbstractKickstartFormPropertySection extends GFPropertySection implements ITabbedPropertyConstants {
+public abstract class AbstractKickstartFormComponentSection extends GFPropertySection implements ITabbedPropertyConstants {
 
   /**
    * Internal list of controls added to this section.
@@ -54,7 +55,7 @@ public abstract class AbstractKickstartFormPropertySection extends GFPropertySec
   
   protected Composite formComposite;
   
-  public AbstractKickstartFormPropertySection() {
+  public AbstractKickstartFormComponentSection() {
     
     controls = new ArrayList<Control>();
     
@@ -243,6 +244,31 @@ public abstract class AbstractKickstartFormPropertySection extends GFPropertySec
       } else {
         throw new IllegalArgumentException("Checkbox control expects a Boolean model value");
       }
+    } else if(control instanceof Combo) {
+      Combo comboControl = (Combo) control;
+      int newIndex = -1;
+       
+      if(valueFromModel instanceof String) {
+        // Locate the index for the model value in the available items
+        for(int i=0; i<comboControl.getItemCount(); i++) {
+          if(((String) valueFromModel).equals(comboControl.getItems()[i])) {
+            newIndex = i;
+            break;
+          }
+        }
+        ((org.eclipse.swt.widgets.List)control).getItems();
+      } else if(valueFromModel != null) {
+        throw new IllegalArgumentException("List control expects a String model value");
+      }
+      if(newIndex < 0) {
+        // When no index is found, revert to default (if available) or select first item
+        if(comboControl.getData() != null && comboControl.getData() instanceof Integer) {
+          newIndex = (Integer) comboControl.getData();
+        } else {
+          newIndex = 0;
+        }
+      }
+      comboControl.select(newIndex);
     } else {
       throw new IllegalArgumentException("Request to populate unsupported control based on model");
     }
@@ -253,8 +279,9 @@ public abstract class AbstractKickstartFormPropertySection extends GFPropertySec
       return ((Text) control).getText();
     } else if(control instanceof Button) {
       return ((Button) control).getSelection();
+    } else if(control instanceof Combo) {
+      return ((Combo)control).getText();
     }
-    
     throw new IllegalArgumentException("Unsupported control: "+ control.getClass().getName());
   }
   
@@ -340,6 +367,35 @@ public abstract class AbstractKickstartFormPropertySection extends GFPropertySec
     registerControl(checkControl);
     return checkControl;
   }
+  
+  /**
+   * @param values values for the combo
+   * @param defaultSelectionIndex index of the default selection. If there is no default selection,
+   * pass in a negative number.
+   * @return the combo component
+   */
+  protected Combo createCombobox(String[] values, int defaultSelectionIndex) {
+    Combo comboControl = new Combo(formComposite, SWT.READ_ONLY);
+    FormData data = new FormData();
+    data.left = new FormAttachment(0, 120);
+    data.right = new FormAttachment(100, 0);
+    data.top = createTopFormAttachment();
+    comboControl.setLayoutData(data);
+    
+    // Set possible values
+    comboControl.setItems(values);
+    
+    if(defaultSelectionIndex >= 0) {
+      comboControl.select(defaultSelectionIndex);
+      // Store the default-selection as "data", so we can reselect it when
+      // the combo needs to be reset
+      comboControl.setData(defaultSelectionIndex);
+    }
+    
+    comboControl.addSelectionListener(selectionListener);
+    registerControl(comboControl);
+    return comboControl;
+  }
 
   protected CLabel createLabel(String labelName, Control control) {
     CLabel labelControl = getWidgetFactory().createCLabel(formComposite, labelName);
@@ -368,5 +424,12 @@ public abstract class AbstractKickstartFormPropertySection extends GFPropertySec
     } else {
       return getContainer(container.eContainer());
     }
+  }
+  
+  protected String getSafeText(String string) {
+    if(string == null) {
+      return "";
+    }
+    return string;
   }
 }

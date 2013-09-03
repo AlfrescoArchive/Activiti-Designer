@@ -1,7 +1,7 @@
 package org.activiti.designer.kickstart.form.features;
 
 import org.activiti.designer.kickstart.form.diagram.KickstartFormFeatureProvider;
-import org.activiti.designer.kickstart.form.diagram.KickstartFormLayouter;
+import org.activiti.designer.kickstart.form.diagram.layout.KickstartFormLayouter;
 import org.activiti.designer.util.editor.KickstartFormMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.workflow.simple.definition.form.FormPropertyDefinition;

@@ -12,7 +12,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 /**
  * @author Frederik Heremans
  */
-public class DatePropertyDefinitionPropertySection extends AbstractKickstartFormPropertySection {
+public class DatePropertyDefinitionPropertySection extends AbstractKickstartFormComponentSection {
 
   protected Button showTimeControl;
 

@@ -1,5 +1,6 @@
 package org.activiti.designer.kickstart.form.diagram;
 
+import org.activiti.designer.kickstart.form.diagram.layout.KickstartFormLayouter;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 

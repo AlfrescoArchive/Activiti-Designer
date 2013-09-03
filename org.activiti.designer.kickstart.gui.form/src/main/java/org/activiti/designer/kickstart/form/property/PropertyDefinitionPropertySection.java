@@ -12,7 +12,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 /**
  * @author Frederik Heremans
  */
-public class PropertyDefinitionPropertySection extends AbstractKickstartFormPropertySection {
+public class PropertyDefinitionPropertySection extends AbstractKickstartFormComponentSection {
 
   protected Text nameControl;
   protected Button mandatoryControl;
@@ -25,7 +25,6 @@ public class PropertyDefinitionPropertySection extends AbstractKickstartFormProp
 
     mandatoryControl = createCheckboxControl("Mandatory");
     writableControl = createCheckboxControl("Writable");
-
   }
 
   @Override

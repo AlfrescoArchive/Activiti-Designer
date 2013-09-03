@@ -1,7 +1,7 @@
 package org.activiti.designer.kickstart.form.features;
 
 import org.activiti.designer.kickstart.form.diagram.KickstartFormFeatureProvider;
-import org.activiti.designer.kickstart.form.diagram.KickstartFormLayouter;
+import org.activiti.designer.kickstart.form.diagram.layout.KickstartFormLayouter;
 import org.eclipse.graphiti.features.ICustomUndoableFeature;
 import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.features.context.IMoveShapeContext;
@@ -46,6 +46,7 @@ public class MoveFormComponentFeature extends DefaultMoveShapeFeature implements
     // Since the model is updated by the layout based on the actual shape order,
     // it's sufficient to force a re-layout at this point
     getFormLayouter().relayout(((IMoveShapeContext)context).getTargetContainer());
+    getFormLayouter().relayout(((IMoveShapeContext)context).getSourceContainer());
   }
   
   @Override
@@ -53,6 +54,7 @@ public class MoveFormComponentFeature extends DefaultMoveShapeFeature implements
     // Since the model is updated by the layout based on the actual shape order,
     // it's sufficient to force a re-layout at this point
     getFormLayouter().relayout(((IMoveShapeContext)context).getTargetContainer());
+    getFormLayouter().relayout(((IMoveShapeContext)context).getSourceContainer());
   }
   
   protected KickstartFormLayouter getFormLayouter() {
