@@ -18,7 +18,7 @@ import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
 
 /**
- * Class capable of layouting elements in a single column. Allows moving of components.
+ * Class capable of layouting elements in two columns.
  * 
  * @author Frederik Heremans
  */
@@ -27,7 +27,6 @@ public class SingleColumnFormLayout implements FormComponentLayout {
   private static final int GROUP_INSET_SIZE = 5;
   private int leftPadding = 20;
   private int verticalSpacing = 10;
-
   
   public void relayout(KickstartFormLayouter layouter, ContainerShape targetContainer) {
     int yPosition = verticalSpacing;

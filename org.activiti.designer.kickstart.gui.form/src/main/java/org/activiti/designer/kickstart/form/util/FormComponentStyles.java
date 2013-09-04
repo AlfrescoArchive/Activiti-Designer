@@ -39,13 +39,14 @@ public final class FormComponentStyles {
 
   // Sizes for components
   public static final int DEFAULT_COMPONENT_WIDTH = 600;
+  public static final int DEFAULT_COMPONENT_WIDTH_TWO_COLUMNS = 300;
+  public static final int DEFAULT_COMPONENT_WIDTH_THREE_COLUMNS = 198;
   public static final int DEFAULT_LABEL_HEIGHT = 20;
   public static final int DEFAULT_COMPONENT_BOX_HEIGHT = 25;
   public static final int DEFAULT_SCROLLBAR_DECORATION_WIDTH = 10;
   public static final int DEFAULT_GROUP_HEIGHT = 100;
   public static final int DEFAULT_GROUP_LABEL_HEIGHT = 25;
 
-  
   private static Map<String, Style> styleMap = new HashMap<String, Style>();
   
   private FormComponentStyles() {

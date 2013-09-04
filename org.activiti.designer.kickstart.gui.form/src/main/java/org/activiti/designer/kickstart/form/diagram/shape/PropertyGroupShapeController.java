@@ -94,11 +94,6 @@ public class PropertyGroupShapeController extends AbstractBusinessObjectShapeCon
     if(labelText != null) {
       labelText.setValue(getLabelTextValue(group));
     }
-    
-    // Check if width needs to be altered
-    if(width != shape.getGraphicsAlgorithm().getWidth()) {
-      // TODO: implement
-    }
   }
   
   @Override

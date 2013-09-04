@@ -1,6 +1,7 @@
 package org.activiti.designer.kickstart.form.diagram.layout;
 
 import org.activiti.designer.kickstart.form.diagram.FormComponentLayout;
+import org.activiti.designer.kickstart.form.property.FormPropertyGroupPropertySection;
 import org.activiti.designer.util.editor.KickstartFormMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.workflow.simple.definition.form.FormPropertyGroup;
@@ -17,11 +18,15 @@ import org.eclipse.graphiti.mm.pictograms.Shape;
 public class KickstartFormLayouter {
 
   private SingleColumnFormLayout defaultLayout;
-  private SingleColumnGroupFormLayout defaultGroupLayout;
+  private GroupFormLayout oneColumnLayout;
+  private GroupFormLayout twoColumnLayout;
+  private GroupFormLayout threeColumnLayout;
   
   public KickstartFormLayouter() {
     defaultLayout = new SingleColumnFormLayout();
-    defaultGroupLayout = new SingleColumnGroupFormLayout();
+    oneColumnLayout = new GroupFormLayout(1);
+    twoColumnLayout = new GroupFormLayout(2);
+    threeColumnLayout = new GroupFormLayout(3);
   }
   
   /**
@@ -73,7 +78,7 @@ public class KickstartFormLayouter {
       ContainerShape offsetContainer = targetContainer;
       while(offsetContainer != null && offsetContainer != actualTargetContainer) {
         x += offsetContainer.getGraphicsAlgorithm().getX();
-        y += offsetContainer.getGraphicsAlgorithm().getX();
+        y += offsetContainer.getGraphicsAlgorithm().getY();
         offsetContainer = offsetContainer.getContainer();
       }
     }
@@ -106,15 +111,25 @@ public class KickstartFormLayouter {
   }
   
   protected FormComponentLayout getLayoutForContainer(ContainerShape container) {
+    FormComponentLayout layout = null;
+    
     if(container instanceof Diagram) {
-      return defaultLayout;
+      layout = defaultLayout;
     } else {
       Object businessObject = ModelHandler.getKickstartFormMemoryModel(EcoreUtil.getURI(getDiagram(container)))
           .getFeatureProvider().getBusinessObjectForPictogramElement(container);
       if(businessObject instanceof FormPropertyGroup) {
-        return defaultGroupLayout;
+        FormPropertyGroup group = (FormPropertyGroup) businessObject;
+        
+        if(FormPropertyGroupPropertySection.TWO_COLUMN_VALUE.equals(group.getType())) {
+          layout = twoColumnLayout;
+        } else if(FormPropertyGroupPropertySection.THREE_COLUMN_VALUE.equals(group.getType())) {
+          layout = threeColumnLayout;
+        } else {
+          layout = oneColumnLayout;
+        }
       }
-      return null;
     }
+    return layout;
   }
 }

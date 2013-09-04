@@ -256,7 +256,6 @@ public abstract class AbstractKickstartFormComponentSection extends GFPropertySe
             break;
           }
         }
-        ((org.eclipse.swt.widgets.List)control).getItems();
       } else if(valueFromModel != null) {
         throw new IllegalArgumentException("List control expects a String model value");
       }

@@ -11,6 +11,7 @@ import org.activiti.designer.util.platform.OSUtil;
 import org.activiti.workflow.simple.definition.form.DatePropertyDefinition;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
+import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.algorithms.MultiText;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.RoundedRectangle;
@@ -84,7 +85,7 @@ public class DatePropertyShapeController extends AbstractBusinessObjectShapeCont
     Text innerText = gaService.createPlainText(innerTextShape, getDefaultValue(definition));
     innerText.setHorizontalAlignment(Orientation.ALIGNMENT_LEFT);
     innerText.setVerticalAlignment(Orientation.ALIGNMENT_TOP);
-    innerText.setBackground(FormComponentStyles.getCalandarDecorationColor(diagram));
+    innerText.setFilled(false);
     innerText.setLineWidth(0);
     gaService.setLocationAndSize(innerText, 3, FormComponentStyles.DEFAULT_LABEL_HEIGHT + 1, width - 4, height - FormComponentStyles.DEFAULT_LABEL_HEIGHT - 2);
 
@@ -142,8 +143,35 @@ public class DatePropertyShapeController extends AbstractBusinessObjectShapeCont
     }
     
     // Check if width needs to be altered
-    if(width != shape.getGraphicsAlgorithm().getWidth()) {
-      // TODO: implement
+    if(width > 0 && width != shape.getGraphicsAlgorithm().getWidth()) {
+      int widthDiv = width - shape.getGraphicsAlgorithm().getWidth();
+      
+      // Check if width needs to be altered
+      if(width != shape.getGraphicsAlgorithm().getWidth()) {
+        IGaService gaService = Graphiti.getGaService();
+        
+        // Resize main shape rectangle
+        Rectangle invisibleRectangle = (Rectangle) shape.getGraphicsAlgorithm();
+        gaService.setWidth(invisibleRectangle, width);
+        
+        // Resize box shape (child of invisibleRectangle)
+        GraphicsAlgorithm box = (GraphicsAlgorithm) invisibleRectangle.eContents().get(0);
+        gaService.setWidth(box, width);
+        
+        // Resize label shape 
+        Shape labelShape = shape.getChildren().get(0);
+        gaService.setWidth(labelShape.getGraphicsAlgorithm(), width);
+        
+        // Resize default value shape
+        Shape defaultShape = shape.getChildren().get(1);
+        gaService.setWidth(defaultShape.getGraphicsAlgorithm(), width);
+        
+        // Also move the calendar decorations, relative to right corner
+        for(int i = 2; i < shape.getChildren().size(); i++) {
+          GraphicsAlgorithm decoration = shape.getChildren().get(i).getGraphicsAlgorithm();
+          gaService.setLocation(decoration,  decoration.getX() + widthDiv, decoration.getY()); 
+        }
+      }
     }
   }
 

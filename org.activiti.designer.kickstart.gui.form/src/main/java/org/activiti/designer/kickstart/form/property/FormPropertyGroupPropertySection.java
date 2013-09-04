@@ -14,10 +14,19 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
  */
 public class FormPropertyGroupPropertySection extends AbstractKickstartFormComponentSection {
   
-  protected static final String[] LAYOUT_VALUES = new String[] {"Single column", "Two columns", "Three columns"};
+  // TODO: use kickstart-alfresco constants for this
+  public static final String SINGLE_COLUMN_VALUE = "one-column";
+  public static final String TWO_COLUMN_VALUE = "two-column";
+  public static final String THREE_COLUMN_VALUE = "three-column";
+  
+  protected static final String SINGLE_COLUMN_MESSAGE = "Single column layout";
+  protected static final String TWO_COLUMN_MESSAGE = "Two column layout";
+  protected static final String THREE_COLUMN_MESSAGE = "Three column layout";
+  
+  protected static final String[] LAYOUT_VALUES = new String[] {SINGLE_COLUMN_MESSAGE, TWO_COLUMN_MESSAGE, THREE_COLUMN_MESSAGE};
   protected Text idControl;
   protected Text titleControl;
-  protected Combo layoutControl;
+  protected Combo typeControl;
   
   @Override
   public void createFormControls(TabbedPropertySheetPage aTabbedPropertySheetPage) {
@@ -27,8 +36,8 @@ public class FormPropertyGroupPropertySection extends AbstractKickstartFormCompo
     idControl = createTextControl(false);
     createLabel("Group ID", idControl);
     
-    layoutControl = createCombobox(LAYOUT_VALUES, 0);
-    createLabel("Layout", layoutControl);
+    typeControl = createCombobox(LAYOUT_VALUES, 0);
+    createLabel("Type", typeControl);
   }
 
   @Override
@@ -38,6 +47,8 @@ public class FormPropertyGroupPropertySection extends AbstractKickstartFormCompo
       return group.getId();
     } else if(control == titleControl) {
       return group.getTitle();
+    } else if(control == typeControl) {
+      return getTypeMessageForvalue(group.getType());
     }
     return null;
   }
@@ -49,9 +60,36 @@ public class FormPropertyGroupPropertySection extends AbstractKickstartFormCompo
       group.setId(idControl.getText());
     } else if(control == titleControl) {
       group.setTitle(titleControl.getText());
+    } else if(control == typeControl) {
+      group.setType(getTypeValueForMessage(typeControl.getText()));
     }
   }
   
+  /**
+   * @return the message to display for the given type.
+   */
+  protected String getTypeValueForMessage(String text) {
+    if(TWO_COLUMN_MESSAGE.equals(text) ) {
+      return TWO_COLUMN_VALUE;
+    } else if(THREE_COLUMN_MESSAGE.equals(text)) {
+      return THREE_COLUMN_VALUE;
+    }
+    return SINGLE_COLUMN_VALUE;
+  }
+  
+  /**
+   * @return the actual value to use for the group type, based on the selected
+   * value.
+   */
+  protected String getTypeMessageForvalue(String type) {
+    if(TWO_COLUMN_VALUE.equals(type) ) {
+      return TWO_COLUMN_MESSAGE;
+    } else if(THREE_COLUMN_VALUE.equals(type)) {
+      return THREE_COLUMN_MESSAGE;
+    }
+    return SINGLE_COLUMN_MESSAGE;
+  }
+
   @Override
   protected KickstartModelUpdater<?> getModelUpdater() {
     PictogramElement pictogramElement = getSelectedPictogramElement();

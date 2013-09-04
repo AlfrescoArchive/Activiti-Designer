@@ -35,13 +35,14 @@ public class AddFormComponentFeature extends AbstractAddShapeFeature {
     final ContainerShape containerShape = shapeController.createShape(context.getNewObject(), 
         parent, context.getWidth(), context.getHeight());
         
+    // Create link between shape and business object
+    link(containerShape, context.getNewObject());
+    
     // Since new shape has already been added to the parent, trigger a move to have it
     // positioned based on the layout implementation, taking into account X and Y from add-context
     getKickstartFormFeatureProvider().getFormLayouter()
       .moveShape(parent, parent, containerShape, context.getX(), context.getY());
     
-    // Create link between shape and business object
-    link(containerShape, context.getNewObject());
     return containerShape;
   }
 

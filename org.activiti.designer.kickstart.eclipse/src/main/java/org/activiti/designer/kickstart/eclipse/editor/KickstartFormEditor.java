@@ -190,8 +190,10 @@ public class KickstartFormEditor extends DiagramEditor {
     IFeatureProvider featureProvider = getDiagramTypeProvider().getFeatureProvider();
     AddContext addContext = null;
     
+    // Provide -1 as x and y, to force layout adding the shape at the end
     AreaContext areaContext = new AreaContext();
-    areaContext.setY(0);
+    areaContext.setY(-1);
+    areaContext.setX(-1);
     
     // Loop over definitions backwards and add at y-location 0 to retain the actual order
     // they appear in the diagram
@@ -212,9 +214,7 @@ public class KickstartFormEditor extends DiagramEditor {
       PictogramElement addedGroupPE = featureProvider.getAddFeature(addContext).add(addContext);
       
       // Add properties to the group
-      FormPropertyDefinition defInGroup = null;
-      for(int j=group.getFormPropertyDefinitions().size() - 1 ; j>=0; j--) {
-        defInGroup = group.getFormPropertyDefinitions().get(j);
+      for(FormPropertyDefinition defInGroup : group.getFormPropertyDefinitions()) {
         addContext = new AddContext(areaContext, defInGroup);
         addContext.setTargetContainer((ContainerShape) addedGroupPE);
         featureProvider.getAddFeature(addContext).execute(addContext);

@@ -30,9 +30,12 @@ public class UpdateFormComponentFeature extends AbstractUpdateFeature {
   public IReason updateNeeded(IUpdateContext context) {
     if (context.getPictogramElement() instanceof ContainerShape) {
       Object bo = getBusinessObjectForPictogramElement(context.getPictogramElement());
-      BusinessObjectShapeController controller = ((KickstartFormFeatureProvider)getFeatureProvider()).getShapeController(bo);
-      if(controller.isShapeUpdateNeeded((ContainerShape) context.getPictogramElement(), bo)) {
-        return Reason.createTrueReason();
+      // Ignore shapes without a business-object
+      if(bo != null) {
+        BusinessObjectShapeController controller = ((KickstartFormFeatureProvider)getFeatureProvider()).getShapeController(bo);
+        if(controller.isShapeUpdateNeeded((ContainerShape) context.getPictogramElement(), bo)) {
+          return Reason.createTrueReason();
+        }
       }
     }
     return Reason.createFalseReason();

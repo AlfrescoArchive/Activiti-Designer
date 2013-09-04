@@ -7,6 +7,7 @@ import org.activiti.designer.util.platform.OSUtil;
 import org.activiti.workflow.simple.definition.form.TextPropertyDefinition;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
+import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.algorithms.MultiText;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.RoundedRectangle;
@@ -61,12 +62,6 @@ public class TextPropertyShapeController extends AbstractBusinessObjectShapeCont
     final Rectangle invisibleRectangle = gaService.createInvisibleRectangle(containerShape);
     gaService.setLocationAndSize(invisibleRectangle, 0, 0, width, height);
 
-    // Create and set visible rectangle inside invisible rectangle
-    rectangle = gaService.createRoundedRectangle(invisibleRectangle, 2, 2);
-    rectangle.setStyle(FormComponentStyles.getInputFieldStyle(diagram));
-    rectangle.setParentGraphicsAlgorithm(invisibleRectangle);
-    gaService.setLocationAndSize(rectangle, 0, FormComponentStyles.DEFAULT_LABEL_HEIGHT, width, height - FormComponentStyles.DEFAULT_LABEL_HEIGHT);
-    
     // Add label
     final Shape shape = peCreateService.createShape(containerShape, false);
     final MultiText text = gaService.createDefaultMultiText(diagram, shape, getLabelTextValue(definition));
@@ -75,9 +70,15 @@ public class TextPropertyShapeController extends AbstractBusinessObjectShapeCont
     if (OSUtil.getOperatingSystem() == OSEnum.Mac) {
       text.setFont(gaService.manageFont(getFeatureProvider().getDiagramTypeProvider().getDiagram(), text.getFont().getName(), 11));
     }
-    
     gaService.setLocationAndSize(text, 0, 0, width, FormComponentStyles.DEFAULT_LABEL_HEIGHT);
     gaService.setLocationAndSize(shape.getGraphicsAlgorithm(), 0, 0, width, FormComponentStyles.DEFAULT_LABEL_HEIGHT);
+    
+    // Create and set visible rectangle inside invisible rectangle
+    rectangle = gaService.createRoundedRectangle(invisibleRectangle, 2, 2);
+    rectangle.setStyle(FormComponentStyles.getInputFieldStyle(diagram));
+    rectangle.setParentGraphicsAlgorithm(invisibleRectangle);
+    gaService.setLocationAndSize(rectangle, 0, FormComponentStyles.DEFAULT_LABEL_HEIGHT, width, height - FormComponentStyles.DEFAULT_LABEL_HEIGHT);
+    
     
     if(definition.isMultiline()) {
       Shape textareaDecorationShape = peCreateService.createShape(containerShape, false);
@@ -111,8 +112,27 @@ public class TextPropertyShapeController extends AbstractBusinessObjectShapeCont
     }
     
     // Check if width needs to be altered
-    if(width != shape.getGraphicsAlgorithm().getWidth()) {
-      // TODO: implement
+    if(width > 0 && width != shape.getGraphicsAlgorithm().getWidth()) {
+      IGaService gaService = Graphiti.getGaService();
+      
+      // Resize main shape rectangle
+      Rectangle invisibleRectangle = (Rectangle) shape.getGraphicsAlgorithm();
+      gaService.setWidth(invisibleRectangle, width);
+      
+      // Resize box shape (child of invisibleRectangle)
+      GraphicsAlgorithm box = (GraphicsAlgorithm) invisibleRectangle.eContents().get(0);
+      gaService.setWidth(box, width);
+      
+      // Resize label shape 
+      Shape labelShape = shape.getChildren().get(0);
+      gaService.setWidth(labelShape.getGraphicsAlgorithm(), width);
+      
+      
+      if(propDef.isMultiline()) {
+        // Also move the text-area decoration
+        GraphicsAlgorithm decoration = shape.getChildren().get(1).getGraphicsAlgorithm();
+        gaService.setLocation(decoration, width - FormComponentStyles.DEFAULT_SCROLLBAR_DECORATION_WIDTH - 2, decoration.getY()); 
+      }
     }
   }
   

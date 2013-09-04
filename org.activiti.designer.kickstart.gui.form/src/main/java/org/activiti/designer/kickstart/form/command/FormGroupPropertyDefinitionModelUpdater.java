@@ -1,7 +1,10 @@
 package org.activiti.designer.kickstart.form.command;
 
+import org.activiti.designer.kickstart.form.diagram.KickstartFormFeatureProvider;
 import org.activiti.workflow.simple.definition.form.FormPropertyGroup;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.graphiti.features.IFeatureProvider;
+import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 
 public class FormGroupPropertyDefinitionModelUpdater extends KickstartModelUpdater<FormPropertyGroup> {
@@ -27,7 +30,17 @@ public class FormGroupPropertyDefinitionModelUpdater extends KickstartModelUpdat
   protected void performUpdates(FormPropertyGroup valueObject, FormPropertyGroup targetObject) {
     targetObject.setId(valueObject.getId());
     targetObject.setTitle(valueObject.getTitle());
+    
+    boolean typeChanged = !StringUtils.equals(valueObject.getType(), targetObject.getType());
     targetObject.setType(valueObject.getType());
+    
+    if(typeChanged) {
+      // Force relayout of the updated group
+      PictogramElement element = ((KickstartFormFeatureProvider)featureProvider).getPictogramElementForBusinessObject(targetObject);
+      if(element != null) {
+        ((KickstartFormFeatureProvider)featureProvider).getFormLayouter().relayout((ContainerShape) element);
+      }
+    }
   }
 
 
