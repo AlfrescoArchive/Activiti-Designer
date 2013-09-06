@@ -45,6 +45,11 @@ public abstract class AbstractKickstartFormComponentSection extends GFPropertySe
   private List<Control> controls;
   
   /**
+   * Cached updater.
+   */
+  private KickstartModelUpdater<?> currentUpdater;
+  
+  /**
    * Shared focus-listener added to all controls created. Makes sure value-updates are performed
    * and includes a fix for the focus-issue on Eclipse Juno.
    */
@@ -185,18 +190,12 @@ public abstract class AbstractKickstartFormComponentSection extends GFPropertySe
         try {
           modelChangesEnabled = false;
           
-          // Make sure the update of the model is done in the transactional editing domain
-          // to allow for "undoing" changes
-          DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
-          TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
           KickstartModelUpdater<?> updater = getModelUpdater();
 
           // Perform the changes on the updatable BO instead of the original
           Object updatableBo = updater.getUpdatableBusinessObject();
           storeValueInModel(control, updatableBo);
-
-          // Do the actual changes to the business-object in a command
-          editingDomain.getCommandStack().execute(new UpdateBusinessObjectCommand(editingDomain, updater));
+          executeModelUpdater();
           
         } finally {
           // Re-enable model-change listener after our change has been applied
@@ -207,9 +206,28 @@ public abstract class AbstractKickstartFormComponentSection extends GFPropertySe
   }
   
   /**
+   * Execute the updates queued in the given updated using the current transactional
+   * edition domain. 
+   */
+  protected void executeModelUpdater() {
+    // Make sure the update of the model is done in the transactional editing domain
+    // to allow for "undoing" changes
+    DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
+    TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
+    
+    if(currentUpdater != null) {
+      // Do the actual changes to the business-object in a command
+      editingDomain.getCommandStack().execute(new UpdateBusinessObjectCommand(editingDomain, currentUpdater));
+    }
+    
+    // Create a new updater for future changes
+    resetModelUpdater();
+  }
+  
+  /**
    * @return an {@link UpdateBusinessObjectCommand} that will be used to record model updates. 
    */
-  protected abstract KickstartModelUpdater<?> getModelUpdater();
+  protected abstract KickstartModelUpdater<?> createModelUpdater();
 
   protected boolean hasChanged(Object oldValue, Object newValue) {
     if(oldValue == null) {
@@ -217,6 +235,21 @@ public abstract class AbstractKickstartFormComponentSection extends GFPropertySe
     } else {
       return !oldValue.equals(newValue);
     }
+  }
+  
+  protected KickstartModelUpdater<?> getModelUpdater() {
+    if(currentUpdater == null) {
+      currentUpdater = createModelUpdater();
+    }
+    return currentUpdater;
+  }
+  
+  /**
+   * Clears the current updates, if any and creates a new fresh updater based on the
+   * current model state.
+   */
+  protected void resetModelUpdater() {
+    currentUpdater = createModelUpdater();
   }
   
   /**
@@ -406,6 +439,9 @@ public abstract class AbstractKickstartFormComponentSection extends GFPropertySe
     return labelControl;
   }
   
+  /**
+   * @return a {@link FormAttachment} relative to the last element.
+   */
   protected FormAttachment createTopFormAttachment() {
     if (controls.size() == 0) {
       return new FormAttachment(0, VSPACE);

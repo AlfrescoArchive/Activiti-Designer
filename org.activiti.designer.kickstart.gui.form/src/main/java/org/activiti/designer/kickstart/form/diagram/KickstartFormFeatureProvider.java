@@ -6,11 +6,13 @@ import java.util.List;
 import org.activiti.designer.kickstart.form.diagram.layout.KickstartFormLayouter;
 import org.activiti.designer.kickstart.form.diagram.shape.BusinessObjectShapeController;
 import org.activiti.designer.kickstart.form.diagram.shape.DatePropertyShapeController;
+import org.activiti.designer.kickstart.form.diagram.shape.ListPropertyShapeController;
 import org.activiti.designer.kickstart.form.diagram.shape.PropertyGroupShapeController;
 import org.activiti.designer.kickstart.form.diagram.shape.TextPropertyShapeController;
 import org.activiti.designer.kickstart.form.features.AddFormComponentFeature;
 import org.activiti.designer.kickstart.form.features.CreateDatePropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateFormGroupFeature;
+import org.activiti.designer.kickstart.form.features.CreateListPropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateTextAreaPropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateTextInputPropertyFeature;
 import org.activiti.designer.kickstart.form.features.DeleteFormComponentFeature;
@@ -55,6 +57,7 @@ public class KickstartFormFeatureProvider extends DefaultFeatureProvider {
 		shapeControllers.add(new DatePropertyShapeController(this));
 		shapeControllers.add(new TextPropertyShapeController(this));
 		shapeControllers.add(new PropertyGroupShapeController(this));
+		shapeControllers.add(new ListPropertyShapeController(this));
 	}
 	
 	/**
@@ -88,7 +91,7 @@ public class KickstartFormFeatureProvider extends DefaultFeatureProvider {
 	public ICreateFeature[] getCreateFeatures() {
 	  return new ICreateFeature[]{ 
 	      new CreateTextInputPropertyFeature(this), new CreateTextAreaPropertyFeature(this),
-	      new CreateDatePropertyFeature(this), new CreateFormGroupFeature(this)
+	      new CreateDatePropertyFeature(this), new CreateFormGroupFeature(this), new CreateListPropertyFeature(this)
 	  };
 	}
 	

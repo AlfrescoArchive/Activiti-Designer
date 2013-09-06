@@ -7,7 +7,9 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.features.context.IDirectEditingContext;
 import org.eclipse.graphiti.features.impl.AbstractDirectEditingFeature;
+import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
+import org.eclipse.graphiti.mm.pictograms.Shape;
 
 /**
  * @author Frederik Heremans
@@ -26,17 +28,18 @@ public class DirectEditFormComponentFeature extends AbstractDirectEditingFeature
 
   @Override
   public boolean canDirectEdit(IDirectEditingContext context) {
-    PictogramElement pe = context.getPictogramElement();
-    Object bo = getBusinessObjectForPictogramElement(pe);
-    return bo instanceof FormPropertyDefinition;
+    return getDefinitionForShape(context.getPictogramElement()) != null;
   }
 
   public String getInitialValue(IDirectEditingContext context) {
     // Return the current name of the EClass
-    PictogramElement pe = context.getPictogramElement();
-    FormPropertyDefinition definition = (FormPropertyDefinition) getBusinessObjectForPictogramElement(pe);
-    return definition.getName();
+    FormPropertyDefinition definition = getDefinitionForShape(context.getPictogramElement());
+    if(definition != null) {
+      return definition.getName();
+    }
+    return null;
   }
+  
 
   @Override
   public String checkValueValid(String value, IDirectEditingContext context) {
@@ -79,6 +82,8 @@ public class DirectEditFormComponentFeature extends AbstractDirectEditingFeature
       updater.doUpdate();
     }
   }
+  
+  
 
   protected FormPropertyDefinitionModelUpdater getUpdater(PictogramElement pe, boolean includeDiagramUpdate) {
     if(updater == null) {
@@ -92,5 +97,19 @@ public class DirectEditFormComponentFeature extends AbstractDirectEditingFeature
       }
     }
     return updater;
+  }
+  
+  protected FormPropertyDefinition getDefinitionForShape(PictogramElement pe) {
+    // Traverse up to parent "container" to find business-object
+    while (pe != null && !(pe instanceof ContainerShape)) {
+      if (pe instanceof Shape) {
+        pe = ((Shape) pe).getContainer();
+      }
+    }
+    Object bo = getBusinessObjectForPictogramElement(pe);
+    if(bo instanceof FormPropertyDefinition) {
+      return (FormPropertyDefinition) bo;
+    }
+    return null;
   }
 }

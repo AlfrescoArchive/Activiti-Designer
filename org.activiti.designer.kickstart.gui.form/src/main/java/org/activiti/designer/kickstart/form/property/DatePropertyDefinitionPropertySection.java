@@ -39,7 +39,7 @@ public class DatePropertyDefinitionPropertySection extends AbstractKickstartForm
   }
 
   @Override
-  protected KickstartModelUpdater<?> getModelUpdater() {
+  protected KickstartModelUpdater<?> createModelUpdater() {
     PictogramElement pictogramElement = getSelectedPictogramElement();
     FormPropertyDefinition propDef = (FormPropertyDefinition) getBusinessObject(pictogramElement);
         

@@ -91,7 +91,7 @@ public class FormPropertyGroupPropertySection extends AbstractKickstartFormCompo
   }
 
   @Override
-  protected KickstartModelUpdater<?> getModelUpdater() {
+  protected KickstartModelUpdater<?> createModelUpdater() {
     PictogramElement pictogramElement = getSelectedPictogramElement();
     FormPropertyGroup group = (FormPropertyGroup) getBusinessObject(pictogramElement);
         

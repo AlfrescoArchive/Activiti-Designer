@@ -1,18 +1,15 @@
 package org.activiti.designer.kickstart.form.diagram.shape;
 
-import java.text.DateFormat;
-import java.util.Calendar;
-import java.util.Date;
-
 import org.activiti.designer.kickstart.form.diagram.KickstartFormFeatureProvider;
 import org.activiti.designer.kickstart.form.util.FormComponentStyles;
 import org.activiti.designer.util.platform.OSEnum;
 import org.activiti.designer.util.platform.OSUtil;
-import org.activiti.workflow.simple.definition.form.DatePropertyDefinition;
+import org.activiti.workflow.simple.definition.form.ListPropertyDefinition;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.algorithms.MultiText;
+import org.eclipse.graphiti.mm.algorithms.Polygon;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.RoundedRectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;
@@ -26,19 +23,19 @@ import org.eclipse.graphiti.services.IPeCreateService;
 
 /**
  * A {@link BusinessObjectShapeController} capable of creating and updating shapes for
- * {@link DatePropertyDefinition} objects.
+ * {@link ListPropertyDefinition} objects.
  *  
  * @author Frederik Heremans
  */
-public class DatePropertyShapeController extends AbstractBusinessObjectShapeController {
+public class ListPropertyShapeController extends AbstractBusinessObjectShapeController {
   
-  public DatePropertyShapeController(KickstartFormFeatureProvider featureProvider) {
+  public ListPropertyShapeController(KickstartFormFeatureProvider featureProvider) {
     super(featureProvider);
   }
 
   @Override
   public boolean canControlShapeFor(Object businessObject) {
-    return businessObject instanceof DatePropertyDefinition;
+    return businessObject instanceof ListPropertyDefinition;
   }
 
   @Override
@@ -49,7 +46,7 @@ public class DatePropertyShapeController extends AbstractBusinessObjectShapeCont
     
     Diagram diagram = getFeatureProvider().getDiagramTypeProvider().getDiagram();
     
-    DatePropertyDefinition definition = (DatePropertyDefinition) businessObject;
+    ListPropertyDefinition definition = (ListPropertyDefinition) businessObject;
 
     // If no size has been supplied, revert to the default sizes
     if(width < 0) {
@@ -89,30 +86,20 @@ public class DatePropertyShapeController extends AbstractBusinessObjectShapeCont
     innerText.setLineWidth(0);
     gaService.setLocationAndSize(innerText, 3, FormComponentStyles.DEFAULT_LABEL_HEIGHT + 1, width - 4, height - FormComponentStyles.DEFAULT_LABEL_HEIGHT - 2);
 
-    // Add calendar decoration
+    // Add combo decoration
     Shape decoration = peCreateService.createShape(containerShape, false);
-    Rectangle decorationRect = gaService.createRectangle(decoration);
-    decorationRect.setBackground(FormComponentStyles.getCalandarDecorationColor(diagram));
-    decorationRect.setForeground(FormComponentStyles.getDefaultForegroundColor(diagram));
-    gaService.setLocationAndSize(decorationRect, width - 20, FormComponentStyles.DEFAULT_LABEL_HEIGHT + 4, 16, 16);
-
-    Shape decorationInner = peCreateService.createShape(containerShape, false);
-    Rectangle decorationInnerRect = gaService.createRectangle(decorationInner);
-    decorationInnerRect.setBackground(FormComponentStyles.getCalandarTopDecorationColor(diagram));
-    decorationInnerRect.setLineWidth(0);
-    decorationInnerRect.setLineVisible(false);
-    gaService.setLocationAndSize(decorationInnerRect, width - 19, FormComponentStyles.DEFAULT_LABEL_HEIGHT + 5, 14, 5);
-
-    Shape decorationText = peCreateService.createShape(containerShape, false);
-    Text dayText = gaService.createPlainText(decorationText,
-        StringUtils.leftPad(Calendar.getInstance().get(Calendar.DAY_OF_MONTH) + "", 2, '0'));
-    dayText.setVerticalAlignment(Orientation.ALIGNMENT_MIDDLE);
-    dayText.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
-    dayText.setBackground(FormComponentStyles.getCalandarDecorationColor(diagram));
-    dayText.setForeground(FormComponentStyles.getDefaultForegroundColor(diagram));
-    dayText.setFont(gaService.manageFont(diagram, text.getFont().getName(), 8));
-    dayText.setLineWidth(0);
-    gaService.setLocationAndSize(dayText, width - 19, FormComponentStyles.DEFAULT_LABEL_HEIGHT + 10, 14, 8);
+    Rectangle decorationRectangle = gaService.createInvisibleRectangle(decoration);
+    gaService.setLocationAndSize(decorationRectangle, width - 25, FormComponentStyles.DEFAULT_LABEL_HEIGHT, 30, FormComponentStyles.DEFAULT_COMPONENT_BOX_HEIGHT);
+    
+    Polygon seperator = gaService.createPolygon(decorationRectangle, new int[] {0, 0, 0, FormComponentStyles.DEFAULT_COMPONENT_BOX_HEIGHT});
+    seperator.setLineWidth(0);
+    seperator.setBackground(FormComponentStyles.getDefaultForegroundColor(diagram));
+    
+    
+    int caretY = (FormComponentStyles.DEFAULT_COMPONENT_BOX_HEIGHT - 7) / 2;
+    Polygon caret = gaService.createPolygon(decorationRectangle, new int[] {18, caretY, 8, caretY, 13, caretY + 7});
+    caret.setLineVisible(false);
+    caret.setForeground(FormComponentStyles.getDefaultForegroundColor(diagram));
     
     // Allow quick-edit
     final IDirectEditingInfo directEditingInfo = getFeatureProvider().getDirectEditingInfo();
@@ -129,7 +116,7 @@ public class DatePropertyShapeController extends AbstractBusinessObjectShapeCont
 
   @Override
   public void updateShape(ContainerShape shape, Object businessObject, int width, int height) {
-    DatePropertyDefinition propDef = (DatePropertyDefinition) businessObject;
+    ListPropertyDefinition propDef = (ListPropertyDefinition) businessObject;
 
     // Update the label
     MultiText labelText = findNameMultiText(shape);
@@ -176,23 +163,21 @@ public class DatePropertyShapeController extends AbstractBusinessObjectShapeCont
     }
   }
 
-  protected String getDefaultValue(DatePropertyDefinition definition) {
-    String dateValue = null;
-    if (definition.isShowTime()) {
-      Calendar noon = Calendar.getInstance();
-      noon.set(Calendar.HOUR_OF_DAY, 12);
-      noon.set(Calendar.MINUTE, 0);
-      noon.set(Calendar.SECOND, 0);
-      dateValue = DateFormat.getDateTimeInstance().format(noon.getTime());
-    } else {
-      dateValue = DateFormat.getDateInstance().format(new Date());
+  protected String getDefaultValue(ListPropertyDefinition definition) {
+    String value = null;
+    if(definition.getEntries() != null && !definition.getEntries().isEmpty()) {
+      value = definition.getEntries().get(0).getName();
     }
-    return dateValue;
+    
+    if(value == null || value.isEmpty()) {
+      value = "Select a value...";
+    }
+    return value;
   }
   
   @Override
   public boolean isShapeUpdateNeeded(ContainerShape shape, Object businessObject) {
-    DatePropertyDefinition propDef = (DatePropertyDefinition) businessObject;
+    ListPropertyDefinition propDef = (ListPropertyDefinition) businessObject;
     
     // Check label text
     String currentLabel = (String) extractShapeData(LABEL_DATA_KEY, shape);
@@ -209,9 +194,10 @@ public class DatePropertyShapeController extends AbstractBusinessObjectShapeCont
     }
     return false;
   }
-
+  
   @Override
   public GraphicsAlgorithm getGraphicsAlgorithmForDirectEdit(ContainerShape container) {
     return container.getChildren().get(0).getGraphicsAlgorithm();
   }
+
 }

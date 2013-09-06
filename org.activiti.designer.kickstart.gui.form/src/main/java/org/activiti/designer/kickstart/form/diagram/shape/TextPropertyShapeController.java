@@ -89,6 +89,8 @@ public class TextPropertyShapeController extends AbstractBusinessObjectShapeCont
       polygon.setLineVisible(false);
     }
     
+    getFeatureProvider().link(containerShape, new Object[] {definition});
+    
     // Allow quick-edit
     final IDirectEditingInfo directEditingInfo = getFeatureProvider().getDirectEditingInfo();
     // set container shape for direct editing after object creation
@@ -97,6 +99,7 @@ public class TextPropertyShapeController extends AbstractBusinessObjectShapeCont
     // direct editing shall be opened after object creation
     directEditingInfo.setPictogramElement(containerShape);
     directEditingInfo.setGraphicsAlgorithm(text);
+    directEditingInfo.setActive(true);
     
     return containerShape;
   }
@@ -127,7 +130,6 @@ public class TextPropertyShapeController extends AbstractBusinessObjectShapeCont
       Shape labelShape = shape.getChildren().get(0);
       gaService.setWidth(labelShape.getGraphicsAlgorithm(), width);
       
-      
       if(propDef.isMultiline()) {
         // Also move the text-area decoration
         GraphicsAlgorithm decoration = shape.getChildren().get(1).getGraphicsAlgorithm();
@@ -136,6 +138,10 @@ public class TextPropertyShapeController extends AbstractBusinessObjectShapeCont
     }
   }
   
+  @Override
+  public GraphicsAlgorithm getGraphicsAlgorithmForDirectEdit(ContainerShape container) {
+    return container.getChildren().get(0).getGraphicsAlgorithm();
+  }
   @Override
   public boolean isShapeUpdateNeeded(ContainerShape shape, Object businessObject) {
     TextPropertyDefinition propDef = (TextPropertyDefinition) businessObject;

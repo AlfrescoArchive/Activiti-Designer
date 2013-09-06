@@ -53,7 +53,7 @@ public class PropertyDefinitionPropertySection extends AbstractKickstartFormComp
   }
 
   @Override
-  protected KickstartModelUpdater<?> getModelUpdater() {
+  protected KickstartModelUpdater<?> createModelUpdater() {
     PictogramElement pictogramElement = getSelectedPictogramElement();
     FormPropertyDefinition propDef = (FormPropertyDefinition) getBusinessObject(pictogramElement);
         
