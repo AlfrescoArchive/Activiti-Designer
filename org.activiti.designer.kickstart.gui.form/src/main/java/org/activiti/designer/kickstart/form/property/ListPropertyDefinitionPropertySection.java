@@ -1,12 +1,10 @@
 package org.activiti.designer.kickstart.form.property;
 
 
-import org.activiti.designer.kickstart.form.command.FormPropertyDefinitionModelUpdater;
+import org.activiti.designer.kickstart.form.command.FormPropertyGroupModelUpdater;
 import org.activiti.designer.kickstart.form.command.KickstartModelUpdater;
-import org.activiti.workflow.simple.definition.form.FormPropertyDefinition;
 import org.activiti.workflow.simple.definition.form.ListPropertyDefinition;
 import org.activiti.workflow.simple.definition.form.ListPropertyEntry;
-import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.jface.fieldassist.ControlDecoration;
 import org.eclipse.jface.fieldassist.FieldDecoration;
 import org.eclipse.jface.fieldassist.FieldDecorationRegistry;
@@ -78,6 +76,7 @@ public class ListPropertyDefinitionPropertySection extends AbstractKickstartForm
     data.right = new FormAttachment(100, -30);
     data.top = new FormAttachment(addEntryText, VSPACE);
     data.bottom = new FormAttachment(100);
+    data.height = 150;
     
     valueTableViewer = new TableViewer(formComposite);
     valueTableViewer.getTable().setHeaderVisible(true);
@@ -221,11 +220,8 @@ public class ListPropertyDefinitionPropertySection extends AbstractKickstartForm
 
   @Override
   protected KickstartModelUpdater<?> createModelUpdater() {
-    PictogramElement pictogramElement = getSelectedPictogramElement();
-    FormPropertyDefinition propDef = (FormPropertyDefinition) getBusinessObject(pictogramElement);
-    
-    if(propDef != null) {
-       FormPropertyDefinitionModelUpdater updater = new FormPropertyDefinitionModelUpdater(propDef, pictogramElement, getDiagramTypeProvider().getFeatureProvider());
+    KickstartModelUpdater<?> updater = super.createModelUpdater();
+    if(updater != null) {
        // Use the updateable model as source for the table
        valueTableViewer.setInput(((ListPropertyDefinition) updater.getUpdatableBusinessObject())
            .getEntries());

@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.activiti.designer.kickstart.form.command.KickstartModelUpdater;
 import org.activiti.designer.kickstart.form.command.UpdateBusinessObjectCommand;
+import org.activiti.designer.kickstart.form.diagram.KickstartFormFeatureProvider;
 import org.activiti.designer.util.editor.KickstartFormMemoryModel;
 import org.activiti.designer.util.editor.KickstartFormMemoryModel.KickstartFormModelListener;
 import org.activiti.designer.util.editor.ModelHandler;
@@ -227,7 +228,14 @@ public abstract class AbstractKickstartFormComponentSection extends GFPropertySe
   /**
    * @return an {@link UpdateBusinessObjectCommand} that will be used to record model updates. 
    */
-  protected abstract KickstartModelUpdater<?> createModelUpdater();
+  protected KickstartModelUpdater<?> createModelUpdater() {
+    PictogramElement element = getSelectedPictogramElement();
+    KickstartFormFeatureProvider featureProvider = getFeatureProvider(element);
+    if(featureProvider != null) {
+      return featureProvider.getModelUpdaterFor(featureProvider.getBusinessObjectForPictogramElement(element), element);
+    }
+    return null;
+  }
 
   protected boolean hasChanged(Object oldValue, Object newValue) {
     if(oldValue == null) {
@@ -342,10 +350,20 @@ public abstract class AbstractKickstartFormComponentSection extends GFPropertySe
   protected Object getBusinessObject(PictogramElement element) {
     if (element == null)
       return null;
+   KickstartFormFeatureProvider featureProvider = getFeatureProvider(element);
+   if(featureProvider != null) {
+     return featureProvider.getBusinessObjectForPictogramElement(element);
+   }
+   return null;
+  }
+  
+  protected KickstartFormFeatureProvider getFeatureProvider(PictogramElement element) {
+    if (element == null)
+      return null;
     Diagram diagram = getContainer(element);
     KickstartFormMemoryModel model = (ModelHandler.getKickstartFormMemoryModel(EcoreUtil.getURI(diagram)));
     if (model != null) {
-      return model.getFeatureProvider().getBusinessObjectForPictogramElement(element);
+      return (KickstartFormFeatureProvider) model.getFeatureProvider();
     }
     return null;
   }

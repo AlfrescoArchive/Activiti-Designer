@@ -3,6 +3,9 @@ package org.activiti.designer.kickstart.form.diagram;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.activiti.designer.kickstart.form.command.FormPropertyGroupModelUpdater;
+import org.activiti.designer.kickstart.form.command.FormPropertyDefinitionModelUpdater;
+import org.activiti.designer.kickstart.form.command.KickstartModelUpdater;
 import org.activiti.designer.kickstart.form.diagram.layout.KickstartFormLayouter;
 import org.activiti.designer.kickstart.form.diagram.shape.BusinessObjectShapeController;
 import org.activiti.designer.kickstart.form.diagram.shape.DatePropertyShapeController;
@@ -23,6 +26,8 @@ import org.activiti.designer.kickstart.form.features.UpdateFormComponentFeature;
 import org.activiti.designer.util.editor.KickstartFormIndependenceSolver;
 import org.activiti.designer.util.editor.KickstartFormMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
+import org.activiti.workflow.simple.definition.form.FormPropertyDefinition;
+import org.activiti.workflow.simple.definition.form.FormPropertyGroup;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.IAddFeature;
@@ -87,6 +92,22 @@ public class KickstartFormFeatureProvider extends DefaultFeatureProvider {
 	  return false;
 	}
 
+	/**
+	 * @param businessObject the business-object to update
+	 * @param pictogramElement optional pictogram-element to refresh after update is performed. When null
+	 * is provided, no additional update besides the actual model update is done.
+	 * @return the updater capable of updating the given object. Null, if the object cannot be updated.
+	 */
+	public KickstartModelUpdater<?> getModelUpdaterFor(Object businessObject, PictogramElement pictogramElement) {
+	  if(businessObject instanceof FormPropertyDefinition) {
+	    return new FormPropertyDefinitionModelUpdater((FormPropertyDefinition) businessObject, pictogramElement, this);
+	  } else if(businessObject instanceof FormPropertyGroup) {
+	    return new FormPropertyGroupModelUpdater((FormPropertyGroup) businessObject, pictogramElement, this);
+	  }
+	  return null;
+	}
+	
+	
 	@Override
 	public ICreateFeature[] getCreateFeatures() {
 	  return new ICreateFeature[]{ 

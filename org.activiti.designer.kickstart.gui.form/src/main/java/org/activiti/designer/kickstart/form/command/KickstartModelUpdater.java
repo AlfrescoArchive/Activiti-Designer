@@ -12,8 +12,8 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 /**
  * Class capable of updating and cloning a Kickstart form model object.
  * 
- * Calls the neccasiary methods to notify the {@link KickstartFormMemoryModel} of the change
- * and optionallt notifies the Diagram UI.
+ * Calls the necessary methods to notify the {@link KickstartFormMemoryModel} of the change
+ * and optional notifies the Diagram UI.
  * 
  * @author Frederik Heremans
  */
@@ -48,15 +48,27 @@ public abstract class KickstartModelUpdater<T extends Object> {
   }
   
   public void doUpdate() {
-    performUpdates(newBusinessObject, businessObject);
-    triggerBusinessObjectModelUpdated();
-    requestPictorgramElementUpdate();
+    doUpdate(true);
   }
   
   public void doUndo() {
+    doUndo(true);
+  }
+  
+  public void doUpdate(boolean updatePictorgramElement) {
+    performUpdates(newBusinessObject, businessObject);
+    triggerBusinessObjectModelUpdated();
+    if(updatePictorgramElement) {
+      requestPictorgramElementUpdate();
+    }
+  }
+  
+  public void doUndo(boolean updatePictorgramElement) {
     performUpdates(oldBusinessObject, businessObject);
     triggerBusinessObjectModelUpdated();
-    requestPictorgramElementUpdate();
+    if(updatePictorgramElement) {
+      requestPictorgramElementUpdate();
+    }
   }
   
   /**

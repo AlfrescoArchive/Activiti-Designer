@@ -142,6 +142,7 @@ public class TextPropertyShapeController extends AbstractBusinessObjectShapeCont
   public GraphicsAlgorithm getGraphicsAlgorithmForDirectEdit(ContainerShape container) {
     return container.getChildren().get(0).getGraphicsAlgorithm();
   }
+  
   @Override
   public boolean isShapeUpdateNeeded(ContainerShape shape, Object businessObject) {
     TextPropertyDefinition propDef = (TextPropertyDefinition) businessObject;

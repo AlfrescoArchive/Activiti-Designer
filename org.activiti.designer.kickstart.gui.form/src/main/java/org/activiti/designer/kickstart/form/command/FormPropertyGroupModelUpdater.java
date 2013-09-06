@@ -7,9 +7,9 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 
-public class FormGroupPropertyDefinitionModelUpdater extends KickstartModelUpdater<FormPropertyGroup> {
+public class FormPropertyGroupModelUpdater extends KickstartModelUpdater<FormPropertyGroup> {
 
-  public FormGroupPropertyDefinitionModelUpdater(FormPropertyGroup businessObject, PictogramElement pictogramElement,
+  public FormPropertyGroupModelUpdater(FormPropertyGroup businessObject, PictogramElement pictogramElement,
       IFeatureProvider featureProvider) {
     super(businessObject, pictogramElement, featureProvider);
   }
