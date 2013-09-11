@@ -1,7 +1,6 @@
 package org.activiti.designer.kickstart.form.property;
 
 
-import org.activiti.designer.kickstart.form.command.FormPropertyGroupModelUpdater;
 import org.activiti.designer.kickstart.form.command.KickstartModelUpdater;
 import org.activiti.workflow.simple.definition.form.ListPropertyDefinition;
 import org.activiti.workflow.simple.definition.form.ListPropertyEntry;
@@ -87,35 +86,6 @@ public class ListPropertyDefinitionPropertySection extends AbstractKickstartForm
     valueTableViewer.setContentProvider(ArrayContentProvider.getInstance());
     
     // Create columns
-    TableViewerColumn valueColumn = new TableViewerColumn(valueTableViewer, SWT.NONE);
-    valueColumn.getColumn().setText("Value");
-    valueColumn.getColumn().setWidth(300);
-    valueColumn.setEditingSupport(new ListPropertyEntryEditingSupport(valueTableViewer) {
-
-      @Override
-      protected Object getValueFromEntry(ListPropertyEntry entry) {
-        return entry.getValue();
-      }
-
-      @Override
-      protected void setValueInEntry(ListPropertyEntry entry, Object value) {
-        String newValue = String.valueOf(value);
-        if(hasChanged(entry.getValue(), newValue)) {
-          entry.setValue(String.valueOf(value));
-          executeModelUpdater();
-        }
-      }
-    });
-    
-    
-    valueColumn.setLabelProvider(new ColumnLabelProvider() {
-      @Override
-      public String getText(Object element) {
-        ListPropertyEntry entry = (ListPropertyEntry) element;
-        return entry.getValue();
-      }
-    });
-    
     TableViewerColumn nameColumn = new TableViewerColumn(valueTableViewer, SWT.NONE);
     nameColumn.getColumn().setText("Label");
     nameColumn.getColumn().setWidth(300);
@@ -135,11 +105,39 @@ public class ListPropertyDefinitionPropertySection extends AbstractKickstartForm
         }
       }
     });
+    
     nameColumn.setLabelProvider(new ColumnLabelProvider() {
       @Override
       public String getText(Object element) {
         ListPropertyEntry entry = (ListPropertyEntry) element;
         return entry.getName();
+      }
+    });
+    
+    TableViewerColumn valueColumn = new TableViewerColumn(valueTableViewer, SWT.NONE);
+    valueColumn.getColumn().setText("Value");
+    valueColumn.getColumn().setWidth(300);
+    valueColumn.setEditingSupport(new ListPropertyEntryEditingSupport(valueTableViewer) {
+
+      @Override
+      protected Object getValueFromEntry(ListPropertyEntry entry) {
+        return entry.getValue();
+      }
+
+      @Override
+      protected void setValueInEntry(ListPropertyEntry entry, Object value) {
+        String newValue = String.valueOf(value);
+        if(hasChanged(entry.getValue(), newValue)) {
+          entry.setValue(String.valueOf(value));
+          executeModelUpdater();
+        }
+      }
+    });
+    valueColumn.setLabelProvider(new ColumnLabelProvider() {
+      @Override
+      public String getText(Object element) {
+        ListPropertyEntry entry = (ListPropertyEntry) element;
+        return entry.getValue();
       }
     });
     
@@ -221,7 +219,7 @@ public class ListPropertyDefinitionPropertySection extends AbstractKickstartForm
   @Override
   protected KickstartModelUpdater<?> createModelUpdater() {
     KickstartModelUpdater<?> updater = super.createModelUpdater();
-    if(updater != null) {
+    if(updater != null && !valueTableViewer.getTable().isDisposed()) {
        // Use the updateable model as source for the table
        valueTableViewer.setInput(((ListPropertyDefinition) updater.getUpdatableBusinessObject())
            .getEntries());

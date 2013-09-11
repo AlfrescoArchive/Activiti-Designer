@@ -24,6 +24,19 @@ public class DeleteFormComponentFeature extends DefaultDeleteFeature implements 
   }
   
   @Override
+  public boolean canDelete(IDeleteContext context) {
+    boolean canDelete = false;
+    Object bo = getBusinessObjectForPictogramElement(context.getPictogramElement());
+    if(bo != null) {
+      // Any object can be deleted, apart from the "info" group
+      canDelete = !(bo instanceof FormPropertyGroup) || (bo instanceof FormPropertyGroup && 
+          !KickstartFormMemoryModel.INFO_GROUP_ID.equals(((FormPropertyGroup) bo).getId()));
+    }
+    return canDelete;
+  }
+  
+  
+  @Override
   public void delete(IDeleteContext context) {
     ContainerShape parent = null;
     if(context.getPictogramElement() instanceof ContainerShape) {

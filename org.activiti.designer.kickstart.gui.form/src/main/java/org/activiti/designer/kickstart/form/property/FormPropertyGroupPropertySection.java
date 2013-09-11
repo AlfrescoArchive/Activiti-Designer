@@ -1,5 +1,6 @@
 package org.activiti.designer.kickstart.form.property;
 
+import org.activiti.designer.util.editor.KickstartFormMemoryModel;
 import org.activiti.workflow.simple.definition.form.FormPropertyGroup;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Control;
@@ -37,6 +38,18 @@ public class FormPropertyGroupPropertySection extends AbstractKickstartFormCompo
     createLabel("Type", typeControl);
   }
 
+  
+  @Override
+  public void refresh() {
+    super.refresh();
+    
+    // ID of "info" group cannot be changed
+    FormPropertyGroup group = (FormPropertyGroup) getBusinessObject(getSelectedPictogramElement());
+    if(group != null) {
+      idControl.setEnabled(!KickstartFormMemoryModel.INFO_GROUP_ID.equals(group.getId()));
+    }
+  }
+  
   @Override
   protected Object getModelValueForControl(Control control, Object businessObject) {
     FormPropertyGroup group = (FormPropertyGroup) businessObject;

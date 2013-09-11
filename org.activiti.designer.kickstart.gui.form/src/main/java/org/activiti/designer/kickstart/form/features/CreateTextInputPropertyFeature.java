@@ -1,7 +1,5 @@
 package org.activiti.designer.kickstart.form.features;
 
-import java.util.Random;
-
 import org.activiti.designer.kickstart.form.KickstartFormPluginImage;
 import org.activiti.designer.kickstart.form.diagram.KickstartFormFeatureProvider;
 import org.activiti.workflow.simple.definition.form.FormPropertyDefinition;
@@ -23,7 +21,7 @@ public class CreateTextInputPropertyFeature extends AbstractCreateFormPropertyFe
   @Override
   protected FormPropertyDefinition createFormPropertyDefinition(ICreateContext context) {
     TextPropertyDefinition definition = new TextPropertyDefinition();
-    definition.setName("Property " + new Random().nextInt(100));
+    definition.setName("Text input");
     return definition;
   }
 

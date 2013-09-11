@@ -1,7 +1,5 @@
 package org.activiti.designer.kickstart.form.features;
 
-import java.util.Random;
-
 import org.activiti.designer.kickstart.form.KickstartFormPluginImage;
 import org.activiti.designer.kickstart.form.diagram.KickstartFormFeatureProvider;
 import org.activiti.workflow.simple.definition.form.FormPropertyDefinition;
@@ -26,7 +24,7 @@ public class CreateTextAreaPropertyFeature extends AbstractCreateFormPropertyFea
     TextPropertyDefinition definition = new TextPropertyDefinition();
     // Text-area is a multi-lined TextPropertyDefinition
     definition.setMultiline(true);
-    definition.setName("Textarea " + new Random().nextInt(100));
+    definition.setName("Textarea");
     return definition;
   }
 

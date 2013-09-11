@@ -3,8 +3,8 @@ package org.activiti.designer.kickstart.form.diagram;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.designer.kickstart.form.command.FormPropertyGroupModelUpdater;
 import org.activiti.designer.kickstart.form.command.FormPropertyDefinitionModelUpdater;
+import org.activiti.designer.kickstart.form.command.FormPropertyGroupModelUpdater;
 import org.activiti.designer.kickstart.form.command.KickstartModelUpdater;
 import org.activiti.designer.kickstart.form.diagram.layout.KickstartFormLayouter;
 import org.activiti.designer.kickstart.form.diagram.shape.BusinessObjectShapeController;
@@ -151,7 +151,7 @@ public class KickstartFormFeatureProvider extends DefaultFeatureProvider {
 	  // Business-object for the diagram is ALWAYS the root form-definition
 	  if(pictogramElement instanceof Diagram) {
 	    KickstartFormMemoryModel model = ModelHandler.getKickstartFormMemoryModel(EcoreUtil.getURI(pictogramElement));
-	    if(model != null) {
+	    if(model != null && model.isInitialized()) {
 	      return model.getFormDefinition();
 	    }
 	  }
