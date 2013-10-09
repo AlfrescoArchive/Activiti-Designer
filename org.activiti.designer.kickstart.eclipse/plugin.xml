@@ -93,4 +93,67 @@
           priority="normal">
     </content-type>
  </extension>
+ <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="org.activiti.designer.kickstart"
+            name="Activiti">
+      </category>
+      <view
+            name="Awesome View"
+            icon="icons/sample.gif"
+            category="org.activiti.designer.kickstart"
+            class="org.activiti.designer.kickstart.eclipse.navigator.AwesomeView"
+            id="testproject.views.SampleView">
+      </view>
+      <view
+            category="org.activiti.designer.kickstart"
+            class="org.activiti.designer.kickstart.eclipse.navigator.CmisNavigator"
+            id="org.activiti.designer.kickstart.eclipse.cmisnavigator"
+            name="CMIS Navigator"
+            restorable="true">
+      </view>
+ </extension>
+ <extension
+       point="org.eclipse.ui.navigator.navigatorContent">
+    <navigatorContent
+          contentProvider="org.activiti.designer.kickstart.eclipse.navigator.ContentProvider"
+          id="org.activiti.designer.kickstart.eclipse.cmisnavigatorContent"
+          labelProvider="org.activiti.designer.kickstart.eclipse.navigator.CmisLabelProvider"
+          name="CMIS Navigator Content">
+       <triggerPoints>
+          <or>
+             <instanceof
+                   value="org.activiti.designer.kickstart.eclipse.navigator.Root">
+             </instanceof>
+             <instanceof
+                   value="org.activiti.designer.kickstart.eclipse.navigator.Parent">
+             </instanceof>
+          </or>
+          <or>
+             <instanceof
+                   value="org.activiti.designer.kickstart.eclipse.navigator.Parent">
+             </instanceof>
+             <instanceof
+                   value="org.activiti.designer.kickstart.eclipse.navigator.Child">
+             </instanceof>
+          </or>
+       </triggerPoints>
+    </navigatorContent>
+ </extension>
+ <extension
+       point="org.eclipse.ui.navigator.viewer">
+    <viewer
+          viewerId="org.activiti.designer.kickstart.eclipse.cmisnavigator">
+    </viewer>
+    <viewerContentBinding
+          viewerId="org.activiti.designer.kickstart.eclipse.cmisnavigator">
+       <includes>
+          <contentExtension
+                isRoot="true"
+                pattern="org.activiti.designer.kickstart.eclipse.cmisnavigatorContent">
+          </contentExtension>
+       </includes>
+    </viewerContentBinding>
+ </extension>
 </plugin>

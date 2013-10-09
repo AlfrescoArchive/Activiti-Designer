@@ -20,7 +20,9 @@ Require-Bundle: org.eclipse.graphiti,
  org.activiti.designer.util,
  org.activiti.designer.integration,
  org.eclipse.jdt.launching,
- org.activiti.designer.libs
+ org.activiti.designer.libs,
+ org.eclipse.core.resources,
+ org.eclipse.ui.navigator.resources
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: 
@@ -35,4 +37,9 @@ Bundle-Activator: org.activiti.designer.kickstart.eclipse.common.KickstartPlugin
 Bundle-Vendor: Activiti
 Bundle-ClassPath: .,
  jdi.jar,
- jdimodel.jar
+ jdimodel.jar,
+ chemistry-opencmis-client-api-0.10.0.jar,
+ chemistry-opencmis-client-bindings-0.10.0.jar,
+ chemistry-opencmis-client-impl-0.10.0.jar,
+ chemistry-opencmis-commons-api-0.10.0.jar,
+ chemistry-opencmis-commons-impl-0.10.0.jar
