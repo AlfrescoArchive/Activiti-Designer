@@ -10,13 +10,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.activiti.designer.kickstart.eclipse.navigator;
+package org.activiti.designer.kickstart.eclipse.navigator.handlers;
 
-import org.eclipse.core.runtime.PlatformObject;
+import org.eclipse.core.commands.AbstractHandler;
+import org.eclipse.core.commands.ExecutionEvent;
+import org.eclipse.core.commands.ExecutionException;
 
-public class Root extends PlatformObject {
-	
-	public Root() {
-		System.out.println("-----> ROOT IS BEING CREATED");
+public class RenameHandler extends AbstractHandler {
+
+	@Override
+	public Object execute(ExecutionEvent event) throws ExecutionException {
+		System.out.println("Executing " + event.getParameters());
+		return null;
 	}
+
 }
