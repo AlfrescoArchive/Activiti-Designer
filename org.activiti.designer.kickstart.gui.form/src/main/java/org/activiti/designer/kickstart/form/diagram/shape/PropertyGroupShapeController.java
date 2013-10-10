@@ -5,6 +5,7 @@ import org.activiti.designer.kickstart.form.util.FormComponentStyles;
 import org.activiti.workflow.simple.definition.form.FormPropertyGroup;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
+import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.algorithms.MultiText;
 import org.eclipse.graphiti.mm.algorithms.Polygon;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
@@ -81,6 +82,7 @@ public class PropertyGroupShapeController extends AbstractBusinessObjectShapeCon
     // direct editing shall be opened after object creation
     directEditingInfo.setPictogramElement(containerShape);
     directEditingInfo.setGraphicsAlgorithm(text);
+    directEditingInfo.setActive(true);
     
     return containerShape;
   }
@@ -107,5 +109,10 @@ public class PropertyGroupShapeController extends AbstractBusinessObjectShapeCon
       return true;
     }
     return false;
+  }
+  
+  @Override
+  public GraphicsAlgorithm getGraphicsAlgorithmForDirectEdit(ContainerShape container) {
+    return container.getChildren().get(0).getGraphicsAlgorithm();
   }
 }

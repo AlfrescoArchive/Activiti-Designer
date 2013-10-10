@@ -50,7 +50,6 @@ public class PropertyExecutionListenerSection extends ActivitiPropertySection im
 		data.right = new FormAttachment(listenersComposite, -HSPACE);
 		data.top = new FormAttachment(listenersComposite, 0, SWT.TOP);
 		listenersLabel.setLayoutData(data);
-
 	}
 	
 	@Override

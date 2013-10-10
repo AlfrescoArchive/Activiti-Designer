@@ -1,6 +1,9 @@
 package org.activiti.designer.kickstart.form.diagram.shape;
 
+
+import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
+import org.eclipse.graphiti.mm.pictograms.Shape;
 
 /**
  * Interface describing a controller capable of creating and updating
@@ -49,5 +52,12 @@ public interface BusinessObjectShapeController {
    * @return the shape data value that can be extracted from the given shape for the given key. Returns
    * null if the data cannot be extracted or if the data is null.
    */
-  Object extractShapeData(String key, ContainerShape shape);
+  Object extractShapeData(String key, Shape shape);
+  
+  /**
+   * @param container
+   * @return the graphics algorithm that should be used to position the default direct editor for
+   * the given container shape.
+   */
+   GraphicsAlgorithm getGraphicsAlgorithmForDirectEdit(ContainerShape container);
 }

@@ -1,9 +1,7 @@
 package org.activiti.designer.kickstart.form.property;
 
-import org.activiti.designer.kickstart.form.command.FormGroupPropertyDefinitionModelUpdater;
-import org.activiti.designer.kickstart.form.command.KickstartModelUpdater;
+import org.activiti.designer.util.editor.KickstartFormMemoryModel;
 import org.activiti.workflow.simple.definition.form.FormPropertyGroup;
-import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
@@ -40,6 +38,18 @@ public class FormPropertyGroupPropertySection extends AbstractKickstartFormCompo
     createLabel("Type", typeControl);
   }
 
+  
+  @Override
+  public void refresh() {
+    super.refresh();
+    
+    // ID of "info" group cannot be changed
+    FormPropertyGroup group = (FormPropertyGroup) getBusinessObject(getSelectedPictogramElement());
+    if(group != null) {
+      idControl.setEnabled(!KickstartFormMemoryModel.INFO_GROUP_ID.equals(group.getId()));
+    }
+  }
+  
   @Override
   protected Object getModelValueForControl(Control control, Object businessObject) {
     FormPropertyGroup group = (FormPropertyGroup) businessObject;
@@ -88,16 +98,5 @@ public class FormPropertyGroupPropertySection extends AbstractKickstartFormCompo
       return THREE_COLUMN_MESSAGE;
     }
     return SINGLE_COLUMN_MESSAGE;
-  }
-
-  @Override
-  protected KickstartModelUpdater<?> getModelUpdater() {
-    PictogramElement pictogramElement = getSelectedPictogramElement();
-    FormPropertyGroup group = (FormPropertyGroup) getBusinessObject(pictogramElement);
-        
-    if(group != null) {
-      return new FormGroupPropertyDefinitionModelUpdater(group, pictogramElement, getDiagramTypeProvider().getFeatureProvider());
-    }
-    return null;
   }
 }

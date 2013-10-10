@@ -34,7 +34,7 @@ public abstract class AbstractBusinessObjectShapeController implements BusinessO
    * <p>Supported keys: {@value #LABEL_DATA_KEY}, {@value #DEFAULT_VALUE_DATA_KEY}</p>
    */
   @Override
-  public Object extractShapeData(String key, ContainerShape shape) {
+  public Object extractShapeData(String key, Shape shape) {
     Object data = null;
     
     if(LABEL_DATA_KEY.equals(key)) {

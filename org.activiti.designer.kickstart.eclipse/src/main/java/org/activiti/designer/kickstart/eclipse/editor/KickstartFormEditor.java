@@ -136,27 +136,35 @@ public class KickstartFormEditor extends DiagramEditor {
     File formDefinitionFile = new File(filePath);
     try {
       if (formDefinitionFile.exists() == false) {
-        model.setFormDefinition(new FormDefinition());
+        model.setFormDefinition(createEmptyFormDefinition());
         formDefinitionFile.createNewFile();
         dataFile.refreshLocal(IResource.DEPTH_INFINITE, null);
       } else {
-        FileInputStream fileStream = new FileInputStream(formDefinitionFile);
+        // Empty file, create default model
         FormDefinition definition = null;
-        try {
-          definition = jsonConverter.readFormDefinition(fileStream);
-        } catch(Exception e) {
-          definition = new FormDefinition();
-
-          // Show an error to the user, informing that the input file cannot be read
-          // and an empty diagram is opened
-          Logger.logError("Error while opening form diagram", e);
-          getSite().getShell().getDisplay().asyncExec(
-            new Runnable() {
-              public void run() {
-                  MessageDialog.openError(getSite().getShell(), "Error while opening form", 
-                      "An error occured while opening the form, make sure the content of the file is valid. See the error-log for additional details.");
-              }
-          });
+        
+        if(formDefinitionFile.length() == 0L) {
+          definition = createEmptyFormDefinition();
+          jsonConverter.writeFormDefinition(definition, new FileWriter(formDefinitionFile));
+        } else {
+          // Non-empty file, load contents
+          FileInputStream fileStream = new FileInputStream(formDefinitionFile);
+          try {
+            definition = jsonConverter.readFormDefinition(fileStream);
+          } catch(Exception e) {
+            definition = createEmptyFormDefinition();
+            
+            // Show an error to the user, informing that the input file cannot be read
+            // and an empty diagram is opened
+            Logger.logError("Error while opening form diagram", e);
+            getSite().getShell().getDisplay().asyncExec(
+                new Runnable() {
+                  public void run() {
+                    MessageDialog.openError(getSite().getShell(), "Error while opening form", 
+                        "An error occured while opening the form, make sure the content of the file is valid. See the error-log for additional details.");
+                  }
+                });
+          }
         }
         
         model.setFormDefinition(definition);
@@ -185,6 +193,16 @@ public class KickstartFormEditor extends DiagramEditor {
       e.printStackTrace();
     }
   }
+  
+  protected FormDefinition createEmptyFormDefinition() {
+    FormDefinition definition = new FormDefinition();
+    FormPropertyGroup infoGroup = new FormPropertyGroup();
+    infoGroup.setId(KickstartFormMemoryModel.INFO_GROUP_ID);
+    infoGroup.setTitle("Info");
+    
+    definition.addFormPropertyGroup(infoGroup);
+    return definition;
+  }
 
   protected void importDiagram(FormDefinition formDefinition) {
     IFeatureProvider featureProvider = getDiagramTypeProvider().getFeatureProvider();
@@ -194,16 +212,6 @@ public class KickstartFormEditor extends DiagramEditor {
     AreaContext areaContext = new AreaContext();
     areaContext.setY(-1);
     areaContext.setX(-1);
-    
-    // Loop over definitions backwards and add at y-location 0 to retain the actual order
-    // they appear in the diagram
-    FormPropertyDefinition definition = null;
-    for(int i=formDefinition.getFormPropertyDefinitions().size() - 1 ; i>=0; i--) {
-      definition = formDefinition.getFormPropertyDefinitions().get(i);
-      addContext = new AddContext(areaContext, definition);
-      addContext.setTargetContainer(getDiagramTypeProvider().getDiagram());
-      featureProvider.getAddFeature(addContext).execute(addContext);
-    }
     
     FormPropertyGroup group = null;
     // Loop over the groups backwards and add y-location of 0 to retain the actual order

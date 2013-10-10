@@ -13,6 +13,7 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 
 public class KickstartFormMemoryModel {
 
+  public static final String INFO_GROUP_ID = "info";
   protected IFeatureProvider featureProvider;
   protected IFile modelFile;
   protected FormDefinition formDefinition;

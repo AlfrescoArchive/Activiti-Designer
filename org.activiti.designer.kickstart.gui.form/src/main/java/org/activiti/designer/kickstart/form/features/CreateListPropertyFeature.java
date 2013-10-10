@@ -3,15 +3,15 @@ package org.activiti.designer.kickstart.form.features;
 import org.activiti.designer.kickstart.form.KickstartFormPluginImage;
 import org.activiti.designer.kickstart.form.diagram.KickstartFormFeatureProvider;
 import org.activiti.workflow.simple.definition.form.FormPropertyDefinition;
-import org.activiti.workflow.simple.definition.form.TextPropertyDefinition;
+import org.activiti.workflow.simple.definition.form.ListPropertyDefinition;
 import org.eclipse.graphiti.features.context.ICreateContext;
 
-public class CreateTextAreaPropertyFeature extends AbstractCreateFormPropertyFeature {
+public class CreateListPropertyFeature extends AbstractCreateFormPropertyFeature {
 
-  public static final String FEATURE_ID_KEY = "text-area";
+  public static final String FEATURE_ID_KEY = "date";
 
-  public CreateTextAreaPropertyFeature(KickstartFormFeatureProvider fp) {
-    super(fp, "Text area", "Add a text area field");
+  public CreateListPropertyFeature(KickstartFormFeatureProvider fp) {
+    super(fp, "Dropdown list", "Add a dropdown with a number of possible values to select");
   }
 
   @Override
@@ -21,10 +21,8 @@ public class CreateTextAreaPropertyFeature extends AbstractCreateFormPropertyFea
   
   @Override
   protected FormPropertyDefinition createFormPropertyDefinition(ICreateContext context) {
-    TextPropertyDefinition definition = new TextPropertyDefinition();
-    // Text-area is a multi-lined TextPropertyDefinition
-    definition.setMultiline(true);
-    definition.setName("Textarea");
+    ListPropertyDefinition definition = new ListPropertyDefinition();
+    definition.setName("Value select");
     return definition;
   }
 
