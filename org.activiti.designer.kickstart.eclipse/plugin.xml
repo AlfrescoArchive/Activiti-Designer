@@ -93,4 +93,164 @@
           priority="normal">
     </content-type>
  </extension>
+ <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="org.activiti.designer.kickstart"
+            name="Activiti">
+      </category>
+      <view
+            category="org.activiti.designer.kickstart"
+            class="org.activiti.designer.kickstart.eclipse.navigator.CmisNavigator"
+            id="org.activiti.designer.kickstart.eclipse.cmisnavigator"
+            name="CMIS Navigator"
+            restorable="true">
+      </view>
+ </extension>
+ <extension
+       point="org.eclipse.ui.navigator.navigatorContent">
+    <navigatorContent
+          contentProvider="org.activiti.designer.kickstart.eclipse.navigator.ContentProvider"
+          id="org.activiti.designer.kickstart.eclipse.cmisnavigatorContent"
+          labelProvider="org.activiti.designer.kickstart.eclipse.navigator.CmisLabelProvider"
+          name="CMIS Navigator Content">
+       <triggerPoints>
+          <or>
+             <instanceof
+                   value="org.activiti.designer.kickstart.eclipse.navigator.Root">
+             </instanceof>
+             <instanceof
+                   value="org.activiti.designer.kickstart.eclipse.navigator.Parent">
+             </instanceof>
+          </or>
+          <or>
+             <instanceof
+                   value="org.activiti.designer.kickstart.eclipse.navigator.Parent">
+             </instanceof>
+             <instanceof
+                   value="org.activiti.designer.kickstart.eclipse.navigator.Child">
+             </instanceof>
+          </or>
+       </triggerPoints>
+    </navigatorContent>
+ </extension>
+ <extension
+       point="org.eclipse.ui.navigator.viewer">
+    <viewer
+          viewerId="org.activiti.designer.kickstart.eclipse.cmisnavigator">
+          <popupMenu
+            allowsPlatformContributions="true"
+            id="org.activiti.designer.kickstart.cmisnavigator.view.popup">
+      </popupMenu>
+    </viewer>
+    <viewerContentBinding
+          viewerId="org.activiti.designer.kickstart.eclipse.cmisnavigator">
+       <includes>
+          <contentExtension
+                isRoot="true"
+                pattern="org.activiti.designer.kickstart.eclipse.cmisnavigatorContent">
+          </contentExtension>
+       </includes>
+    </viewerContentBinding>
+ </extension>
+ 
+ <!-- The popup menu for the cmis navigator -->
+ <extension
+      point="org.eclipse.ui.menus">
+   <menuContribution
+         locationURI="popup:org.activiti.designer.kickstart.cmisnavigator.view.popup">
+      <command
+            commandId="org.activiti.designer.kickstart.cmisnavigator.command.open"
+            id="org.activiti.designer.kickstart.cmisnavigator.command.open"
+            label="Open"
+            mnemonic="O"
+            style="push">
+      </command>
+      <command
+            commandId="org.activiti.designer.kickstart.cmisnavigator.command.delete"
+            id="org.activiti.designer.kickstart.cmisnavigator.command.delete"
+            label="Delete"
+            mnemonic="D"
+            style="push">
+      </command>
+      <command
+            commandId="org.activiti.designer.kickstart.cmisnavigator.command.remame"
+            id="org.activiti.designer.kickstart.cmisnavigator.command.rename"
+            label="Rename"
+            mnemonic="R"
+            style="push">
+      </command>
+   </menuContribution>
+ </extension>
+ 
+ <!-- The command handlers for the items in the cmis navigator popup-->
+ <extension
+      point="org.eclipse.ui.handlers">
+   <handler
+         class="org.activiti.designer.kickstart.eclipse.navigator.handlers.DeleteHandler"
+         commandId="org.activiti.designer.kickstart.cmisnavigator.command.delete">
+      <activeWhen>
+         <reference definitionId="org.activiti.designer.kickstart.cmisnavigator.isFolderOrDocument" />
+      </activeWhen>
+      <enabledWhen>
+         <reference definitionId="org.activiti.designer.kickstart.cmisnavigator.isFolderOrDocument" />
+      </enabledWhen>
+   </handler>
+</extension>
+ <extension
+      point="org.eclipse.ui.handlers">
+   <handler
+         class="org.activiti.designer.kickstart.eclipse.navigator.handlers.RenameHandler"
+         commandId="org.activiti.designer.kickstart.cmisnavigator.command.remame">
+      <activeWhen>
+         <reference definitionId="org.activiti.designer.kickstart.cmisnavigator.isFolderOrDocument" />
+      </activeWhen>
+      <enabledWhen>
+         <reference definitionId="org.activiti.designer.kickstart.cmisnavigator.isFolderOrDocument" />
+      </enabledWhen>
+   </handler>
+</extension>
+ <extension
+      point="org.eclipse.ui.handlers">
+   <handler
+         class="org.activiti.designer.kickstart.eclipse.navigator.handlers.OpenHandler"
+         commandId="org.activiti.designer.kickstart.cmisnavigator.command.open">
+      <activeWhen>
+         <reference definitionId="org.activiti.designer.kickstart.cmisnavigator.isDocument" />
+      </activeWhen>
+      <enabledWhen>
+         <reference definitionId="org.activiti.designer.kickstart.cmisnavigator.isDocument" />
+      </enabledWhen>
+   </handler>
+</extension>
+
+<!-- The expression to check if commands should be shown -->
+<extension
+      point="org.eclipse.core.expressions.definitions">
+   <definition id="org.activiti.designer.kickstart.cmisnavigator.isFolder">
+      <with variable="selection">
+         <iterate ifEmpty="false">
+            <instanceof value="org.apache.chemistry.opencmis.client.api.Folder" />
+         </iterate>
+      </with>
+   </definition>
+   <definition id="org.activiti.designer.kickstart.cmisnavigator.isDocument">
+      <with variable="selection">
+         <iterate ifEmpty="false">
+            <instanceof value="org.apache.chemistry.opencmis.client.api.Document" />
+         </iterate>
+      </with>
+   </definition>
+    <definition id="org.activiti.designer.kickstart.cmisnavigator.isFolderOrDocument">
+      <with variable="selection">
+         <iterate ifEmpty="false">
+         	<or>
+         		<instanceof value="org.apache.chemistry.opencmis.client.api.Folder" />
+         		<instanceof value="org.apache.chemistry.opencmis.client.api.Document" />
+         	</or>
+         </iterate>
+      </with>
+   </definition>
+</extension>
+ 
 </plugin>
