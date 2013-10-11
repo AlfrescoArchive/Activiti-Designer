@@ -20,7 +20,7 @@ package org.activiti.designer.kickstart.process;
  * @since 0.6.1
  * @version 3
  */
-public enum PluginImage {
+public enum KickstartProcessPluginImage {
 
   ACTION_UP("action.up", "action.up.png"), //$NON-NLS-1$ 
   ACTION_DOWN("action.down", "action.down.png"), //$NON-NLS-1$ 
@@ -87,7 +87,7 @@ public enum PluginImage {
   private final String imageKey;
   private final String imagePath;
 
-  private PluginImage(final String imageKey, final String imagePath) {
+  private KickstartProcessPluginImage(final String imageKey, final String imagePath) {
     this.imageKey = KEY_PREFIX + imageKey;
     this.imagePath = DEFAULT_IMAGE_DIR + imagePath;
   }

@@ -44,19 +44,19 @@
       <propertyTabs
             contributorId="KickstartProcessDiagram.PropertyContributor">
          <propertyTab
-               category="Kickstart"
+               category="Kickstart process"
                id="org.activiti.designer.kickstart.generalTab"
                label="General">
          </propertyTab>
          <propertyTab
                afterTab="org.activiti.designer.kickstart.generalTab"
-               category="Kickstart"
+               category="Kickstart process"
                id="org.activiti.designer.kickstart.processTab"
                label="Process">
          </propertyTab>
          <propertyTab
                afterTab="org.activiti.designer.kickstart.generalTab"
-               category="Kickstart"
+               category="Kickstart process"
                id="org.activiti.designer.kickstart.mainConfigTab"
                label="Main config">
          </propertyTab>

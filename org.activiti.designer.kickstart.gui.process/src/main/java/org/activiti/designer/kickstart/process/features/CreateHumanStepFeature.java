@@ -1,39 +1,33 @@
 package org.activiti.designer.kickstart.process.features;
 
-import org.activiti.designer.kickstart.process.PluginImage;
+import org.activiti.designer.kickstart.process.KickstartProcessPluginImage;
+import org.activiti.designer.kickstart.process.diagram.KickstartProcessFeatureProvider;
+import org.activiti.workflow.simple.definition.AbstractNamedStepDefinition;
 import org.activiti.workflow.simple.definition.HumanStepDefinition;
-import org.eclipse.graphiti.features.IFeatureProvider;
+import org.activiti.workflow.simple.definition.StepDefinition;
 import org.eclipse.graphiti.features.context.ICreateContext;
 
-public class CreateHumanStepFeature extends AbstractCreateFastBPMNFeature {
+public class CreateHumanStepFeature extends AbstractCreateStepDefinitionFeature {
 
-  public static final String FEATURE_ID_KEY = "humanstep";
+  public static final String FEATURE_ID_KEY = "human-step";
 
-  public CreateHumanStepFeature(IFeatureProvider fp) {
-    super(fp, "Human step", "Add human step");
-  }
-
-  public CreateHumanStepFeature(IFeatureProvider fp, String name, String description) {
-    super(fp, name, description);
+  public CreateHumanStepFeature(KickstartProcessFeatureProvider fp) {
+    super(fp, "Human step", "Add a human step");
   }
 
   @Override
-  public Object[] create(ICreateContext context) {
-    HumanStepDefinition newHumanStep = new HumanStepDefinition();
-    newHumanStep.setName("Human step");
-    
-    addObjectToContainer(context, newHumanStep, newHumanStep.getName());
-
-    return new Object[] { newHumanStep };
+  public boolean canCreate(ICreateContext context) {
+    return true;
+  }
+  @Override
+  protected StepDefinition createStepDefinition(ICreateContext context) {
+    AbstractNamedStepDefinition definition = new HumanStepDefinition();
+    definition.setName("Step name");
+    return definition;
   }
 
   @Override
   public String getCreateImageId() {
-    return PluginImage.IMG_SERVICETASK.getImageKey();
-  }
-
-  @Override
-  protected String getFeatureIdKey() {
-    return FEATURE_ID_KEY;
+    return KickstartProcessPluginImage.IMG_SERVICETASK.getImageKey();
   }
 }

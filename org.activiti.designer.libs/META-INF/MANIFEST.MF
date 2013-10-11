@@ -2,13 +2,20 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Activiti Designer - Libs
 Bundle-SymbolicName: org.activiti.designer.libs;singleton:=true
-Bundle-Version: 5.12.1.qualifier
-Export-Package: org.activiti.bpmn,
+Bundle-Version: 5.12.1.SNAPSHOT
+Export-Package: org.activiti.bpmn;
+  uses:="com.mxgraph.layout.hierarchical,
+   com.mxgraph.view,
+   com.mxgraph.util,
+   org.activiti.bpmn.model,
+   com.mxgraph.layout",
  org.activiti.bpmn.constants,
  org.activiti.bpmn.converter;
   uses:="javax.xml.stream,
    org.activiti.bpmn.constants,
    org.activiti.bpmn.model,
+   org.activiti.bpmn.converter.util,
+   javax.xml.validation,
    org.slf4j,
    javax.xml.namespace,
    org.activiti.bpmn.converter.child",
@@ -23,25 +30,33 @@ Export-Package: org.activiti.bpmn,
  org.activiti.bpmn.exceptions,
  org.activiti.bpmn.model;uses:="javax.xml.stream",
  org.activiti.bpmn.model.alfresco;uses:="org.activiti.bpmn.model",
- org.activiti.workflow.simple.converter,
- org.activiti.workflow.simple.converter.json,
- org.activiti.workflow.simple.converter.listener,
- org.activiti.workflow.simple.converter.step,
- org.activiti.workflow.simple.definition,
+ org.activiti.workflow.simple.converter;uses:="org.activiti.workflow.simple.definition,org.activiti.bpmn.model,org.activiti.workflow.simple.converter.step",
+ org.activiti.workflow.simple.converter.json;
+  uses:="org.activiti.workflow.simple.definition,
+   org.codehaus.jackson.map,
+   org.activiti.workflow.simple.definition.form,
+   org.activiti.workflow.simple.exception",
+ org.activiti.workflow.simple.converter.listener;uses:="org.activiti.workflow.simple.definition,org.activiti.workflow.simple.converter,org.activiti.bpmn.model",
+ org.activiti.workflow.simple.converter.step;
+  uses:="org.activiti.workflow.simple.definition,
+   org.activiti.workflow.simple.definition.form,
+   org.activiti.workflow.simple.converter,
+   org.activiti.bpmn.model",
+ org.activiti.workflow.simple.definition;uses:="org.activiti.workflow.simple.definition.form",
  org.activiti.workflow.simple.definition.form,
- org.activiti.workflow.simple.util
+ org.activiti.workflow.simple.util;uses:="org.activiti.bpmn.model"
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.apache.commons.lang
 Bundle-Vendor: Activiti
 Bundle-ClassPath: .,
- slf4j-api-1.7.2.jar,
- jgraphx-1.10.4.2.jar,
- commons-lang3-3.1.jar,
- activiti-bpmn-model-5.14-SNAPSHOT.jar,
+ activiti-simple-workflow-5.14-SNAPSHOT.jar,
  activiti-bpmn-converter-5.14-SNAPSHOT.jar,
  activiti-bpmn-layout-5.13.jar,
- activiti-simple-workflow-5.14-SNAPSHOT.jar,
+ activiti-bpmn-model-5.14-SNAPSHOT.jar,
+ commons-lang3-3.1.jar,
  jackson-core-asl-1.9.9.jar,
  jackson-mapper-asl-1.9.9.jar,
- slf4j-log4j12-1.7.2.jar,
- log4j-1.2.17.jar
+ jgraphx-1.10.4.2.jar,
+ log4j-1.2.17.jar,
+ slf4j-api-1.7.2.jar,
+ slf4j-log4j12-1.7.2.jar

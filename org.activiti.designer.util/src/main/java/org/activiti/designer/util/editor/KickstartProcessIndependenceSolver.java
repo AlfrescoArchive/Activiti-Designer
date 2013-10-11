@@ -1,50 +1,51 @@
 package org.activiti.designer.util.editor;
 
-import java.util.HashMap;
 import java.util.Map;
 
-import org.activiti.workflow.simple.definition.StepDefinition;
+import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.impl.IIndependenceSolver;
 
 /**
- * @author Nikolai Raitsev
+ * @author Tijs Rademakers
  *
  */
 public class KickstartProcessIndependenceSolver implements IIndependenceSolver {
 	
-	private Map<String, Object> objectMap = new HashMap<String, Object>();
+  private IDiagramTypeProvider diagramTypeProvider;
+  
+  public KickstartProcessIndependenceSolver(IDiagramTypeProvider diagramTypeProvider) {
+    this.diagramTypeProvider = diagramTypeProvider;
+  }
+    
+  @Override
+  public String getKeyForBusinessObject(Object bo) {
+    return ensureKickstartProcessMemoryModel().getKeyForBusinessObject(bo);
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.graphiti.features.impl.IIndependenceSolver#getKeyForBusinessObject(java.lang.Object)
-	 */
-	@Override
-	public String getKeyForBusinessObject(Object bo) {
-		String result = null;
-		if(bo != null && bo instanceof StepDefinition ) {
-			result = String.valueOf(bo.hashCode());
-			
-			if(!objectMap.containsKey(result))
-				objectMap.put(result, bo);
-		}
-		return result;
-	}
+  @Override
+  public Object getBusinessObjectForKey(String key) {
+    return ensureKickstartProcessMemoryModel().getBusinessObjectForKey(key);
+  }
 
-	/* (non-Javadoc)
-	 * @see org.eclipse.graphiti.features.impl.IIndependenceSolver#getBusinessObjectForKey(java.lang.String)
-	 */
-	@Override
-	public Object getBusinessObjectForKey(String key) {
-		return objectMap.get(key);
-	}
+  public Map<String, Object> getObjectMap() {
+    return ensureKickstartProcessMemoryModel().getObjectMap();
+  }
 
-	public Map<String, Object> getObjectMap() {
-		return objectMap;
-	}
-
-	public void setObjectMap(Map<String, Object> objectMap) {
-		this.objectMap = objectMap;
-	}
-	
-	
+  public void setObjectMap(Map<String, Object> objectMap) {
+    ensureKickstartProcessMemoryModel().setObjectMap(objectMap);
+  }
+  
+  protected KickstartProcessMemoryModel ensureKickstartProcessMemoryModel() {
+    if(diagramTypeProvider.getDiagram() == null) {
+      throw new IllegalStateException("No diagram is currently active");
+    }
+    
+    KickstartProcessMemoryModel model = ModelHandler.getKickstartProcessModel(EcoreUtil.getURI(diagramTypeProvider.getDiagram()));
+    if(model == null) {
+      throw new IllegalStateException("No diagram model is currently available for diagram: " + EcoreUtil.getURI(diagramTypeProvider.getDiagram()));
+    }
+    return model;
+  }
 
 }

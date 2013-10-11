@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Activiti Designer - Util
 Bundle-SymbolicName: org.activiti.designer.util;singleton:=true
-Bundle-Version: 5.12.1.qualifier
+Bundle-Version: 5.12.1.SNAPSHOT
 Bundle-Activator: org.activiti.designer.util.Activator
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
@@ -28,4 +28,5 @@ Export-Package: org.activiti.designer.util,
  org.activiti.designer.util.property,
  org.activiti.designer.util.style,
  org.activiti.designer.util.workspace
-Bundle-ClassPath: .
+Bundle-ClassPath: .,
+ activiti-simple-workflow-5.14-SNAPSHOT.jar

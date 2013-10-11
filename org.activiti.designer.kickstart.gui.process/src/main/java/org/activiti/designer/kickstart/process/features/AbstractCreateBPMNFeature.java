@@ -11,6 +11,7 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 import org.eclipse.graphiti.features.impl.AbstractCreateFeature;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
+import org.eclipse.graphiti.mm.pictograms.Diagram;
 
 /**
  * @author Tijs Rademakers
@@ -32,8 +33,7 @@ public abstract class AbstractCreateBPMNFeature extends AbstractCreateFeature {
   }
   
   public boolean canCreate(ICreateContext context) {
-    Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-    return (parentObject instanceof WorkflowDefinition);
+    return (context.getTargetContainer() instanceof Diagram);
   }
   
   /**

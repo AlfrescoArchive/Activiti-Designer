@@ -1,26 +1,13 @@
 package org.activiti.designer.kickstart.eclipse.editor;
 
-import java.awt.Point;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
 
-import org.activiti.bpmn.model.BoundaryEvent;
-import org.activiti.bpmn.model.FlowElement;
-import org.activiti.bpmn.model.GraphicInfo;
-import org.activiti.bpmn.model.Lane;
-import org.activiti.bpmn.model.Process;
-import org.activiti.bpmn.model.SequenceFlow;
-import org.activiti.bpmn.model.SubProcess;
 import org.activiti.designer.kickstart.eclipse.ui.ActivitiEditorContextMenuProvider;
 import org.activiti.designer.kickstart.eclipse.util.FileService;
 import org.activiti.designer.util.editor.KickstartProcessMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
-import org.activiti.designer.util.style.StyleUtil;
 import org.activiti.workflow.simple.converter.json.SimpleWorkflowJsonConverter;
 import org.activiti.workflow.simple.definition.StepDefinition;
 import org.activiti.workflow.simple.definition.WorkflowDefinition;
@@ -30,31 +17,15 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.draw2d.IFigure;
 import org.eclipse.emf.common.command.BasicCommandStack;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.transaction.RecordingCommand;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.gef.ContextMenuProvider;
 import org.eclipse.gef.GraphicalViewer;
-import org.eclipse.gef.LayerConstants;
-import org.eclipse.gef.editparts.LayerManager;
-import org.eclipse.gef.editparts.ScalableFreeformRootEditPart;
-import org.eclipse.graphiti.features.IAddFeature;
-import org.eclipse.graphiti.features.IFeatureProvider;
-import org.eclipse.graphiti.features.context.impl.AddContext;
-import org.eclipse.graphiti.features.context.impl.AreaContext;
-import org.eclipse.graphiti.mm.algorithms.Rectangle;
-import org.eclipse.graphiti.mm.algorithms.RoundedRectangle;
-import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
-import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.services.Graphiti;
-import org.eclipse.graphiti.services.IGaService;
-import org.eclipse.graphiti.services.IPeCreateService;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
-import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
@@ -202,12 +173,17 @@ public class KickstartProcessDiagramEditor extends DiagramEditor {
             @Override
             protected void doExecute() {
               importDiagram(model);
+              
+              // Hide the grid
+              getDiagramTypeProvider().getDiagram().setGridUnit(-1);
             }
           });
         }
         basicCommandStack.saveIsDone();
         basicCommandStack.flush();
       }
+      
+      model.setInitialized(true);
 
     } catch (Exception e) {
       e.printStackTrace();
@@ -222,146 +198,13 @@ public class KickstartProcessDiagramEditor extends DiagramEditor {
 
       @Override
       protected void doExecute() {
-        addContainerElement(diagram, model);
+        //addContainerElement(diagram, model);
               
         for (StepDefinition step : model.getWorkflowDefinition().getSteps()) {
           // draw step
         }
       }
     });
-  }
-
-  private void addContainerElement(ContainerShape parent, final KickstartProcessMemoryModel model) {
-    final IFeatureProvider featureProvider = getDiagramTypeProvider().getFeatureProvider();
-    final IPeCreateService peCreateService = Graphiti.getPeCreateService();
-    final ContainerShape containerShape = peCreateService.createContainerShape(parent, true);
-    final IGaService gaService = Graphiti.getGaService();
-    
-    final Rectangle invisibleRectangle = gaService.createInvisibleRectangle(containerShape);
-    gaService.setLocationAndSize(invisibleRectangle, 40, 40, 400, 400);
-    
-    RoundedRectangle roundedRectangle = gaService.createRoundedRectangle(invisibleRectangle, 20, 20);
-    gaService.setLocationAndSize(roundedRectangle, 0, 0, 400, 400);
-    roundedRectangle.setStyle(StyleUtil.getStyleForPool(getDiagramTypeProvider().getDiagram()));
-    featureProvider.link(containerShape, model.getWorkflowDefinition());
-  }
-
-  private void drawFlowElements(Collection<FlowElement> elementList, Map<String, GraphicInfo> locationMap, ContainerShape parentShape, Process process) {
-
-    final IFeatureProvider featureProvider = getDiagramTypeProvider().getFeatureProvider();
-
-    List<FlowElement> noDIList = new ArrayList<FlowElement>();
-    for (FlowElement flowElement : elementList) {
-
-      if (flowElement instanceof SequenceFlow) {
-        continue;
-      }
-
-      AddContext context = new AddContext(new AreaContext(), flowElement);
-      IAddFeature addFeature = featureProvider.getAddFeature(context);
-
-      if (addFeature == null) {
-        System.out.println("Element not supported: " + flowElement);
-        return;
-      }
-
-      GraphicInfo graphicInfo = locationMap.get(flowElement.getId());
-      if (graphicInfo == null) {
-
-        noDIList.add(flowElement);
-
-      } else {
-
-        context.setNewObject(flowElement);
-        context.setSize((int) graphicInfo.getWidth(), (int) graphicInfo.getHeight());
-
-        ContainerShape parentContainer = null;
-        if (parentShape instanceof Diagram) {
-          parentContainer = getParentContainer(flowElement.getId(), process, (Diagram) parentShape);
-        } else {
-          parentContainer = parentShape;
-        }
-        
-        context.setTargetContainer(parentContainer);
-        if (parentContainer instanceof Diagram == false) {
-          Point location = getLocation(parentContainer);
-          context.setLocation((int) graphicInfo.getX() - location.x, (int) graphicInfo.getY() - location.y);
-        } else {
-          context.setLocation((int) graphicInfo.getX(), (int) graphicInfo.getY());
-        }
-
-        if (flowElement instanceof BoundaryEvent) {
-          BoundaryEvent boundaryEvent = (BoundaryEvent) flowElement;
-          if (boundaryEvent.getAttachedToRef() != null) {
-            ContainerShape container = (ContainerShape) featureProvider.getPictogramElementForBusinessObject(boundaryEvent.getAttachedToRef());
-
-            if (container != null) {
-              AddContext boundaryContext = new AddContext(new AreaContext(), boundaryEvent);
-              boundaryContext.setTargetContainer(container);
-              Point location = getLocation(container);
-              boundaryContext.setLocation((int) graphicInfo.getX() - location.x, (int) graphicInfo.getY() - location.y);
-
-              if (addFeature.canAdd(boundaryContext)) {
-                PictogramElement newBoundaryContainer = addFeature.add(boundaryContext);
-                featureProvider.link(newBoundaryContainer, new Object[] { boundaryEvent });
-              }
-            }
-          }
-        } else if (addFeature.canAdd(context)) {
-          PictogramElement newContainer = addFeature.add(context);
-          featureProvider.link(newContainer, new Object[] { flowElement });
-
-          if (flowElement instanceof SubProcess) {
-            drawFlowElements(((SubProcess) flowElement).getFlowElements(), locationMap, (ContainerShape) newContainer, process);
-          }
-        }
-      }
-    }
-
-    for (FlowElement flowElement : noDIList) {
-      if (flowElement instanceof BoundaryEvent) {
-        ((BoundaryEvent) flowElement).getAttachedToRef().getBoundaryEvents().remove(flowElement);
-      } else {
-        elementList.remove(flowElement);
-      }
-    }
-  }
-
-  private ContainerShape getParentContainer(String flowElementId, Process process, Diagram diagram) {
-    Lane foundLane = null;
-    for (Lane lane : process.getLanes()) {
-      if (lane.getFlowReferences().contains(flowElementId)) {
-        foundLane = lane;
-        break;
-      }
-    }
-
-    if (foundLane != null) {
-      final IFeatureProvider featureProvider = getDiagramTypeProvider().getFeatureProvider();
-      return (ContainerShape) featureProvider.getPictogramElementForBusinessObject(foundLane);
-    } else {
-      return diagram;
-    }
-  }
-
-  private Point getLocation(ContainerShape containerShape) {
-    if (containerShape instanceof Diagram == true) {
-      return new Point(containerShape.getGraphicsAlgorithm().getX(), containerShape.getGraphicsAlgorithm().getY());
-    }
-
-    Point location = getLocation(containerShape.getContainer());
-    return new Point(location.x + containerShape.getGraphicsAlgorithm().getX(), location.y + containerShape.getGraphicsAlgorithm().getY());
-  }
-
-  @Override
-  public void createPartControl(Composite parent) {
-    super.createPartControl(parent);
-    // hides grid on diagram, but you can reenable it
-    if (getGraphicalViewer() != null && getGraphicalViewer().getEditPartRegistry() != null) {
-      ScalableFreeformRootEditPart rootEditPart = (ScalableFreeformRootEditPart) getGraphicalViewer().getEditPartRegistry().get(LayerManager.ID);
-      IFigure gridFigure = ((LayerManager) rootEditPart).getLayer(LayerConstants.GRID_LAYER);
-      gridFigure.setVisible(false);
-    }
   }
 
   @Override

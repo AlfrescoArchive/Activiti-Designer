@@ -41,7 +41,7 @@ import org.activiti.bpmn.model.UserTask;
 import org.activiti.bpmn.model.alfresco.AlfrescoStartEvent;
 import org.activiti.designer.eclipse.extension.icon.IconProvider;
 import org.activiti.designer.kickstart.process.Activator;
-import org.activiti.designer.kickstart.process.PluginImage;
+import org.activiti.designer.kickstart.process.KickstartProcessPluginImage;
 import org.eclipse.swt.graphics.Image;
 
 /**
@@ -82,54 +82,54 @@ public class DefaultIconProvider implements IconProvider {
     Image result = null;
 
     if (context instanceof Process) {
-      result = Activator.getImage(PluginImage.IMG_SUBPROCESS_EXPANDED);
+      result = Activator.getImage(KickstartProcessPluginImage.IMG_SUBPROCESS_EXPANDED);
     } else if (context instanceof EventSubProcess) {
-      result = Activator.getImage(PluginImage.IMG_EVENT_SUBPROCESS);
+      result = Activator.getImage(KickstartProcessPluginImage.IMG_EVENT_SUBPROCESS);
     } else if (context instanceof SubProcess) {
-      result = Activator.getImage(PluginImage.IMG_SUBPROCESS_COLLAPSED);
+      result = Activator.getImage(KickstartProcessPluginImage.IMG_SUBPROCESS_COLLAPSED);
     } else if (context instanceof Pool) {
-      result = Activator.getImage(PluginImage.IMG_POOL);
+      result = Activator.getImage(KickstartProcessPluginImage.IMG_POOL);
     } else if (context instanceof ParallelGateway) {
-      result = Activator.getImage(PluginImage.IMG_GATEWAY_PARALLEL);
+      result = Activator.getImage(KickstartProcessPluginImage.IMG_GATEWAY_PARALLEL);
     } else if (context instanceof ExclusiveGateway) {
-      result = Activator.getImage(PluginImage.IMG_GATEWAY_EXCLUSIVE);
+      result = Activator.getImage(KickstartProcessPluginImage.IMG_GATEWAY_EXCLUSIVE);
     } else if (context instanceof InclusiveGateway) {
-      result = Activator.getImage(PluginImage.IMG_GATEWAY_INCLUSIVE);
+      result = Activator.getImage(KickstartProcessPluginImage.IMG_GATEWAY_INCLUSIVE);
     } else if (context instanceof EventGateway) {
-      result = Activator.getImage(PluginImage.IMG_GATEWAY_EVENT);
+      result = Activator.getImage(KickstartProcessPluginImage.IMG_GATEWAY_EVENT);
     } else if (context instanceof Lane) {
-      result = Activator.getImage(PluginImage.IMG_LANE);
+      result = Activator.getImage(KickstartProcessPluginImage.IMG_LANE);
     } else if (context instanceof ManualTask) {
-      result = Activator.getImage(PluginImage.IMG_MANUALTASK);
+      result = Activator.getImage(KickstartProcessPluginImage.IMG_MANUALTASK);
     } else if (context instanceof UserTask) {
-      result = Activator.getImage(PluginImage.IMG_USERTASK);
+      result = Activator.getImage(KickstartProcessPluginImage.IMG_USERTASK);
     } else if (context instanceof ServiceTask) {
       ServiceTask serviceTask = (ServiceTask) context;
       if (ServiceTask.MAIL_TASK.equalsIgnoreCase(serviceTask.getType())) {
-        result = Activator.getImage(PluginImage.IMG_MAILTASK);
+        result = Activator.getImage(KickstartProcessPluginImage.IMG_MAILTASK);
       } else {
-        result = Activator.getImage(PluginImage.IMG_SERVICETASK);
+        result = Activator.getImage(KickstartProcessPluginImage.IMG_SERVICETASK);
       }
     } else if (context instanceof ScriptTask) {
-      result = Activator.getImage(PluginImage.IMG_SCRIPTTASK);
+      result = Activator.getImage(KickstartProcessPluginImage.IMG_SCRIPTTASK);
     } else if (context instanceof ReceiveTask) {
-      result = Activator.getImage(PluginImage.IMG_RECEIVETASK);
+      result = Activator.getImage(KickstartProcessPluginImage.IMG_RECEIVETASK);
     } else if (context instanceof BusinessRuleTask) {
-      result = Activator.getImage(PluginImage.IMG_BUSINESSRULETASK);
+      result = Activator.getImage(KickstartProcessPluginImage.IMG_BUSINESSRULETASK);
     } else if (context instanceof CallActivity) {
-      result = Activator.getImage(PluginImage.IMG_CALLACTIVITY);
+      result = Activator.getImage(KickstartProcessPluginImage.IMG_CALLACTIVITY);
     } else if (context instanceof StartEvent) {
       if(context instanceof AlfrescoStartEvent) {
-        result = Activator.getImage(PluginImage.IMG_STARTEVENT_NONE);
+        result = Activator.getImage(KickstartProcessPluginImage.IMG_STARTEVENT_NONE);
       } else {
         if(((StartEvent) context).getEventDefinitions().size() > 0) {
           if(((StartEvent) context).getEventDefinitions().get(0) instanceof TimerEventDefinition) {
-            result = Activator.getImage(PluginImage.IMG_BOUNDARY_TIMER);
+            result = Activator.getImage(KickstartProcessPluginImage.IMG_BOUNDARY_TIMER);
           } else {
-            result = Activator.getImage(PluginImage.IMG_BOUNDARY_ERROR);
+            result = Activator.getImage(KickstartProcessPluginImage.IMG_BOUNDARY_ERROR);
           }
         } else {
-          result = Activator.getImage(PluginImage.IMG_STARTEVENT_NONE);
+          result = Activator.getImage(KickstartProcessPluginImage.IMG_STARTEVENT_NONE);
         }
       }
       
@@ -137,42 +137,42 @@ public class DefaultIconProvider implements IconProvider {
       EndEvent endEvent = (EndEvent) context;
       for (EventDefinition eventDefinition : endEvent.getEventDefinitions()) {
         if (eventDefinition instanceof ErrorEventDefinition) {
-          result = Activator.getImage(PluginImage.IMG_ENDEVENT_ERROR);
+          result = Activator.getImage(KickstartProcessPluginImage.IMG_ENDEVENT_ERROR);
         } else if (eventDefinition instanceof TerminateEventDefinition) {
-          result = Activator.getImage(PluginImage.IMG_ENDEVENT_TERMINATE);
+          result = Activator.getImage(KickstartProcessPluginImage.IMG_ENDEVENT_TERMINATE);
         }
       }
       if (result == null) {
-        result = Activator.getImage(PluginImage.IMG_ENDEVENT_NONE);
+        result = Activator.getImage(KickstartProcessPluginImage.IMG_ENDEVENT_NONE);
       }
     
     } else if (context instanceof BoundaryEvent) {
       if(((BoundaryEvent) context).getEventDefinitions().size() > 0) {
         EventDefinition definition = ((BoundaryEvent) context).getEventDefinitions().get(0);
         if (definition instanceof ErrorEventDefinition) {
-          result = Activator.getImage(PluginImage.IMG_BOUNDARY_ERROR);
+          result = Activator.getImage(KickstartProcessPluginImage.IMG_BOUNDARY_ERROR);
         } else if (definition instanceof SignalEventDefinition) {
-          result = Activator.getImage(PluginImage.IMG_BOUNDARY_SIGNAL);
+          result = Activator.getImage(KickstartProcessPluginImage.IMG_BOUNDARY_SIGNAL);
         } else if (definition instanceof MessageEventDefinition) {
-          result = Activator.getImage(PluginImage.IMG_BOUNDARY_MESSAGE);
+          result = Activator.getImage(KickstartProcessPluginImage.IMG_BOUNDARY_MESSAGE);
         } else {
-          result = Activator.getImage(PluginImage.IMG_BOUNDARY_TIMER);
+          result = Activator.getImage(KickstartProcessPluginImage.IMG_BOUNDARY_TIMER);
         }
       }
     } else if (context instanceof IntermediateCatchEvent) {
       if(((IntermediateCatchEvent) context).getEventDefinitions().size() > 0) {
         EventDefinition definition = ((IntermediateCatchEvent) context).getEventDefinitions().get(0);
         if(definition instanceof SignalEventDefinition) {
-          result = Activator.getImage(PluginImage.IMG_BOUNDARY_SIGNAL);
+          result = Activator.getImage(KickstartProcessPluginImage.IMG_BOUNDARY_SIGNAL);
         } else {
-          result = Activator.getImage(PluginImage.IMG_BOUNDARY_TIMER);
+          result = Activator.getImage(KickstartProcessPluginImage.IMG_BOUNDARY_TIMER);
         }
       }
     } else if (context instanceof ThrowEvent) {
       if(((ThrowEvent) context).getEventDefinitions().size() > 0) {
-        result = Activator.getImage(PluginImage.IMG_BOUNDARY_SIGNAL);
+        result = Activator.getImage(KickstartProcessPluginImage.IMG_BOUNDARY_SIGNAL);
       } else {
-        result = Activator.getImage(PluginImage.IMG_BOUNDARY_TIMER);
+        result = Activator.getImage(KickstartProcessPluginImage.IMG_BOUNDARY_TIMER);
       }
     } else {
       throw new IllegalArgumentException("This provider has no Icon for the provided context");

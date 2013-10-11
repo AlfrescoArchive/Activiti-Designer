@@ -12,11 +12,11 @@ import org.eclipse.graphiti.features.impl.IIndependenceSolver;
  */
 public class KickstartFormIndependenceSolver implements IIndependenceSolver {
 	
-    private IDiagramTypeProvider diagramTypeProvider;
+  private IDiagramTypeProvider diagramTypeProvider;
     
-    public KickstartFormIndependenceSolver(IDiagramTypeProvider diagramTypeProvider) {
-      this.diagramTypeProvider = diagramTypeProvider;
-    }
+  public KickstartFormIndependenceSolver(IDiagramTypeProvider diagramTypeProvider) {
+    this.diagramTypeProvider = diagramTypeProvider;
+  }
     
 	@Override
 	public String getKeyForBusinessObject(Object bo) {

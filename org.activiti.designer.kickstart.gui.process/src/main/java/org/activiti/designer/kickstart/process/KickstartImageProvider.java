@@ -23,7 +23,7 @@ public class KickstartImageProvider extends AbstractImageProvider {
   @Override
   protected void addAvailableImages() {
     // register the path for each image identifier
-    for (final PluginImage pluginImage : PluginImage.values()) {
+    for (final KickstartProcessPluginImage pluginImage : KickstartProcessPluginImage.values()) {
       addImageFilePath(pluginImage.getImageKey(), pluginImage.getImagePath());
     }
   }

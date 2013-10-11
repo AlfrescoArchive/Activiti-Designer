@@ -67,7 +67,7 @@ public class Activator extends AbstractUIPlugin {
   protected void initializeImageRegistry(ImageRegistry registry) {
     Bundle bundle = Platform.getBundle(Activator.PLUGIN_ID);
 
-    for (final PluginImage pluginImage : PluginImage.values()) {
+    for (final KickstartProcessPluginImage pluginImage : KickstartProcessPluginImage.values()) {
       final IPath path = new Path(pluginImage.getImagePath());
       final URL url = FileLocator.find(bundle, path, null);
       final ImageDescriptor descriptor = ImageDescriptor.createFromURL(url);
@@ -78,14 +78,14 @@ public class Activator extends AbstractUIPlugin {
   /**
    * Utility method to get an image from the plugin.
    */
-  public static final Image getImage(final PluginImage pluginImage) {
+  public static final Image getImage(final KickstartProcessPluginImage pluginImage) {
     return plugin.getImageRegistry().get(pluginImage.getImageKey());
   }
 
   /**
    * Utility method to get an image descriptor from the plugin.
    */
-  public static final ImageDescriptor getImageDescriptor(final PluginImage pluginImage) {
+  public static final ImageDescriptor getImageDescriptor(final KickstartProcessPluginImage pluginImage) {
     return ImageDescriptor.createFromImage(plugin.getImageRegistry().get(pluginImage.getImageKey()));
   }
 
