@@ -93,7 +93,7 @@ public class ContentProvider implements ITreeContentProvider {
 
 	private void initializeRootElements() {
 		System.out.println("Initializing session");
-		cmisSession = CmisUtil.createCmisSession("admin", "admin", "http://localhost:8080/alfresco/service/cmis");
+		cmisSession = CmisUtil.createCmisSession("admin", "admin", "http://localhost:8280/alfresco/service/cmis");
 		this.rootElements = CmisUtil.getRootElements();
 	}
 

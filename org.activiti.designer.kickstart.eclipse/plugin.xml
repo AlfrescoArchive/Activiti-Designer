@@ -252,5 +252,14 @@
       </with>
    </definition>
 </extension>
+<extension
+      point="org.eclipse.ui.exportWizards">
+   <wizard
+         class="org.activiti.designer.kickstart.eclipse.ui.wizard.diagram.ExportKickstartProcessWizard"
+         icon="icons/logo/activiti.logo.gradients.16x16.png"
+         id="org.activiti.designer.kickstart.eclipse.exportDiagramWizard"
+         name="Kickstart Process">
+   </wizard>
+</extension>
  
 </plugin>

@@ -25,6 +25,13 @@ Export-Package: org.activiti.bpmn,
  org.activiti.bpmn.exceptions,
  org.activiti.bpmn.model;uses:="javax.xml.stream",
  org.activiti.bpmn.model.alfresco;uses:="org.activiti.bpmn.model",
+ org.activiti.workflow.simple.alfresco.conversion,
+ org.activiti.workflow.simple.alfresco.conversion.exception,
+ org.activiti.workflow.simple.alfresco.conversion.form,
+ org.activiti.workflow.simple.alfresco.export,
+ org.activiti.workflow.simple.alfresco.model,
+ org.activiti.workflow.simple.alfresco.model.beans,
+ org.activiti.workflow.simple.alfresco.model.config,
  org.activiti.workflow.simple.converter;uses:="org.activiti.workflow.simple.definition,org.activiti.bpmn.model,org.activiti.workflow.simple.converter.step",
  org.activiti.workflow.simple.converter.json;
   uses:="org.activiti.workflow.simple.definition,
@@ -43,6 +50,8 @@ Export-Package: org.activiti.bpmn,
  org.apache.chemistry.opencmis.client.api,
  org.apache.chemistry.opencmis.client.runtime,
  org.apache.chemistry.opencmis.commons,
+ org.apache.chemistry.opencmis.commons.data,
+ org.apache.chemistry.opencmis.commons.definitions,
  org.apache.chemistry.opencmis.commons.enums
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.apache.commons.lang
@@ -78,4 +87,5 @@ Bundle-ClassPath: .,
  stax-ex-1.2.jar,
  stax2-api-3.1.1.jar,
  streambuffer-0.9.jar,
- woodstox-core-asl-4.2.0.jar
+ woodstox-core-asl-4.2.0.jar,
+ activiti-simple-workflow-alfresco-5.14-SNAPSHOT.jar
