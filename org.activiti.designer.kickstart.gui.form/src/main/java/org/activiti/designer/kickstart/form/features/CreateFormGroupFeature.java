@@ -1,5 +1,6 @@
 package org.activiti.designer.kickstart.form.features;
 
+import org.activiti.designer.kickstart.form.KickstartFormPluginImage;
 import org.activiti.designer.util.editor.KickstartFormMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.workflow.simple.definition.form.FormPropertyGroup;
@@ -66,6 +67,11 @@ public class CreateFormGroupFeature extends AbstractCreateFeature implements ICu
     if (model != null && model.isInitialized() && createdGroup != null) {
       model.getFormDefinition().addFormPropertyGroup(createdGroup);
     }
+  }
+  
+  @Override
+  public String getCreateImageId() {
+    return KickstartFormPluginImage.NEW_GROUP.getImageKey();
   }
   
 }

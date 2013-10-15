@@ -23,12 +23,17 @@ import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
+import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
+import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
@@ -146,13 +151,22 @@ public abstract class AbstractKickstartFormComponentSection extends GFPropertySe
   }
 
   @Override
-  public final void createControls(Composite parent, TabbedPropertySheetPage aTabbedPropertySheetPage) {
+  public final void createControls(final Composite parent, TabbedPropertySheetPage aTabbedPropertySheetPage) {
     super.createControls(parent, aTabbedPropertySheetPage);
+    
+    final GridData parentGridData = new GridData(SWT.FILL, SWT.FILL, true, false);
+    parent.setLayoutData(parentGridData);
+    
+    parent.addListener(SWT.Resize, new Listener () {
+      public void handleEvent(Event event) {
+          Rectangle bounds = parent.getBounds();
+          parentGridData.widthHint = bounds.width;
+      }
+    });
     
     TabbedPropertySheetWidgetFactory factory = getWidgetFactory();
     // Create a shared form-composite to add all controls to
     formComposite = factory.createFlatFormComposite(parent);
-    
     // Let superclass create controls
     createFormControls(aTabbedPropertySheetPage);
   }
@@ -309,7 +323,7 @@ public abstract class AbstractKickstartFormComponentSection extends GFPropertySe
         }
       }
       comboControl.select(newIndex);
-    } else {
+    } else if((!(control instanceof Label) || !(control instanceof CLabel)) && valueFromModel != null){
       throw new IllegalArgumentException("Request to populate unsupported control based on model");
     }
   }
@@ -377,6 +391,7 @@ public abstract class AbstractKickstartFormComponentSection extends GFPropertySe
     controls.add(control);
     
     // Add shared focus-listener to this control
+    if(!(control instanceof Label) && !(control instanceof CLabel))
     control.addFocusListener(focusListener);
     
     if(control instanceof Button) {
@@ -454,6 +469,30 @@ public abstract class AbstractKickstartFormComponentSection extends GFPropertySe
     data.right = new FormAttachment(control, -HSPACE);
     data.top = new FormAttachment(control, 0, SWT.CENTER);
     labelControl.setLayoutData(data);
+    return labelControl;
+  }
+  
+  protected Label createFullWidthLabel(String labelName) {
+    Label labelControl = getWidgetFactory().createLabel(formComposite, labelName, SWT.WRAP);
+    FormData data = new FormData();
+    data.left = new FormAttachment(0, 0);
+    data.right = new FormAttachment(100, 0);
+    data.top = createTopFormAttachment();
+    labelControl.setLayoutData(data);
+    
+    registerControl(labelControl);
+    return labelControl;
+  }
+  
+  protected Label createSeparator() {
+    Label labelControl = getWidgetFactory().createLabel(formComposite, "", SWT.SEPARATOR | SWT.HORIZONTAL);
+    FormData data = new FormData();
+    data.left = new FormAttachment(0, 0);
+    data.right = new FormAttachment(100, 0);
+    data.top = createTopFormAttachment();
+    labelControl.setLayoutData(data);
+    
+    registerControl(labelControl);
     return labelControl;
   }
   

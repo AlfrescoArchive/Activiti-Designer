@@ -21,7 +21,7 @@ public class PropertyDefinitionPropertySection extends AbstractKickstartFormComp
     createLabel("Property name", nameControl);
 
     mandatoryControl = createCheckboxControl("Mandatory");
-    writableControl = createCheckboxControl("Writable");
+    writableControl = createCheckboxControl("Editable");
   }
 
   @Override

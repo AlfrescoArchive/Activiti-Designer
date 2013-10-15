@@ -7,17 +7,29 @@ import org.activiti.designer.kickstart.form.command.FormPropertyDefinitionModelU
 import org.activiti.designer.kickstart.form.command.FormPropertyGroupModelUpdater;
 import org.activiti.designer.kickstart.form.command.KickstartModelUpdater;
 import org.activiti.designer.kickstart.form.diagram.layout.KickstartFormLayouter;
+import org.activiti.designer.kickstart.form.diagram.shape.BooleanPropertyShapeController;
 import org.activiti.designer.kickstart.form.diagram.shape.BusinessObjectShapeController;
 import org.activiti.designer.kickstart.form.diagram.shape.DatePropertyShapeController;
+import org.activiti.designer.kickstart.form.diagram.shape.DueDatePropertyShapeController;
 import org.activiti.designer.kickstart.form.diagram.shape.ListPropertyShapeController;
+import org.activiti.designer.kickstart.form.diagram.shape.PackageItemsPropertyShapeController;
+import org.activiti.designer.kickstart.form.diagram.shape.PriorityPropertyShapeController;
 import org.activiti.designer.kickstart.form.diagram.shape.PropertyGroupShapeController;
+import org.activiti.designer.kickstart.form.diagram.shape.ReferencePropertyShapeController;
 import org.activiti.designer.kickstart.form.diagram.shape.TextPropertyShapeController;
+import org.activiti.designer.kickstart.form.diagram.shape.WorkflowDescriptionShapeController;
 import org.activiti.designer.kickstart.form.features.AddFormComponentFeature;
+import org.activiti.designer.kickstart.form.features.CreateBooleanPropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateDatePropertyFeature;
+import org.activiti.designer.kickstart.form.features.CreateDueDatePropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateFormGroupFeature;
 import org.activiti.designer.kickstart.form.features.CreateListPropertyFeature;
+import org.activiti.designer.kickstart.form.features.CreatePackageItemsPropertyFeature;
+import org.activiti.designer.kickstart.form.features.CreatePriorityPropertyFeature;
+import org.activiti.designer.kickstart.form.features.CreateReferencePropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateTextAreaPropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateTextInputPropertyFeature;
+import org.activiti.designer.kickstart.form.features.CreateWorkflowDescriptionPropertyFeature;
 import org.activiti.designer.kickstart.form.features.DeleteFormComponentFeature;
 import org.activiti.designer.kickstart.form.features.DirectEditFormComponentFeature;
 import org.activiti.designer.kickstart.form.features.FormPropertyResizeFeature;
@@ -63,6 +75,14 @@ public class KickstartFormFeatureProvider extends DefaultFeatureProvider {
 		shapeControllers.add(new TextPropertyShapeController(this));
 		shapeControllers.add(new PropertyGroupShapeController(this));
 		shapeControllers.add(new ListPropertyShapeController(this));
+		shapeControllers.add(new BooleanPropertyShapeController(this));
+		
+		// Fixed elements
+		shapeControllers.add(new DueDatePropertyShapeController(this));
+		shapeControllers.add(new PackageItemsPropertyShapeController(this));
+		shapeControllers.add(new PriorityPropertyShapeController(this));
+		shapeControllers.add(new WorkflowDescriptionShapeController(this));
+		shapeControllers.add(new ReferencePropertyShapeController(this));
 	}
 	
 	/**
@@ -112,7 +132,9 @@ public class KickstartFormFeatureProvider extends DefaultFeatureProvider {
 	public ICreateFeature[] getCreateFeatures() {
 	  return new ICreateFeature[]{ 
 	      new CreateTextInputPropertyFeature(this), new CreateTextAreaPropertyFeature(this),
-	      new CreateDatePropertyFeature(this), new CreateFormGroupFeature(this), new CreateListPropertyFeature(this)
+	      new CreateDatePropertyFeature(this), new CreateBooleanPropertyFeature(this), new CreateFormGroupFeature(this), new CreateListPropertyFeature(this),
+	      new CreateDueDatePropertyFeature(this), new CreatePackageItemsPropertyFeature(this), new CreatePriorityPropertyFeature(this),
+	      new CreateWorkflowDescriptionPropertyFeature(this), new CreateReferencePropertyFeature(this)
 	  };
 	}
 	

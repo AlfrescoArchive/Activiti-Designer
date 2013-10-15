@@ -23,11 +23,12 @@ public class CreateListPropertyFeature extends AbstractCreateFormPropertyFeature
   protected FormPropertyDefinition createFormPropertyDefinition(ICreateContext context) {
     ListPropertyDefinition definition = new ListPropertyDefinition();
     definition.setName("Value select");
+    definition.setWritable(true);
     return definition;
   }
 
   @Override
   public String getCreateImageId() {
-    return KickstartFormPluginImage.NEW_TEXT_AREA.getImageKey();
+    return KickstartFormPluginImage.NEW_LIST_INPUT.getImageKey();
   }
 }

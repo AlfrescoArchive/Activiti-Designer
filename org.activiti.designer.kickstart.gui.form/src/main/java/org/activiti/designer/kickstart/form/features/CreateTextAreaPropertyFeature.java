@@ -25,6 +25,7 @@ public class CreateTextAreaPropertyFeature extends AbstractCreateFormPropertyFea
     // Text-area is a multi-lined TextPropertyDefinition
     definition.setMultiline(true);
     definition.setName("Textarea");
+    definition.setWritable(true);
     return definition;
   }
 
