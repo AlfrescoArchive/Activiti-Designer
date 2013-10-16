@@ -9,6 +9,7 @@ import org.activiti.designer.kickstart.form.diagram.KickstartFormFeatureProvider
 import org.activiti.designer.util.editor.KickstartFormMemoryModel;
 import org.activiti.designer.util.editor.KickstartFormMemoryModel.KickstartFormModelListener;
 import org.activiti.designer.util.editor.ModelHandler;
+import org.activiti.workflow.simple.definition.form.FormPropertyDefinition;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
@@ -494,6 +495,19 @@ public abstract class AbstractKickstartFormComponentSection extends GFPropertySe
     
     registerControl(labelControl);
     return labelControl;
+  }
+  
+  protected Boolean getBooleanParameter(FormPropertyDefinition propDef, String key, boolean defaultValue) {
+    Boolean result = defaultValue;
+    if (propDef.getParameters() != null) {
+      Object value = propDef.getParameters().get(key);
+      if (value instanceof Boolean) {
+        result = (Boolean) value;
+      } else if (value != null) {
+        result = Boolean.valueOf(value.toString());
+      }
+    }
+    return result;
   }
   
   /**

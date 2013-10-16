@@ -23,8 +23,10 @@ import org.activiti.designer.kickstart.form.features.CreateBooleanPropertyFeatur
 import org.activiti.designer.kickstart.form.features.CreateDatePropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateDueDatePropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateFormGroupFeature;
+import org.activiti.designer.kickstart.form.features.CreateGroupSelectPropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateListPropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreatePackageItemsPropertyFeature;
+import org.activiti.designer.kickstart.form.features.CreatePeopleSelectPropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreatePriorityPropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateReferencePropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateTextAreaPropertyFeature;
@@ -76,7 +78,7 @@ public class KickstartFormFeatureProvider extends DefaultFeatureProvider {
 		shapeControllers.add(new PropertyGroupShapeController(this));
 		shapeControllers.add(new ListPropertyShapeController(this));
 		shapeControllers.add(new BooleanPropertyShapeController(this));
-		
+
 		// Fixed elements
 		shapeControllers.add(new DueDatePropertyShapeController(this));
 		shapeControllers.add(new PackageItemsPropertyShapeController(this));
@@ -87,7 +89,7 @@ public class KickstartFormFeatureProvider extends DefaultFeatureProvider {
 	
 	/**
 	 * @param businessObject object to get a {@link BusinessObjectShapeController} for
-	 * @return a {@link BusinessObjectShapeController} capable of creating/updating shapes
+	 * @return a {@link BusinessObjectShapeControllr} capable of creating/updating shapes
 	 * of for the given businessObject.
 	 * @throws IllegalArgumentException When no controller can be found for the given object.
 	 */
@@ -133,6 +135,7 @@ public class KickstartFormFeatureProvider extends DefaultFeatureProvider {
 	  return new ICreateFeature[]{ 
 	      new CreateTextInputPropertyFeature(this), new CreateTextAreaPropertyFeature(this),
 	      new CreateDatePropertyFeature(this), new CreateBooleanPropertyFeature(this), new CreateFormGroupFeature(this), new CreateListPropertyFeature(this),
+	      new CreatePeopleSelectPropertyFeature(this), new CreateGroupSelectPropertyFeature(this),
 	      new CreateDueDatePropertyFeature(this), new CreatePackageItemsPropertyFeature(this), new CreatePriorityPropertyFeature(this),
 	      new CreateWorkflowDescriptionPropertyFeature(this), new CreateReferencePropertyFeature(this)
 	  };

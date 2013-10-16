@@ -103,6 +103,6 @@ public abstract class AbstractBusinessObjectShapeController implements BusinessO
   }
   
   protected String getLabelTextValue(FormPropertyGroup group) {
-    return group.getTitle() != null && !group.getTitle().isEmpty() ?  group.getTitle() : "(Nameless group)";
+    return group.getTitle() != null && !group.getTitle().isEmpty() ?  group.getTitle() : "";
   }
 }

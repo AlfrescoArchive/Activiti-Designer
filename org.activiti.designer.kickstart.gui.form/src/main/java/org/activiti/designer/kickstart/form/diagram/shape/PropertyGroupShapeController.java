@@ -4,6 +4,7 @@ import org.activiti.designer.kickstart.form.diagram.KickstartFormFeatureProvider
 import org.activiti.designer.kickstart.form.util.FormComponentStyles;
 import org.activiti.workflow.simple.definition.form.FormPropertyGroup;
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.algorithms.MultiText;
@@ -43,19 +44,24 @@ public class PropertyGroupShapeController extends AbstractBusinessObjectShapeCon
     FormPropertyGroup group = (FormPropertyGroup) businessObject;
     
     Diagram diagram = getFeatureProvider().getDiagramTypeProvider().getDiagram();
+    String label = getLabelTextValue(group);
 
     // If no size has been supplied, revert to the default sizes
     if (width < 0) {
       width = FormComponentStyles.DEFAULT_COMPONENT_WIDTH + 10;
     }
-    height = FormComponentStyles.DEFAULT_GROUP_LABEL_HEIGHT + FormComponentStyles.DEFAULT_GROUP_HEIGHT;
+    if(label.isEmpty()) {
+      height = FormComponentStyles.DEFAULT_GROUP_HEIGHT;
+    } else {
+      height = FormComponentStyles.DEFAULT_GROUP_LABEL_HEIGHT + FormComponentStyles.DEFAULT_GROUP_HEIGHT;
+    }
 
     final Rectangle rectangle = gaService.createInvisibleRectangle(containerShape);
     gaService.setLocationAndSize(rectangle, 0, 0, width, height);
     
     // Add label
     final Shape shape = peCreateService.createShape(containerShape, false);
-    final MultiText text = gaService.createDefaultMultiText(diagram, shape, group.getTitle());
+    final MultiText text = gaService.createDefaultMultiText(diagram, shape, label);
     text.setHorizontalAlignment(Orientation.ALIGNMENT_LEFT);
     text.setVerticalAlignment(Orientation.ALIGNMENT_TOP);
     text.setFont(gaService.manageFont(diagram, text.getFont().getName(), 15));
@@ -73,6 +79,8 @@ public class PropertyGroupShapeController extends AbstractBusinessObjectShapeCon
     final Polygon topLine = gaService.createPlainPolygon(rectangle, new int[]
         {5, FormComponentStyles.DEFAULT_GROUP_LABEL_HEIGHT, width, FormComponentStyles.DEFAULT_GROUP_LABEL_HEIGHT});
     topLine.setForeground(FormComponentStyles.getDefaultForegroundColor(diagram));
+    topLine.setLineVisible(!label.isEmpty());
+    
     
     // Allow quick-edit
     final IDirectEditingInfo directEditingInfo = getFeatureProvider().getDirectEditingInfo();
@@ -90,11 +98,24 @@ public class PropertyGroupShapeController extends AbstractBusinessObjectShapeCon
   @Override
   public void updateShape(ContainerShape shape, Object businessObject, int width, int height) {
     FormPropertyGroup group = (FormPropertyGroup) businessObject;
+    String label = getLabelTextValue(group);
+
     
     // Update the label
     MultiText labelText = findNameMultiText(shape);
     if(labelText != null) {
-      labelText.setValue(getLabelTextValue(group));
+      if(!StringUtils.equals(labelText.getValue(), label)) {
+        labelText.setValue(label);
+      }
+    }
+    
+    // Hide line if no title is used
+    Polygon line = findPolygon(shape.getGraphicsAlgorithm());
+    if(line != null) {
+      if(line.getLineVisible() == label.isEmpty()) {
+        ((KickstartFormFeatureProvider) getFeatureProvider()).getFormLayouter().relayout(shape);
+      }
+      line.setLineVisible(!label.isEmpty());
     }
   }
   
@@ -114,5 +135,23 @@ public class PropertyGroupShapeController extends AbstractBusinessObjectShapeCon
   @Override
   public GraphicsAlgorithm getGraphicsAlgorithmForDirectEdit(ContainerShape container) {
     return container.getChildren().get(0).getGraphicsAlgorithm();
+  }
+  
+  protected Polygon findPolygon(GraphicsAlgorithm ga) {
+    if (ga instanceof Polygon) {
+      return (Polygon) ga;
+    }
+    Polygon foundPolygon = null;
+    for (EObject child : ga.eContents()) {
+      if (child instanceof GraphicsAlgorithm) {
+        foundPolygon = findPolygon((GraphicsAlgorithm) child);
+
+        if (foundPolygon != null) {
+          return foundPolygon;
+        }
+
+      }
+    }
+    return null;
   }
 }

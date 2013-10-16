@@ -29,9 +29,9 @@ public class PackageItemsPropertySection extends AbstractKickstartFormComponentS
   protected Object getModelValueForControl(Control control, Object businessObject) {
     ReferencePropertyDefinition propDef = (ReferencePropertyDefinition) businessObject;
     if (control == allowRemovingControl) {
-      return getBooleanParameter(propDef, AlfrescoConversionConstants.PARAMETER_PACKAGEITEMS_ALLOW_REMOVE);
+      return getBooleanParameter(propDef, AlfrescoConversionConstants.PARAMETER_PACKAGEITEMS_ALLOW_REMOVE, false);
     } else if (control == allowAddingControl) {
-      return getBooleanParameter(propDef, AlfrescoConversionConstants.PARAMETER_PACKAGEITEMS_ALLOW_ADD);
+      return getBooleanParameter(propDef, AlfrescoConversionConstants.PARAMETER_PACKAGEITEMS_ALLOW_ADD, false);
     }
     return null;
   }
@@ -46,18 +46,5 @@ public class PackageItemsPropertySection extends AbstractKickstartFormComponentS
       propDef.getParameters().put(AlfrescoConversionConstants.PARAMETER_PACKAGEITEMS_ALLOW_ADD,
           allowAddingControl.getSelection());
     }
-  }
-
-  protected Boolean getBooleanParameter(ReferencePropertyDefinition propDef, String key) {
-    Boolean result = Boolean.FALSE;
-    if (propDef.getParameters() != null) {
-      Object value = propDef.getParameters().get(key);
-      if (value instanceof Boolean) {
-        result = (Boolean) value;
-      } else if (value != null) {
-        result = Boolean.valueOf(value.toString());
-      }
-    }
-    return result;
   }
 }

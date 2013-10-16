@@ -14,4 +14,6 @@ public interface KickstartConstants {
   String PREFERENCE_TARGET_LOCATION_REPOSITORY = "target-location-repository";
   
   String PREFERENCE_TARGET_LOCATION_SHARE = "target-location-share";
+
+  String PREFERENCE_USE_CUSTOM_LCOATION = "target-custom-location";
 }

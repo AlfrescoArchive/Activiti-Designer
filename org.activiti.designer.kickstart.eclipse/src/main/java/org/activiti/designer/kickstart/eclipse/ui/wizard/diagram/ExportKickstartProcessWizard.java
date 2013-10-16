@@ -104,8 +104,8 @@ public class ExportKickstartProcessWizard extends Wizard implements IExportWizar
   }
 
   protected void exportProcess(IProgressMonitor monitor) {
+    storePreferences();
     if (targetPage.isCustomLocationUsed()) {
-      storeCustomTargetFolders();
 
       if (StringUtils.isEmpty(targetPage.getCustomRepositoryFolder())
           || StringUtils.isEmpty(targetPage.getCustomShareFolder())) {
@@ -147,15 +147,23 @@ public class ExportKickstartProcessWizard extends Wizard implements IExportWizar
         humanStep.setId("step1");
         definition.addStep(humanStep);
         
+        HumanStepDefinition secondStep = new HumanStepDefinition();
+        secondStep.setName("Second step");
+        secondStep.setId("step2");
+        definition.addStep(secondStep);
+        
         // Read start and human form from fixed files in workspace
         IResource startFormResource = project.getFile("start-form.kickform");
         IResource taskFormResource = project.getFile("form.kickform");
+        IResource secondTaskResource = project.getFile("second-form.kickform");
         
         FormDefinition startForm = converter.readFormDefinition(new FileInputStream(startFormResource.getLocation().toFile()));
         FormDefinition taskForm = converter.readFormDefinition(new FileInputStream(taskFormResource.getLocation().toFile()));
+        FormDefinition secondTaskForm = converter.readFormDefinition(new FileInputStream(secondTaskResource.getLocation().toFile()));
         
         definition.setStartFormDefinition(startForm);
         humanStep.setForm(taskForm);
+        secondStep.setForm(secondTaskForm);
             
             
         WorkflowDefinitionConversion definitionConversion = factory.createWorkflowDefinitionConversion(definition);
@@ -199,10 +207,14 @@ public class ExportKickstartProcessWizard extends Wizard implements IExportWizar
     }
   }
 
-  protected void storeCustomTargetFolders() {
+  protected void storePreferences() {
     IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(KickstartPlugin.PLUGIN_ID);
-    preferences.put(KickstartConstants.PREFERENCE_TARGET_LOCATION_REPOSITORY, targetPage.getCustomRepositoryFolder());
-    preferences.put(KickstartConstants.PREFERENCE_TARGET_LOCATION_SHARE, targetPage.getCustomShareFolder());
+    preferences.putBoolean(KickstartConstants.PREFERENCE_USE_CUSTOM_LCOATION, targetPage.isCustomLocationUsed());
+    
+    if(targetPage.isCustomLocationUsed()) {
+      preferences.put(KickstartConstants.PREFERENCE_TARGET_LOCATION_REPOSITORY, targetPage.getCustomRepositoryFolder());
+      preferences.put(KickstartConstants.PREFERENCE_TARGET_LOCATION_SHARE, targetPage.getCustomShareFolder());
+    }
 
     try {
       preferences.flush();

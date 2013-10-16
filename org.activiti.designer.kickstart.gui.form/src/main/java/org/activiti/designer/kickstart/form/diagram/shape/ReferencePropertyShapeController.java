@@ -28,8 +28,14 @@ public class ReferencePropertyShapeController extends SimpleIconInputShapeContro
 
   @Override
   public boolean canControlShapeFor(Object businessObject) {
-    return businessObject instanceof ReferencePropertyDefinition && AlfrescoConversionConstants.FORM_REFERENCE_FIELD.equals(
-        ((ReferencePropertyDefinition) businessObject).getType());
+    boolean valid =  businessObject instanceof ReferencePropertyDefinition;
+    if(valid) {
+      ReferencePropertyDefinition ref = (ReferencePropertyDefinition) businessObject;
+      valid = AlfrescoConversionConstants.FORM_REFERENCE_FIELD.equals(ref.getType())
+          || AlfrescoConversionConstants.CONTENT_TYPE_PEOPLE.equals(ref.getType())
+          || AlfrescoConversionConstants.CONTENT_TYPE_GROUP.equals(ref.getType());
+    }
+    return valid;
   }
 
   @Override
@@ -84,6 +90,13 @@ public class ReferencePropertyShapeController extends SimpleIconInputShapeContro
 
   @Override
   protected String getIconKey(FormPropertyDefinition definition) {
-    return KickstartFormPluginImage.NEW_FIELD_REFERENCE.getImageKey();
+    ReferencePropertyDefinition ref = (ReferencePropertyDefinition) definition;
+    if(AlfrescoConversionConstants.CONTENT_TYPE_PEOPLE.equals(ref.getType())) {
+      return KickstartFormPluginImage.NEW_PEOPLE_SELECT.getImageKey();
+    } else if(AlfrescoConversionConstants.CONTENT_TYPE_GROUP.equals(ref.getType())) {
+      return KickstartFormPluginImage.NEW_GROUP_SELECT.getImageKey();
+    } else {
+      return KickstartFormPluginImage.NEW_FIELD_REFERENCE.getImageKey();
+    }
   }
 }

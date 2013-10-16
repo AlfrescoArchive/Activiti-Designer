@@ -11,6 +11,7 @@ import org.eclipse.graphiti.mm.algorithms.Image;
 import org.eclipse.graphiti.mm.algorithms.MultiText;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.RoundedRectangle;
+import org.eclipse.graphiti.mm.algorithms.styles.LineStyle;
 import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -65,8 +66,9 @@ public abstract class SimpleIconInputShapeController extends AbstractBusinessObj
     
     // Create and set visible rectangle inside invisible rectangle
     rectangle = gaService.createRoundedRectangle(invisibleRectangle, 2, 2);
-    rectangle.setStyle(FormComponentStyles.getInputFieldStyle(diagram));
+    rectangle.setStyle(FormComponentStyles.getFixedElementStyle(diagram));
     rectangle.setParentGraphicsAlgorithm(invisibleRectangle);
+    rectangle.setLineStyle(LineStyle.DASH);
     gaService.setLocationAndSize(rectangle, 0, FormComponentStyles.DEFAULT_LABEL_HEIGHT, width, height - FormComponentStyles.DEFAULT_LABEL_HEIGHT);
     
     // Add icon
