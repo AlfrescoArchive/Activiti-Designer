@@ -11,8 +11,11 @@
  * limitations under the License.
  */
 package org.activiti.designer.kickstart.eclipse.navigator.dialog;
+import java.util.List;
+
 import org.activiti.designer.kickstart.eclipse.navigator.CmisNavigatorSelectionHolder;
 import org.activiti.designer.kickstart.eclipse.navigator.CmisUtil;
+import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -33,6 +36,7 @@ import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Shell;
@@ -81,10 +85,16 @@ public class SelectFolderForDownloadDialog extends TitleAreaDialog {
 					Object selectedElement = selectedElements[0]; // Tree is single selection
 					if (selectedElement instanceof IResource) {
 						currentlySelectedResource = (IResource) selectedElement;
-						getButton(IDialogConstants.OK_ID).setEnabled(true);
+						Button okButton = getButton(IDialogConstants.OK_ID); 
+						if (okButton != null) {
+							okButton.setEnabled(true);
+						}
 					}
 				} else {
-					getButton(IDialogConstants.OK_ID).setEnabled(false);
+					Button okButton = getButton(IDialogConstants.OK_ID); 
+					if (okButton != null) {
+						okButton.setEnabled(false);
+					}
 				}
 			}
 		});
@@ -100,23 +110,28 @@ public class SelectFolderForDownloadDialog extends TitleAreaDialog {
     // OK button is disabled on creation
     getButton(IDialogConstants.OK_ID).setEnabled(false);
     
-    // Click listener for ok button
+    // Click listener for OK button
     getButton(IDialogConstants.OK_ID).addSelectionListener(new SelectionAdapter() {
     	@Override
     	public void widgetSelected(SelectionEvent e) {
     		if (currentlySelectedResource instanceof IContainer) {
     			IContainer container = (IContainer) currentlySelectedResource;
     			
-    			Document document = (Document) CmisNavigatorSelectionHolder.getInstance().getSelectedObjects().get(0);
-    			IFile file = container.getFile(new Path(document.getName()));
-    			
-    			// TODO: handle file exists
-    			if (!file.exists()) {
-    				try {
-	            file.create(CmisUtil.downloadDocument(document), true, null);
-            } catch (CoreException e1) {
-	            e1.printStackTrace();
-            }
+    			List<CmisObject> selectedObjects = CmisNavigatorSelectionHolder.getInstance().getSelectedObjects();
+    			for (CmisObject cmisObject : selectedObjects) {
+    				if (cmisObject instanceof Document) {
+    					Document document = (Document) cmisObject;
+		    			IFile file = container.getFile(new Path(document.getName()));
+		    			
+		    			// TODO: handle file exists
+		    			if (!file.exists()) {
+		    				try {
+			            file.create(CmisUtil.downloadDocument(document), true, null);
+		            } catch (CoreException e1) {
+			            e1.printStackTrace();
+		            }
+		    			}
+    				}
     			}
     		}
     	}
