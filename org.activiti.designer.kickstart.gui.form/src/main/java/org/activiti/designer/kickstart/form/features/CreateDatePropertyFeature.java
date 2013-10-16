@@ -11,7 +11,7 @@ public class CreateDatePropertyFeature extends AbstractCreateFormPropertyFeature
   public static final String FEATURE_ID_KEY = "date";
 
   public CreateDatePropertyFeature(KickstartFormFeatureProvider fp) {
-    super(fp, "Date field", "Add a date selection field");
+    super(fp, "Date", "Add a date selection field");
   }
 
   @Override
@@ -24,11 +24,12 @@ public class CreateDatePropertyFeature extends AbstractCreateFormPropertyFeature
     DatePropertyDefinition definition = new DatePropertyDefinition();
     definition.setShowTime(true);
     definition.setName("Date field");
+    definition.setWritable(true);
     return definition;
   }
 
   @Override
   public String getCreateImageId() {
-    return KickstartFormPluginImage.NEW_TEXT_AREA.getImageKey();
+    return KickstartFormPluginImage.NEW_DATE_INPUT.getImageKey();
   }
 }

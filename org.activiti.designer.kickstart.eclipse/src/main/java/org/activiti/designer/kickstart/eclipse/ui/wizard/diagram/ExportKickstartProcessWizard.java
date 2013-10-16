@@ -10,7 +10,9 @@ import org.activiti.designer.kickstart.eclipse.util.KickstartConstants;
 import org.activiti.workflow.simple.alfresco.conversion.AlfrescoWorkflowDefinitionConversionFactory;
 import org.activiti.workflow.simple.converter.WorkflowDefinitionConversion;
 import org.activiti.workflow.simple.converter.json.SimpleWorkflowJsonConverter;
+import org.activiti.workflow.simple.definition.HumanStepDefinition;
 import org.activiti.workflow.simple.definition.WorkflowDefinition;
+import org.activiti.workflow.simple.definition.form.FormDefinition;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -132,9 +134,30 @@ public class ExportKickstartProcessWizard extends Wizard implements IExportWizar
         AlfrescoWorkflowDefinitionConversionFactory factory = new AlfrescoWorkflowDefinitionConversionFactory();
 
         SimpleWorkflowJsonConverter converter = new SimpleWorkflowJsonConverter();
-        FileInputStream fis = new FileInputStream(processResource.getLocation().toFile());
-        WorkflowDefinition definition = converter.readWorkflowDefinition(fis);
+// TODO: bring back to life after actual process-editor supports forms
+//        FileInputStream fis = new FileInputStream(processResource.getLocation().toFile());
+//        WorkflowDefinition definition = converter.readWorkflowDefinition(fis);
 
+        WorkflowDefinition definition = new WorkflowDefinition();
+        definition.setName("A custom process");
+        definition.setDescription("Custom process created in kickstart");
+        definition.setId("process");
+        HumanStepDefinition humanStep = new HumanStepDefinition();
+        humanStep.setName("First step");
+        humanStep.setId("step1");
+        definition.addStep(humanStep);
+        
+        // Read start and human form from fixed files in workspace
+        IResource startFormResource = project.getFile("start-form.kickform");
+        IResource taskFormResource = project.getFile("form.kickform");
+        
+        FormDefinition startForm = converter.readFormDefinition(new FileInputStream(startFormResource.getLocation().toFile()));
+        FormDefinition taskForm = converter.readFormDefinition(new FileInputStream(taskFormResource.getLocation().toFile()));
+        
+        definition.setStartFormDefinition(startForm);
+        humanStep.setForm(taskForm);
+            
+            
         WorkflowDefinitionConversion definitionConversion = factory.createWorkflowDefinitionConversion(definition);
         definitionConversion.convert();
 

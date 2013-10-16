@@ -36,6 +36,6 @@ public class KickstartFormDiagramTypeProvider extends AbstractDiagramTypeProvide
   public boolean isAutoUpdateAtStartup() {
     return true;
   }
-
+  
 
 }

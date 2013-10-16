@@ -9,6 +9,7 @@ import org.activiti.designer.kickstart.form.util.FormComponentStyles;
 import org.activiti.designer.util.platform.OSEnum;
 import org.activiti.designer.util.platform.OSUtil;
 import org.activiti.workflow.simple.definition.form.DatePropertyDefinition;
+import org.activiti.workflow.simple.definition.form.FormPropertyDefinition;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
@@ -49,7 +50,7 @@ public class DatePropertyShapeController extends AbstractBusinessObjectShapeCont
     
     Diagram diagram = getFeatureProvider().getDiagramTypeProvider().getDiagram();
     
-    DatePropertyDefinition definition = (DatePropertyDefinition) businessObject;
+    FormPropertyDefinition definition = (FormPropertyDefinition) businessObject;
 
     // If no size has been supplied, revert to the default sizes
     if(width < 0) {
@@ -114,22 +115,28 @@ public class DatePropertyShapeController extends AbstractBusinessObjectShapeCont
     dayText.setLineWidth(0);
     gaService.setLocationAndSize(dayText, width - 19, FormComponentStyles.DEFAULT_LABEL_HEIGHT + 10, 14, 8);
     
-    // Allow quick-edit
-    final IDirectEditingInfo directEditingInfo = getFeatureProvider().getDirectEditingInfo();
-    // set container shape for direct editing after object creation
-    directEditingInfo.setMainPictogramElement(containerShape);
-    // set shape and graphics algorithm where the editor for
-    // direct editing shall be opened after object creation
-    directEditingInfo.setPictogramElement(containerShape);
-    directEditingInfo.setGraphicsAlgorithm(text);
-    directEditingInfo.setActive(true);
+    if(isQuickEditAllowed()) {
+      // Allow quick-edit
+      final IDirectEditingInfo directEditingInfo = getFeatureProvider().getDirectEditingInfo();
+      // set container shape for direct editing after object creation
+      directEditingInfo.setMainPictogramElement(containerShape);
+      // set shape and graphics algorithm where the editor for
+      // direct editing shall be opened after object creation
+      directEditingInfo.setPictogramElement(containerShape);
+      directEditingInfo.setGraphicsAlgorithm(text);
+      directEditingInfo.setActive(true);
+    }
     
     return containerShape;
+  }
+  
+  protected boolean isQuickEditAllowed() {
+    return true;
   }
 
   @Override
   public void updateShape(ContainerShape shape, Object businessObject, int width, int height) {
-    DatePropertyDefinition propDef = (DatePropertyDefinition) businessObject;
+    FormPropertyDefinition propDef = (FormPropertyDefinition) businessObject;
 
     // Update the label
     MultiText labelText = findNameMultiText(shape);
@@ -176,15 +183,19 @@ public class DatePropertyShapeController extends AbstractBusinessObjectShapeCont
     }
   }
 
-  protected String getDefaultValue(DatePropertyDefinition definition) {
+  protected String getDefaultValue(FormPropertyDefinition definition) {
     String dateValue = null;
-    if (definition.isShowTime()) {
-      Calendar noon = Calendar.getInstance();
-      noon.set(Calendar.HOUR_OF_DAY, 12);
-      noon.set(Calendar.MINUTE, 0);
-      noon.set(Calendar.SECOND, 0);
-      dateValue = DateFormat.getDateTimeInstance().format(noon.getTime());
-    } else {
+    if(definition instanceof DatePropertyDefinition) {
+      if (((DatePropertyDefinition) definition).isShowTime()) {
+        Calendar noon = Calendar.getInstance();
+        noon.set(Calendar.HOUR_OF_DAY, 12);
+        noon.set(Calendar.MINUTE, 0);
+        noon.set(Calendar.SECOND, 0);
+        dateValue = DateFormat.getDateTimeInstance().format(noon.getTime());
+      }
+    }
+    
+    if(dateValue == null) {
       dateValue = DateFormat.getDateInstance().format(new Date());
     }
     return dateValue;
@@ -192,7 +203,7 @@ public class DatePropertyShapeController extends AbstractBusinessObjectShapeCont
   
   @Override
   public boolean isShapeUpdateNeeded(ContainerShape shape, Object businessObject) {
-    DatePropertyDefinition propDef = (DatePropertyDefinition) businessObject;
+    FormPropertyDefinition propDef = (FormPropertyDefinition) businessObject;
     
     // Check label text
     String currentLabel = (String) extractShapeData(LABEL_DATA_KEY, shape);

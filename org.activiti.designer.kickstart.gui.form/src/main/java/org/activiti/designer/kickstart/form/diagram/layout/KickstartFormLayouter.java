@@ -1,9 +1,9 @@
 package org.activiti.designer.kickstart.form.diagram.layout;
 
 import org.activiti.designer.kickstart.form.diagram.FormComponentLayout;
-import org.activiti.designer.kickstart.form.property.FormPropertyGroupPropertySection;
 import org.activiti.designer.util.editor.KickstartFormMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
+import org.activiti.workflow.simple.alfresco.conversion.AlfrescoConversionConstants;
 import org.activiti.workflow.simple.definition.form.FormPropertyDefinition;
 import org.activiti.workflow.simple.definition.form.FormPropertyGroup;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -141,9 +141,9 @@ public class KickstartFormLayouter {
       if(businessObject instanceof FormPropertyGroup) {
         FormPropertyGroup group = (FormPropertyGroup) businessObject;
         
-        if(FormPropertyGroupPropertySection.TWO_COLUMN_VALUE.equals(group.getType())) {
+        if(AlfrescoConversionConstants.FORM_GROUP_LAYOUT_2_COLUMNS.equals(group.getType())) {
           layout = twoColumnLayout;
-        } else if(FormPropertyGroupPropertySection.THREE_COLUMN_VALUE.equals(group.getType())) {
+        } else if(AlfrescoConversionConstants.FORM_GROUP_LAYOUT_3_COLUMNS.equals(group.getType())) {
           layout = threeColumnLayout;
         } else {
           layout = oneColumnLayout;

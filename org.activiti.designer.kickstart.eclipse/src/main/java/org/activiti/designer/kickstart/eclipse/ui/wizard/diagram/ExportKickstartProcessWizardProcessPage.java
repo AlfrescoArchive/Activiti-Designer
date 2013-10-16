@@ -132,14 +132,7 @@ public class ExportKickstartProcessWizardProcessPage extends WizardPage {
 
   protected List<IResource> gatherProcesses() {
     List<IResource> processes = new ArrayList<IResource>();
-
-    // TODO: Remove
-    try {
-      Thread.sleep(500L);
-    } catch (InterruptedException e) {
-      e.printStackTrace();
-    }
-
+    
     IProject project = ((ExportKickstartProcessWizard) getWizard()).getProject();
     if (project != null) {
       addProcesses(project, processes);

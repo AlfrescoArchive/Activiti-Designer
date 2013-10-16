@@ -22,6 +22,7 @@ public class CreateTextInputPropertyFeature extends AbstractCreateFormPropertyFe
   protected FormPropertyDefinition createFormPropertyDefinition(ICreateContext context) {
     TextPropertyDefinition definition = new TextPropertyDefinition();
     definition.setName("Text input");
+    definition.setWritable(true);
     return definition;
   }
 

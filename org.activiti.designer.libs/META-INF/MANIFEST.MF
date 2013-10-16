@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Activiti Designer - Libs
 Bundle-SymbolicName: org.activiti.designer.libs;singleton:=true
-Bundle-Version: 5.12.1.SNAPSHOT
+Bundle-Version: 5.12.1.qualifier
 Export-Package: org.activiti.bpmn,
  org.activiti.bpmn.constants,
  org.activiti.bpmn.converter;

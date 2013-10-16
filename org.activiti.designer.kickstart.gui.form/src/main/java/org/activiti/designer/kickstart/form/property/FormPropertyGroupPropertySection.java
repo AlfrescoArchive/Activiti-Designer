@@ -1,6 +1,7 @@
 package org.activiti.designer.kickstart.form.property;
 
 import org.activiti.designer.util.editor.KickstartFormMemoryModel;
+import org.activiti.workflow.simple.alfresco.conversion.AlfrescoConversionConstants;
 import org.activiti.workflow.simple.definition.form.FormPropertyGroup;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Control;
@@ -11,11 +12,6 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
  * @author Frederik Heremans
  */
 public class FormPropertyGroupPropertySection extends AbstractKickstartFormComponentSection {
-  
-  // TODO: use kickstart-alfresco constants for this
-  public static final String SINGLE_COLUMN_VALUE = "one-column";
-  public static final String TWO_COLUMN_VALUE = "two-column";
-  public static final String THREE_COLUMN_VALUE = "three-column";
   
   protected static final String SINGLE_COLUMN_MESSAGE = "Single column layout";
   protected static final String TWO_COLUMN_MESSAGE = "Two column layout";
@@ -80,11 +76,11 @@ public class FormPropertyGroupPropertySection extends AbstractKickstartFormCompo
    */
   protected String getTypeValueForMessage(String text) {
     if(TWO_COLUMN_MESSAGE.equals(text) ) {
-      return TWO_COLUMN_VALUE;
+      return AlfrescoConversionConstants.FORM_GROUP_LAYOUT_2_COLUMNS;
     } else if(THREE_COLUMN_MESSAGE.equals(text)) {
-      return THREE_COLUMN_VALUE;
+      return AlfrescoConversionConstants.FORM_GROUP_LAYOUT_3_COLUMNS;
     }
-    return SINGLE_COLUMN_VALUE;
+    return AlfrescoConversionConstants.FORM_GROUP_LAYOUT_1_COLUMN;
   }
   
   /**
@@ -92,9 +88,9 @@ public class FormPropertyGroupPropertySection extends AbstractKickstartFormCompo
    * value.
    */
   protected String getTypeMessageForvalue(String type) {
-    if(TWO_COLUMN_VALUE.equals(type) ) {
+    if(AlfrescoConversionConstants.FORM_GROUP_LAYOUT_2_COLUMNS.equals(type) ) {
       return TWO_COLUMN_MESSAGE;
-    } else if(THREE_COLUMN_VALUE.equals(type)) {
+    } else if(AlfrescoConversionConstants.FORM_GROUP_LAYOUT_3_COLUMNS.equals(type)) {
       return THREE_COLUMN_MESSAGE;
     }
     return SINGLE_COLUMN_MESSAGE;
