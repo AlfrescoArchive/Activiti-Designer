@@ -41,15 +41,6 @@ public class DirectEditFormComponentFeature extends AbstractDirectEditingFeature
     }
     return null;
   }
-  
-
-  @Override
-  public String checkValueValid(String value, IDirectEditingContext context) {
-    if (value.length() < 1) {
-      return "The label should be at least one character long";
-    }
-    return null;
-  }
 
   public void setValue(String value, IDirectEditingContext context) {
     Object businessObject = getBusinessObjectForPictogramElement(context.getPictogramElement());

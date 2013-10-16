@@ -53,7 +53,6 @@ public class ExportKickstartProcessTargetWizardPage extends WizardPage {
     targetFolderButton = new Button(radioButtonGroup, SWT.RADIO);
     targetFolderButton.setText("Project target folder");
     targetFolderButton.setData("target");
-    targetFolderButton.setSelection(true);
     
     customFoldersButton = new Button(radioButtonGroup, SWT.RADIO);
     customFoldersButton.setData("folders");
@@ -63,7 +62,6 @@ public class ExportKickstartProcessTargetWizardPage extends WizardPage {
     
     // Add target widgets
     repoFolderSelect = new ExternalFolderSelector(topLevel);
-    repoFolderSelect.setEnabled(false);
     data = new FormData();
     data.left = new FormAttachment(0, LABEL_WIDTH);
     data.right = new FormAttachment(100, -IDialogConstants.HORIZONTAL_MARGIN);
@@ -72,7 +70,6 @@ public class ExportKickstartProcessTargetWizardPage extends WizardPage {
     createLabel("Repository extensions folder", repoFolderSelect.getComposite(), topLevel);
     
     shareFolderSelect = new ExternalFolderSelector(topLevel);
-    shareFolderSelect.setEnabled(false);
     data = new FormData();
     data.left = new FormAttachment(0, LABEL_WIDTH);
     data.right = new FormAttachment(100, -IDialogConstants.HORIZONTAL_MARGIN);
@@ -89,16 +86,27 @@ public class ExportKickstartProcessTargetWizardPage extends WizardPage {
         customLocationUsed = customFoldersButton.getSelection();
       }
     });
+
+    loadPreferences();
     
-    // Initialize paths from preferences
+    setControl(topLevel);
+  }
+  
+  protected void loadPreferences() {
+    // Initialize paths and settings from preferences
     IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(KickstartPlugin.PLUGIN_ID);
     String repositoryPath = preferences.get(KickstartConstants.PREFERENCE_TARGET_LOCATION_REPOSITORY, "");
     String sharePath = preferences.get(KickstartConstants.PREFERENCE_TARGET_LOCATION_SHARE, "");
     
+    customLocationUsed = preferences.getBoolean(KickstartConstants.PREFERENCE_USE_CUSTOM_LCOATION, Boolean.FALSE);
+    
+    // Update widgets according to preferences
+    customFoldersButton.setSelection(customLocationUsed);
+    repoFolderSelect.setEnabled(customLocationUsed);
+    shareFolderSelect.setEnabled(customLocationUsed);
+    
     repoFolderSelect.setCurrentPath(repositoryPath);
     shareFolderSelect.setCurrentPath(sharePath);
-    
-    setControl(topLevel);
   }
 
   public boolean isCustomLocationUsed() {

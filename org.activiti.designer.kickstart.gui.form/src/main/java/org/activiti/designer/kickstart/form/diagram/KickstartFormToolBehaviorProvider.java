@@ -9,8 +9,10 @@ import org.activiti.designer.kickstart.form.features.CreateBooleanPropertyFeatur
 import org.activiti.designer.kickstart.form.features.CreateDatePropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateDueDatePropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateFormGroupFeature;
+import org.activiti.designer.kickstart.form.features.CreateGroupSelectPropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateListPropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreatePackageItemsPropertyFeature;
+import org.activiti.designer.kickstart.form.features.CreatePeopleSelectPropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreatePriorityPropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateReferencePropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateTextAreaPropertyFeature;
@@ -42,6 +44,8 @@ public class KickstartFormToolBehaviorProvider extends DefaultToolBehaviorProvid
     contolToolClasses.add(CreateDatePropertyFeature.class);
     contolToolClasses.add(CreateBooleanPropertyFeature.class);
     contolToolClasses.add(CreateListPropertyFeature.class);
+    contolToolClasses.add(CreatePeopleSelectPropertyFeature.class);
+    contolToolClasses.add(CreateGroupSelectPropertyFeature.class);
     
     fixedToolClasses.add(CreateDueDatePropertyFeature.class);
     fixedToolClasses.add(CreatePriorityPropertyFeature.class);

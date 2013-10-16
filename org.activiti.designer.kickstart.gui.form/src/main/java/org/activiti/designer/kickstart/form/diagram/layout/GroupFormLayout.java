@@ -24,7 +24,7 @@ import org.eclipse.graphiti.services.Graphiti;
  */
 public class GroupFormLayout implements FormComponentLayout {
   private int initialverticalSpacing = 40;
-  private int verticalSpacing = 10;
+  private int verticalSpacing = 5;
   private int leftPadding = 5;
   private int horizontalSpacing = 5;
   
@@ -125,6 +125,11 @@ public class GroupFormLayout implements FormComponentLayout {
     FormPropertyGroup group = (FormPropertyGroup) featureProvider.getBusinessObjectForPictogramElement(targetContainer);
 
     int yPosition = initialverticalSpacing;
+    
+    // In case the group doesn't have a title, children are layout to the top of the group
+    if(group.getTitle() == null || group.getTitle().isEmpty()) {
+      yPosition = verticalSpacing;
+    }
     int yOffset = 0;
     int xPosition = leftPadding;
 

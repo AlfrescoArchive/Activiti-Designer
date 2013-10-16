@@ -1,5 +1,6 @@
 package org.activiti.designer.kickstart.form.property;
 
+import org.activiti.workflow.simple.alfresco.conversion.AlfrescoConversionConstants;
 import org.activiti.workflow.simple.definition.form.FormPropertyDefinition;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Control;
@@ -14,6 +15,7 @@ public class PropertyDefinitionPropertySection extends AbstractKickstartFormComp
   protected Text nameControl;
   protected Button mandatoryControl;
   protected Button writableControl;
+  protected Button outputPropertyControl;
 
   @Override
   public void createFormControls(TabbedPropertySheetPage aTabbedPropertySheetPage) {
@@ -22,6 +24,7 @@ public class PropertyDefinitionPropertySection extends AbstractKickstartFormComp
 
     mandatoryControl = createCheckboxControl("Mandatory");
     writableControl = createCheckboxControl("Editable");
+    outputPropertyControl = createCheckboxControl("Output property to process");
   }
 
   @Override
@@ -33,6 +36,8 @@ public class PropertyDefinitionPropertySection extends AbstractKickstartFormComp
       return propDef.isMandatory();
     } else if (control == writableControl) {
       return propDef.isWritable();
+    } else if(control == outputPropertyControl) {
+      return getBooleanParameter(propDef, AlfrescoConversionConstants.PARAMETER_ADD_PROPERTY_TO_OUTPUT, false);
     }
     return null;
   }
@@ -46,6 +51,8 @@ public class PropertyDefinitionPropertySection extends AbstractKickstartFormComp
       propDef.setMandatory(mandatoryControl.getSelection());
     } else if (control == writableControl) {
       propDef.setWritable(writableControl.getSelection());
+    } else if(control == outputPropertyControl) {
+      propDef.getParameters().put(AlfrescoConversionConstants.PARAMETER_ADD_PROPERTY_TO_OUTPUT, outputPropertyControl.getSelection());
     }
   }
 }

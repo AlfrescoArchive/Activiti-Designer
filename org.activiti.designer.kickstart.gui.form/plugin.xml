@@ -122,6 +122,18 @@
                 id="org.activiti.designer.kickstart.generalTab.fieldReference"
                 tab="org.activiti.designer.kickstart.generalTab">
           </propertySection>
+          <propertySection
+                class="org.activiti.designer.kickstart.form.property.PeopleSelectPropertySection"
+                filter="org.activiti.designer.kickstart.form.property.PeopleSelectPropertyFilter"
+                id="org.activiti.designer.kickstart.generalTab.peopleSelect"
+                tab="org.activiti.designer.kickstart.generalTab">
+          </propertySection>
+          <propertySection
+                class="org.activiti.designer.kickstart.form.property.GroupSelectPropertySection"
+                filter="org.activiti.designer.kickstart.form.property.GroupSelectPropertyFilter"
+                id="org.activiti.designer.kickstart.generalTab.groupSelect"
+                tab="org.activiti.designer.kickstart.generalTab">
+          </propertySection>
       </propertySections>
    </extension>
 

@@ -54,7 +54,7 @@
          contributorClass="org.eclipse.graphiti.ui.editor.DiagramEditorActionBarContributor"
          default="true"
          extensions="kickproc"
-         icon="community_icon.png"
+         icon="icons/process-16.png"
          id="org.activiti.designer.kickstart.editor.processEditor"
          matchingStrategy="org.activiti.designer.kickstart.eclipse.editor.KickstartProcessDiagramMatchingStrategy"
          name="Kickstart Process Editor">
@@ -67,7 +67,7 @@
          contributorClass="org.eclipse.graphiti.ui.editor.DiagramEditorActionBarContributor"
          default="true"
          extensions="kickform"
-         icon="community_icon.png"
+         icon="icons/form-16.png"
          id="org.activiti.designer.kickstart.editor.formEditor"
          matchingStrategy="org.activiti.designer.kickstart.eclipse.editor.KickstartProcessDiagramMatchingStrategy"
          name="Kickstart Form Editor">
@@ -268,11 +268,16 @@
 <extension
       point="org.eclipse.ui.exportWizards">
    <wizard
+         category="org.activiti.designer.kickstart.eclipse.export.category"
          class="org.activiti.designer.kickstart.eclipse.ui.wizard.diagram.ExportKickstartProcessWizard"
-         icon="icons/logo/activiti.logo.gradients.16x16.png"
+         icon="icons/process-16.png"
          id="org.activiti.designer.kickstart.eclipse.exportDiagramWizard"
          name="Kickstart Process">
    </wizard>
+   <category
+         id="org.activiti.designer.kickstart.eclipse.export.category"
+         name="Kickstart">
+   </category>
 </extension>
  
 </plugin>

@@ -9,6 +9,7 @@ import org.eclipse.graphiti.mm.algorithms.styles.AdaptedGradientColoredAreas;
 import org.eclipse.graphiti.mm.algorithms.styles.Color;
 import org.eclipse.graphiti.mm.algorithms.styles.GradientColoredArea;
 import org.eclipse.graphiti.mm.algorithms.styles.GradientColoredAreas;
+import org.eclipse.graphiti.mm.algorithms.styles.LineStyle;
 import org.eclipse.graphiti.mm.algorithms.styles.LocationType;
 import org.eclipse.graphiti.mm.algorithms.styles.Style;
 import org.eclipse.graphiti.mm.algorithms.styles.StylesFactory;
@@ -29,6 +30,7 @@ public final class FormComponentStyles {
 
   // Style ID's
   private static final String INPUT_FIELD_RECTANGLE_STYLE_ID = "input-field-rectangle";
+  private static final String FIXED_FIELD_RECTANGLE_STYLE_ID = "fixed-field-rectangle";
   
   // Colors
   private static final IColorConstant DEFAULT_FOREGROUND_COLOR = new ColorConstant(0, 0, 0);
@@ -36,6 +38,7 @@ public final class FormComponentStyles {
   private static final IColorConstant GROUP_BORDER_COLOR = new ColorConstant(180, 180, 180);
   private static final IColorConstant CALENDAR_DECORATION_TOP_COLOR = new ColorConstant(255, 145, 145);
   private static final IColorConstant CALENDAR_DECORATION_COLOR = new ColorConstant(255, 255, 255);
+  private static final IColorConstant FIXED_FIELD_BACKGROUND_COLOR = CALENDAR_DECORATION_COLOR;
 
   // Sizes for components
   public static final int DEFAULT_COMPONENT_WIDTH = 600;
@@ -66,6 +69,23 @@ public final class FormComponentStyles {
       style.setLineWidth(20);
       
       styleMap.put(INPUT_FIELD_RECTANGLE_STYLE_ID, style);
+    }
+    return style;
+  }
+  
+  /**
+   * @return style that should be used for the rectangle of an input-field.
+   */
+  public static Style getFixedElementStyle(Diagram diagram) {
+    Style style = styleMap.get(FIXED_FIELD_RECTANGLE_STYLE_ID);
+    if(style == null) {
+      IGaService gaService = Graphiti.getGaService();
+      style = gaService.createStyle(diagram, FIXED_FIELD_RECTANGLE_STYLE_ID);
+      style.setForeground(gaService.manageColor(diagram, DEFAULT_FOREGROUND_COLOR));
+      style.setBackground(gaService.manageColor(diagram, FIXED_FIELD_BACKGROUND_COLOR));
+      style.setLineStyle(LineStyle.DASH);
+      style.setLineWidth(20);
+      styleMap.put(FIXED_FIELD_RECTANGLE_STYLE_ID, style);
     }
     return style;
   }
