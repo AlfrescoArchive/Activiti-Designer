@@ -11,6 +11,7 @@
  * limitations under the License.
  */
 package org.activiti.designer.kickstart.eclipse.navigator.dialog;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.activiti.designer.kickstart.eclipse.navigator.CmisNavigatorSelectionHolder;
@@ -22,7 +23,11 @@ import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.core.runtime.CoreException;
+import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
@@ -110,29 +115,45 @@ public class SelectFolderForDownloadDialog extends TitleAreaDialog {
     // OK button is disabled on creation
     getButton(IDialogConstants.OK_ID).setEnabled(false);
     
-    // Click listener for OK button
+    // Click listener for OK button: download files
     getButton(IDialogConstants.OK_ID).addSelectionListener(new SelectionAdapter() {
     	@Override
     	public void widgetSelected(SelectionEvent e) {
     		if (currentlySelectedResource instanceof IContainer) {
-    			IContainer container = (IContainer) currentlySelectedResource;
+
+    			Job job = new Job("Downloading files") {
+    			  
+    			  @Override
+    			  protected IStatus run(IProgressMonitor monitor) {
+    			    monitor.beginTask("Downloading files", IProgressMonitor.UNKNOWN);
+    			    
+    			    List<CmisObject> selectedObjects = new ArrayList<CmisObject>(CmisNavigatorSelectionHolder.getInstance().getSelectedObjects()); // need to clone list to avoid concurrent modification
+        			for (CmisObject cmisObject : selectedObjects) {
+        				if (cmisObject instanceof Document) {
+        					Document document = (Document) cmisObject;
+        					
+        					IContainer container = (IContainer) currentlySelectedResource;
+    		    			IFile file = container.getFile(new Path(document.getName()));
+    		    			
+    		    			// TODO: handle file exists
+    		    			if (!file.exists()) {
+    		    				try {
+    			            file.create(CmisUtil.downloadDocument(document), true, null);
+    		            } catch (CoreException e1) {
+    			            e1.printStackTrace();
+    		            }
+    		    			}
+        				}
+        			}
+    			    
+    			    return Status.OK_STATUS;
+    			  }
+    			  
+    			};
+
+    			job.setUser(true);
+    			job.schedule();
     			
-    			List<CmisObject> selectedObjects = CmisNavigatorSelectionHolder.getInstance().getSelectedObjects();
-    			for (CmisObject cmisObject : selectedObjects) {
-    				if (cmisObject instanceof Document) {
-    					Document document = (Document) cmisObject;
-		    			IFile file = container.getFile(new Path(document.getName()));
-		    			
-		    			// TODO: handle file exists
-		    			if (!file.exists()) {
-		    				try {
-			            file.create(CmisUtil.downloadDocument(document), true, null);
-		            } catch (CoreException e1) {
-			            e1.printStackTrace();
-		            }
-		    			}
-    				}
-    			}
     		}
     	}
 		});
