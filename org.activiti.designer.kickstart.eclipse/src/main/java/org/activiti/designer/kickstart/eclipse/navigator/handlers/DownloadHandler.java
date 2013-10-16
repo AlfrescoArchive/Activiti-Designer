@@ -12,15 +12,19 @@
  */
 package org.activiti.designer.kickstart.eclipse.navigator.handlers;
 
+import org.activiti.designer.kickstart.eclipse.navigator.dialog.SelectFolderForDownloadDialog;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.ui.handlers.HandlerUtil;
 
-public class OpenHandler extends AbstractHandler {
+public class DownloadHandler extends AbstractHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 		System.out.println("Executing " + event.getParameters());
+		SelectFolderForDownloadDialog myTitleAreaDialog = new SelectFolderForDownloadDialog(HandlerUtil.getActiveShellChecked(event));
+		myTitleAreaDialog.open();
 		return null;
 	}
 

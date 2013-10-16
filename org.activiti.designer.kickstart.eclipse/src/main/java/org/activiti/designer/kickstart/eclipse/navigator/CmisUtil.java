@@ -13,6 +13,7 @@
 package org.activiti.designer.kickstart.eclipse.navigator;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -116,6 +117,10 @@ public class CmisUtil {
 	  for (CmisObject cmisObject : cmisObjects) {
 	  	currentSession.delete(new ObjectIdImpl(cmisObject.getId()));
 	  }
+  }
+  
+  public static InputStream downloadDocument(Document document) {
+  	return currentSession.getContentStream(new ObjectIdImpl(document.getId())).getStream();
   }
   
 }

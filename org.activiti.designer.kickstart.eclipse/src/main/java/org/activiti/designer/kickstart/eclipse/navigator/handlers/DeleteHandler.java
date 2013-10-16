@@ -33,33 +33,6 @@ import org.eclipse.ui.handlers.HandlerUtil;
 
 public class DeleteHandler extends AbstractHandler {
 
-//	@Override
-//	public Object execute(ExecutionEvent event) throws ExecutionException {
-//
-//		List<CmisObject> selectedObjects = CmisNavigatorSelectionHolder.getInstance().getSelectedObjects();
-//		
-//		if (!selectedObjects.isEmpty()) {
-//			
-//			MessageDialog dialog = new MessageDialog(
-//					HandlerUtil.getActiveShellChecked(event),
-//					generateDialogTitle(selectedObjects),
-//					null, // icon
-//					generateDialogMessage(selectedObjects),
-//					MessageDialog.WARNING,
-//					new String[] { IDialogConstants.YES_LABEL, IDialogConstants.NO_LABEL }, 0);
-//
-//			int result = dialog.open();
-//			if (result == 0) { // 'YES'
-//				CmisUtil.deleteCmisObjects(selectedObjects);
-//				
-//				final IWorkbenchPart wbp = HandlerUtil.getActivePart(event);
-//				((CmisNavigator) wbp).getCommonViewer().getTree();
-//			}
-//		}
-//
-//		return this;
-//	}
-	
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
 

@@ -160,9 +160,9 @@
    <menuContribution
          locationURI="popup:org.activiti.designer.kickstart.cmisnavigator.view.popup">
       <command
-            commandId="org.activiti.designer.kickstart.cmisnavigator.command.open"
-            id="org.activiti.designer.kickstart.cmisnavigator.command.open"
-            label="Open"
+            commandId="org.activiti.designer.kickstart.cmisnavigator.command.download"
+            id="org.activiti.designer.kickstart.cmisnavigator.command.download"
+            label="Download"
             mnemonic="O"
             style="push">
       </command>
@@ -213,8 +213,8 @@
  <extension
       point="org.eclipse.ui.handlers">
    <handler
-         class="org.activiti.designer.kickstart.eclipse.navigator.handlers.OpenHandler"
-         commandId="org.activiti.designer.kickstart.cmisnavigator.command.open">
+         class="org.activiti.designer.kickstart.eclipse.navigator.handlers.DownloadHandler"
+         commandId="org.activiti.designer.kickstart.cmisnavigator.command.download">
       <activeWhen>
          <reference definitionId="org.activiti.designer.kickstart.cmisnavigator.isDocument" />
       </activeWhen>
