@@ -12,15 +12,32 @@
  */
 package org.activiti.designer.kickstart.eclipse.navigator.handlers;
 
+import org.activiti.designer.kickstart.eclipse.navigator.CmisNavigator;
+import org.activiti.designer.kickstart.eclipse.navigator.dialog.RenameDialog;
 import org.eclipse.core.commands.AbstractHandler;
 import org.eclipse.core.commands.ExecutionEvent;
 import org.eclipse.core.commands.ExecutionException;
+import org.eclipse.swt.widgets.Tree;
+import org.eclipse.swt.widgets.TreeItem;
+import org.eclipse.ui.IWorkbenchPart;
+import org.eclipse.ui.handlers.HandlerUtil;
 
 public class RenameHandler extends AbstractHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		System.out.println("Executing " + event.getParameters());
+		RenameDialog renameDialog = new RenameDialog(HandlerUtil.getActiveShellChecked(event));
+		renameDialog.open();
+		
+		// This is executed after close
+		IWorkbenchPart wbp = HandlerUtil.getActivePart(event);
+		Tree tree = ((CmisNavigator) wbp).getCommonViewer().getTree();
+		TreeItem[] selectedItems = tree.getSelection();
+		if (selectedItems != null && selectedItems.length > 0) {
+			TreeItem selectedItem = selectedItems[0]; // Can be only one for rename
+			selectedItem.setText(renameDialog.getName());
+		}
+		
 		return null;
 	}
 

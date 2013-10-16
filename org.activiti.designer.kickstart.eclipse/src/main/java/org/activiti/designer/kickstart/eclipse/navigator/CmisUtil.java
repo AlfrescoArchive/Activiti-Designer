@@ -123,4 +123,10 @@ public class CmisUtil {
   	return currentSession.getContentStream(new ObjectIdImpl(document.getId())).getStream();
   }
   
+  public static void renameCmisObject(CmisObject cmisObject, String newName) {
+  	Map<String, String> properties = new HashMap<String, String>();
+  	properties.put(PropertyIds.NAME, newName);
+  	cmisObject.updateProperties(properties);
+  }
+  
 }

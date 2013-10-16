@@ -203,10 +203,10 @@
          class="org.activiti.designer.kickstart.eclipse.navigator.handlers.RenameHandler"
          commandId="org.activiti.designer.kickstart.cmisnavigator.command.remame">
       <activeWhen>
-         <reference definitionId="org.activiti.designer.kickstart.cmisnavigator.isFolderOrDocument" />
+         <reference definitionId="org.activiti.designer.kickstart.cmisnavigator.isSingleElementFolderOrDocument" />
       </activeWhen>
       <enabledWhen>
-         <reference definitionId="org.activiti.designer.kickstart.cmisnavigator.isFolderOrDocument" />
+         <reference definitionId="org.activiti.designer.kickstart.cmisnavigator.isSingleElementFolderOrDocument" />
       </enabledWhen>
    </handler>
 </extension>
@@ -249,6 +249,19 @@
          		<instanceof value="org.apache.chemistry.opencmis.client.api.Document" />
          	</or>
          </iterate>
+      </with>
+   </definition>
+   <definition id="org.activiti.designer.kickstart.cmisnavigator.isSingleElementFolderOrDocument">
+      <with variable="selection">
+         <iterate ifEmpty="false">
+         	<or>
+         		<instanceof value="org.apache.chemistry.opencmis.client.api.Folder" />
+         		<instanceof value="org.apache.chemistry.opencmis.client.api.Document" />
+         	</or>
+         </iterate>
+         <count
+               value="1">
+         </count>
       </with>
    </definition>
 </extension>

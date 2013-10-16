@@ -36,6 +36,9 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.dnd.DND;
+import org.eclipse.swt.dnd.TextTransfer;
+import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
@@ -73,14 +76,19 @@ public class SelectFolderForDownloadDialog extends TitleAreaDialog {
     container.setLayout(layout);
 
     // Project tree viewer
-    final TreeViewer tv = new TreeViewer(container, SWT.SINGLE);
-    tv.getTree().setLayoutData(new GridData(GridData.FILL_BOTH));
-    tv.setContentProvider(new FileTreeContentProvider());
-    tv.setLabelProvider(WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider());
-    tv.setInput(ResourcesPlugin.getWorkspace());
+    final TreeViewer projectTreeViewer = new TreeViewer(container, SWT.SINGLE| SWT.H_SCROLL | SWT.V_SCROLL);
+    projectTreeViewer.getTree().setLayoutData(new GridData(GridData.FILL_BOTH));
+    projectTreeViewer.setContentProvider(new FileTreeContentProvider());
+    projectTreeViewer.setLabelProvider(WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider());
+    projectTreeViewer.setInput(ResourcesPlugin.getWorkspace());
+    
+    // DnD support
+    int operations = DND.DROP_COPY| DND.DROP_MOVE;
+    Transfer[] transferTypes = new Transfer[]{TextTransfer.getInstance()};
+    projectTreeViewer.addDragSupport(operations, transferTypes , null);
     
     // Selection listener for folders
-    tv.addSelectionChangedListener(new ISelectionChangedListener() {
+    projectTreeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			
 			@Override
 			public void selectionChanged(SelectionChangedEvent event) {
@@ -164,11 +172,6 @@ public class SelectFolderForDownloadDialog extends TitleAreaDialog {
     return true;
   }
 
-  @Override
-  protected void okPressed() {
-    super.okPressed();
-  }
-  
   @Override
   protected Point getInitialSize() {
     return new Point(600, 500);

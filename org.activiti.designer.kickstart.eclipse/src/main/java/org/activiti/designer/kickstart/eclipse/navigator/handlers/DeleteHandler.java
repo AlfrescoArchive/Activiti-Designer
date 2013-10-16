@@ -17,7 +17,6 @@ import java.util.List;
 import org.activiti.designer.kickstart.eclipse.navigator.CmisNavigator;
 import org.activiti.designer.kickstart.eclipse.navigator.CmisNavigatorSelectionHolder;
 import org.activiti.designer.kickstart.eclipse.navigator.CmisUtil;
-import org.activiti.designer.kickstart.eclipse.navigator.ContentProvider;
 import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;

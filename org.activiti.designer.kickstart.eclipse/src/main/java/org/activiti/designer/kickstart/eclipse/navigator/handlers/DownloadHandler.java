@@ -22,9 +22,8 @@ public class DownloadHandler extends AbstractHandler {
 
 	@Override
 	public Object execute(ExecutionEvent event) throws ExecutionException {
-		System.out.println("Executing " + event.getParameters());
-		SelectFolderForDownloadDialog myTitleAreaDialog = new SelectFolderForDownloadDialog(HandlerUtil.getActiveShellChecked(event));
-		myTitleAreaDialog.open();
+		SelectFolderForDownloadDialog selectFolderDialog = new SelectFolderForDownloadDialog(HandlerUtil.getActiveShellChecked(event));
+		selectFolderDialog.open();
 		return null;
 	}
 
