@@ -11,23 +11,9 @@
  * limitations under the License.
  */
 package org.activiti.designer.kickstart.eclipse.navigator.dialog;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.activiti.designer.kickstart.eclipse.navigator.CmisNavigatorSelectionHolder;
-import org.activiti.designer.kickstart.eclipse.navigator.CmisUtil;
-import org.apache.chemistry.opencmis.client.api.CmisObject;
-import org.apache.chemistry.opencmis.client.api.Document;
 import org.eclipse.core.resources.IContainer;
-import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Path;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
@@ -36,9 +22,6 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.dnd.DND;
-import org.eclipse.swt.dnd.TextTransfer;
-import org.eclipse.swt.dnd.Transfer;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
@@ -82,11 +65,11 @@ public class SelectFolderForDownloadDialog extends TitleAreaDialog {
     projectTreeViewer.setLabelProvider(WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider());
     projectTreeViewer.setInput(ResourcesPlugin.getWorkspace());
     
-    // DnD support
-    int operations = DND.DROP_COPY| DND.DROP_MOVE;
-    Transfer[] transferTypes = new Transfer[]{TextTransfer.getInstance()};
-    projectTreeViewer.addDragSupport(operations, transferTypes , null);
-    
+//    // DnD support
+//    int operations = DND.DROP_COPY| DND.DROP_MOVE;
+//    Transfer[] transferTypes = new Transfer[]{ResourceTransfer.getInstance()};
+//    projectTreeViewer.addDragSupport(operations, transferTypes , null);
+//    
     // Selection listener for folders
     projectTreeViewer.addSelectionChangedListener(new ISelectionChangedListener() {
 			
@@ -129,36 +112,7 @@ public class SelectFolderForDownloadDialog extends TitleAreaDialog {
     	public void widgetSelected(SelectionEvent e) {
     		if (currentlySelectedResource instanceof IContainer) {
 
-    			Job job = new Job("Downloading files") {
-    			  
-    			  @Override
-    			  protected IStatus run(IProgressMonitor monitor) {
-    			    monitor.beginTask("Downloading files", IProgressMonitor.UNKNOWN);
-    			    
-    			    List<CmisObject> selectedObjects = new ArrayList<CmisObject>(CmisNavigatorSelectionHolder.getInstance().getSelectedObjects()); // need to clone list to avoid concurrent modification
-        			for (CmisObject cmisObject : selectedObjects) {
-        				if (cmisObject instanceof Document) {
-        					Document document = (Document) cmisObject;
-        					
-        					IContainer container = (IContainer) currentlySelectedResource;
-    		    			IFile file = container.getFile(new Path(document.getName()));
-    		    			
-    		    			// TODO: handle file exists
-    		    			if (!file.exists()) {
-    		    				try {
-    			            file.create(CmisUtil.downloadDocument(document), true, null);
-    		            } catch (CoreException e1) {
-    			            e1.printStackTrace();
-    		            }
-    		    			}
-        				}
-        			}
-    			    
-    			    return Status.OK_STATUS;
-    			  }
-    			  
-    			};
-
+    			DownloadCurrentlySelectedFilesJob job = new DownloadCurrentlySelectedFilesJob(getShell(), (IContainer) currentlySelectedResource);
     			job.setUser(true);
     			job.schedule();
     			
