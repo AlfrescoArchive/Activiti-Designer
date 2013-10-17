@@ -17,7 +17,10 @@ import org.eclipse.core.resources.ResourcesPlugin;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.IMessageProvider;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
+import org.eclipse.jface.viewers.DoubleClickEvent;
+import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
+import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeSelection;
 import org.eclipse.jface.viewers.TreeViewer;
@@ -64,6 +67,18 @@ public class SelectFolderForDownloadDialog extends TitleAreaDialog {
     projectTreeViewer.setContentProvider(new FileTreeContentProvider());
     projectTreeViewer.setLabelProvider(WorkbenchLabelProvider.getDecoratingWorkbenchLabelProvider());
     projectTreeViewer.setInput(ResourcesPlugin.getWorkspace());
+    
+    // Expand current selection on double click
+    projectTreeViewer.addDoubleClickListener(new IDoubleClickListener() {
+      @Override
+      public void doubleClick(DoubleClickEvent event) {
+        TreeViewer viewer = (TreeViewer) event.getViewer();
+        IStructuredSelection thisSelection = (IStructuredSelection) event.getSelection(); 
+        Object selectedNode = thisSelection.getFirstElement(); 
+        viewer.setExpandedState(selectedNode,
+            !viewer.getExpandedState(selectedNode));
+      }
+    }); 
     
 //    // DnD support
 //    int operations = DND.DROP_COPY| DND.DROP_MOVE;
