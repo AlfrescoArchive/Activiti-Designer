@@ -22,12 +22,12 @@ public class CreateHumanStepFeature extends AbstractCreateStepDefinitionFeature 
   @Override
   protected StepDefinition createStepDefinition(ICreateContext context) {
     AbstractNamedStepDefinition definition = new HumanStepDefinition();
-    definition.setName("Step name");
+    definition.setName("Human step");
     return definition;
   }
 
   @Override
   public String getCreateImageId() {
-    return KickstartProcessPluginImage.IMG_SERVICETASK.getImageKey();
+    return KickstartProcessPluginImage.HUMAN_STEP_ICON.getImageKey();
   }
 }

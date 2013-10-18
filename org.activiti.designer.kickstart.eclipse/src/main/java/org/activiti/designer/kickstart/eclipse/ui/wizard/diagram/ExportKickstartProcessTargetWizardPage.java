@@ -121,8 +121,6 @@ public class ExportKickstartProcessTargetWizardPage extends WizardPage {
     return shareFolderSelect.getCurrentPath();
   }
   
-  
-  
   protected void createLabel(String text, Control control, Composite parent) {
     Label label = new Label(parent, SWT.NONE | SWT.WRAP);
     label.setText(text);

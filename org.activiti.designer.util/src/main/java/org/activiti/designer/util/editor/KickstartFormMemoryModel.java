@@ -14,6 +14,8 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 public class KickstartFormMemoryModel {
 
   public static final String INFO_GROUP_ID = "info";
+  public static final String KICKSTART_FORM_CONTENT_TYPE = "org.activiti.designer.kickstart.editor.form.contenttype";
+  
   protected IFeatureProvider featureProvider;
   protected IFile modelFile;
   protected FormDefinition formDefinition;

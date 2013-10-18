@@ -2,6 +2,7 @@ package org.activiti.designer.kickstart.process.features;
 
 import org.activiti.designer.kickstart.process.diagram.KickstartProcessFeatureProvider;
 import org.activiti.designer.kickstart.process.diagram.shape.BusinessObjectShapeController;
+import org.activiti.workflow.simple.definition.StepDefinition;
 import org.eclipse.graphiti.features.IReason;
 import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.features.impl.AbstractUpdateFeature;
@@ -23,7 +24,7 @@ public class UpdateStepDefinitionFeature extends AbstractUpdateFeature {
   @Override
   public boolean canUpdate(IUpdateContext context) {
     Object bo = getBusinessObjectForPictogramElement(context.getPictogramElement());
-    return ((KickstartProcessFeatureProvider)getFeatureProvider()).hasShapeController(bo);
+    return bo instanceof StepDefinition && ((KickstartProcessFeatureProvider)getFeatureProvider()).hasShapeController(bo);
   }
 
   @Override

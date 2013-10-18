@@ -7,10 +7,12 @@ import java.lang.reflect.InvocationTargetException;
 import org.activiti.designer.kickstart.eclipse.Logger;
 import org.activiti.designer.kickstart.eclipse.common.KickstartPlugin;
 import org.activiti.designer.kickstart.eclipse.util.KickstartConstants;
+import org.activiti.designer.util.editor.KickstartProcessMemoryModel;
 import org.activiti.workflow.simple.alfresco.conversion.AlfrescoWorkflowDefinitionConversionFactory;
 import org.activiti.workflow.simple.converter.WorkflowDefinitionConversion;
 import org.activiti.workflow.simple.converter.json.SimpleWorkflowJsonConverter;
 import org.activiti.workflow.simple.definition.HumanStepDefinition;
+import org.activiti.workflow.simple.definition.StepDefinition;
 import org.activiti.workflow.simple.definition.WorkflowDefinition;
 import org.activiti.workflow.simple.definition.form.FormDefinition;
 import org.apache.commons.lang.StringUtils;
@@ -21,6 +23,7 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
@@ -35,6 +38,8 @@ public class ExportKickstartProcessWizard extends Wizard implements IExportWizar
 
   public static final String EXPORT_WIZARD_TITLE = "Export Kickstart Process";
 
+  // TODO: use shared constants
+  public static final String PARAMETER_FORM_REFERENCE = "form-reference";
   protected IProject project;
   protected IResource processResource;
 
@@ -134,37 +139,38 @@ public class ExportKickstartProcessWizard extends Wizard implements IExportWizar
         AlfrescoWorkflowDefinitionConversionFactory factory = new AlfrescoWorkflowDefinitionConversionFactory();
 
         SimpleWorkflowJsonConverter converter = new SimpleWorkflowJsonConverter();
-// TODO: bring back to life after actual process-editor supports forms
-//        FileInputStream fis = new FileInputStream(processResource.getLocation().toFile());
-//        WorkflowDefinition definition = converter.readWorkflowDefinition(fis);
+        FileInputStream fis = new FileInputStream(processResource.getLocation().toFile());
+        WorkflowDefinition definition = converter.readWorkflowDefinition(fis);
+        
+        // Add start-form, if any
+        if(definition.getParameters().containsKey(PARAMETER_FORM_REFERENCE)) {
+          String startFormPath = (String) definition.getParameters().get(PARAMETER_FORM_REFERENCE);
+          IFile startFormFile = project.getFile(new Path(startFormPath));
+          FormDefinition startForm = converter.readFormDefinition(new FileInputStream(startFormFile.getLocation().toFile()));
+          definition.setStartFormDefinition(startForm);
+          System.out.println("Using start-form: " + startFormFile);
+        }
 
-        WorkflowDefinition definition = new WorkflowDefinition();
-        definition.setName("A custom process");
-        definition.setDescription("Custom process created in kickstart");
-        definition.setId("process");
-        HumanStepDefinition humanStep = new HumanStepDefinition();
-        humanStep.setName("First step");
-        humanStep.setId("step1");
-        definition.addStep(humanStep);
-        
-        HumanStepDefinition secondStep = new HumanStepDefinition();
-        secondStep.setName("Second step");
-        secondStep.setId("step2");
-        definition.addStep(secondStep);
-        
-        // Read start and human form from fixed files in workspace
-        IResource startFormResource = project.getFile("start-form.kickform");
-        IResource taskFormResource = project.getFile("form.kickform");
-        IResource secondTaskResource = project.getFile("second-form.kickform");
-        
-        FormDefinition startForm = converter.readFormDefinition(new FileInputStream(startFormResource.getLocation().toFile()));
-        FormDefinition taskForm = converter.readFormDefinition(new FileInputStream(taskFormResource.getLocation().toFile()));
-        FormDefinition secondTaskForm = converter.readFormDefinition(new FileInputStream(secondTaskResource.getLocation().toFile()));
-        
-        definition.setStartFormDefinition(startForm);
-        humanStep.setForm(taskForm);
-        secondStep.setForm(secondTaskForm);
+        // Add all forms
+        for(StepDefinition step : definition.getSteps()) {
+          if(step instanceof HumanStepDefinition) {
+            HumanStepDefinition humanStep = (HumanStepDefinition) step;
             
+            // TODO: REMOVE
+            if(humanStep.getId() == null) {
+              humanStep.setId(humanStep.getName().replace(" ", "").toLowerCase());
+            }
+            
+            if(humanStep.getParameters().containsKey(PARAMETER_FORM_REFERENCE)) {
+              String formPath = (String) humanStep.getParameters().get(PARAMETER_FORM_REFERENCE);
+              IFile formFile = project.getFile(new Path(formPath));
+              FormDefinition form = converter.readFormDefinition(new FileInputStream(formFile.getLocation().toFile()));
+              humanStep.setForm(form);
+              
+              System.out.println("Using form: " + formFile);
+            }
+          }
+        }
             
         WorkflowDefinitionConversion definitionConversion = factory.createWorkflowDefinitionConversion(definition);
         definitionConversion.convert();
@@ -251,7 +257,7 @@ public class ExportKickstartProcessWizard extends Wizard implements IExportWizar
             IContentDescription contentDescription = resourceFile.getContentDescription();
             if (contentDescription != null
                 && contentDescription.getContentType() != null
-                && KickstartConstants.KICKSTART_PROCESS_CONTENT_TYPE
+                && KickstartProcessMemoryModel.KICKSTART_PROCESS_CONTENT_TYPE
                     .equals(contentDescription.getContentType().getId())) {
               processResource = selectedResource;
             }

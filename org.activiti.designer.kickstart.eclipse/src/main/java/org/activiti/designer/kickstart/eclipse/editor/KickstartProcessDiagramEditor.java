@@ -193,7 +193,6 @@ public class KickstartProcessDiagramEditor extends DiagramEditor {
   private void importDiagram(final KickstartProcessMemoryModel model) {
     final Diagram diagram = getDiagramTypeProvider().getDiagram();
     diagram.setActive(true);
-
     getEditingDomain().getCommandStack().execute(new RecordingCommand(getEditingDomain()) {
 
       @Override

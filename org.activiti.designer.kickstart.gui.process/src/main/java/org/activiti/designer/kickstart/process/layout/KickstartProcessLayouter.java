@@ -16,10 +16,10 @@ import org.eclipse.graphiti.mm.pictograms.Shape;
  */
 public class KickstartProcessLayouter {
 
-  private SingleColumnFormLayout defaultLayout;
+  private SingleColumnProcessLayout defaultLayout;
   
   public KickstartProcessLayouter() {
-    defaultLayout = new SingleColumnFormLayout();
+    defaultLayout = new SingleColumnProcessLayout();
   }
   
   /**

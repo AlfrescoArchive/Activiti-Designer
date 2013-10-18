@@ -8,12 +8,13 @@ import java.util.Map;
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.workflow.simple.definition.StepDefinition;
 import org.activiti.workflow.simple.definition.WorkflowDefinition;
-import org.activiti.workflow.simple.definition.form.FormDefinition;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.graphiti.features.IFeatureProvider;
 
 public class KickstartProcessMemoryModel {
+  
+    public static final String KICKSTART_PROCESS_CONTENT_TYPE = "org.activiti.designer.kickstart.editor.process.contenttype";
   
 	protected IFeatureProvider featureProvider;
 	protected IFile modelFile;
@@ -38,10 +39,20 @@ public class KickstartProcessMemoryModel {
   /**
    * @return true, if the model can be used to be updated. If false is returned,
    * no changes should be made to this model and an exception will be thrown when
-   * the {@link FormDefinition} is accessed.
+   * the {@link WorkflowDefinition} is accessed.
    */
   public boolean isInitialized() {
     return initialized;
+  }
+  
+  public void addModelListener(KickstartProcessModelListener listener) {
+    if(!modelListeners.contains(listener)) {
+      modelListeners.add(listener);
+    }
+  }
+  
+  public void removeModelListener(KickstartProcessModelListener listener) {
+    modelListeners.remove(listener);
   }
   
   /**
@@ -50,7 +61,7 @@ public class KickstartProcessMemoryModel {
    */
   public void modelObjectUpdated(Object modelObject) {
     if (modelObject != null) {
-      if (modelObject instanceof StepDefinition) {
+      if (modelObject instanceof StepDefinition || modelObject instanceof WorkflowDefinition) {
         if (!modelListeners.isEmpty()) {
           // Create a copy of the listener-list, to prevent ConcurrentModificationExcepcions
           // when iterating the listeners and a listener is added/removed during this process

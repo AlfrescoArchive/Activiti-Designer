@@ -5,7 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.activiti.designer.kickstart.eclipse.Logger;
-import org.activiti.designer.kickstart.eclipse.util.KickstartConstants;
+import org.activiti.designer.util.editor.KickstartProcessMemoryModel;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
@@ -148,7 +148,7 @@ public class ExportKickstartProcessWizardProcessPage extends WizardPage {
           addProcesses((IContainer) resource, processes);
         } else if (resource instanceof IFile) {
           description = ((IFile) resource).getContentDescription();
-          if(description != null && description.getContentType() != null && KickstartConstants.KICKSTART_PROCESS_CONTENT_TYPE.equals(
+          if(description != null && description.getContentType() != null && KickstartProcessMemoryModel.KICKSTART_PROCESS_CONTENT_TYPE.equals(
               description.getContentType().getId())) {
             processes.add(resource);
           }

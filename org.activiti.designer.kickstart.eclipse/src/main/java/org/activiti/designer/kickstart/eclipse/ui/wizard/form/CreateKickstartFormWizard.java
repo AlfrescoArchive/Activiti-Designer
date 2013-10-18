@@ -1,6 +1,7 @@
 package org.activiti.designer.kickstart.eclipse.ui.wizard.form;
 
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.IWorkbenchWindow;
@@ -15,9 +16,10 @@ import org.eclipse.ui.wizards.newresource.BasicNewFileResourceWizard;
  */
 // TODO: do NOT use BasicNewFileResourceWizard, as it's not made for extending. using now for
 // easy access to selectAndReveal() but that can be done using an IAction...
-public class CreateKickstartFormWizard extends BasicNewFileResourceWizard {
+public class CreateKickstartFormWizard extends BasicNewFileResourceWizard implements IAdaptable {
 
   private CreateKickstartFormNameWizardPage namePage;
+  private IFile file;
   
   @Override
   public void addPages() {
@@ -28,7 +30,7 @@ public class CreateKickstartFormWizard extends BasicNewFileResourceWizard {
   @Override
   public boolean performFinish() {
     // Create the file that has been selected in the "create file" page
-    IFile file = namePage.createNewFile();
+    file = namePage.createNewFile();
     
     if(file == null) {
       return false;
@@ -49,5 +51,14 @@ public class CreateKickstartFormWizard extends BasicNewFileResourceWizard {
       MessageDialog.openError(getShell(), "Error while ", e.getMessage());
     }
     return true;
+  }
+
+  @Override
+  @SuppressWarnings("rawtypes")
+  public Object getAdapter(Class adapter) {
+    if(IFile.class.equals(adapter)) {
+      return file;
+    }
+    return null;
   }
 }

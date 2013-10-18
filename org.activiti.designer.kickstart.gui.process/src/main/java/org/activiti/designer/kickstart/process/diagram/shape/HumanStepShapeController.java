@@ -5,7 +5,6 @@ import org.activiti.designer.kickstart.process.util.StepDefinitionStyles;
 import org.activiti.designer.util.platform.OSEnum;
 import org.activiti.designer.util.platform.OSUtil;
 import org.activiti.workflow.simple.definition.HumanStepDefinition;
-import org.activiti.workflow.simple.definition.form.TextPropertyDefinition;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
@@ -22,7 +21,7 @@ import org.eclipse.graphiti.services.IPeCreateService;
 
 /**
  * A {@link BusinessObjectShapeController} capable of creating and updating shapes for
- * {@link TextPropertyDefinition} objects.
+ * {@link HumanStepDefinition} objects.
  *  
  * @author Tijs Rademakers
  */

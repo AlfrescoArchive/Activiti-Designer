@@ -20,7 +20,7 @@ public class GroupSelectPropertySection extends AbstractKickstartFormComponentSe
     editableControl = createCheckboxControl("Editable");
     mandatoryControl = createCheckboxControl("Mandatory");
     createSeparator();
-    manyControl = createCheckboxControl("Allow selecting multiple people");
+    manyControl = createCheckboxControl("Allow selecting multiple groups");
   }
 
   @Override

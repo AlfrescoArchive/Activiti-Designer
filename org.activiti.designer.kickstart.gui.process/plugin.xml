@@ -45,20 +45,14 @@
             contributorId="KickstartProcessDiagram.PropertyContributor">
          <propertyTab
                category="Kickstart process"
-               id="org.activiti.designer.kickstart.generalTab"
+               id="org.activiti.designer.kickstart.process.generalTab"
                label="General">
          </propertyTab>
          <propertyTab
-               afterTab="org.activiti.designer.kickstart.generalTab"
+               afterTab="org.activiti.designer.kickstart.process.generalTab"
                category="Kickstart process"
-               id="org.activiti.designer.kickstart.processTab"
-               label="Process">
-         </propertyTab>
-         <propertyTab
-               afterTab="org.activiti.designer.kickstart.generalTab"
-               category="Kickstart process"
-               id="org.activiti.designer.kickstart.mainConfigTab"
-               label="Main config">
+               id="org.activiti.designer.kickstart.process.assignmentTab"
+               label="Assignment">
          </propertyTab>
          
       </propertyTabs>
@@ -67,16 +61,38 @@
          point="org.eclipse.ui.views.properties.tabbed.propertySections">
       <propertySections
             contributorId="KickstartProcessDiagram.PropertyContributor">
+         <propertySection
+               class="org.activiti.designer.kickstart.process.property.WorkflowDefinitionPropertySection"
+               filter="org.activiti.designer.kickstart.process.property.WorkflowDefinitionPropertyFilter"
+               id="org.activiti.designer.kickstart.process.workflowDefinition"
+               tab="org.activiti.designer.kickstart.process.generalTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.kickstart.process.property.NamedStepDefinitionPropertySection"
+               filter="org.activiti.designer.kickstart.process.property.NamedStepDefinitionPropertyFilter"
+               id="org.activiti.designer.kickstart.process.namedStepDefinition"
+               tab="org.activiti.designer.kickstart.process.generalTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.kickstart.process.property.WorkflowDefinitionFormPropertySection"
+               filter="org.activiti.designer.kickstart.process.property.WorkflowDefinitionPropertyFilter"
+               id="org.activiti.designer.kickstart.process.workflowDefinitionForm"
+               tab="org.activiti.designer.kickstart.process.generalTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.kickstart.process.property.HumanStepDefinitionFormPropertySection"
+               filter="org.activiti.designer.kickstart.process.property.HumanStepDefinitionPropertyFilter"
+               id="org.activiti.designer.kickstart.process.humanStepDefinitionForm"
+               tab="org.activiti.designer.kickstart.process.generalTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.kickstart.process.property.HumanStepAssignmentPropertySection"
+               filter="org.activiti.designer.kickstart.process.property.HumanStepDefinitionPropertyFilter"
+               id="org.activiti.designer.kickstart.process.humanStepDefinitionAssignment"
+               tab="org.activiti.designer.kickstart.process.assignmentTab">
+         </propertySection>
          
       </propertySections>
-   </extension>
-   <extension
-         id="org.activiti.designer.kickstart.iconProvider"
-         name="Kickstart Process Icon Provider"
-         point="org.activiti.designer.eclipse.extension.IconProvider">
-      <ImageProvider
-            class="org.activiti.designer.kickstart.process.diagram.DefaultIconProvider">
-      </ImageProvider>
    </extension>
 
 </plugin>
