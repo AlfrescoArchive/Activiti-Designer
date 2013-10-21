@@ -20,7 +20,11 @@ public enum Preferences {
   EDITOR_ADD_LABELS_TO_NEW_SEQUENCEFLOWS("org.activiti.designer.preferences.editor.addLabelsToNewSequenceFlows"), 
   EDITOR_ADD_DEFAULT_CONTENT_TO_DIAGRAMS("org.activiti.designer.preferences.editor.addDefaultContentToDiagrams"), 
   SAVE_TO_FORMAT("org.activiti.designer.preferences.save.saveToFormat"), 
-  SAVE_IMAGE("org.activiti.designer.preferences.save.imageFormat");
+  SAVE_IMAGE("org.activiti.designer.preferences.save.imageFormat"),
+  
+  CMIS_URL("org.activiti.designer.kickstart.preferences.cmis.url"),
+  CMIS_USERNAME("org.activiti.designer.kickstart.preferences.cmis.username"),
+  CMIS_PASSWORD("org.activiti.designer.kickstart.preferences.cmis.password");
 
   private String preferenceId;
 

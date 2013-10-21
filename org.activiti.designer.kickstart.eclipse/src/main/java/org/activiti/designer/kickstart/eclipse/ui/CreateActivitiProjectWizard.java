@@ -48,46 +48,6 @@ public class CreateActivitiProjectWizard extends BasicNewProjectResourceWizard {
 			createSourceFolders(newProject);
 			createOutputLocation(javaProject);
 
-			IFile pomFile = newProject.getFile("pom.xml");
-			InputStream pomSource = new ByteArrayInputStream(createPOMFile().getBytes());
-			pomFile.create(pomSource, true, null);
-			pomSource.close();
-
-			String[] userLibraryNames = JavaCore.getUserLibraryNames();
-			boolean activitiExtensionLibraryPresent = false;
-			if(userLibraryNames != null && userLibraryNames.length > 0) {
-			  for(String userLibraryName : userLibraryNames) {
-			    if(KickstartPlugin.USER_LIBRARY_NAME_EXTENSIONS.equals(userLibraryName)) {
-			      activitiExtensionLibraryPresent = true;
-			    }
-			  }
-			}
-
-			if(activitiExtensionLibraryPresent == false) {
-  			ClasspathContainerInitializer initializer = JavaCore.getClasspathContainerInitializer(JavaCore.USER_LIBRARY_CONTAINER_ID);
-  			IPath containerPath = new Path(JavaCore.USER_LIBRARY_CONTAINER_ID);
-  			initializer.requestClasspathContainerUpdate(containerPath.append(KickstartPlugin.USER_LIBRARY_NAME_EXTENSIONS),
-  			        null, new IClasspathContainer() {
-
-  			  @Override
-          public IPath getPath() {
-  			    return new Path(JavaCore.USER_LIBRARY_CONTAINER_ID).append(KickstartPlugin.USER_LIBRARY_NAME_EXTENSIONS) ;
-  			  }
-  			  @Override
-          public int getKind() {
-  			    return K_APPLICATION;
-  			  }
-  			  @Override
-          public String getDescription() {
-  			    return KickstartPlugin.USER_LIBRARY_NAME_EXTENSIONS;
-  			  }
-  			  @Override
-          public IClasspathEntry[] getClasspathEntries() {
-  			    return new IClasspathEntry[] {};
-  			  }
-  			});
-			}
-
 			IClasspathEntry[] entries = createClasspathEntries(javaProject);
 
 			javaProject.setRawClasspath(entries, null);
@@ -109,13 +69,11 @@ public class CreateActivitiProjectWizard extends BasicNewProjectResourceWizard {
 		IPath[] javaPath = new IPath[] { new Path("**/*.java") };
 		IPath testOutputLocation = javaProject.getPath().append("target/test-classes");
 
-		IPath srcPathUserLibrary = new Path(KickstartPlugin.DESIGNER_EXTENSIONS_USER_LIB_PATH);
-
 		IClasspathEntry[] entries = { JavaCore.newSourceEntry(srcPath1, javaPath, null, null),
 				JavaCore.newSourceEntry(srcPath2, javaPath),
 				JavaCore.newSourceEntry(srcPath3, javaPath, null, testOutputLocation),
 				JavaCore.newSourceEntry(srcPath4, javaPath, testOutputLocation),
-				JavaRuntime.getDefaultJREContainerEntry(), JavaCore.newContainerEntry(srcPathUserLibrary) };
+				JavaRuntime.getDefaultJREContainerEntry() };
 
 		return entries;
 	}
@@ -144,75 +102,4 @@ public class CreateActivitiProjectWizard extends BasicNewProjectResourceWizard {
 		IPath targetPath = javaProject.getPath().append("target/classes");
 		javaProject.setOutputLocation(targetPath, null);
 	}
-
-	private String createPOMFile() {
-		StringBuilder buffer = new StringBuilder();
-		buffer.append("<project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n");
-		buffer.append("    xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd\">\n");
-		buffer.append("  <modelVersion>4.0.0</modelVersion>\n");
-		buffer.append("  <groupId>org.activiti.examples</groupId>\n");
-		buffer.append("  <artifactId>activiti-examples</artifactId>\n");
-		buffer.append("  <version>1.0-SNAPSHOT</version>\n");
-		buffer.append("  <packaging>jar</packaging>\n");
-		buffer.append("  <name>BPMN 2.0 with Activiti - Examples</name>\n");
-		buffer.append("  <properties>\n");
-		buffer.append("    <activiti-version>5.9</activiti-version>\n");
-		buffer.append("  </properties>\n");
-		buffer.append("  <dependencies>\n");
-		addDependency(buffer, "org.activiti", "activiti-engine", "${activiti-version}");
-		addDependency(buffer, "org.activiti", "activiti-spring", "${activiti-version}");
-		addDependency(buffer, "org.codehaus.groovy", "groovy", "1.7.5");
-		addDependency(buffer, "hsqldb", "hsqldb", "1.8.0.7");
-		addDependency(buffer, "com.h2database", "h2", "1.2.132");
-		addDependency(buffer, "junit", "junit", "4.8.1");
-		buffer.append("  </dependencies>\n");
-		buffer.append("	 <repositories>\n");
-		buffer.append("    <repository>\n");
-		buffer.append("      <id>Activiti</id>\n");
-		buffer.append("      <url>http://maven.alfresco.com/nexus/content/repositories/activiti</url>\n");
-		buffer.append("	   </repository>\n");
-		buffer.append("	 </repositories>\n");
-		buffer.append("	 <build>\n");
-		buffer.append("    <plugins>\n");
-		buffer.append("      <plugin>\n");
-		buffer.append("        <groupId>org.apache.maven.plugins</groupId>\n");
-		buffer.append("        <artifactId>maven-compiler-plugin</artifactId>\n");
-		buffer.append("	       <version>2.3.2</version>\n");
-		buffer.append("        <configuration>\n");
-		buffer.append("	         <source>1.6</source>\n");
-		buffer.append("	         <target>1.6</target>\n");
-		buffer.append("	       </configuration>\n");
-		buffer.append("	     </plugin>\n");
-		buffer.append("	     <plugin>\n");
-		buffer.append("        <groupId>org.apache.maven.plugins</groupId>\n");
-		buffer.append("        <artifactId>maven-eclipse-plugin</artifactId>\n");
-		buffer.append("        <inherited>true</inherited>\n");
-		buffer.append("        <configuration>\n");
-		buffer.append("	         <classpathContainers>\n");
-		buffer.append("	           <classpathContainer>");
-		buffer.append(KickstartPlugin.DESIGNER_EXTENSIONS_USER_LIB_PATH);
-		buffer.append("</classpathContainer>\n");
-		buffer.append("	         </classpathContainers>\n");
-		buffer.append("	       </configuration>\n");
-		buffer.append("	     </plugin>\n");
-		buffer.append("    </plugins>\n");
-		buffer.append("	 </build>\n");
-		buffer.append("</project>\n");
-		return buffer.toString();
-	}
-
-	private void addDependency(StringBuilder buffer, String groupId, String artifactId, String version) {
-		buffer.append("    <dependency>\n")
-			.append("      <groupId>")
-			.append(groupId)
-			.append("</groupId>\n")
-			.append("      <artifactId>")
-			.append(artifactId)
-			.append("</artifactId>\n")
-			.append("      <version>")
-			.append(version)
-			.append("</version>\n")
-			.append("    </dependency>\n");
-	}
-
 }

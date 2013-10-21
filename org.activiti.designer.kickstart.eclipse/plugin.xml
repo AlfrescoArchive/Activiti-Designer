@@ -279,5 +279,19 @@
          name="Kickstart">
    </category>
 </extension>
+<extension
+      point="org.eclipse.ui.preferencePages">
+   <page
+         class="org.activiti.designer.kickstart.eclipse.preferences.KickstartPreferencePage"
+         id="org.activiti.designer.kickstart.preferences"
+         name="Kickstart settings">
+   </page>
+</extension>
+<extension
+      point="org.eclipse.core.runtime.preferences">
+   <initializer
+         class="org.activiti.designer.kickstart.eclipse.preferences.KickstartPreferencesPageInitializer">
+   </initializer>
+</extension>
  
 </plugin>

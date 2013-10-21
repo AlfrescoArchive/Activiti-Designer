@@ -105,11 +105,9 @@ public class CreateDefaultKickstartProjectWizard extends BasicNewProjectResource
     IPath[] javaPath = new IPath[] { new Path("**/*.java") };
     IPath testOutputLocation = javaProject.getPath().append("target/test-classes");
 
-    IPath srcPathUserLibrary = new Path(KickstartPlugin.DESIGNER_EXTENSIONS_USER_LIB_PATH);
-
     IClasspathEntry[] entries = { JavaCore.newSourceEntry(srcPath1, javaPath, null, null), JavaCore.newSourceEntry(srcPath2, javaPath),
         JavaCore.newSourceEntry(srcPath3, javaPath, null, testOutputLocation), JavaCore.newSourceEntry(srcPath4, javaPath, testOutputLocation),
-        JavaRuntime.getDefaultJREContainerEntry(), JavaCore.newContainerEntry(srcPathUserLibrary) };
+        JavaRuntime.getDefaultJREContainerEntry() };
 
     return entries;
   }

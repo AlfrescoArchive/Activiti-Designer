@@ -15,17 +15,7 @@ import org.osgi.framework.BundleContext;
 
 public class KickstartPlugin extends AbstractUIPlugin {
 
-  public static final String PLUGIN_ID = "org.activiti.designer.eclipse"; //$NON-NLS-1$
-
-  public static final String GUI_PLUGIN_ID = "org.activiti.designer.gui"; //$NON-NLS-1$
-
-  /**
-   * The name used for the user library that contains extensions for the
-   * Activiti Designer.
-   */
-  public static final String USER_LIBRARY_NAME_EXTENSIONS = "Activiti Designer Extensions";
-
-  public static final String DESIGNER_EXTENSIONS_USER_LIB_PATH = "org.eclipse.jdt.USER_LIBRARY/" + USER_LIBRARY_NAME_EXTENSIONS;
+  public static final String PLUGIN_ID = "org.activiti.designer.kickstart.eclipse"; //$NON-NLS-1$
 
   private static KickstartPlugin _plugin;
 
