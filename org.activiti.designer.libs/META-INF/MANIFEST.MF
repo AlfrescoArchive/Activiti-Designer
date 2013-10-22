@@ -52,7 +52,9 @@ Export-Package: org.activiti.bpmn,
  org.apache.chemistry.opencmis.commons,
  org.apache.chemistry.opencmis.commons.data,
  org.apache.chemistry.opencmis.commons.definitions,
- org.apache.chemistry.opencmis.commons.enums
+ org.apache.chemistry.opencmis.commons.enums,
+ org.apache.chemistry.opencmis.commons.exceptions,
+ org.apache.chemistry.opencmis.commons.impl.dataobjects
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.apache.commons.lang
 Bundle-Vendor: Activiti

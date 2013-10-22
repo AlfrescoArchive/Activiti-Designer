@@ -15,6 +15,8 @@ package org.activiti.designer.kickstart.eclipse.navigator;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.activiti.designer.kickstart.eclipse.preferences.PreferencesUtil;
+import org.activiti.designer.util.preferences.Preferences;
 import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
@@ -23,16 +25,27 @@ import org.apache.chemistry.opencmis.client.api.Session;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
-public class ContentProvider implements ITreeContentProvider {
+public class CmisContentProvider implements ITreeContentProvider {
 
 	private static final Object[] EMPTY_ARRAY = new Object[0];
 	
-	private Session cmisSession;
+	protected Session cmisSession;
 	
-	private List<CmisObject> rootElements;
+	protected List<CmisObject> rootElements;
 	
-	public ContentProvider() {
-		System.out.println("Content provider wordt aangemaakt");
+	protected boolean onlyFolders;
+	protected String fileExtension;
+	
+	public CmisContentProvider() {
+	}
+	
+	public CmisContentProvider(boolean onlyFolders) {
+		this.onlyFolders = onlyFolders;
+	}
+	
+	public CmisContentProvider(String fileExtension) {
+		this.onlyFolders = false;
+		this.fileExtension = fileExtension;
 	}
 
 	public Object[] getChildren(Object parentElement) {
@@ -49,7 +62,12 @@ public class ContentProvider implements ITreeContentProvider {
 			ItemIterable<CmisObject> children = folder.getChildren();
 			List<CmisObject> childCmisObjects = new ArrayList<CmisObject>();
 			for (CmisObject childCmisObject : children) {
-				childCmisObjects.add(childCmisObject);
+				if ( (childCmisObject instanceof Folder) // Folders are always added
+						|| (childCmisObject instanceof Document && fileExtension == null && !onlyFolders) // Child is a document, but we dont care about the extension
+						|| (childCmisObject instanceof Document && fileExtension != null &&
+								childCmisObject.getName().endsWith(fileExtension)) ) { // Child is a document, and has the wanted file extension
+					childCmisObjects.add(childCmisObject);
+				}
 			}
 			return childCmisObjects.toArray();
 			
@@ -84,7 +102,6 @@ public class ContentProvider implements ITreeContentProvider {
 
 	public void dispose() {
 		this.cmisSession = null;
-//		this.parents = null;
 		this.rootElements = null;
 	}
 
@@ -92,8 +109,11 @@ public class ContentProvider implements ITreeContentProvider {
 	}
 
 	private void initializeRootElements() {
-		System.out.println("Initializing session");
-		cmisSession = CmisUtil.createCmisSession("admin", "admin", "http://localhost:8080/alfresco/service/cmis");
+		String url = PreferencesUtil.getStringPreference(Preferences.CMIS_URL);
+		String userName = PreferencesUtil.getStringPreference(Preferences.CMIS_USERNAME);
+		String password = PreferencesUtil.getStringPreference(Preferences.CMIS_PASSWORD);
+		
+		cmisSession = CmisUtil.createCmisSession(userName, password, url);
 		this.rootElements = CmisUtil.getRootElements();
 	}
 

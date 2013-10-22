@@ -18,15 +18,17 @@ import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.ui.navigator.CommonNavigator;
 
 public class CmisNavigator extends CommonNavigator {
-	
+
 	public CmisNavigator() {
-		System.out.println("----> NAVIGATOR wordt aangemaakt");
 	}
-	
+
 	protected Object getInitialInput() {
-		getCommonViewer().addSelectionChangedListener(new CmisNavigatorSelectionChangedListener());
-		System.out.println("----> GETTING INITIAL INPUT");
-        return new Root();
-    }
+
+		// Add listener for selection changes in the tree
+		getCommonViewer().addSelectionChangedListener(
+		    new CmisNavigatorSelectionChangedListener());
+
+		return new Root();
+	}
 
 }

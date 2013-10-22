@@ -14,6 +14,7 @@ package org.activiti.designer.kickstart.eclipse.navigator;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -39,6 +40,9 @@ import org.apache.chemistry.opencmis.commons.SessionParameter;
 import org.apache.chemistry.opencmis.commons.data.ContentStream;
 import org.apache.chemistry.opencmis.commons.definitions.PropertyDefinition;
 import org.apache.chemistry.opencmis.commons.enums.BindingType;
+import org.apache.chemistry.opencmis.commons.enums.VersioningState;
+import org.apache.chemistry.opencmis.commons.exceptions.CmisObjectNotFoundException;
+import org.apache.chemistry.opencmis.commons.impl.dataobjects.ContentStreamImpl;
 
 
 public class CmisUtil {
@@ -91,6 +95,14 @@ public class CmisUtil {
     return null;
   }
   
+  public static CmisObject getCmisObject(String nodeId) {
+  	try {
+  		return currentSession.getObject(new ObjectIdImpl(nodeId));
+  	} catch (CmisObjectNotFoundException confe) {
+  		return null;
+  	}
+  }
+  
   public static Folder createFolder(Folder parentFolder, String folderName) {
     Map<String, Object> folderProps = new HashMap<String, Object>();
     folderProps.put(PropertyIds.NAME, folderName);
@@ -121,6 +133,38 @@ public class CmisUtil {
   
   public static InputStream downloadDocument(Document document) {
   	return currentSession.getContentStream(new ObjectIdImpl(document.getId())).getStream();
+  }
+  
+  public static String uploadDocumentToFolder(Folder folder, String fileName, byte[] content) {
+  	Map<String, Object> properties = new HashMap<String, Object>();
+  	properties.put(PropertyIds.OBJECT_TYPE_ID, "cmis:document");
+  	properties.put(PropertyIds.NAME, fileName);
+
+  	// content
+  	InputStream stream = new ByteArrayInputStream(content);
+  	ContentStream contentStream = new ContentStreamImpl(fileName, BigInteger.valueOf(content.length), "text/plain", stream);
+
+  	// create document
+  	return folder.createDocument(properties, contentStream, VersioningState.MAJOR).getId();
+  }
+  
+  public static void overwriteDocumentContent(Document document, byte[] content, String mimetype) {
+  	InputStream stream = new ByteArrayInputStream(content);
+  	ContentStream contentStream = new ContentStreamImpl(document.getName(), BigInteger.valueOf(content.length), "text/plain", stream);
+  	document.setContentStream(contentStream, true);
+  }
+  
+  public static String uploadNewVersion(Document document, byte[] content, String mimetype) {
+  	 Document pwc = (Document) currentSession.getObject(document.checkOut());
+     InputStream stream = new ByteArrayInputStream(content);
+     ContentStream contentStream = currentSession.getObjectFactory().createContentStream(
+             document.getName(), content.length, mimetype, stream);
+     try {
+         return pwc.checkIn(false, null, contentStream, "minor version").getId();
+     } catch (Exception e) {
+         pwc.cancelCheckOut();
+     }
+     return null;
   }
   
   public static void renameCmisObject(CmisObject cmisObject, String newName) {
