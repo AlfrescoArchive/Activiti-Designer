@@ -1,5 +1,7 @@
 package org.activiti.designer.kickstart.process.property;
 
+import java.beans.PropertyChangeListener;
+
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
@@ -11,10 +13,10 @@ import org.eclipse.swt.widgets.Control;
 public interface StringItemBrowser {
 
   /**
-   * @param viewer viewer to report selection back to
+   * @param viewer listener to report selection back to
    * @param parent parent to add control to
    * @return the control that is added to the parent
    */
-  public Control getBrowserControl(StringItemSelectionViewer viewer, Composite parent);
+  public Control getBrowserControl(PropertyChangeListener listener, Composite parent);
 
 }

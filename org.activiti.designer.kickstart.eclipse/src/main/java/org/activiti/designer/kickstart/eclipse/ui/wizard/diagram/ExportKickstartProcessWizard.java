@@ -7,14 +7,12 @@ import java.lang.reflect.InvocationTargetException;
 import org.activiti.designer.kickstart.eclipse.Logger;
 import org.activiti.designer.kickstart.eclipse.common.KickstartPlugin;
 import org.activiti.designer.kickstart.eclipse.util.KickstartConstants;
+import org.activiti.designer.kickstart.util.FormReferenceReader;
 import org.activiti.designer.util.editor.KickstartProcessMemoryModel;
 import org.activiti.workflow.simple.alfresco.conversion.AlfrescoWorkflowDefinitionConversionFactory;
 import org.activiti.workflow.simple.converter.WorkflowDefinitionConversion;
 import org.activiti.workflow.simple.converter.json.SimpleWorkflowJsonConverter;
-import org.activiti.workflow.simple.definition.HumanStepDefinition;
-import org.activiti.workflow.simple.definition.StepDefinition;
 import org.activiti.workflow.simple.definition.WorkflowDefinition;
-import org.activiti.workflow.simple.definition.form.FormDefinition;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -23,7 +21,6 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
-import org.eclipse.core.runtime.Path;
 import org.eclipse.core.runtime.content.IContentDescription;
 import org.eclipse.core.runtime.preferences.IEclipsePreferences;
 import org.eclipse.core.runtime.preferences.InstanceScope;
@@ -38,8 +35,6 @@ public class ExportKickstartProcessWizard extends Wizard implements IExportWizar
 
   public static final String EXPORT_WIZARD_TITLE = "Export Kickstart Process";
 
-  // TODO: use shared constants
-  public static final String PARAMETER_FORM_REFERENCE = "form-reference";
   protected IProject project;
   protected IResource processResource;
 
@@ -133,6 +128,7 @@ public class ExportKickstartProcessWizard extends Wizard implements IExportWizar
     if (error == null) {
       // We have valid folder locations, finally export the actual process
 
+      FormReferenceReader merger = null;
       try {
         monitor.beginTask("Converting process", IProgressMonitor.UNKNOWN);
         // TODO: perhaps create once and share?
@@ -142,35 +138,9 @@ public class ExportKickstartProcessWizard extends Wizard implements IExportWizar
         FileInputStream fis = new FileInputStream(processResource.getLocation().toFile());
         WorkflowDefinition definition = converter.readWorkflowDefinition(fis);
         
-        // Add start-form, if any
-        if(definition.getParameters().containsKey(PARAMETER_FORM_REFERENCE)) {
-          String startFormPath = (String) definition.getParameters().get(PARAMETER_FORM_REFERENCE);
-          IFile startFormFile = project.getFile(new Path(startFormPath));
-          FormDefinition startForm = converter.readFormDefinition(new FileInputStream(startFormFile.getLocation().toFile()));
-          definition.setStartFormDefinition(startForm);
-          System.out.println("Using start-form: " + startFormFile);
-        }
-
-        // Add all forms
-        for(StepDefinition step : definition.getSteps()) {
-          if(step instanceof HumanStepDefinition) {
-            HumanStepDefinition humanStep = (HumanStepDefinition) step;
-            
-            // TODO: REMOVE
-            if(humanStep.getId() == null) {
-              humanStep.setId(humanStep.getName().replace(" ", "").toLowerCase());
-            }
-            
-            if(humanStep.getParameters().containsKey(PARAMETER_FORM_REFERENCE)) {
-              String formPath = (String) humanStep.getParameters().get(PARAMETER_FORM_REFERENCE);
-              IFile formFile = project.getFile(new Path(formPath));
-              FormDefinition form = converter.readFormDefinition(new FileInputStream(formFile.getLocation().toFile()));
-              humanStep.setForm(form);
-              
-              System.out.println("Using form: " + formFile);
-            }
-          }
-        }
+        // Request merge of the form-definitions
+        merger = new FormReferenceReader(definition, project);
+        merger.mergeFormDefinition();
             
         WorkflowDefinitionConversion definitionConversion = factory.createWorkflowDefinitionConversion(definition);
         definitionConversion.convert();
@@ -182,6 +152,11 @@ public class ExportKickstartProcessWizard extends Wizard implements IExportWizar
         error = "Error while exporting process: " + t.toString();
       } finally {
         monitor.done();
+        
+        // Revert all changes to the definition that were done during form-merging
+        if(merger != null) {
+          merger.removeFormReferences();
+        }
       }
     }
   }

@@ -22,7 +22,8 @@ Require-Bundle: org.eclipse.ui,
  org.activiti.designer.util,
  org.eclipse.jdt.ui,
  org.activiti.designer.eclipse,
- org.activiti.designer.libs
+ org.activiti.designer.libs,
+ org.activiti.kickstart.util;bundle-version="5.12.1"
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: org.activiti.designer.kickstart.form

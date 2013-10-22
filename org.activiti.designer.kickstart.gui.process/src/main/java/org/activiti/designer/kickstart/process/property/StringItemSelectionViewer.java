@@ -1,6 +1,9 @@
 package org.activiti.designer.kickstart.process.property;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.commons.lang.StringUtils;
@@ -21,7 +24,6 @@ import org.eclipse.swt.layout.RowLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Text;
 
 
@@ -43,15 +45,16 @@ public class StringItemSelectionViewer {
   
   protected List<String> items = new ArrayList<String>();
   protected boolean multiSelect;
-  protected SelectionListener selectionListener;
+  protected PropertyChangeListener changeListener;
   
   protected String addItemLabel = "Add item";
   protected String removeItemLabel = "Remove item";
   protected String defaultItemValue = "item";
   
   
-  public StringItemSelectionViewer(Composite parent, boolean multiSelect, SelectionListener selectionListener, StringItemBrowser browser) {
+  public StringItemSelectionViewer(Composite parent, boolean multiSelect, PropertyChangeListener changeListener, StringItemBrowser browser) {
     this.multiSelect = multiSelect;
+    this.changeListener = changeListener;
     
     composite = new Composite(parent, SWT.NONE);
     composite.setBackground(parent.getDisplay().getSystemColor(SWT.COLOR_WHITE));
@@ -59,11 +62,21 @@ public class StringItemSelectionViewer {
 
     itemText = new Text(composite, SWT.BORDER);
     
+    PropertyChangeListener browserChangeListener = new PropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+          if(itemText.isEnabled()) {
+            itemText.setText((String) evt.getNewValue());
+            flushUserText();
+        }
+      }
+    };
+    
     if(multiSelect) {
       itemText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 1, 1));
       itemText.setEnabled(false);
       
-      browserControl = browser.getBrowserControl(this, composite);
+      browserControl = browser.getBrowserControl(browserChangeListener, composite);
       browserControl.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
       browserControl.setEnabled(false);
       
@@ -105,7 +118,7 @@ public class StringItemSelectionViewer {
         @Override
         public void widgetSelected(SelectionEvent e) {
           String newItem = defaultItemValue;
-          items.add(newItem);
+          ensureItems().add(newItem);
           listViewer.refresh();
           listViewer.setSelection(new StructuredSelection(newItem));
           itemText.setFocus();
@@ -117,13 +130,17 @@ public class StringItemSelectionViewer {
         @Override
         public void widgetSelected(SelectionEvent e) {
           if(listViewer.getSelection() != null && !listViewer.getSelection().isEmpty()) {
-            items.remove((String) ((IStructuredSelection) listViewer.getSelection()).getFirstElement());
+            ensureItems().remove((String) ((IStructuredSelection) listViewer.getSelection()).getFirstElement());
             listViewer.refresh();
           }
         }
       });
     } else {
-      itemText.setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false, 2, 1));
+      itemText.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, true, false, 2, 1));
+      
+      browserControl = browser.getBrowserControl(browserChangeListener, composite);
+      browserControl.setLayoutData(new GridData(SWT.LEFT, SWT.CENTER, false, false, 1, 1));
+      browserControl.setEnabled(true);
     }
     
     itemText.addFocusListener(new FocusAdapter() {
@@ -133,16 +150,27 @@ public class StringItemSelectionViewer {
     });
   }
   
+  protected List<String> ensureItems() {
+    if(items == null) {
+      items = new ArrayList<String>();
+      listViewer.setInput(items);
+    }
+    return items;
+  }
+  
+  
   public Composite getComposite() {
     return composite;
   }
   
   public void setAddItemLabel(String addItemLabel) {
     this.addItemLabel = addItemLabel;
+    addButton.setText(addItemLabel);
   }
   
   public void setRemoveItemLabel(String removeItemLabel) {
     this.removeItemLabel = removeItemLabel;
+    removeButton.setText(removeItemLabel);
   }
   
   public void setDefaultItemValue(String defaultItemValue) {
@@ -156,9 +184,32 @@ public class StringItemSelectionViewer {
   public void setItems(List<String> items) {
     this.items = items;
     
-    if(listViewer != null) {
+    if(multiSelect && listViewer != null) {
       listViewer.setInput(items);
-    } 
+    }
+    
+    if(!multiSelect && itemText != null) {
+      if(items != null && items.size() > 0) {
+        itemText.setText(items.get(0));
+      } else {
+        itemText.setText("");
+      }
+    }
+  }
+  
+  public String getItem() {
+    if(items != null && items.size() > 0) {
+      return items.get(0);
+    }
+    return null;
+  }
+  
+  public void setItem(String item) {
+    if(item != null) {
+      setItems(new ArrayList<String>(Arrays.asList(item)));
+    } else {
+      setItems(new ArrayList<String>());
+    }
   }
   
   protected void flushUserText() {
@@ -184,9 +235,11 @@ public class StringItemSelectionViewer {
     }
     
     if(changed) {
-      listViewer.refresh();
-      if(selectionListener != null) {
-        selectionListener.widgetSelected(new SelectionEvent(new Event()));
+      if(listViewer != null) {
+        listViewer.refresh();
+      }
+      if(changeListener != null) {
+        changeListener.propertyChange(new PropertyChangeEvent(this, "items", null, null));
       }
     }
   }
@@ -202,5 +255,4 @@ public class StringItemSelectionViewer {
       browserControl.setEnabled(false);
     }
   }
-  
 }
