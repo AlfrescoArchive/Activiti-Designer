@@ -19,6 +19,8 @@ public class FieldReferencePropertySection extends AbstractKickstartFormComponen
     createSeparator();
     
     nameText = createTextControl(false);
+    nameText.setEditable(false);
+    
     createLabel("Property name", nameText);
   }
 

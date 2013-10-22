@@ -105,6 +105,8 @@ public class ExportKickstartProcessTargetWizardPage extends WizardPage {
     repoFolderSelect.setEnabled(customLocationUsed);
     shareFolderSelect.setEnabled(customLocationUsed);
     
+    targetFolderButton.setSelection(!customLocationUsed);
+    
     repoFolderSelect.setCurrentPath(repositoryPath);
     shareFolderSelect.setCurrentPath(sharePath);
   }

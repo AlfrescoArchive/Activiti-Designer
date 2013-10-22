@@ -1,8 +1,14 @@
 package org.activiti.designer.kickstart.process.property;
 
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+
+import org.activiti.designer.util.editor.KickstartProcessMemoryModel;
+import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.workflow.simple.definition.HumanStepAssignment.HumanStepAssignmentType;
 import org.activiti.workflow.simple.definition.HumanStepDefinition;
 import org.activiti.workflow.simple.definition.StepDefinition;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -28,8 +34,16 @@ public class HumanStepAssignmentPropertySection extends AbstractKickstartProcess
   protected Button groupOption;
   protected Button usersOption;
   protected Composite assigneeOptions;
-  protected Label assignmentTypeLabel;
+  protected Label separator;
+  
+  protected ToggleContainerViewer assignmentDetailsViewer;
   protected StringItemSelectionViewer selectedUsersViewer;
+  protected StringItemSelectionViewer selectedUserViewer;
+  protected StringItemSelectionViewer selectedGroupsViewer;
+  
+  protected PropertyItemBrowser userBrowser;
+  protected PropertyItemBrowser groupBrowser;
+  protected PropertyItemBrowser usersBrowser;
   
   protected boolean clearingSelection = false;
   
@@ -53,39 +67,83 @@ public class HumanStepAssignmentPropertySection extends AbstractKickstartProcess
     registerControl(assigneeOptions);
     addOptionListeners();
     
-    createSeparator();
+    separator = createSeparator();
     
-    assignmentTypeLabel = createFullWidthLabel("");
+    assignmentDetailsViewer = new ToggleContainerViewer(formComposite);
+    FormData formData = new FormData();
+    assignmentDetailsViewer.getComposite().setLayoutData(formData);
+    formData.left = new FormAttachment(0, 0);
+    formData.right = new FormAttachment(100, 0);
+    formData.top = createTopFormAttachment();
     
-    selectedUsersViewer = new StringItemSelectionViewer(formComposite, true, new SelectionAdapter() {
+    userBrowser = new PropertyItemBrowser();
+    userBrowser.setItemfilter(new UserPropertyItemFilter());
+    
+    usersBrowser = new PropertyItemBrowser();
+    usersBrowser.setItemfilter(new UserPropertyItemFilter());
+    
+    groupBrowser = new PropertyItemBrowser();
+    groupBrowser.setItemfilter(new GroupPropertyItemFilter());
+    
+    addUserDetails();
+    addUsersDetails();
+    addGroupsDetails();
+  }
+  
+  protected void addGroupsDetails() {
+    selectedGroupsViewer = new StringItemSelectionViewer(assignmentDetailsViewer.getComposite(), true, new PropertyChangeListener() {
       @Override
-      public void widgetSelected(SelectionEvent e) {
-        // TODO: implement
+      public void propertyChange(PropertyChangeEvent evt) {
+        HumanStepDefinition step = (HumanStepDefinition) getModelUpdater().getUpdatableBusinessObject();
+        step.setCandidateGroups(selectedGroupsViewer.getItems());
+        executeModelUpdater();
       }
-    }, new StringItemBrowser() {
-      
+    }, groupBrowser);
+    selectedGroupsViewer.setAddItemLabel("Add group");
+    selectedGroupsViewer.setRemoveItemLabel("Remove group");
+    selectedGroupsViewer.setDefaultItemValue("group");
+    selectedGroupsViewer.getComposite().setVisible(false);
+    
+    assignmentDetailsViewer.addControl("groups", selectedGroupsViewer.getComposite());
+  }
+
+  protected void addUsersDetails() {
+    selectedUsersViewer = new StringItemSelectionViewer(assignmentDetailsViewer.getComposite(), true, new PropertyChangeListener() {
       @Override
-      public Control getBrowserControl(StringItemSelectionViewer viewer, Composite parent) {
-        Button button = new Button(parent, SWT.PUSH);
-        button.setText("Use form property...");
-        return button;
+      public void propertyChange(PropertyChangeEvent evt) {
+        HumanStepDefinition step = (HumanStepDefinition) getModelUpdater().getUpdatableBusinessObject();
+        step.setCandidateUsers(selectedUsersViewer.getItems());
+        executeModelUpdater();
       }
-    });
+    }, usersBrowser);
     selectedUsersViewer.setAddItemLabel("Add user");
     selectedUsersViewer.setRemoveItemLabel("Remove user");
     selectedUsersViewer.setDefaultItemValue("user");
     selectedUsersViewer.getComposite().setVisible(false);
     
-    FormData formData = new FormData();
-    formData.left = new FormAttachment(0, 0);
-    formData.right = new FormAttachment(100, 0);
-    formData.top = createTopFormAttachment();
-    selectedUsersViewer.getComposite().setLayoutData(formData);
+    assignmentDetailsViewer.addControl("users", selectedUsersViewer.getComposite());
     
   }
-  
-  protected void addOptionListeners() {
+
+  protected void addUserDetails() {
+    selectedUserViewer = new StringItemSelectionViewer(assignmentDetailsViewer.getComposite(), false,new PropertyChangeListener() {
+      @Override
+      public void propertyChange(PropertyChangeEvent evt) {
+        HumanStepDefinition step = (HumanStepDefinition) getModelUpdater().getUpdatableBusinessObject();
+        step.setAssignee(selectedUserViewer.getItem());
+        executeModelUpdater();
+      }
+    }, userBrowser);
+    selectedUserViewer.getComposite().setVisible(false);
     
+    assignmentDetailsViewer.addControl("user", selectedUserViewer.getComposite());
+    
+    Label initiatorDetailsLabel = new Label(assignmentDetailsViewer.getComposite(), SWT.NONE);
+    initiatorDetailsLabel.setText("The user who starts the workflow will be the assignee of this task.");
+    assignmentDetailsViewer.addControl("initiator", initiatorDetailsLabel);
+  }
+
+  protected void addOptionListeners() {
     SelectionListener switchTypeSelectionListener = new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -123,28 +181,27 @@ public class HumanStepAssignmentPropertySection extends AbstractKickstartProcess
     if(control == assigneeOptions) {
       clearRadioButtons();
       
-      // TODO: remove
-      selectedUsersViewer.getComposite().setVisible(false);
-      
       // Populate selection box based on assignment type
-      HumanStepAssignmentType type = ((HumanStepDefinition) businessObject).getAssignmentType();
-      switch (type) {
+      HumanStepDefinition definition =  ((HumanStepDefinition) businessObject);
+      switch (definition.getAssignmentType()) {
       case GROUPS:
         groupOption.setSelection(true);
-        assignmentTypeLabel.setText(groupOption.getText());
+        selectedGroupsViewer.setItems(definition.getAssignment().getCandidateGroups());
+        assignmentDetailsViewer.showChild("groups");
         break;
       case USER:
         userOption.setSelection(true);
-        assignmentTypeLabel.setText(userOption.getText());
+        selectedUserViewer.setItem(definition.getAssignment().getAssignee());
+        assignmentDetailsViewer.showChild("user");
         break;
       case USERS:
         usersOption.setSelection(true);
-        assignmentTypeLabel.setText(usersOption.getText());
-        selectedUsersViewer.getComposite().setVisible(true);
+        selectedUsersViewer.setItems(definition.getAssignment().getCandidateUsers());
+        assignmentDetailsViewer.showChild("users");
         break;
       default:
         initiatorOption.setSelection(true);
-        assignmentTypeLabel.setText("");
+        assignmentDetailsViewer.showChild("initiator");
         break;
       }
     } else {
@@ -165,6 +222,23 @@ public class HumanStepAssignmentPropertySection extends AbstractKickstartProcess
   }
   
   @Override
+  public void refresh() {
+    super.refresh();
+    if(getSelectedPictogramElement() != null && getDiagram() != null && userBrowser != null && groupBrowser != null) {
+      KickstartProcessMemoryModel model = ModelHandler.getKickstartProcessModel(EcoreUtil.getURI(getDiagram()));
+      if(model != null && model.getModelFile() != null) {
+        userBrowser.setWorkflowDefinition(model.getWorkflowDefinition());
+        groupBrowser.setWorkflowDefinition(model.getWorkflowDefinition());
+        usersBrowser.setWorkflowDefinition(model.getWorkflowDefinition());
+        
+        userBrowser.setProject(model.getModelFile().getProject());
+        groupBrowser.setProject(model.getModelFile().getProject());
+        usersBrowser.setProject(model.getModelFile().getProject());
+      }
+    }
+  }
+  
+  @Override
   protected Object getModelValueForControl(Control control, Object businessObject) {
     return null;
   }
@@ -172,6 +246,6 @@ public class HumanStepAssignmentPropertySection extends AbstractKickstartProcess
   
   @Override
   protected void storeValueInModel(Control control, Object businessObject) {
-    // Not using standard control
+    // Not using standard control storage
   }
 }
