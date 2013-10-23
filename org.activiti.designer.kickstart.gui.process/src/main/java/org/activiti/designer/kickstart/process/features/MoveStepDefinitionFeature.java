@@ -26,9 +26,9 @@ public class MoveStepDefinitionFeature extends DefaultMoveShapeFeature implement
 
   @Override
   public void moveShape(IMoveShapeContext context) {
-      getProcessLayouter().moveShape(
-          context.getTargetContainer(), context.getSourceContainer(), context.getShape(),
-          context.getX(), context.getY());
+    getProcessLayouter().moveShape((KickstartProcessFeatureProvider) getFeatureProvider(), context.getTargetContainer(), 
+        context.getSourceContainer(), context.getShape(),
+        context.getX(), context.getY(), true);
   }
   
   @Override
@@ -45,16 +45,16 @@ public class MoveStepDefinitionFeature extends DefaultMoveShapeFeature implement
   public void undo(IContext context) {
     // Since the model is updated by the layout based on the actual shape order,
     // it's sufficient to force a re-layout at this point
-    getProcessLayouter().relayout(((IMoveShapeContext)context).getTargetContainer());
-    getProcessLayouter().relayout(((IMoveShapeContext)context).getSourceContainer());
+    getProcessLayouter().relayout(((IMoveShapeContext)context).getTargetContainer(), (KickstartProcessFeatureProvider) getFeatureProvider());
+    getProcessLayouter().relayout(((IMoveShapeContext)context).getSourceContainer(), (KickstartProcessFeatureProvider) getFeatureProvider());
   }
   
   @Override
   public void redo(IContext context) {
     // Since the model is updated by the layout based on the actual shape order,
     // it's sufficient to force a re-layout at this point
-    getProcessLayouter().relayout(((IMoveShapeContext)context).getTargetContainer());
-    getProcessLayouter().relayout(((IMoveShapeContext)context).getSourceContainer());
+    getProcessLayouter().relayout(((IMoveShapeContext)context).getTargetContainer(), (KickstartProcessFeatureProvider) getFeatureProvider());
+    getProcessLayouter().relayout(((IMoveShapeContext)context).getSourceContainer(), (KickstartProcessFeatureProvider) getFeatureProvider());
   }
   
   protected KickstartProcessLayouter getProcessLayouter() {

@@ -7,7 +7,10 @@ import org.activiti.designer.kickstart.process.dialog.KickstartFormReferenceSele
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Path;
+import org.eclipse.core.runtime.Status;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
@@ -97,19 +100,25 @@ public class FormReferenceViewer {
       @Override
       public void widgetSelected(SelectionEvent e) {
         if(formResource != null) {
-          final IWorkbench workbench = PlatformUI.getWorkbench();
-          
-          workbench.getDisplay().syncExec(new Runnable() {
-
-            @Override
-            public void run() {
-              try {
-                IDE.openEditor(workbench.getActiveWorkbenchWindow().getActivePage(), formResource, "org.activiti.designer.kickstart.editor.formEditor");
-              } catch (PartInitException exception) {
-                Logger.logError("Error while opening referenced form editor", exception);
+          if(formResource.exists()) {
+            final IWorkbench workbench = PlatformUI.getWorkbench();
+            workbench.getDisplay().syncExec(new Runnable() {
+              
+              @Override
+              public void run() {
+                try {
+                  IDE.openEditor(workbench.getActiveWorkbenchWindow().getActivePage(), formResource, "org.activiti.designer.kickstart.editor.formEditor");
+                } catch (PartInitException exception) {
+                  Logger.logError("Error while opening referenced form editor", exception);
+                }
               }
-            }
-          });
+            });
+          } else {
+            final IStatus status = new Status(IStatus.ERROR, Activator.PLUGIN_ID
+                , "The referenced form does not exist: " + formResource.getProjectRelativePath());
+            ErrorDialog.openError(composite.getShell(), "Unable to open form", "The form cannot be opened",
+                status);
+          }
         }
       }
     });

@@ -8,10 +8,15 @@ import org.activiti.designer.kickstart.process.command.StepDefinitionModelUpdate
 import org.activiti.designer.kickstart.process.command.WorkflowDefinitionModelUpdater;
 import org.activiti.designer.kickstart.process.diagram.shape.BusinessObjectShapeController;
 import org.activiti.designer.kickstart.process.diagram.shape.HumanStepShapeController;
+import org.activiti.designer.kickstart.process.diagram.shape.ListStepShapeController;
+import org.activiti.designer.kickstart.process.diagram.shape.ParallelStepShapeController;
 import org.activiti.designer.kickstart.process.features.AddStepDefinitionFeature;
 import org.activiti.designer.kickstart.process.features.CreateHumanStepFeature;
+import org.activiti.designer.kickstart.process.features.CreateParallelStepFeature;
+import org.activiti.designer.kickstart.process.features.DeleteStepFeature;
 import org.activiti.designer.kickstart.process.features.DirectEditStepDefinitionFeature;
 import org.activiti.designer.kickstart.process.features.MoveStepDefinitionFeature;
+import org.activiti.designer.kickstart.process.features.ProcessStepResizeFeature;
 import org.activiti.designer.kickstart.process.features.UpdateStepDefinitionFeature;
 import org.activiti.designer.kickstart.process.layout.KickstartProcessLayouter;
 import org.activiti.designer.util.editor.KickstartProcessIndependenceSolver;
@@ -23,12 +28,16 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.ICreateFeature;
+import org.eclipse.graphiti.features.IDeleteFeature;
 import org.eclipse.graphiti.features.IDirectEditingFeature;
 import org.eclipse.graphiti.features.IMoveShapeFeature;
+import org.eclipse.graphiti.features.IResizeShapeFeature;
 import org.eclipse.graphiti.features.IUpdateFeature;
 import org.eclipse.graphiti.features.context.IAddContext;
+import org.eclipse.graphiti.features.context.IDeleteContext;
 import org.eclipse.graphiti.features.context.IDirectEditingContext;
 import org.eclipse.graphiti.features.context.IMoveShapeContext;
+import org.eclipse.graphiti.features.context.IResizeShapeContext;
 import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
@@ -48,6 +57,8 @@ public class KickstartProcessFeatureProvider extends DefaultFeatureProvider {
 
     this.shapeControllers = new ArrayList<BusinessObjectShapeController>();
     shapeControllers.add(new HumanStepShapeController(this));
+    shapeControllers.add(new ParallelStepShapeController(this));
+    shapeControllers.add(new ListStepShapeController(this));
   }
 
   /**
@@ -103,7 +114,7 @@ public class KickstartProcessFeatureProvider extends DefaultFeatureProvider {
 
   @Override
   public ICreateFeature[] getCreateFeatures() {
-    return new ICreateFeature[] { new CreateHumanStepFeature(this) };
+    return new ICreateFeature[] { new CreateHumanStepFeature(this), new CreateParallelStepFeature(this) };
   }
 
   @Override
@@ -119,6 +130,16 @@ public class KickstartProcessFeatureProvider extends DefaultFeatureProvider {
   @Override
   public IMoveShapeFeature getMoveShapeFeature(IMoveShapeContext context) {
     return new MoveStepDefinitionFeature(this);
+  }
+  
+  @Override
+  public IDeleteFeature getDeleteFeature(IDeleteContext context) {
+    return new DeleteStepFeature(this);
+  }
+  
+  @Override
+  public IResizeShapeFeature getResizeShapeFeature(IResizeShapeContext context) {
+    return new ProcessStepResizeFeature(this);
   }
   
   @Override

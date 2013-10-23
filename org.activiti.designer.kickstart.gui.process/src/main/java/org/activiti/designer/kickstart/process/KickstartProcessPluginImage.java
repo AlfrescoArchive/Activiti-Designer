@@ -22,7 +22,8 @@ public enum KickstartProcessPluginImage {
 
   FORM_ICON("form.icon", "form-16.png"), 
   PROCESS_ICON("process.icon", "process-16.png"),
-  HUMAN_STEP_ICON("humanstep.icon", "human-step-16.png");
+  HUMAN_STEP_ICON("humanstep.icon", "human-step-16.png"),
+  PARALLEL_STEP_ICON("parallelstep.icon", "parallel-16.png"),;
 
   private static final String KEY_PREFIX = Activator.PLUGIN_ID;
   private static final String DEFAULT_IMAGE_DIR = "icons/";

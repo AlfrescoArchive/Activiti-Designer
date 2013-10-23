@@ -1,5 +1,6 @@
 package org.activiti.designer.kickstart.process.diagram.shape;
 
+import org.activiti.designer.kickstart.process.KickstartProcessPluginImage;
 import org.activiti.designer.kickstart.process.diagram.KickstartProcessFeatureProvider;
 import org.activiti.designer.kickstart.process.util.StepDefinitionStyles;
 import org.activiti.designer.util.platform.OSEnum;
@@ -8,6 +9,7 @@ import org.activiti.workflow.simple.definition.HumanStepDefinition;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
+import org.eclipse.graphiti.mm.algorithms.Image;
 import org.eclipse.graphiti.mm.algorithms.MultiText;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.RoundedRectangle;
@@ -72,6 +74,13 @@ public class HumanStepShapeController extends AbstractBusinessObjectShapeControl
     rectangle.setStyle(StepDefinitionStyles.getStepDefinitionStyle(diagram));
     rectangle.setParentGraphicsAlgorithm(invisibleRectangle);
     gaService.setLocationAndSize(rectangle, 0, 0, width, height);
+    
+    // Add icon
+    Image icon = gaService.createImage(rectangle, KickstartProcessPluginImage.HUMAN_STEP_ICON.getImageKey());
+    
+    int iconSize = 16;
+    int iconOffset = (height - iconSize) / 2 + 2;
+    gaService.setLocationAndSize(icon, iconSize / 2, iconOffset, iconSize, iconSize);
     
     getFeatureProvider().link(containerShape, new Object[] {definition});
     

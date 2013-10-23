@@ -4,8 +4,6 @@ import org.activiti.workflow.simple.definition.AbstractNamedStepDefinition;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 
 /**
- * Property-filter for the main process-properties.
- * 
  * @author Frederik Heremans
  */
 public class NamedStepDefinitionPropertyFilter extends AbstractKickstartProcessPropertyFilter {

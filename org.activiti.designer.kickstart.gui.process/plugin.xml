@@ -91,6 +91,12 @@
                id="org.activiti.designer.kickstart.process.humanStepDefinitionAssignment"
                tab="org.activiti.designer.kickstart.process.assignmentTab">
          </propertySection>
+         <propertySection
+               class="org.activiti.designer.kickstart.process.property.ParallelStepDefinitionPropertySection"
+               filter="org.activiti.designer.kickstart.process.property.ParallelStepDefinitionPropertyFilter"
+               id="org.activiti.designer.kickstart.process.parallelStepDefinition"
+               tab="org.activiti.designer.kickstart.process.generalTab">
+         </propertySection>
          
       </propertySections>
    </extension>

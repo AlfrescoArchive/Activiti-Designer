@@ -60,9 +60,6 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.apache.commons.lang
 Bundle-Vendor: Activiti
 Bundle-ClassPath: .,
- activiti-bpmn-converter-5.14-SNAPSHOT.jar,
- activiti-bpmn-layout-5.13.jar,
- activiti-bpmn-model-5.14-SNAPSHOT.jar,
  commons-lang3-3.1.jar,
  jackson-core-asl-1.9.9.jar,
  jackson-mapper-asl-1.9.9.jar,
@@ -70,7 +67,6 @@ Bundle-ClassPath: .,
  log4j-1.2.17.jar,
  slf4j-api-1.7.2.jar,
  slf4j-log4j12-1.7.2.jar,
- activiti-simple-workflow-5.14-SNAPSHOT.jar,
  activation-1.1.jar,
  chemistry-opencmis-client-api-0.10.0.jar,
  chemistry-opencmis-client-bindings-0.10.0.jar,
@@ -87,4 +83,8 @@ Bundle-ClassPath: .,
  saaj-impl-1.3.3.jar,
  slf4j-api-1.7.5.jar,
  streambuffer-0.9.jar,
- activiti-simple-workflow-alfresco-5.14-SNAPSHOT.jar
+ activiti-bpmn-converter-5.15-SNAPSHOT.jar,
+ activiti-bpmn-layout-5.15-SNAPSHOT.jar,
+ activiti-bpmn-model-5.15-SNAPSHOT.jar,
+ activiti-simple-workflow-5.15-SNAPSHOT.jar,
+ activiti-simple-workflow-alfresco-5.15-SNAPSHOT.jar

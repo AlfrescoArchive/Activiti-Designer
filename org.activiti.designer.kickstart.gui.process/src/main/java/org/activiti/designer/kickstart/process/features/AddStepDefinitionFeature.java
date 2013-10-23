@@ -41,7 +41,7 @@ public class AddStepDefinitionFeature extends AbstractAddShapeFeature {
     // Since new shape has already been added to the parent, trigger a move to have it
     // positioned based on the layout implementation, taking into account X and Y from add-context
     getKickstartProcessFeatureProvider().getProcessLayouter()
-      .moveShape(parent, parent, containerShape, context.getX(), context.getY());
+      .moveShape((KickstartProcessFeatureProvider) getFeatureProvider(), parent, parent, containerShape, context.getX(), context.getY(), false);
     
     return containerShape;
   }

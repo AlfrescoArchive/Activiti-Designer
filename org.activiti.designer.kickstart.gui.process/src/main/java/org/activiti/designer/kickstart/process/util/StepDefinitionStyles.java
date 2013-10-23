@@ -23,12 +23,15 @@ public final class StepDefinitionStyles {
   
   // Colors
   private static final IColorConstant DEFAULT_FOREGROUND_COLOR = new ColorConstant(0, 0, 0);
+  private static final IColorConstant SUBTLE_FOREGROUND_COLOR = new ColorConstant(200, 200, 200);
   private static final IColorConstant DEFAULT_BACKGROUND_COLOR = new ColorConstant(255, 255, 255);
+  private static final IColorConstant SUBTLE_BACKGROUND_COLOR = new ColorConstant(240, 240, 240);
 
   // Sizes for components
   public static final int DEFAULT_COMPONENT_WIDTH = 600;
   public static final int DEFAULT_LABEL_HEIGHT = 20;
   public static final int DEFAULT_COMPONENT_BOX_HEIGHT = 40;
+  public static final int DEFAULT_PARALLEL_BOX_HEIGHT = 60;
 
   private static Map<String, Style> styleMap = new HashMap<String, Style>();
   
@@ -54,6 +57,14 @@ public final class StepDefinitionStyles {
   
   public static Color getDefaultForegroundColor(Diagram diagram) {
     return Graphiti.getGaService().manageColor(diagram, DEFAULT_FOREGROUND_COLOR);
+  }
+  
+  public static Color getSubtleForegroundColor(Diagram diagram) {
+    return Graphiti.getGaService().manageColor(diagram, SUBTLE_FOREGROUND_COLOR);
+  }
+  
+  public static Color getSubtleBackgroundColor(Diagram diagram) {
+    return Graphiti.getGaService().manageColor(diagram, SUBTLE_BACKGROUND_COLOR);
   }
   
   public static Color getDefaultBackgroundColor(Diagram diagram) {

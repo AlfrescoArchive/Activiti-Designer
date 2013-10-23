@@ -23,6 +23,9 @@ import org.eclipse.emf.transaction.RecordingCommand;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.gef.ContextMenuProvider;
 import org.eclipse.gef.GraphicalViewer;
+import org.eclipse.graphiti.features.IFeatureProvider;
+import org.eclipse.graphiti.features.context.impl.AddContext;
+import org.eclipse.graphiti.features.context.impl.AreaContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
@@ -107,14 +110,15 @@ public class KickstartProcessDiagramEditor extends DiagramEditor {
       final IFile dataFile = adei.getDataFile();
       final String diagramFileString = dataFile.getLocationURI().getPath();
 
-      KickstartProcessMemoryModel model = ModelHandler.getKickstartProcessModel(EcoreUtil.getURI(getDiagramTypeProvider().getDiagram()));
+      KickstartProcessMemoryModel model = ModelHandler.getKickstartProcessModel(EcoreUtil
+          .getURI(getDiagramTypeProvider().getDiagram()));
 
       SimpleWorkflowJsonConverter converter = new SimpleWorkflowJsonConverter();
       File objectsFile = new File(diagramFileString);
       FileWriter writer = new FileWriter(objectsFile);
       converter.writeWorkflowDefinition(model.getWorkflowDefinition(), writer);
       writer.close();
-      
+
       dataFile.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
 
     } catch (Exception e) {
@@ -143,7 +147,8 @@ public class KickstartProcessDiagramEditor extends DiagramEditor {
     final KickstartDiagramEditorInput adei = (KickstartDiagramEditorInput) input;
     final IFile dataFile = adei.getDataFile();
 
-    final KickstartProcessMemoryModel model = new KickstartProcessMemoryModel(getDiagramTypeProvider().getFeatureProvider(), dataFile);
+    final KickstartProcessMemoryModel model = new KickstartProcessMemoryModel(getDiagramTypeProvider()
+        .getFeatureProvider(), dataFile);
     ModelHandler.addModel(EcoreUtil.getURI(getDiagramTypeProvider().getDiagram()), model);
 
     String filePath = dataFile.getLocationURI().getPath();
@@ -159,7 +164,7 @@ public class KickstartProcessDiagramEditor extends DiagramEditor {
         WorkflowDefinition definition = null;
         try {
           definition = converter.readWorkflowDefinition(fileStream);
-        } catch(Exception e) {
+        } catch (Exception e) {
           definition = new WorkflowDefinition();
         }
         model.setWorkflowDefinition(definition);
@@ -173,7 +178,7 @@ public class KickstartProcessDiagramEditor extends DiagramEditor {
             @Override
             protected void doExecute() {
               importDiagram(model);
-              
+
               // Hide the grid
               getDiagramTypeProvider().getDiagram().setGridUnit(-1);
             }
@@ -182,7 +187,7 @@ public class KickstartProcessDiagramEditor extends DiagramEditor {
         basicCommandStack.saveIsDone();
         basicCommandStack.flush();
       }
-      
+
       model.setInitialized(true);
 
     } catch (Exception e) {
@@ -197,10 +202,20 @@ public class KickstartProcessDiagramEditor extends DiagramEditor {
 
       @Override
       protected void doExecute() {
-        //addContainerElement(diagram, model);
-              
-        for (StepDefinition step : model.getWorkflowDefinition().getSteps()) {
-          // draw step
+        IFeatureProvider featureProvider = getDiagramTypeProvider().getFeatureProvider();
+
+        // Provide -1 as x and y, to force layout adding the shape at the end
+        AreaContext areaContext = new AreaContext();
+        areaContext.setY(-1);
+        areaContext.setX(-1);
+
+        // Add steps in reverse order to have correct layout
+        StepDefinition step = null;
+        for (int i = model.getWorkflowDefinition().getSteps().size() - 1; i >= 0; i--) {
+          step = model.getWorkflowDefinition().getSteps().get(i);
+          AddContext addContext = new AddContext(areaContext, step);
+          addContext.setTargetContainer(getDiagramTypeProvider().getDiagram());
+          featureProvider.getAddFeature(addContext).add(addContext);
         }
       }
     });
