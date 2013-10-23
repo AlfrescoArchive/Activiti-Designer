@@ -25,6 +25,9 @@ import org.apache.chemistry.opencmis.client.api.Session;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
+/**
+ * @author jbarrez
+ */
 public class CmisContentProvider implements ITreeContentProvider {
 
 	private static final Object[] EMPTY_ARRAY = new Object[0];
@@ -109,11 +112,6 @@ public class CmisContentProvider implements ITreeContentProvider {
 	}
 
 	private void initializeRootElements() {
-		String url = PreferencesUtil.getStringPreference(Preferences.CMIS_URL);
-		String userName = PreferencesUtil.getStringPreference(Preferences.CMIS_USERNAME);
-		String password = PreferencesUtil.getStringPreference(Preferences.CMIS_PASSWORD);
-		
-		cmisSession = CmisUtil.createCmisSession(userName, password, url);
 		this.rootElements = CmisUtil.getRootElements();
 	}
 

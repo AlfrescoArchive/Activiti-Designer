@@ -21,6 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.designer.kickstart.eclipse.preferences.PreferencesUtil;
+import org.activiti.designer.util.preferences.Preferences;
 import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.DocumentType;
@@ -50,17 +52,31 @@ public class CmisUtil {
   private static Session currentSession;
   
   public static Session getCurrentSession() {
+  	if (currentSession == null) {
+  		createCmisSession();
+  	}
   	return currentSession;
   }
   
   public static void closeCurrentSession() {
   	currentSession = null;
   }
+  
+  public static void clearCaches() {
+  	closeCurrentSession();
+  }
 
-  public static Session createCmisSession(String user, String password, String url) {
+  public static Session createCmisSession() {
+  	
+  	// Get settings from preferences
+  	String url = PreferencesUtil.getStringPreference(Preferences.CMIS_URL);
+		String userName = PreferencesUtil.getStringPreference(Preferences.CMIS_USERNAME);
+		String password = PreferencesUtil.getStringPreference(Preferences.CMIS_PASSWORD);
+  	
+		// Build session
     SessionFactory sessionFactory = SessionFactoryImpl.newInstance();
     Map<String, String> parameter = new HashMap<String, String>();
-    parameter.put(SessionParameter.USER, user);
+    parameter.put(SessionParameter.USER, userName);
     parameter.put(SessionParameter.PASSWORD, password);
     parameter.put(SessionParameter.ATOMPUB_URL, url); 
     parameter.put(SessionParameter.BINDING_TYPE, BindingType.ATOMPUB.value());
@@ -68,12 +84,12 @@ public class CmisUtil {
     Repository repository = sessionFactory.getRepositories(parameter).get(0);
     Session session = repository.createSession();
     
-    currentSession = session;
-    return currentSession;
+    CmisUtil.currentSession = session;
+    return CmisUtil.currentSession;
   }
   
   public static List<CmisObject> getRootElements() {
-	  Folder rootFolder = currentSession.getRootFolder();
+	  Folder rootFolder = getCurrentSession().getRootFolder();
 	  ItemIterable<CmisObject> children = rootFolder.getChildren();
 	  List<CmisObject> cmisObjects = new ArrayList<CmisObject>();
 	  for (CmisObject cmisObject : children) {
@@ -83,21 +99,21 @@ public class CmisUtil {
   }
   
   public static Folder getFolder(String folderName) {
-    ObjectType type = currentSession.getTypeDefinition("cmis:folder");
+    ObjectType type = getCurrentSession().getTypeDefinition("cmis:folder");
     PropertyDefinition<?> objectIdPropDef = type.getPropertyDefinitions().get(PropertyIds.OBJECT_ID);
     String objectIdQueryName = objectIdPropDef.getQueryName();
     
-    ItemIterable<QueryResult> results = currentSession.query("SELECT * FROM cmis:folder WHERE cmis:name='" + folderName + "'", false);
+    ItemIterable<QueryResult> results = getCurrentSession().query("SELECT * FROM cmis:folder WHERE cmis:name='" + folderName + "'", false);
     for (QueryResult qResult : results) {
     	String objectId = qResult.getPropertyValueByQueryName(objectIdQueryName);
-    	return (Folder) currentSession.getObject(currentSession.createObjectId(objectId));
+    	return (Folder) getCurrentSession().getObject(getCurrentSession().createObjectId(objectId));
     }
     return null;
   }
   
   public static CmisObject getCmisObject(String nodeId) {
   	try {
-  		return currentSession.getObject(new ObjectIdImpl(nodeId));
+  		return getCurrentSession().getObject(new ObjectIdImpl(nodeId));
   	} catch (CmisObjectNotFoundException confe) {
   		return null;
   	}
@@ -108,8 +124,8 @@ public class CmisUtil {
     folderProps.put(PropertyIds.NAME, folderName);
     folderProps.put(PropertyIds.OBJECT_TYPE_ID, FolderType.FOLDER_BASETYPE_ID);
 
-    ObjectId folderObjectId = currentSession.createFolder(folderProps, parentFolder, null, null, null);
-    return (Folder) currentSession.getObject(folderObjectId);
+    ObjectId folderObjectId = getCurrentSession().createFolder(folderProps, parentFolder, null, null, null);
+    return (Folder) getCurrentSession().getObject(folderObjectId);
   }
   
   public static Document createDocument(Folder folder, String fileName, String mimetype, byte[] content) throws Exception {
@@ -118,21 +134,21 @@ public class CmisUtil {
     docProps.put(PropertyIds.OBJECT_TYPE_ID, DocumentType.DOCUMENT_BASETYPE_ID);
     
     ByteArrayInputStream in = new ByteArrayInputStream(content);
-    ContentStream contentStream = currentSession.getObjectFactory().createContentStream(fileName, content.length, mimetype, in);
+    ContentStream contentStream = getCurrentSession().getObjectFactory().createContentStream(fileName, content.length, mimetype, in);
     
-    ObjectId documentId = currentSession.createDocument(docProps, currentSession.createObjectId((String) folder.getPropertyValue(PropertyIds.OBJECT_ID)), contentStream, null, null, null, null);
-    Document document = (Document) currentSession.getObject(documentId);
+    ObjectId documentId = getCurrentSession().createDocument(docProps, getCurrentSession().createObjectId((String) folder.getPropertyValue(PropertyIds.OBJECT_ID)), contentStream, null, null, null, null);
+    Document document = (Document) getCurrentSession().getObject(documentId);
     return document;
   }
   
   public static void deleteCmisObjects(Collection<CmisObject> cmisObjects) {
 	  for (CmisObject cmisObject : cmisObjects) {
-	  	currentSession.delete(new ObjectIdImpl(cmisObject.getId()));
+	  	getCurrentSession().delete(new ObjectIdImpl(cmisObject.getId()));
 	  }
   }
   
   public static InputStream downloadDocument(Document document) {
-  	return currentSession.getContentStream(new ObjectIdImpl(document.getId())).getStream();
+  	return getCurrentSession().getContentStream(new ObjectIdImpl(document.getId())).getStream();
   }
   
   public static String uploadDocumentToFolder(Folder folder, String fileName, byte[] content) {
@@ -155,9 +171,9 @@ public class CmisUtil {
   }
   
   public static String uploadNewVersion(Document document, byte[] content, String mimetype) {
-  	 Document pwc = (Document) currentSession.getObject(document.checkOut());
+  	 Document pwc = (Document) getCurrentSession().getObject(document.checkOut());
      InputStream stream = new ByteArrayInputStream(content);
-     ContentStream contentStream = currentSession.getObjectFactory().createContentStream(
+     ContentStream contentStream = getCurrentSession().getObjectFactory().createContentStream(
              document.getName(), content.length, mimetype, stream);
      try {
          return pwc.checkIn(false, null, contentStream, "minor version").getId();

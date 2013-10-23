@@ -317,5 +317,15 @@
          class="org.activiti.designer.kickstart.eclipse.preferences.KickstartPreferencesPageInitializer">
    </initializer>
 </extension>
- 
+<extension
+      point="org.eclipse.ui.commands">
+      <!-- Command for cmis navigator refresh is needed otherwise a big ugly warning is displayed in the logs -->
+	<command
+	    name="Refresh cmis navigator"
+	    description="Refresh cmis navigator"
+	    categoryId="org.activiti.designer.kickstart.eclipse.categor"
+	    id="org.activiti.designer.kickstart.command.refreshCmisNavigator">
+	</command>
+</extension>
+	 
 </plugin>

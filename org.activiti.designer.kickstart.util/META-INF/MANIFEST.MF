@@ -9,9 +9,9 @@ Require-Bundle: org.eclipse.ui,
  org.apache.commons.lang,
  org.eclipse.core.resources,
  org.activiti.designer.libs,
- org.eclipse.ui.forms;bundle-version="3.5.200",
- org.eclipse.graphiti.ui;bundle-version="0.9.2",
- org.eclipse.graphiti;bundle-version="0.9.2"
+ org.eclipse.ui.forms,
+ org.eclipse.graphiti.ui,
+ org.eclipse.graphiti
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: org.activiti.designer.kickstart.util,
