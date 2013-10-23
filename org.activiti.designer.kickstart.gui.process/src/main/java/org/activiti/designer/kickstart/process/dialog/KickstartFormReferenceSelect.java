@@ -171,8 +171,8 @@ public class KickstartFormReferenceSelect extends TitleAreaDialog {
             }
 
             if(file != null) {
-              treeViewer.refresh(file.getParent());
-              treeViewer.setSelection(new StructuredSelection(file));
+              updateSelection(file);
+              okPressed();
             } else {
               // Best effort to show location of newly created file
               if(selectedParent != null) {

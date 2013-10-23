@@ -1,18 +1,19 @@
 package org.activiti.designer.kickstart.process.features;
 
+import java.util.UUID;
+
 import org.activiti.designer.kickstart.process.KickstartProcessPluginImage;
 import org.activiti.designer.kickstart.process.diagram.KickstartProcessFeatureProvider;
-import org.activiti.workflow.simple.definition.AbstractNamedStepDefinition;
-import org.activiti.workflow.simple.definition.HumanStepDefinition;
+import org.activiti.workflow.simple.definition.ParallelStepsDefinition;
 import org.activiti.workflow.simple.definition.StepDefinition;
 import org.eclipse.graphiti.features.context.ICreateContext;
 
-public class CreateHumanStepFeature extends AbstractCreateStepDefinitionFeature {
+public class CreateParallelStepFeature extends AbstractCreateStepDefinitionFeature {
 
-  public static final String FEATURE_ID_KEY = "human-step";
+  public static final String FEATURE_ID_KEY = "parallel-step";
 
-  public CreateHumanStepFeature(KickstartProcessFeatureProvider fp) {
-    super(fp, "Human step", "Add a human step");
+  public CreateParallelStepFeature(KickstartProcessFeatureProvider fp) {
+    super(fp, "Parallel step", "Add a parallel step");
   }
 
   @Override
@@ -22,13 +23,13 @@ public class CreateHumanStepFeature extends AbstractCreateStepDefinitionFeature 
   
   @Override
   protected StepDefinition createStepDefinition(ICreateContext context) {
-    AbstractNamedStepDefinition definition = new HumanStepDefinition();
-    definition.setName("Human step");
+    ParallelStepsDefinition definition = new ParallelStepsDefinition();
+    definition.setId(UUID.randomUUID().toString());
     return definition;
   }
 
   @Override
   public String getCreateImageId() {
-    return KickstartProcessPluginImage.HUMAN_STEP_ICON.getImageKey();
+    return KickstartProcessPluginImage.PARALLEL_STEP_ICON.getImageKey();
   }
 }

@@ -3,9 +3,13 @@ package org.activiti.designer.kickstart.process.layout;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.activiti.designer.kickstart.process.diagram.KickstartProcessFeatureProvider;
 import org.activiti.designer.kickstart.process.diagram.ProcessComponentLayout;
+import org.activiti.designer.kickstart.process.util.StepDefinitionStyles;
 import org.activiti.designer.util.editor.KickstartProcessMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
+import org.activiti.workflow.simple.definition.AbstractStepDefinitionContainer;
+import org.activiti.workflow.simple.definition.ParallelStepsDefinition;
 import org.activiti.workflow.simple.definition.StepDefinition;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
@@ -17,18 +21,20 @@ import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
 
 /**
- * Class capable of layouting elements in one column.
+ * Class capable of layouting elements in a {@link AbstractStepDefinitionContainer} in one row.
  * 
- * @author Tijs Rademakers
+ * @author Frederik Heremans
  */
-public class SingleColumnProcessLayout implements ProcessComponentLayout {
+public class StepDefinitionHorizontalLayout implements ProcessComponentLayout {
 
-  private int leftPadding = 20;
+  private int horizontalSpacing = 15;
+  private int leftPadding = horizontalSpacing;
   private int verticalSpacing = 10;
   
   public void relayout(KickstartProcessLayouter layouter, ContainerShape targetContainer) {
     int yPosition = verticalSpacing;
     int xPosition = leftPadding;
+    int maxheight = StepDefinitionStyles.DEFAULT_PARALLEL_BOX_HEIGHT;
     
     TransactionalEditingDomain editingDomain = TransactionUtil.getEditingDomain(targetContainer);
     
@@ -37,25 +43,58 @@ public class SingleColumnProcessLayout implements ProcessComponentLayout {
     
     Diagram diagram = layouter.getDiagram(targetContainer);
     KickstartProcessMemoryModel model = (ModelHandler.getKickstartProcessModel(EcoreUtil.getURI(diagram)));
+    KickstartProcessFeatureProvider featureProvider = (KickstartProcessFeatureProvider) model.getFeatureProvider();
     
     List<StepDefinition> definitionsInNewOrder = new ArrayList<StepDefinition>();
+    int count = targetContainer.getChildren().size();
+    int columnWidth = 0;
     
-    for (Shape child : targetContainer.getChildren()) {
+    if(count > 0) {
+      columnWidth = (targetContainer.getGraphicsAlgorithm().getWidth() - leftPadding) / count - horizontalSpacing;
+    } else {
+      columnWidth = (targetContainer.getGraphicsAlgorithm().getWidth() - horizontalSpacing * 2 - leftPadding);
+    }
+    
+    List<Shape> children = new ArrayList<Shape>(targetContainer.getChildren());
+    
+    for (Shape child : children) {
       Object businessObject = model.getFeatureProvider().getBusinessObjectForPictogramElement(child);
       if (businessObject instanceof StepDefinition) {
-        definitionsInNewOrder.add((StepDefinition) businessObject);
-        xPosition = leftPadding; 
+        StepDefinition definition = (StepDefinition) businessObject;
+        definitionsInNewOrder.add(definition);
+      
+        if(updateGraphicsAllowed) {
+          Graphiti.getGaService().setLocation(child.getGraphicsAlgorithm(), xPosition, yPosition);
+          
+          // Also, request an update of the shape itself, adapting it to the available width
+          featureProvider.getShapeController(definition).updateShape((ContainerShape) child, definition,
+              columnWidth, -1);
+          
+          featureProvider.getProcessLayouter().relayoutIfNeeded((ContainerShape) child, featureProvider);
+        }
+        
+        if(child.getGraphicsAlgorithm() != null && child.getGraphicsAlgorithm().getHeight() + verticalSpacing * 2 > maxheight) {
+          maxheight = child.getGraphicsAlgorithm().getHeight() + verticalSpacing * 2;
+        }
       }
-      if(updateGraphicsAllowed) {
-        Graphiti.getGaService().setLocation(child.getGraphicsAlgorithm(), xPosition, yPosition);
+      xPosition = xPosition + horizontalSpacing + columnWidth;
+    }
+    
+    if(updateGraphicsAllowed) {
+      
+      if(targetContainer.getGraphicsAlgorithm().getHeight() != maxheight) {
+        // Also, request an update of the shape itself, adapting it to the available height
+        ParallelStepsDefinition definition = (ParallelStepsDefinition) featureProvider.getBusinessObjectForPictogramElement(targetContainer);
+        featureProvider.getShapeController(definition).updateShape(targetContainer, definition,
+            -1, maxheight);
       }
-      yPosition = yPosition + child.getGraphicsAlgorithm().getHeight() + verticalSpacing;
     }
     
     if (model.isInitialized()) {
-      // Set the properties list in the new order after re-layouting
-      model.getWorkflowDefinition().getSteps().clear();
-      model.getWorkflowDefinition().getSteps().addAll(definitionsInNewOrder);
+      // Set the steps list in the new order after re-layouting
+      AbstractStepDefinitionContainer<?> container = (AbstractStepDefinitionContainer<?>) model.getFeatureProvider().getBusinessObjectForPictogramElement(targetContainer);
+      container.getSteps().clear();
+      container.getSteps().addAll(definitionsInNewOrder);
     }
   }
   
@@ -67,7 +106,7 @@ public class SingleColumnProcessLayout implements ProcessComponentLayout {
   public void moveShape(KickstartProcessLayouter layouter, ContainerShape targetContainer, ContainerShape sourceContainer, Shape shape, int x, int y) {
     boolean inSameContainer = targetContainer.equals(sourceContainer);
     
-    int xPosition = leftPadding;
+    int xPosition = horizontalSpacing;
     
     if(targetContainer.getChildren().size() == 0) {
       // First element in the container
@@ -79,8 +118,16 @@ public class SingleColumnProcessLayout implements ProcessComponentLayout {
     } else {
       // Only move when the shape is not already present as the only one in the container
       int shapeIndex = 0;
-      int targetShapeIndex = Math.max(shapeIndex - 1, 0);
-      shapeIndex++;
+      int targetShapeIndex = -1;
+
+      // Loop over all children to find the appropriate position to insert the shape
+      for (Shape child : targetContainer.getChildren()) {
+        if (child.getGraphicsAlgorithm().getX() > x) {
+          targetShapeIndex = shapeIndex;
+          break;
+        }
+        shapeIndex++;
+      }
       
       // No index specified, add at end of the container
       if(targetShapeIndex < 0) {
@@ -92,15 +139,6 @@ public class SingleColumnProcessLayout implements ProcessComponentLayout {
         sourceContainer.getChildren().remove(shape);
         targetContainer.getChildren().add(targetShapeIndex, shape);
       }
-      
-      // Finally, re-position all shapes according to their order in the container
-      relayout(layouter, targetContainer);
-    }
-      
-    // Request the other container to be re-layouted, since an element has
-    // been moved
-    if(!inSameContainer) {
-      layouter.relayout(sourceContainer);
     }
   }
 
@@ -110,6 +148,10 @@ public class SingleColumnProcessLayout implements ProcessComponentLayout {
    */
   public void setVerticalSpacing(int verticalSpacing) {
     this.verticalSpacing = verticalSpacing;
+  }
+  
+  public void setHorizontalSpacing(int horizontalSpacing) {
+    this.horizontalSpacing = horizontalSpacing;
   }
 
   /**
