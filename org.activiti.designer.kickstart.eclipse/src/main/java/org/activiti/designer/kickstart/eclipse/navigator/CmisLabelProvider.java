@@ -24,11 +24,9 @@ import org.eclipse.ui.navigator.IDescriptionProvider;
 public class CmisLabelProvider extends LabelProvider implements ILabelProvider, IDescriptionProvider {
 	
 	public CmisLabelProvider() {
-		System.out.println("Label provider wordt aangemaakt");
 	}
 
 	public String getText(Object element) {
-		System.out.println("Getting name of " + element);
 		if (element instanceof Folder) {
 			return ((Folder) element).getName();
 		} else if (element instanceof Document) {
