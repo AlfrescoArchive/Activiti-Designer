@@ -21,10 +21,16 @@ public interface SyncConstants {
 	
 	String REPOSITORY_NODE_ID = "repositoryNodeId";
 	
+	String VERSION = "versionInRepository";
+	
 	String PROCESS_FILE_EXTENSION = ".kickproc";
 	
 	int OVERWRITE_BUTTON_ID = IDialogConstants.CLIENT_ID + 1000;
 	
 	int NEW_VERSION_BUTTON_ID = IDialogConstants.CLIENT_ID + 2000;
+	
+	int USE_LOCAL_CONTENT_BUTTON_ID = IDialogConstants.CLIENT_ID + 3000;
+	
+	int USE_REPO_CONTENT_BUTTON_ID = IDialogConstants.CLIENT_ID + 4000;
 
 }

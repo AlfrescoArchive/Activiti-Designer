@@ -64,7 +64,7 @@ public class SyncProcessWithRepositoryDelegate implements IObjectActionDelegate 
 				CmisObject cmisObject = CmisUtil.getCmisObject(nodeId);
 				if (cmisObject != null && cmisObject instanceof Document) {
 					final Document document = (Document) cmisObject;
-					SyncUtil.startProcessSynchronizationBackgroundJob(shell, document, selectedFile.getName(), false, selectedFile);
+					SyncUtil.startProcessSynchronizationBackgroundJob(shell, document, selectedFile.getName(), false, false, selectedFile);
 				} else {
 					showLocationSelectionDialog();
 				}

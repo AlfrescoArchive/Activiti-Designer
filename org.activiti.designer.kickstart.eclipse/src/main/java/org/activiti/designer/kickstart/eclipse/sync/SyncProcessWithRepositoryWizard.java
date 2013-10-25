@@ -48,6 +48,7 @@ public class SyncProcessWithRepositoryWizard extends Wizard {
 					synchronizationDataHolder.getDestination(),
 					synchronizationDataHolder.getTargetFileName(), 
 					true,
+					false,
 					synchronizationDataHolder.getSourceFile());
 		}
 		return true;

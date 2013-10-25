@@ -42,7 +42,7 @@ import org.eclipse.swt.widgets.Shell;
 public class SyncUtil {
 	
 	public static void startProcessSynchronizationBackgroundJob(final Shell shell, final CmisObject destination, 
-			final String targetFileName, final boolean warnForExistingFile, final IFile sourceFile) {
+			final String targetFileName, final boolean warnForExistingFile, final boolean ignoreVersions, final IFile sourceFile) {
 		
 	  Job uploadJob = new Job("Uploading file") {
 
@@ -52,6 +52,7 @@ public class SyncUtil {
 	  			String nodeId = null;
 	  			
 	  			// If destination is a folder, upload document to it
+	  			// If file already exists in folder, the CmisConstraint exception is thrown (see below)
 	  			if (destination instanceof Folder) {
 		  			byte[] content = IoUtils.getBytesFromInputStream(sourceFile.getContents());
 						nodeId = CmisUtil.uploadDocumentToFolder((Folder) destination, targetFileName, content);
@@ -60,16 +61,28 @@ public class SyncUtil {
 	  					showFileExistsDialog(shell, targetFileName, sourceFile, (Document) destination);
 	  					return Status.CANCEL_STATUS;
 	  				} else {
-	  					nodeId = uploadFileToRepository((Document) destination, sourceFile);
+	  					
+	  					// Verify versions
+	  	  			String repoVersionLabel = ((Document) destination).getVersionLabel();
+	  	  			String localVersionLabel = retrieveLocalVersionLabel(sourceFile);
+	  	  			
+	  	  			if (!ignoreVersions && (compareVersions(localVersionLabel, repoVersionLabel) < 0)) { // local version is behind, we need to check
+	  	  				showFileExistsDialog(shell, targetFileName, sourceFile, (Document) destination);
+	  	  				return Status.CANCEL_STATUS;
+	  	  			} else {
+	  	  				nodeId = uploadFileToRepository((Document) destination, sourceFile);
+	  	  			}
+	  					
 	  				}
 	  			}
 	  			
-	  			updateKickstartProcessJson(sourceFile, nodeId);
+	  			Document processDocumentInRepo = (Document) CmisUtil.getCmisObject(nodeId);
+	  			updateKickstartProcessJson(sourceFile, processDocumentInRepo);
 					showSuccessMessage(shell, destination);
 	     
 	      } catch (CmisConstraintException cmisConstraintException) {
 	      	
-	      	// A file already exists: resolve conflict
+	      	// A file already exists (but there was no node id): resolve conflict
 	      	
 	      	Document targetDocument = null;
 	      	if (destination instanceof Document) {
@@ -97,11 +110,11 @@ public class SyncUtil {
 	  	}
 
 			private void showFileExistsDialog(final Shell shell,
-          final String targetFileName, final IFile sourceFile, final Document d) {
+          final String targetFileName, final IFile sourceFile, final Document destination) {
 	      Display.getDefault().syncExec(new Runnable() {
 	      	public void run() {
 	      		FileExistsInFolderDialog fileExistsInFolderDialog = 
-	      				new FileExistsInFolderDialog(shell, d, targetFileName, sourceFile);
+	      				new FileExistsInFolderDialog(shell, destination, targetFileName, sourceFile);
 	      		fileExistsInFolderDialog.open();
 	      	}
 	      });
@@ -112,19 +125,26 @@ public class SyncUtil {
 	  uploadJob.schedule();
   }
 	
+	public static String retrieveLocalVersionLabel(final IFile sourceFile) throws CoreException {
+    SimpleWorkflowJsonConverter simpleWorkflowJsonConverter = new SimpleWorkflowJsonConverter();
+    WorkflowDefinition workflowDefinition = simpleWorkflowJsonConverter.readWorkflowDefinition(sourceFile.getContents());
+    return (String) workflowDefinition.getParameters().get(SyncConstants.VERSION);
+  }
+	
 
 	private static String uploadFileToRepository(final Document document,final IFile sourceFile) throws IOException, CoreException {
     return CmisUtil.uploadNewVersion(document, IoUtils.getBytesFromInputStream(sourceFile.getContents()), "application/zip");
   }
 	
-	private static void updateKickstartProcessJson(IFile sourceFile, String nodeId) throws CoreException, IOException {
+	private static void updateKickstartProcessJson(IFile sourceFile, Document document) throws CoreException, IOException {
 
 		// Read
 		SimpleWorkflowJsonConverter simpleWorkflowJsonConverter = new SimpleWorkflowJsonConverter();
 		WorkflowDefinition workflowDefinition = simpleWorkflowJsonConverter.readWorkflowDefinition(sourceFile.getContents());
 		
 		// Update
-		workflowDefinition.getParameters().put(SyncConstants.REPOSITORY_NODE_ID, nodeId);
+		workflowDefinition.getParameters().put(SyncConstants.REPOSITORY_NODE_ID, document.getId());
+		workflowDefinition.getParameters().put(SyncConstants.VERSION, document.getVersionLabel());
 		
 		// Write
 		FileWriter writer = new FileWriter(new File(sourceFile.getLocationURI().getPath()));
@@ -132,7 +152,7 @@ public class SyncUtil {
 		sourceFile.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
 	}
 
-	private static void showSuccessMessage(final Shell shell, final CmisObject cmisObject) {
+	protected static void showSuccessMessage(final Shell shell, final CmisObject cmisObject) {
     Display.getDefault().syncExec(new Runnable() {
     	public void run() {
     		String path = (cmisObject instanceof Folder) ? 
@@ -142,5 +162,54 @@ public class SyncUtil {
     	}
     });
   }
+	
+	public static void copyRepoFileToLocalFile(final Shell shell, final IFile sourceFile, final Document destination) {
+		Job downloadJob = new Job("Downloading file") {
+			@Override
+			protected IStatus run(IProgressMonitor monitor) {
+				try {
+					
+          sourceFile.setContents(CmisUtil.downloadDocument(destination), true, true, monitor);
+      		updateKickstartProcessJson(sourceFile, destination);
+					showSuccessMessage(shell, destination);
+					
+          return Status.OK_STATUS;
+        } catch (Exception e) {
+          e.printStackTrace();
+          return Status.CANCEL_STATUS;
+        }
+			}
+		};
+		downloadJob.setUser(true);
+		downloadJob.schedule();
+	}
+	
+	/**
+	 * -1 : versionLabel1 < versionLabel2 
+	 * 0  : equal
+	 * 1  : versionLabel1 > versionLabel2
+	 * null: error happened
+	 */
+	public static Integer compareVersions(String versionLabel1, String versionLabel2) {
+		try {
+			int majorVersion1 = Integer.valueOf(versionLabel1.split("\\.")[0]);
+			int minorVersion1 = Integer.valueOf(versionLabel1.split("\\.")[1]);
+			
+			int majorVersion2 = Integer.valueOf(versionLabel2.split("\\.")[0]);
+			int minorVersion2 = Integer.valueOf(versionLabel2.split("\\.")[1]);
+	
+			if (majorVersion1 != majorVersion2) {
+				return new Integer(majorVersion1).compareTo(new Integer(majorVersion2));
+			} else {
+				
+				// major version is equal
+				return new Integer(minorVersion1).compareTo(new Integer(minorVersion2));
+				
+			}
+		} catch (Exception e) {
+			return null;
+		}
+		
+	}
 
 }

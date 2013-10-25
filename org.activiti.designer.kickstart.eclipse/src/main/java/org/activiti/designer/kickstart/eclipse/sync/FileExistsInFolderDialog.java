@@ -13,6 +13,7 @@
 package org.activiti.designer.kickstart.eclipse.sync;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.eclipse.core.resources.IFile;
+import org.eclipse.core.runtime.CoreException;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.dialogs.TitleAreaDialog;
 import org.eclipse.swt.SWT;
@@ -33,20 +34,50 @@ public class FileExistsInFolderDialog extends TitleAreaDialog {
 	protected String targetFileName;
 	protected IFile sourceFile;
 	
+	protected boolean defaultSetup;
+	protected boolean repoVersionIsHigher;
+	
 	
   public FileExistsInFolderDialog(Shell parentShell, Document destination, String targetFileName, IFile sourceFile) {
     super(parentShell);
     this.destination = destination;
     this.targetFileName = targetFileName;
     this.sourceFile = sourceFile;
+    
+    try {
+    	defaultSetup = true;
+	    String localVersionLabel = SyncUtil.retrieveLocalVersionLabel(sourceFile);
+	    if (localVersionLabel != null) {
+	    	int versionComparison = SyncUtil.compareVersions(localVersionLabel, destination.getVersionLabel());
+	    	if (versionComparison < 0) {
+	    		repoVersionIsHigher = true;
+	    		defaultSetup = false;
+	    	} 
+	    }
+    } catch (CoreException e) {
+    		// just do the default then, is already set
+    }
   }
 
   @Override
   public void create() {
     super.create();
-    setTitle("This process already exists in this location");
-    setMessage("No previous synchronization data found. Do you want to upload a new version? " +
+    setTitle("Conflict situation");
+    
+    if (defaultSetup) {
+    	setDefaultMessage();
+    } else if (repoVersionIsHigher) {
+    	setRepoVersionIsHigherMessage();
+    }
+  }
+
+	private void setDefaultMessage() {
+	  setMessage("No previous synchronization data found. Do you want to upload a new version? " +
     		"This makes the local content the latest version in the repository.");
+  }
+	
+	private void setRepoVersionIsHigherMessage() {
+	  setMessage("The file in the repository has been updated by others. What do you want to do?");
   }
 
   @Override
@@ -62,18 +93,42 @@ public class FileExistsInFolderDialog extends TitleAreaDialog {
   
   @Override
   protected void createButtonsForButtonBar(Composite parent) {
-		createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
 		
-		Button newVersionButton = createButton(parent, SyncConstants.NEW_VERSION_BUTTON_ID, "Create new version", true);
-		newVersionButton.addSelectionListener(new SelectionAdapter() {
-    	@Override
-    	public void widgetSelected(SelectionEvent e) {
-    		SyncUtil.startProcessSynchronizationBackgroundJob(
-    				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
-    				destination, targetFileName, false, sourceFile);
-    		close();
-    	}
-  	});
+		if (defaultSetup) {
+			createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, false);
+			Button newVersionButton = createButton(parent, SyncConstants.NEW_VERSION_BUTTON_ID, "Create new version", true);
+			newVersionButton.addSelectionListener(new SelectionAdapter() {
+	    	@Override
+	    	public void widgetSelected(SelectionEvent e) {
+	    		SyncUtil.startProcessSynchronizationBackgroundJob(
+	    				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
+	    				destination, targetFileName, false, true, sourceFile);
+	    		close();
+	    	}
+	  	});
+		} else if (repoVersionIsHigher) {
+			createButton(parent, IDialogConstants.CANCEL_ID, IDialogConstants.CANCEL_LABEL, true);
+			
+			Button useLocalContentButton = createButton(parent, SyncConstants.USE_LOCAL_CONTENT_BUTTON_ID, "Copy local version to repository", false);
+			useLocalContentButton.addSelectionListener(new SelectionAdapter() {
+	    	@Override
+	    	public void widgetSelected(SelectionEvent e) {
+	    		SyncUtil.startProcessSynchronizationBackgroundJob(
+	    				PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), 
+	    				destination, targetFileName, false, true, sourceFile);
+	    		close();
+	    	}
+	  	});
+			
+			Button useRepoContentButton = createButton(parent, SyncConstants.USE_REPO_CONTENT_BUTTON_ID, "Copy repo version to local file", false);
+			useRepoContentButton.addSelectionListener(new SelectionAdapter() {
+	    	@Override
+	    	public void widgetSelected(SelectionEvent e) {
+	    		SyncUtil.copyRepoFileToLocalFile(getShell(), sourceFile, destination);
+	    		close();
+	    	}
+	  	});
+		}
   }
   
   @Override
@@ -83,7 +138,7 @@ public class FileExistsInFolderDialog extends TitleAreaDialog {
 
   @Override
   protected Point getInitialSize() {
-    return new Point(500, 200);
+    return new Point(680, 200);
   }
 
 } 
