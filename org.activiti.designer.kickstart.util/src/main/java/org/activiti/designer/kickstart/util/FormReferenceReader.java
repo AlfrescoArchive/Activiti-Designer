@@ -7,7 +7,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import org.activiti.workflow.simple.converter.json.SimpleWorkflowJsonConverter;
+import org.activiti.workflow.simple.alfresco.conversion.json.AlfrescoSimpleWorkflowJsonConverter;
 import org.activiti.workflow.simple.definition.HumanStepDefinition;
 import org.activiti.workflow.simple.definition.StepDefinition;
 import org.activiti.workflow.simple.definition.WorkflowDefinition;
@@ -27,13 +27,13 @@ public class FormReferenceReader {
   private Set<HumanStepDefinition> definitionsTouched = new HashSet<HumanStepDefinition>();
   private WorkflowDefinition definition;
   private IProject project;
-  private SimpleWorkflowJsonConverter converter;
+  private AlfrescoSimpleWorkflowJsonConverter converter;
 
   public FormReferenceReader(WorkflowDefinition definition, IProject project) {
     this.definition = definition;
     this.project = project;
 
-    converter = new SimpleWorkflowJsonConverter();
+    converter = new AlfrescoSimpleWorkflowJsonConverter();
   }
 
   public Map<String, FormDefinition> getReferencedForms() {

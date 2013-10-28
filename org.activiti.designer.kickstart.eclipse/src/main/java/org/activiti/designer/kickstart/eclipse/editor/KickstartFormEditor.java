@@ -9,7 +9,7 @@ import org.activiti.designer.kickstart.eclipse.ui.ActivitiEditorContextMenuProvi
 import org.activiti.designer.kickstart.eclipse.util.FileService;
 import org.activiti.designer.util.editor.KickstartFormMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
-import org.activiti.workflow.simple.converter.json.SimpleWorkflowJsonConverter;
+import org.activiti.workflow.simple.alfresco.conversion.json.AlfrescoSimpleWorkflowJsonConverter;
 import org.activiti.workflow.simple.definition.form.FormDefinition;
 import org.activiti.workflow.simple.definition.form.FormPropertyDefinition;
 import org.activiti.workflow.simple.definition.form.FormPropertyGroup;
@@ -40,10 +40,10 @@ import org.eclipse.ui.PartInitException;
 public class KickstartFormEditor extends DiagramEditor {
 
   private static GraphicalViewer activeGraphicalViewer;
-  private SimpleWorkflowJsonConverter jsonConverter;
+  private AlfrescoSimpleWorkflowJsonConverter jsonConverter;
 
   public KickstartFormEditor() {
-    jsonConverter = new SimpleWorkflowJsonConverter();
+    jsonConverter = new AlfrescoSimpleWorkflowJsonConverter();
   }
 
   @Override

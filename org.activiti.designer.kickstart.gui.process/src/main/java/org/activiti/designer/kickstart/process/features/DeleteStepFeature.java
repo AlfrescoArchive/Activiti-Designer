@@ -5,6 +5,8 @@ import org.activiti.designer.kickstart.process.layout.KickstartProcessLayouter;
 import org.activiti.designer.util.editor.KickstartProcessMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.workflow.simple.definition.AbstractStepDefinitionContainer;
+import org.activiti.workflow.simple.definition.ListStepDefinition;
+import org.activiti.workflow.simple.definition.ParallelStepsDefinition;
 import org.activiti.workflow.simple.definition.StepDefinition;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.ICustomUndoableFeature;
@@ -16,7 +18,7 @@ import org.eclipse.graphiti.ui.features.DefaultDeleteFeature;
 public class DeleteStepFeature extends DefaultDeleteFeature implements ICustomUndoableFeature {
 
   protected StepDefinition deletedObject;
-  protected AbstractStepDefinitionContainer<StepDefinition> definitionContainer;
+  protected StepDefinition definitionContainer;
   protected boolean forceDelete = false;
   
   public DeleteStepFeature(KickstartProcessFeatureProvider fp) {
@@ -31,13 +33,15 @@ public class DeleteStepFeature extends DefaultDeleteFeature implements ICustomUn
   
   
   @Override
-  @SuppressWarnings("unchecked")
   public void delete(IDeleteContext context) {
     ContainerShape parent = null;
     if(context.getPictogramElement() instanceof ContainerShape) {
       parent = ((ContainerShape) context.getPictogramElement()).getContainer();
       
-      definitionContainer = (AbstractStepDefinitionContainer<StepDefinition>) getBusinessObjectForPictogramElement(parent);
+      Object parentObject = getBusinessObjectForPictogramElement(parent);
+      if(parentObject instanceof StepDefinition) {
+        definitionContainer = (StepDefinition) parentObject ;
+      }
       deletedObject = (StepDefinition) getBusinessObjectForPictogramElement(context.getPictogramElement());
       
       super.delete(context);
@@ -62,11 +66,16 @@ public class DeleteStepFeature extends DefaultDeleteFeature implements ICustomUn
     return ((KickstartProcessFeatureProvider)getFeatureProvider()).getProcessLayouter(); 
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void undo(IContext context) {
     KickstartProcessMemoryModel model = (ModelHandler.getKickstartProcessModel(EcoreUtil.getURI(getDiagram())));
     if(model != null && model.isInitialized() && deletedObject != null && definitionContainer != null) {
-      definitionContainer.addStep(deletedObject);
+      if(definitionContainer instanceof ParallelStepsDefinition && deletedObject instanceof ListStepDefinition<?>) {
+        ((ParallelStepsDefinition) definitionContainer).getStepList().add((ListStepDefinition<ParallelStepsDefinition>) deletedObject);
+      } else if(definitionContainer instanceof AbstractStepDefinitionContainer<?>) {
+        ((AbstractStepDefinitionContainer<ListStepDefinition<?>>) definitionContainer).addStep(deletedObject);
+      }
     }
     
     if(((IDeleteContext)context).getPictogramElement() instanceof ContainerShape) {
@@ -80,11 +89,16 @@ public class DeleteStepFeature extends DefaultDeleteFeature implements ICustomUn
     return deletedObject != null;
   }
 
+  @SuppressWarnings("unchecked")
   @Override
   public void redo(IContext context) {
     KickstartProcessMemoryModel model = (ModelHandler.getKickstartProcessModel(EcoreUtil.getURI(getDiagram())));
     if(model != null && model.isInitialized() && deletedObject != null && definitionContainer != null) {
-      definitionContainer.getSteps().remove(deletedObject);
+      if(definitionContainer instanceof ParallelStepsDefinition && deletedObject instanceof ListStepDefinition<?>) {
+        ((ParallelStepsDefinition) definitionContainer).getStepList().remove((ListStepDefinition<ParallelStepsDefinition>) deletedObject);
+      } else if(definitionContainer instanceof AbstractStepDefinitionContainer<?>) {
+        ((AbstractStepDefinitionContainer<ListStepDefinition<?>>) definitionContainer).getSteps().remove(deletedObject);
+      }
     }
   }
   

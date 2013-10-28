@@ -7,10 +7,17 @@ import org.activiti.designer.kickstart.process.command.KickstartProcessModelUpda
 import org.activiti.designer.kickstart.process.command.StepDefinitionModelUpdater;
 import org.activiti.designer.kickstart.process.command.WorkflowDefinitionModelUpdater;
 import org.activiti.designer.kickstart.process.diagram.shape.BusinessObjectShapeController;
+import org.activiti.designer.kickstart.process.diagram.shape.ChoiceStepShapeController;
+import org.activiti.designer.kickstart.process.diagram.shape.DelayStepShapeController;
+import org.activiti.designer.kickstart.process.diagram.shape.EmailStepShapeController;
 import org.activiti.designer.kickstart.process.diagram.shape.HumanStepShapeController;
+import org.activiti.designer.kickstart.process.diagram.shape.ListConditionStepShapeController;
 import org.activiti.designer.kickstart.process.diagram.shape.ListStepShapeController;
 import org.activiti.designer.kickstart.process.diagram.shape.ParallelStepShapeController;
 import org.activiti.designer.kickstart.process.features.AddStepDefinitionFeature;
+import org.activiti.designer.kickstart.process.features.CreateChoiceStepFeature;
+import org.activiti.designer.kickstart.process.features.CreateDelayStepFeature;
+import org.activiti.designer.kickstart.process.features.CreateEmailStepFeature;
 import org.activiti.designer.kickstart.process.features.CreateHumanStepFeature;
 import org.activiti.designer.kickstart.process.features.CreateParallelStepFeature;
 import org.activiti.designer.kickstart.process.features.DeleteStepFeature;
@@ -59,6 +66,10 @@ public class KickstartProcessFeatureProvider extends DefaultFeatureProvider {
     shapeControllers.add(new HumanStepShapeController(this));
     shapeControllers.add(new ParallelStepShapeController(this));
     shapeControllers.add(new ListStepShapeController(this));
+    shapeControllers.add(new ChoiceStepShapeController(this));
+    shapeControllers.add(new ListConditionStepShapeController(this));
+    shapeControllers.add(new DelayStepShapeController(this));
+    shapeControllers.add(new EmailStepShapeController(this));
   }
 
   /**
@@ -114,7 +125,10 @@ public class KickstartProcessFeatureProvider extends DefaultFeatureProvider {
 
   @Override
   public ICreateFeature[] getCreateFeatures() {
-    return new ICreateFeature[] { new CreateHumanStepFeature(this), new CreateParallelStepFeature(this) };
+    return new ICreateFeature[] { 
+        new CreateHumanStepFeature(this), new CreateParallelStepFeature(this) , new CreateChoiceStepFeature(this),
+        new CreateDelayStepFeature(this), new CreateEmailStepFeature(this)
+    };
   }
 
   @Override

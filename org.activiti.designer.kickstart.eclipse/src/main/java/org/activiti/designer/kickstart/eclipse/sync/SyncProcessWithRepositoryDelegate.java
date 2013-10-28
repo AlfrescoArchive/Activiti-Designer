@@ -13,7 +13,7 @@
 package org.activiti.designer.kickstart.eclipse.sync;
 import org.activiti.designer.kickstart.eclipse.Logger;
 import org.activiti.designer.kickstart.eclipse.navigator.CmisUtil;
-import org.activiti.workflow.simple.converter.json.SimpleWorkflowJsonConverter;
+import org.activiti.workflow.simple.alfresco.conversion.json.AlfrescoSimpleWorkflowJsonConverter;
 import org.activiti.workflow.simple.definition.WorkflowDefinition;
 import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Document;
@@ -49,7 +49,7 @@ public class SyncProcessWithRepositoryDelegate implements IObjectActionDelegate 
 		
 		try {
 			// Check if the selected process has a node id in the json
-			SimpleWorkflowJsonConverter simpleWorkflowJsonConverter = new SimpleWorkflowJsonConverter();
+		  AlfrescoSimpleWorkflowJsonConverter simpleWorkflowJsonConverter = new AlfrescoSimpleWorkflowJsonConverter();
 			WorkflowDefinition workflowDefinition = simpleWorkflowJsonConverter.readWorkflowDefinition(selectedFile.getContents());
 			String nodeId = (String) workflowDefinition.getParameters().get(SyncConstants.REPOSITORY_NODE_ID);
 			

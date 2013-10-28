@@ -2,11 +2,14 @@ package org.activiti.designer.kickstart.process.layout;
 
 import org.activiti.designer.kickstart.process.diagram.KickstartProcessFeatureProvider;
 import org.activiti.designer.kickstart.process.diagram.ProcessComponentLayout;
+import org.activiti.designer.kickstart.process.diagram.shape.BusinessObjectShapeController;
+import org.activiti.designer.kickstart.process.diagram.shape.WrappingChildShapeController;
 import org.activiti.designer.kickstart.process.features.DeleteStepFeature;
-import org.activiti.designer.kickstart.process.features.REMOVEMEListStepDefinition;
 import org.activiti.designer.util.editor.KickstartProcessMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
-import org.activiti.workflow.simple.definition.AbstractStepDefinitionContainer;
+import org.activiti.workflow.simple.definition.ChoiceStepsDefinition;
+import org.activiti.workflow.simple.definition.ListConditionStepDefinition;
+import org.activiti.workflow.simple.definition.ListStepDefinition;
 import org.activiti.workflow.simple.definition.ParallelStepsDefinition;
 import org.activiti.workflow.simple.definition.StepDefinition;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -30,11 +33,15 @@ public class KickstartProcessLayouter {
   private ProcessStepsVerticalLayout defaultLayout;
   protected StepDefinitionHorizontalLayout parallelLayout;
   protected StepDefinitionVerticalLayout serialLayout;
+  protected StepDefinitionVerticalLayout serialLayoutWithLabel;
 
   public KickstartProcessLayouter() {
     defaultLayout = new ProcessStepsVerticalLayout();
     parallelLayout = new StepDefinitionHorizontalLayout();
     serialLayout = new StepDefinitionVerticalLayout();
+    serialLayoutWithLabel = new StepDefinitionVerticalLayout();
+    serialLayoutWithLabel.setTopPadding(20);
+    serialLayoutWithLabel.setSkipFirstShape(true);
   }
 
   /**
@@ -57,7 +64,8 @@ public class KickstartProcessLayouter {
       return containerShape;
     } else {
       Object containerObject = model.getFeatureProvider().getBusinessObjectForPictogramElement(containerShape);
-      if (containerObject instanceof ParallelStepsDefinition || containerObject instanceof REMOVEMEListStepDefinition) {
+      if (containerObject instanceof ParallelStepsDefinition || containerObject instanceof ListStepDefinition<?> 
+        || containerObject instanceof ChoiceStepsDefinition || containerObject instanceof ListConditionStepDefinition<?>) {
         // Shape represent a parallel step-definition, this has it's own layout
         return containerShape;
       } else {
@@ -85,39 +93,41 @@ public class KickstartProcessLayouter {
    * @return the container the shape was moved to, can differ from the provided targetContainer.
    */
   public ContainerShape moveShape(KickstartProcessFeatureProvider provider, ContainerShape targetContainer,
-      ContainerShape sourceContainer, Shape shape, int x, int y, boolean afterCreate) {
+    ContainerShape sourceContainer, Shape shape, int x, int y, boolean afterCreate) {
     ContainerShape actualTargetContainer = getValidLayoutContainerShape(targetContainer, shape);
 
-    // Special handling for targets that need an additional wrapper
     Object targetDefinition = provider.getBusinessObjectForPictogramElement(actualTargetContainer);
+    Object businessObject = provider.getBusinessObjectForPictogramElement(shape);
 
+    // Special handling for targets that need an additional wrapper
     boolean wrapperCreated = false;
-    
-    // Special handling for parallel and choice-steps, the definitions are wrapped in a new type
-    if (targetDefinition instanceof ParallelStepsDefinition) {
-      Object businessObject = provider.getBusinessObjectForPictogramElement(shape);
-      if (businessObject instanceof StepDefinition && !(businessObject instanceof AbstractStepDefinitionContainer<?>)) {
-        actualTargetContainer.getChildren().remove(shape);
-
-        REMOVEMEListStepDefinition wrapper = new REMOVEMEListStepDefinition();
-        wrapper.addStep((StepDefinition) businessObject);
-        AreaContext area = new AreaContext();
-        area.setX(-1);
-        area.setY(-1);
-        AddContext addContext = new AddContext(area, wrapper);
-        addContext.setTargetContainer(actualTargetContainer);
-        PictogramElement createdElement = provider.getAddFeature(addContext).add(addContext);
-
-        actualTargetContainer = (ContainerShape) createdElement;
-        wrapperCreated = true;
-        
-        if(sourceContainer != actualTargetContainer) {
-          sourceContainer.getChildren().remove(shape);
+    if(targetDefinition instanceof StepDefinition) {
+      BusinessObjectShapeController targetController = provider.getShapeController(targetDefinition);
+      if(businessObject instanceof StepDefinition && targetController instanceof WrappingChildShapeController) {
+        WrappingChildShapeController wrappingController = (WrappingChildShapeController) targetController;
+        if(wrappingController.shouldWrapChild((StepDefinition) businessObject)) {
+          actualTargetContainer.getChildren().remove(shape);
+          StepDefinition wrapper = wrappingController.wrapChild((StepDefinition) businessObject);
+          AreaContext area = new AreaContext();
+          area.setX(-1);
+          area.setY(-1);
+          AddContext addContext = new AddContext(area, wrapper);
+          addContext.setTargetContainer(actualTargetContainer);
+          
+          // Actually add the wrapped element instead of the moved element
+          PictogramElement createdElement = provider.getAddFeature(addContext).add(addContext);
+          
+          actualTargetContainer = (ContainerShape) createdElement;
+          wrapperCreated = true;
+          
+          if(sourceContainer != actualTargetContainer) {
+            sourceContainer.getChildren().remove(shape);
+          }
         }
       }
     }
 
-    // only do the actual move in case NO new wrapper has been created
+    // Only do the actual move in case NO new wrapper has been created
     if(!wrapperCreated) {
       if (actualTargetContainer != targetContainer) {
         // X and Y need to be recalculated using coordinates of container shapes
@@ -129,9 +139,9 @@ public class KickstartProcessLayouter {
           offsetContainer = offsetContainer.getContainer();
         }
       }
-      
       getLayoutForContainer(actualTargetContainer).moveShape(this, actualTargetContainer, sourceContainer, shape, x, y);
     }
+    
     relayoutAll(actualTargetContainer, provider);
     return actualTargetContainer;
   }
@@ -189,20 +199,27 @@ public class KickstartProcessLayouter {
 
     // In case the source-container is a wrapper and it's empty, delete it
     Object businessObjectForSource = provider.getBusinessObjectForPictogramElement(actualTargetContainer);
-    if (businessObjectForSource instanceof REMOVEMEListStepDefinition) {
-      REMOVEMEListStepDefinition containerDefinition = (REMOVEMEListStepDefinition) businessObjectForSource;
-      if (containerDefinition.getSteps().isEmpty()) {
-        ContainerShape parent = actualTargetContainer.getContainer();
-        // Delete the source container if the last child is moved from it
-        DeleteContext context = new DeleteContext(actualTargetContainer);
-        IDeleteFeature deleteFeature = provider.getDeleteFeature(context);
-        if (deleteFeature instanceof DeleteStepFeature) {
-          ((DeleteStepFeature) deleteFeature).setForceDelete(true);
+    if(actualTargetContainer.getContainer() != null) {
+      Object parentDefinition = provider.getBusinessObjectForPictogramElement(actualTargetContainer.getContainer());
+      if(parentDefinition != null && parentDefinition instanceof StepDefinition) {
+        BusinessObjectShapeController parentController = provider.getShapeController(parentDefinition);
+        if(businessObjectForSource instanceof StepDefinition && parentController instanceof WrappingChildShapeController) {
+          WrappingChildShapeController wrappingController = (WrappingChildShapeController) parentController;
+          if(wrappingController.shouldDeleteWrapper((StepDefinition) businessObjectForSource)) {
+            ContainerShape parent = actualTargetContainer.getContainer();
+            
+            // Wrapper shape should be removed
+            DeleteContext context = new DeleteContext(actualTargetContainer);
+            IDeleteFeature deleteFeature = provider.getDeleteFeature(context);
+            if (deleteFeature instanceof DeleteStepFeature) {
+              ((DeleteStepFeature) deleteFeature).setForceDelete(true);
+            }
+            deleteFeature.execute(context);
+            
+            // Force relayout of parent due to removal of this step
+            relayoutAll(parent, provider);
+          }
         }
-        deleteFeature.execute(context);
-        
-        // Force relayout of parent due to removal of this step
-        relayoutIfNeeded(parent, provider);
       }
     }
   }
@@ -213,10 +230,12 @@ public class KickstartProcessLayouter {
     } else {
       Object businessObject = ModelHandler.getKickstartProcessModel(EcoreUtil.getURI(getDiagram(container)))
           .getFeatureProvider().getBusinessObjectForPictogramElement(container);
-      if (businessObject instanceof ParallelStepsDefinition) {
+      if (businessObject instanceof ParallelStepsDefinition || businessObject instanceof ChoiceStepsDefinition) {
         return parallelLayout;
-      } else if (businessObject instanceof REMOVEMEListStepDefinition) {
+      } else if (businessObject instanceof ListStepDefinition<?>) {
         return serialLayout;
+      } else if (businessObject instanceof ListConditionStepDefinition<?>) {
+        return serialLayoutWithLabel;
       }
     }
     return null;

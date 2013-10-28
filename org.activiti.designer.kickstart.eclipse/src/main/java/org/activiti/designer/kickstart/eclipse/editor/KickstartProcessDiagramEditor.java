@@ -4,11 +4,12 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileWriter;
 
+import org.activiti.designer.kickstart.eclipse.common.KickstartPlugin;
 import org.activiti.designer.kickstart.eclipse.ui.ActivitiEditorContextMenuProvider;
 import org.activiti.designer.kickstart.eclipse.util.FileService;
 import org.activiti.designer.util.editor.KickstartProcessMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
-import org.activiti.workflow.simple.converter.json.SimpleWorkflowJsonConverter;
+import org.activiti.workflow.simple.alfresco.conversion.json.AlfrescoSimpleWorkflowJsonConverter;
 import org.activiti.workflow.simple.definition.StepDefinition;
 import org.activiti.workflow.simple.definition.WorkflowDefinition;
 import org.eclipse.core.resources.IFile;
@@ -17,6 +18,8 @@ import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.IStatus;
+import org.eclipse.core.runtime.Status;
 import org.eclipse.emf.common.command.BasicCommandStack;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.transaction.RecordingCommand;
@@ -29,6 +32,7 @@ import org.eclipse.graphiti.features.context.impl.AreaContext;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
@@ -113,7 +117,7 @@ public class KickstartProcessDiagramEditor extends DiagramEditor {
       KickstartProcessMemoryModel model = ModelHandler.getKickstartProcessModel(EcoreUtil
           .getURI(getDiagramTypeProvider().getDiagram()));
 
-      SimpleWorkflowJsonConverter converter = new SimpleWorkflowJsonConverter();
+      AlfrescoSimpleWorkflowJsonConverter converter = new AlfrescoSimpleWorkflowJsonConverter();
       File objectsFile = new File(diagramFileString);
       FileWriter writer = new FileWriter(objectsFile);
       converter.writeWorkflowDefinition(model.getWorkflowDefinition(), writer);
@@ -160,12 +164,19 @@ public class KickstartProcessDiagramEditor extends DiagramEditor {
         dataFile.refreshLocal(IResource.DEPTH_INFINITE, null);
       } else {
         FileInputStream fileStream = new FileInputStream(kickstartProcessFile);
-        SimpleWorkflowJsonConverter converter = new SimpleWorkflowJsonConverter();
+        AlfrescoSimpleWorkflowJsonConverter converter = new AlfrescoSimpleWorkflowJsonConverter();
         WorkflowDefinition definition = null;
         try {
           definition = converter.readWorkflowDefinition(fileStream);
         } catch (Exception e) {
           definition = new WorkflowDefinition();
+          Status errorStatus = null;
+          if(e.getCause() != null) {
+            errorStatus = new Status(IStatus.ERROR, KickstartPlugin.PLUGIN_ID, e.getCause().getMessage());
+          } else {
+            errorStatus = new Status(IStatus.ERROR, KickstartPlugin.PLUGIN_ID, e.getMessage());
+          }
+          ErrorDialog.openError(getSite().getShell(), "Error", "An error occured while reading kickstart process file.", errorStatus);
         }
         model.setWorkflowDefinition(definition);
 

@@ -19,7 +19,7 @@ import java.io.IOException;
 import org.activiti.designer.kickstart.eclipse.Logger;
 import org.activiti.designer.kickstart.eclipse.common.IoUtils;
 import org.activiti.designer.kickstart.eclipse.navigator.CmisUtil;
-import org.activiti.workflow.simple.converter.json.SimpleWorkflowJsonConverter;
+import org.activiti.workflow.simple.alfresco.conversion.json.AlfrescoSimpleWorkflowJsonConverter;
 import org.activiti.workflow.simple.definition.WorkflowDefinition;
 import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Document;
@@ -126,7 +126,7 @@ public class SyncUtil {
   }
 	
 	public static String retrieveLocalVersionLabel(final IFile sourceFile) throws CoreException {
-    SimpleWorkflowJsonConverter simpleWorkflowJsonConverter = new SimpleWorkflowJsonConverter();
+    AlfrescoSimpleWorkflowJsonConverter simpleWorkflowJsonConverter = new AlfrescoSimpleWorkflowJsonConverter();
     WorkflowDefinition workflowDefinition = simpleWorkflowJsonConverter.readWorkflowDefinition(sourceFile.getContents());
     return (String) workflowDefinition.getParameters().get(SyncConstants.VERSION);
   }
@@ -139,7 +139,7 @@ public class SyncUtil {
 	private static void updateKickstartProcessJson(IFile sourceFile, Document document) throws CoreException, IOException {
 
 		// Read
-		SimpleWorkflowJsonConverter simpleWorkflowJsonConverter = new SimpleWorkflowJsonConverter();
+	  AlfrescoSimpleWorkflowJsonConverter simpleWorkflowJsonConverter = new AlfrescoSimpleWorkflowJsonConverter();
 		WorkflowDefinition workflowDefinition = simpleWorkflowJsonConverter.readWorkflowDefinition(sourceFile.getContents());
 		
 		// Update

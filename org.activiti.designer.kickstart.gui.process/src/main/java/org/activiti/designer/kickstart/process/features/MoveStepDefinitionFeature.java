@@ -2,6 +2,8 @@ package org.activiti.designer.kickstart.process.features;
 
 import org.activiti.designer.kickstart.process.diagram.KickstartProcessFeatureProvider;
 import org.activiti.designer.kickstart.process.layout.KickstartProcessLayouter;
+import org.activiti.workflow.simple.definition.ListConditionStepDefinition;
+import org.activiti.workflow.simple.definition.ListStepDefinition;
 import org.eclipse.graphiti.features.ICustomUndoableFeature;
 import org.eclipse.graphiti.features.context.IContext;
 import org.eclipse.graphiti.features.context.IMoveShapeContext;
@@ -21,7 +23,8 @@ public class MoveStepDefinitionFeature extends DefaultMoveShapeFeature implement
 
   @Override
   public boolean canMoveShape(IMoveShapeContext context) {
-    return true;
+    Object bo = getBusinessObjectForPictogramElement(context.getPictogramElement());
+    return ! (bo instanceof ListConditionStepDefinition<?>) && ! (bo instanceof ListStepDefinition<?>);
   }
 
   @Override

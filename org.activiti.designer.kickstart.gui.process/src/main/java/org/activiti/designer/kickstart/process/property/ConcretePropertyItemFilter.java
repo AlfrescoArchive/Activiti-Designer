@@ -14,7 +14,7 @@ public class ConcretePropertyItemFilter implements PropertyItemFilter {
 
   @Override
   public boolean propertySelectable(FormPropertyDefinition definition) {
-    boolean matches = false;
+    boolean matches = true;
     if(definition instanceof ReferencePropertyDefinition) {
       String type = ((ReferencePropertyDefinition) definition).getType();
       matches = !AlfrescoConversionConstants.FORM_REFERENCE_FIELD.equals(type) &&

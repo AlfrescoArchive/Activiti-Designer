@@ -9,8 +9,9 @@ import org.activiti.designer.kickstart.process.util.StepDefinitionStyles;
 import org.activiti.designer.util.editor.KickstartProcessMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.workflow.simple.definition.AbstractStepDefinitionContainer;
-import org.activiti.workflow.simple.definition.ParallelStepsDefinition;
+import org.activiti.workflow.simple.definition.ConditionStepListContainer;
 import org.activiti.workflow.simple.definition.StepDefinition;
+import org.activiti.workflow.simple.definition.StepListContainer;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.emf.transaction.impl.InternalTransactionalEditingDomain;
@@ -61,7 +62,7 @@ public class StepDefinitionHorizontalLayout implements ProcessComponentLayout {
       Object businessObject = model.getFeatureProvider().getBusinessObjectForPictogramElement(child);
       if (businessObject instanceof StepDefinition) {
         StepDefinition definition = (StepDefinition) businessObject;
-        definitionsInNewOrder.add(definition);
+        definitionsInNewOrder.add((StepDefinition) definition);
       
         if(updateGraphicsAllowed) {
           Graphiti.getGaService().setLocation(child.getGraphicsAlgorithm(), xPosition, yPosition);
@@ -84,7 +85,7 @@ public class StepDefinitionHorizontalLayout implements ProcessComponentLayout {
       
       if(targetContainer.getGraphicsAlgorithm().getHeight() != maxheight) {
         // Also, request an update of the shape itself, adapting it to the available height
-        ParallelStepsDefinition definition = (ParallelStepsDefinition) featureProvider.getBusinessObjectForPictogramElement(targetContainer);
+        StepDefinition definition = (StepDefinition) featureProvider.getBusinessObjectForPictogramElement(targetContainer);
         featureProvider.getShapeController(definition).updateShape(targetContainer, definition,
             -1, maxheight);
       }
@@ -92,9 +93,21 @@ public class StepDefinitionHorizontalLayout implements ProcessComponentLayout {
     
     if (model.isInitialized()) {
       // Set the steps list in the new order after re-layouting
-      AbstractStepDefinitionContainer<?> container = (AbstractStepDefinitionContainer<?>) model.getFeatureProvider().getBusinessObjectForPictogramElement(targetContainer);
-      container.getSteps().clear();
-      container.getSteps().addAll(definitionsInNewOrder);
+      List<StepDefinition> stepDefinition = getStepListForContainer((StepDefinition) model.getFeatureProvider()
+          .getBusinessObjectForPictogramElement(targetContainer));
+      stepDefinition.clear();
+      stepDefinition.addAll(definitionsInNewOrder);
+    }
+  }
+  
+  @SuppressWarnings({ "rawtypes", "unchecked" })
+  protected List<StepDefinition> getStepListForContainer(StepDefinition definition) {
+    if(definition instanceof StepListContainer<?>) {
+      return ((StepListContainer) definition).getStepList();
+    } else if(definition instanceof ConditionStepListContainer<?>) {
+      return ((ConditionStepListContainer) definition).getStepList();
+    } else {
+      throw new RuntimeException("StepDefinition not supported for horizontal layout");
     }
   }
   

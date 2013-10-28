@@ -10,8 +10,8 @@ import org.activiti.designer.kickstart.eclipse.util.KickstartConstants;
 import org.activiti.designer.kickstart.util.FormReferenceReader;
 import org.activiti.designer.util.editor.KickstartProcessMemoryModel;
 import org.activiti.workflow.simple.alfresco.conversion.AlfrescoWorkflowDefinitionConversionFactory;
+import org.activiti.workflow.simple.alfresco.conversion.json.AlfrescoSimpleWorkflowJsonConverter;
 import org.activiti.workflow.simple.converter.WorkflowDefinitionConversion;
-import org.activiti.workflow.simple.converter.json.SimpleWorkflowJsonConverter;
 import org.activiti.workflow.simple.definition.WorkflowDefinition;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFile;
@@ -134,7 +134,7 @@ public class ExportKickstartProcessWizard extends Wizard implements IExportWizar
         // TODO: perhaps create once and share?
         AlfrescoWorkflowDefinitionConversionFactory factory = new AlfrescoWorkflowDefinitionConversionFactory();
 
-        SimpleWorkflowJsonConverter converter = new SimpleWorkflowJsonConverter();
+        AlfrescoSimpleWorkflowJsonConverter converter = new AlfrescoSimpleWorkflowJsonConverter();
         FileInputStream fis = new FileInputStream(processResource.getLocation().toFile());
         WorkflowDefinition definition = converter.readWorkflowDefinition(fis);
         

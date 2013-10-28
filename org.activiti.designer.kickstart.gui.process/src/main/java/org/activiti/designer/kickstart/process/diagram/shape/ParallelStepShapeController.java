@@ -2,6 +2,7 @@ package org.activiti.designer.kickstart.process.diagram.shape;
 
 import org.activiti.designer.kickstart.process.diagram.KickstartProcessFeatureProvider;
 import org.activiti.designer.kickstart.process.util.StepDefinitionStyles;
+import org.activiti.workflow.simple.definition.ListStepDefinition;
 import org.activiti.workflow.simple.definition.ParallelStepsDefinition;
 import org.activiti.workflow.simple.definition.StepDefinition;
 import org.eclipse.graphiti.features.context.impl.AddContext;
@@ -21,7 +22,7 @@ import org.eclipse.graphiti.services.IPeCreateService;
  *  
  * @author Frederik Heremans
  */
-public class ParallelStepShapeController extends AbstractBusinessObjectShapeController {
+public class ParallelStepShapeController extends AbstractBusinessObjectShapeController implements WrappingChildShapeController {
   
   public ParallelStepShapeController(KickstartProcessFeatureProvider featureProvider) {
     super(featureProvider);
@@ -62,15 +63,15 @@ public class ParallelStepShapeController extends AbstractBusinessObjectShapeCont
     getFeatureProvider().link(containerShape, new Object[] {definition});
     
     // Check if the shape has any children. If so, create shapes for them as well
-    if(definition.getSteps() != null && !definition.getSteps().isEmpty()) {
+    if(definition.getStepList() != null && !definition.getStepList().isEmpty()) {
       AddContext addContext = null;
       AreaContext areaContext = new AreaContext();
       areaContext.setX(-1);
       areaContext.setY(-1);
       
       StepDefinition child = null;
-      for(int i = definition.getSteps().size() -1; i>=0; i--) {
-        child = definition.getSteps().get(i);
+      for(int i = definition.getStepList().size() -1; i>=0; i--) {
+        child = definition.getStepList().get(i);
         addContext = new AddContext(areaContext, child);
         addContext.setTargetContainer(containerShape);
         featureProvider.getAddFeature(addContext).add(addContext);
@@ -113,6 +114,28 @@ public class ParallelStepShapeController extends AbstractBusinessObjectShapeCont
   @Override
   public boolean isShapeUpdateNeeded(ContainerShape shape, Object businessObject) {
     // Model changes never trigger a shape-update, only layout changes
+    return false;
+  }
+
+  @Override
+  public boolean shouldWrapChild(StepDefinition definition) {
+    return ! (definition instanceof ListStepDefinition<?>);
+  }
+
+  @Override
+  public StepDefinition wrapChild(StepDefinition definition) {
+    ListStepDefinition<ParallelStepsDefinition> wrapper = new ListStepDefinition<ParallelStepsDefinition>();
+    wrapper.addStep(definition);
+    return wrapper;
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public boolean shouldDeleteWrapper(StepDefinition businessObjectForSource) {
+    if(businessObjectForSource instanceof ListStepDefinition<?>) {
+      ListStepDefinition<ParallelStepsDefinition> wrapper = (ListStepDefinition<ParallelStepsDefinition>) businessObjectForSource;
+      return wrapper.getSteps() == null || wrapper.getSteps().isEmpty();
+    }
     return false;
   }
 }

@@ -46,6 +46,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
  */
 public abstract class AbstractKickstartProcessPropertySection extends GFPropertySection implements ITabbedPropertyConstants {
 
+  protected static final Integer LABEL_WIDTH = 120;
   /**
    * Internal list of controls added to this section.
    */
@@ -288,6 +289,8 @@ public abstract class AbstractKickstartProcessPropertySection extends GFProperty
         ((Text)control).setText("");
       } else if(valueFromModel instanceof String) {
         ((Text)control).setText((String) valueFromModel);
+      } else if(valueFromModel instanceof Integer || valueFromModel instanceof Long) {
+        ((Text)control).setText(((Number) valueFromModel).toString());
       } else {
         throw new IllegalArgumentException("Text control expects a String model value");
       }
@@ -414,10 +417,38 @@ public abstract class AbstractKickstartProcessPropertySection extends GFProperty
       textControl = getWidgetFactory().createText(formComposite, "", SWT.NONE);
       data = new FormData();
     }
-    data.left = new FormAttachment(0, 120);
+    data.left = new FormAttachment(0, LABEL_WIDTH);
     data.right = new FormAttachment(100, 0);
     data.top = createTopFormAttachment();
     textControl.setLayoutData(data);
+    registerControl(textControl);
+    return textControl;
+  }
+  
+  /**
+   * @return a new {@link Text} control, added as last element of the given composite, attached
+   * to the last control.
+   */
+  protected Text createTextControlWithButton(boolean multiLine, Control button) {
+    Text textControl = null;
+    FormData data = null;
+    if (multiLine == true) {
+      textControl = getWidgetFactory().createText(formComposite, "", SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL);
+      data = new FormData(SWT.DEFAULT, 60);
+    } else {
+      textControl = getWidgetFactory().createText(formComposite, "", SWT.NONE);
+      data = new FormData();
+    }
+    data.left = new FormAttachment(0, LABEL_WIDTH);
+    data.right = new FormAttachment(button, HSPACE);
+    data.top = createTopFormAttachment();
+    textControl.setLayoutData(data);
+    
+    data = new FormData();
+    data.right = new FormAttachment(100, 0); 
+    data.top = new FormAttachment(textControl, 0, SWT.CENTER);
+    button.setLayoutData(data);
+    
     registerControl(textControl);
     return textControl;
   }
@@ -443,7 +474,7 @@ public abstract class AbstractKickstartProcessPropertySection extends GFProperty
   protected Combo createCombobox(String[] values, int defaultSelectionIndex) {
     Combo comboControl = new Combo(formComposite, SWT.READ_ONLY);
     FormData data = new FormData();
-    data.left = new FormAttachment(0, 120);
+    data.left = new FormAttachment(0, LABEL_WIDTH);
     data.right = new FormAttachment(100, 0);
     data.top = createTopFormAttachment();
     comboControl.setLayoutData(data);

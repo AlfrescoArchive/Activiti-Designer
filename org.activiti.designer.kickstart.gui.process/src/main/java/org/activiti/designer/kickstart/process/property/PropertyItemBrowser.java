@@ -37,7 +37,6 @@ public class PropertyItemBrowser implements StringItemBrowser {
   protected WorkflowDefinition workflowDefinition;
   protected IProject project;
   protected PropertyItemFilter itemfilter;
-  protected PropertyChangeListener listener;
 
   public PropertyItemBrowser() {
     browseLabel = "Use property...";
@@ -56,15 +55,13 @@ public class PropertyItemBrowser implements StringItemBrowser {
   }
 
   @Override
-  public Control getBrowserControl(PropertyChangeListener listener, Composite parent) {
-    this.listener = listener;
-
+  public Control getBrowserControl(final PropertyChangeListener listener, Composite parent) {
     browseButton = new Button(parent, SWT.PUSH);
     browseButton.setText(browseLabel);
     browseButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
-        showDialog();
+        showDialog(listener);
       }
     });
     return browseButton;
@@ -77,7 +74,7 @@ public class PropertyItemBrowser implements StringItemBrowser {
     }
   }
 
-  protected void showDialog() {
+  protected void showDialog(PropertyChangeListener listener) {
     // Fetch all form-properties
     final Map<String, List<FormPropertyDefinition>> properties = new LinkedHashMap<String, List<FormPropertyDefinition>>();
     

@@ -28,12 +28,14 @@ public class StepDefinitionVerticalLayout implements ProcessComponentLayout {
 
   private int horizontalPadding = 20;
   private int verticalSpacing = 10;
+  private int topPadding = 10;
+  private boolean skipFirstShape = false;
   
   public void relayout(KickstartProcessLayouter layouter, ContainerShape targetContainer) {
-    int yPosition = verticalSpacing;
+    int yPosition = topPadding + verticalSpacing;
     int xPosition = horizontalPadding;
     int width = targetContainer.getGraphicsAlgorithm().getWidth() - horizontalPadding * 2;
-    int height = verticalSpacing;
+    int height = yPosition;
     
     TransactionalEditingDomain editingDomain = TransactionUtil.getEditingDomain(targetContainer);
     
@@ -61,11 +63,11 @@ public class StepDefinitionVerticalLayout implements ProcessComponentLayout {
               width, -1);
           
           featureProvider.getProcessLayouter().relayoutIfNeeded((ContainerShape) child, featureProvider);
+          height += child.getGraphicsAlgorithm().getHeight() + verticalSpacing;
+          yPosition = yPosition + child.getGraphicsAlgorithm().getHeight() + verticalSpacing;
         }
         
-        height += child.getGraphicsAlgorithm().getHeight() + verticalSpacing;
       }
-      yPosition = yPosition + child.getGraphicsAlgorithm().getHeight() + verticalSpacing;
     }
     
     if(updateGraphicsAllowed) {
@@ -100,13 +102,13 @@ public class StepDefinitionVerticalLayout implements ProcessComponentLayout {
     
     int xPosition = horizontalPadding;
     
-    if(targetContainer.getChildren().size() == 0) {
+    if(targetContainer.getChildren().size() == getEmptyContainerCount()) {
       // First element in the container
-      Graphiti.getGaService().setLocation(shape.getGraphicsAlgorithm(), xPosition, verticalSpacing);
+      Graphiti.getGaService().setLocation(shape.getGraphicsAlgorithm(), xPosition, topPadding);
       targetContainer.getChildren().add(shape);
-    } else if(inSameContainer && targetContainer.getChildren().size() == 1) {
+    } else if(inSameContainer && targetContainer.getChildren().size() == getEmptyContainerCount() + 1) {
       // Already added to container, re-set the initial location
-      Graphiti.getGaService().setLocation(shape.getGraphicsAlgorithm(), xPosition, verticalSpacing);
+      Graphiti.getGaService().setLocation(shape.getGraphicsAlgorithm(), xPosition, topPadding);
     } else {
       // Only move when the shape is not already present as the only one in the container
       int shapeIndex = 0;
@@ -124,7 +126,10 @@ public class StepDefinitionVerticalLayout implements ProcessComponentLayout {
       // No index specified, add at end of the container
       if(targetShapeIndex < 0) {
         targetShapeIndex = targetContainer.getChildren().size() - 1;
+      } else if(targetShapeIndex == 0) {
+        targetShapeIndex = getFirstIndex();
       }
+      
       if(inSameContainer) {
         targetContainer.getChildren().move(targetShapeIndex, shape);
       } else {
@@ -148,5 +153,21 @@ public class StepDefinitionVerticalLayout implements ProcessComponentLayout {
    */
   public void setLeftPadding(int leftPadding) {
     this.horizontalPadding = leftPadding;
+  }
+  
+  public void setTopPadding(int topPadding) {
+    this.topPadding = topPadding;
+  }
+  
+  public void setSkipFirstShape(boolean skipFirstShape) {
+    this.skipFirstShape = skipFirstShape;
+  }
+  
+  protected int getEmptyContainerCount() {
+    return skipFirstShape ? 1 : 0;
+  }
+  
+  protected int getFirstIndex() {
+    return skipFirstShape ? 1 : 0;
   }
 }

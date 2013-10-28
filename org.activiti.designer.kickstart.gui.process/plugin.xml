@@ -54,6 +54,12 @@
                id="org.activiti.designer.kickstart.process.assignmentTab"
                label="Assignment">
          </propertyTab>
+         <propertyTab
+               afterTab="org.activiti.designer.kickstart.process.generalTab"
+               category="Kickstart process"
+               id="org.activiti.designer.kickstart.process.emailTab"
+               label="Mail">
+         </propertyTab>
          
       </propertyTabs>
    </extension>
@@ -96,6 +102,24 @@
                filter="org.activiti.designer.kickstart.process.property.ParallelStepDefinitionPropertyFilter"
                id="org.activiti.designer.kickstart.process.parallelStepDefinition"
                tab="org.activiti.designer.kickstart.process.generalTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.kickstart.process.property.ListChoiceStepDefinitionPropertySection"
+               filter="org.activiti.designer.kickstart.process.property.ListChoiceStepDefinitionPropertyFilter"
+               id="org.activiti.designer.kickstart.process.listChoiceStepDefinition"
+               tab="org.activiti.designer.kickstart.process.generalTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.kickstart.process.property.DelayStepDefinitionFormPropertySection"
+               filter="org.activiti.designer.kickstart.process.property.DelayStepDefinitionPropertyFilter"
+               id="org.activiti.designer.kickstart.process.delayStepDefinition"
+               tab="org.activiti.designer.kickstart.process.generalTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.kickstart.process.property.EmailStepDefinitionFormPropertySection"
+               filter="org.activiti.designer.kickstart.process.property.EmailDelayStepDefinitionPropertyFilter"
+               id="org.activiti.designer.kickstart.process.emailStepDefinition"
+               tab="org.activiti.designer.kickstart.process.emailTab">
          </propertySection>
          
       </propertySections>

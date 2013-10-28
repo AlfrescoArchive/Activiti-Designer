@@ -19,7 +19,7 @@ public class NamedStepDefinitionPropertySection extends AbstractKickstartProcess
   @Override
   protected void createFormControls(TabbedPropertySheetPage aTabbedPropertySheetPage) {
     nameControl = createTextControl(false);
-    createLabel("Human step name", nameControl);
+    createLabel("Name", nameControl);
     descriptionControl = createTextControl(true);
     createLabel("Description", descriptionControl);
   }

@@ -2,15 +2,14 @@ package org.activiti.designer.kickstart.process.diagram.shape;
 
 import org.activiti.designer.kickstart.process.diagram.KickstartProcessFeatureProvider;
 import org.activiti.designer.kickstart.process.util.StepDefinitionStyles;
-import org.activiti.workflow.simple.definition.ListStepDefinition;
-import org.activiti.workflow.simple.definition.ParallelStepsDefinition;
+import org.activiti.workflow.simple.definition.ChoiceStepsDefinition;
+import org.activiti.workflow.simple.definition.ListConditionStepDefinition;
 import org.activiti.workflow.simple.definition.StepDefinition;
 import org.eclipse.graphiti.features.context.impl.AddContext;
 import org.eclipse.graphiti.features.context.impl.AreaContext;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.RoundedRectangle;
-import org.eclipse.graphiti.mm.algorithms.styles.LineStyle;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.services.Graphiti;
@@ -19,22 +18,21 @@ import org.eclipse.graphiti.services.IPeCreateService;
 
 /**
  * A {@link BusinessObjectShapeController} capable of creating and updating shapes for
- * {@link ParallelStepsDefinition} objects.
+ * {@link ChoiceStepsDefinition} objects.
  *  
  * @author Frederik Heremans
  */
-public class ListStepShapeController extends AbstractBusinessObjectShapeController {
+public class ChoiceStepShapeController extends AbstractBusinessObjectShapeController implements WrappingChildShapeController {
   
-  public ListStepShapeController(KickstartProcessFeatureProvider featureProvider) {
+  public ChoiceStepShapeController(KickstartProcessFeatureProvider featureProvider) {
     super(featureProvider);
   }
 
   @Override
   public boolean canControlShapeFor(Object businessObject) {
-    return businessObject instanceof ListStepDefinition<?>;
+    return businessObject instanceof ChoiceStepsDefinition;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public ContainerShape createShape(Object businessObject, ContainerShape layoutParent, int width, int height) {
     final IPeCreateService peCreateService = Graphiti.getPeCreateService();
@@ -43,7 +41,7 @@ public class ListStepShapeController extends AbstractBusinessObjectShapeControll
     
     Diagram diagram = getFeatureProvider().getDiagramTypeProvider().getDiagram();
     
-    ListStepDefinition<StepDefinition> definition = (ListStepDefinition<StepDefinition>) businessObject;
+    ChoiceStepsDefinition definition = (ChoiceStepsDefinition) businessObject;
 
     // If no size has been supplied, revert to the default sizes
     if(width < 0) {
@@ -58,26 +56,22 @@ public class ListStepShapeController extends AbstractBusinessObjectShapeControll
 
     // Create and set visible rectangle inside invisible rectangle
     rectangle = gaService.createRoundedRectangle(invisibleRectangle, 2, 2);
-    rectangle.setLineStyle(LineStyle.DASH);
-    rectangle.setForeground(StepDefinitionStyles.getSubtleForegroundColor(diagram));
-    rectangle.setBackground(StepDefinitionStyles.getSubtleBackgroundColor(diagram));
-    rectangle.setLineWidth(1);
-    rectangle.setFilled(true);
+    rectangle.setStyle(StepDefinitionStyles.getStepDefinitionStyle(diagram));
     rectangle.setParentGraphicsAlgorithm(invisibleRectangle);
     gaService.setLocationAndSize(rectangle, 0, 0, width, height);
     
     getFeatureProvider().link(containerShape, new Object[] {definition});
     
     // Check if the shape has any children. If so, create shapes for them as well
-    if(definition.getSteps() != null && !definition.getSteps().isEmpty()) {
+    if(definition.getStepList() != null && !definition.getStepList().isEmpty()) {
       AddContext addContext = null;
       AreaContext areaContext = new AreaContext();
       areaContext.setX(-1);
       areaContext.setY(-1);
       
       StepDefinition child = null;
-      for(int i = definition.getSteps().size() -1; i>=0; i--) {
-        child = definition.getSteps().get(i);
+      for(int i = definition.getStepList().size() -1; i>=0; i--) {
+        child = definition.getStepList().get(i);
         addContext = new AddContext(areaContext, child);
         addContext.setTargetContainer(containerShape);
         featureProvider.getAddFeature(addContext).add(addContext);
@@ -85,6 +79,7 @@ public class ListStepShapeController extends AbstractBusinessObjectShapeControll
     }
     return containerShape;
   }
+
 
   @Override
   public void updateShape(ContainerShape shape, Object businessObject, int width, int height) {
@@ -120,6 +115,28 @@ public class ListStepShapeController extends AbstractBusinessObjectShapeControll
   @Override
   public boolean isShapeUpdateNeeded(ContainerShape shape, Object businessObject) {
     // Model changes never trigger a shape-update, only layout changes
+    return false;
+  }
+
+  @Override
+  public boolean shouldWrapChild(StepDefinition definition) {
+    return ! (definition instanceof ListConditionStepDefinition<?>);
+  }
+
+  @Override
+  public StepDefinition wrapChild(StepDefinition definition) {
+    ListConditionStepDefinition<ChoiceStepsDefinition> wrapper = new ListConditionStepDefinition<ChoiceStepsDefinition>();
+    wrapper.addStep(definition);
+    return wrapper;
+  }
+
+  @Override
+  @SuppressWarnings("unchecked")
+  public boolean shouldDeleteWrapper(StepDefinition businessObjectForSource) {
+    if(businessObjectForSource instanceof ListConditionStepDefinition<?>) {
+      ListConditionStepDefinition<ChoiceStepsDefinition> wrapper = (ListConditionStepDefinition<ChoiceStepsDefinition>) businessObjectForSource;
+      return wrapper.getSteps() == null || wrapper.getSteps().isEmpty();
+    }
     return false;
   }
 }
