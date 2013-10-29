@@ -6,7 +6,7 @@ import org.activiti.bpmn.model.FlowNode;
 import org.activiti.bpmn.model.Lane;
 import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.bpmn.model.SubProcess;
-import org.activiti.designer.util.editor.Bpmn2MemoryModel;
+import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -24,7 +24,7 @@ public class ReconnectSequenceFlowFeature extends DefaultReconnectionFeature {
 	
 	@Override
 	public void postReconnect(IReconnectionContext context) {
-	  Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+	  BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
 		Object connectionObject = getFeatureProvider().getBusinessObjectForPictogramElement(context.getConnection());
 	  if(connectionObject instanceof SequenceFlow == false) return;
 	  

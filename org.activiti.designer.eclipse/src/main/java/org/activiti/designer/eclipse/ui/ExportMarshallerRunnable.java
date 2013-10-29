@@ -20,7 +20,7 @@ import org.activiti.designer.eclipse.extension.export.ExportMarshaller;
 import org.activiti.designer.eclipse.extension.export.ExportMarshallerContext;
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.eclipse.util.ExtensionPointUtil;
-import org.activiti.designer.util.editor.Bpmn2MemoryModel;
+import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.SafeRunner;
@@ -41,10 +41,10 @@ public class ExportMarshallerRunnable implements IRunnableWithProgress {
    */
   private static final int WORK_UNITS_PER_MARSHALLER = 100;
 
-  private Bpmn2MemoryModel model;
+  private BpmnMemoryModel model;
   private Collection<ExportMarshaller> marshallers;
 
-  public ExportMarshallerRunnable(final Bpmn2MemoryModel model, final Collection<ExportMarshaller> marshallers) {
+  public ExportMarshallerRunnable(final BpmnMemoryModel model, final Collection<ExportMarshaller> marshallers) {
     this.model = model;
     this.marshallers = checkMarshallers(marshallers);
   }
@@ -59,13 +59,13 @@ public class ExportMarshallerRunnable implements IRunnableWithProgress {
     return result;
   }
 
-  public ExportMarshallerRunnable(final Bpmn2MemoryModel model, final ExportMarshaller marshaller) {
+  public ExportMarshallerRunnable(final BpmnMemoryModel model, final ExportMarshaller marshaller) {
     this.model = model;
     this.marshallers = new ArrayList<ExportMarshaller>();
     this.marshallers.add(marshaller);
   }
 
-  public ExportMarshallerRunnable(final Bpmn2MemoryModel model, final String marshallerName) {
+  public ExportMarshallerRunnable(final BpmnMemoryModel model, final String marshallerName) {
     this.model = model;
     this.marshallers = new ArrayList<ExportMarshaller>();
     final ExportMarshaller marshaller = ExtensionPointUtil.getExportMarshaller(marshallerName);
@@ -101,7 +101,7 @@ public class ExportMarshallerRunnable implements IRunnableWithProgress {
     }
   }
 
-  private void invokeExportMarshaller(final ExportMarshaller exportMarshaller, final Bpmn2MemoryModel model, final IProgressMonitor monitor) {
+  private void invokeExportMarshaller(final ExportMarshaller exportMarshaller, final BpmnMemoryModel model, final IProgressMonitor monitor) {
 
     ISafeRunnable runnable = new ISafeRunnable() {
 
@@ -120,7 +120,7 @@ public class ExportMarshallerRunnable implements IRunnableWithProgress {
           }
 
           @Override
-          public Bpmn2MemoryModel getBpmnModel() {
+          public BpmnMemoryModel getBpmnModel() {
             return model;
           }
         };

@@ -4,7 +4,7 @@ import org.activiti.bpmn.model.Event;
 import org.activiti.bpmn.model.Lane;
 import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.bpmn.model.SubProcess;
-import org.activiti.designer.util.editor.Bpmn2MemoryModel;
+import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -32,7 +32,7 @@ public class MoveEventFeature extends DefaultMoveShapeFeature {
 		// get the event itself to determine its boundary events
 		final Event event = (Event) getBusinessObjectForPictogramElement(shape);
 		
-		Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+		BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
 		
 		if (context.getSourceContainer() != context.getTargetContainer()) {
 		  if (context.getSourceContainer() instanceof Diagram == false) {

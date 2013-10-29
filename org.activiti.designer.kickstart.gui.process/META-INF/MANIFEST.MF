@@ -23,7 +23,7 @@ Require-Bundle: org.eclipse.ui,
  org.eclipse.jdt.ui,
  org.activiti.designer.eclipse,
  org.activiti.designer.libs,
- org.activiti.kickstart.util;bundle-version="5.12.1"
+ org.activiti.designer.kickstart.util
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: org.activiti.designer.kickstart.process
@@ -31,5 +31,4 @@ Bundle-Vendor: Activiti
 Bundle-Activator: org.activiti.designer.kickstart.process.Activator
 Bundle-ClassPath: .,
  jdi.jar,
- jdimodel.jar,
- activiti-simple-workflow-5.15-SNAPSHOT.jar.jar
+ jdimodel.jar

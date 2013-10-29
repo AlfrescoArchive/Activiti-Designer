@@ -1,7 +1,9 @@
 package org.activiti.designer.util.editor;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.activiti.bpmn.model.Artifact;
 import org.activiti.bpmn.model.BpmnModel;
@@ -11,16 +13,20 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.graphiti.features.IFeatureProvider;
 
-public class Bpmn2MemoryModel {
+public class BpmnMemoryModel {
   
 	protected IFeatureProvider featureProvider;
 	protected IFile modelFile;
+	protected Map<String, Object> objectMap;
+	protected List<BpmnModelListener> modelListeners;
 	protected List<FlowElement> clipboard = new ArrayList<FlowElement>();
 	protected BpmnModel bpmnModel;
 
-	public Bpmn2MemoryModel(IFeatureProvider featureProvider, IFile modelFile) {
+	public BpmnMemoryModel(IFeatureProvider featureProvider, IFile modelFile) {
 		this.featureProvider = featureProvider;
 		this.modelFile = modelFile;
+		objectMap = new HashMap<String, Object>();
+		modelListeners = new ArrayList<BpmnModelListener>();
 	}
 	
 	public void addMainProcess() {
@@ -72,5 +78,43 @@ public class Bpmn2MemoryModel {
 
   public void setBpmnModel(BpmnModel bpmnModel) {
     this.bpmnModel = bpmnModel;
+  }
+  
+  public void addModelListener(BpmnModelListener listener) {
+    if(!modelListeners.contains(listener)) {
+      modelListeners.add(listener);
+    }
+  }
+  
+  public void removeModelListener(BpmnModelListener listener) {
+    modelListeners.remove(listener);
+  }
+  
+  public String getKeyForBusinessObject(Object bo) {
+    String result = null;
+    // TODO: Don't use hashcode??
+    if(bo != null) {
+        result = String.valueOf(bo.hashCode());
+        if(!objectMap.containsKey(result)) {
+          objectMap.put(result, bo);
+        }
+    }
+    return result;
+  }
+  
+  public Object getBusinessObjectForKey(String key) {
+    return objectMap.get(key);
+  }
+  
+  public Map<String, Object> getObjectMap() {
+    return objectMap;
+  }
+  
+  public void setObjectMap(Map<String, Object> objectMap) {
+    this.objectMap = objectMap;
+  }
+  
+  public interface BpmnModelListener {
+    void objectUpdated(Object object);
   }
 }

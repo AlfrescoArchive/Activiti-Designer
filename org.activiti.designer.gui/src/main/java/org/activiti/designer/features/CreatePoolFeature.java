@@ -4,7 +4,7 @@ import org.activiti.bpmn.model.Lane;
 import org.activiti.bpmn.model.Pool;
 import org.activiti.bpmn.model.Process;
 import org.activiti.designer.PluginImage;
-import org.activiti.designer.util.editor.Bpmn2MemoryModel;
+import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IAddFeature;
@@ -44,7 +44,7 @@ public class CreatePoolFeature extends AbstractCreateBPMNFeature {
 
     newPool.setProcessRef(newProcess.getId());
 
-    Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+    BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
     model.getBpmnModel().getPools().add(newPool);
     model.getBpmnModel().addProcess(newProcess);
 

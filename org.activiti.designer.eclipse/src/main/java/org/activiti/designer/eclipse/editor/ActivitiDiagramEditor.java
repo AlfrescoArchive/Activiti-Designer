@@ -40,7 +40,7 @@ import org.activiti.designer.eclipse.util.ExtensionPointUtil;
 import org.activiti.designer.eclipse.util.FileService;
 import org.activiti.designer.integration.servicetask.CustomServiceTask;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
-import org.activiti.designer.util.editor.Bpmn2MemoryModel;
+import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.designer.util.extension.ExtensionUtil;
 import org.activiti.designer.util.preferences.Preferences;
@@ -165,7 +165,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     try {
       final IFile dataFile = adei.getDataFile();
       final String diagramFileString = dataFile.getLocationURI().getPath();
-      Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagramTypeProvider().getDiagram()));
+      BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagramTypeProvider().getDiagram()));
 
       // Save the bpmn diagram file
       doSaveToBpmn(model, diagramFileString);
@@ -189,7 +189,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     updateDirtyState();
   }
 
-  private void doSaveToBpmn(final Bpmn2MemoryModel model, final String diagramFileString) throws Exception {
+  private void doSaveToBpmn(final BpmnMemoryModel model, final String diagramFileString) throws Exception {
 
     // add sequence flow bend-points to the model
     final IFeatureProvider featureProvider = getDiagramTypeProvider().getFeatureProvider();
@@ -205,14 +205,14 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 
   }
 
-  private void doSaveImage(final String diagramFileString, Bpmn2MemoryModel model) {
+  private void doSaveImage(final String diagramFileString, BpmnMemoryModel model) {
     boolean saveImage = PreferencesUtil.getBooleanPreference(Preferences.SAVE_IMAGE);
     if (saveImage) {
       marshallImage(model, diagramFileString);
     }
   }
 
-  private void marshallImage(Bpmn2MemoryModel model, String modelFileName) {
+  private void marshallImage(BpmnMemoryModel model, String modelFileName) {
     try {
       final GraphicalViewer graphicalViewer = (GraphicalViewer) ((DiagramEditor) model.getFeatureProvider().getDiagramTypeProvider().getDiagramEditor())
               .getAdapter(GraphicalViewer.class);
@@ -285,7 +285,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     }
   }
 
-  private void doInvokeExportMarshallers(final Bpmn2MemoryModel model) throws InvocationTargetException, InterruptedException {
+  private void doInvokeExportMarshallers(final BpmnMemoryModel model) throws InvocationTargetException, InterruptedException {
     final Collection<ExportMarshaller> marshallers = ExtensionPointUtil.getExportMarshallers();
     final ExportMarshallerRunnable runnable = new ExportMarshallerRunnable(model, marshallers);
     final IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
@@ -309,7 +309,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     final ActivitiDiagramEditorInput adei = (ActivitiDiagramEditorInput) input;
     final IFile dataFile = adei.getDataFile();
 
-    final Bpmn2MemoryModel model = new Bpmn2MemoryModel(getDiagramTypeProvider().getFeatureProvider(), dataFile);
+    final BpmnMemoryModel model = new BpmnMemoryModel(getDiagramTypeProvider().getFeatureProvider(), dataFile);
     ModelHandler.addModel(EcoreUtil.getURI(getDiagramTypeProvider().getDiagram()), model);
 
     String filePath = dataFile.getLocationURI().getPath();
@@ -362,7 +362,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     }
   }
 
-  private void importDiagram(final Bpmn2MemoryModel model) {
+  private void importDiagram(final BpmnMemoryModel model) {
     final Diagram diagram = getDiagramTypeProvider().getDiagram();
     diagram.setActive(true);
 
@@ -435,7 +435,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     });
   }
 
-  private PictogramElement addContainerElement(BaseElement element, Bpmn2MemoryModel model, ContainerShape parent) {
+  private PictogramElement addContainerElement(BaseElement element, BpmnMemoryModel model, ContainerShape parent) {
     GraphicInfo graphicInfo = model.getBpmnModel().getGraphicInfo(element.getId());
     if (graphicInfo == null) {
       return null;
@@ -674,7 +674,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     }
   }
 
-  private void drawAllFlows(Bpmn2MemoryModel model) {
+  private void drawAllFlows(BpmnMemoryModel model) {
     BpmnModel bpmnModel = model.getBpmnModel();
 
     for (Process process : bpmnModel.getProcesses()) {
@@ -683,7 +683,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     }
   }
 
-  private void drawSequenceFlowsInList(Collection<FlowElement> flowList, Bpmn2MemoryModel model) {
+  private void drawSequenceFlowsInList(Collection<FlowElement> flowList, BpmnMemoryModel model) {
     for (FlowElement flowElement : flowList) {
 
       if (flowElement instanceof SubProcess) {
@@ -699,7 +699,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     }
   }
 
-  private void drawSequenceFlow(SequenceFlow sequenceFlow, Bpmn2MemoryModel model) {
+  private void drawSequenceFlow(SequenceFlow sequenceFlow, BpmnMemoryModel model) {
     Anchor sourceAnchor = null;
     Anchor targetAnchor = null;
     ContainerShape sourceShape = (ContainerShape) getDiagramTypeProvider().getFeatureProvider().getPictogramElementForBusinessObject(
@@ -750,7 +750,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     getDiagramTypeProvider().getFeatureProvider().addIfPossible(addContext);
   }
 
-  private void drawAssociationsInList(Collection<Artifact> artifactList, Bpmn2MemoryModel model) {
+  private void drawAssociationsInList(Collection<Artifact> artifactList, BpmnMemoryModel model) {
     for (Artifact artifact : artifactList) {
 
       if (artifact instanceof Association == false) {
@@ -762,7 +762,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     }
   }
 
-  private void drawAssociation(Association association, Bpmn2MemoryModel model) {
+  private void drawAssociation(Association association, BpmnMemoryModel model) {
 
     Anchor sourceAnchor = null;
     Anchor targetAnchor = null;

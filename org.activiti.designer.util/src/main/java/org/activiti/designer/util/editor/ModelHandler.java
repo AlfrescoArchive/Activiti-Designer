@@ -7,13 +7,13 @@ import org.eclipse.emf.common.util.URI;
 
 public class ModelHandler {
 
-	private static Map<URI, Bpmn2MemoryModel> modelMap = new HashMap<URI, Bpmn2MemoryModel>();
+	private static Map<URI, BpmnMemoryModel> modelMap = new HashMap<URI, BpmnMemoryModel>();
 	private static Map<URI, KickstartProcessMemoryModel> kickstartProcessModelMap = new HashMap<URI, KickstartProcessMemoryModel>();
 	private static Map<URI, KickstartFormMemoryModel> kickstartFormModelMap = new HashMap<URI, KickstartFormMemoryModel>();
 
 	public static void addModel(URI uri, Object model) {
-	  if (model instanceof Bpmn2MemoryModel) {
-	    modelMap.put(uri, (Bpmn2MemoryModel) model);
+	  if (model instanceof BpmnMemoryModel) {
+	    modelMap.put(uri, (BpmnMemoryModel) model);
 	  } else if (model instanceof KickstartProcessMemoryModel) {
 	    kickstartProcessModelMap.put(uri, (KickstartProcessMemoryModel) model);
 	  } else if(model instanceof KickstartFormMemoryModel) {
@@ -21,7 +21,7 @@ public class ModelHandler {
 	  }
 	}
 
-	public static Bpmn2MemoryModel getModel(URI uri) {
+	public static BpmnMemoryModel getModel(URI uri) {
 		return modelMap.get(uri);
 	}
 	

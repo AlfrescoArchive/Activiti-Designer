@@ -20,7 +20,7 @@ import org.activiti.bpmn.model.ActivitiListener;
 import org.activiti.bpmn.model.FieldExtension;
 import org.activiti.bpmn.model.HasExecutionListeners;
 import org.activiti.bpmn.model.Pool;
-import org.activiti.designer.util.editor.Bpmn2MemoryModel;
+import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -33,7 +33,7 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 public class BpmnBOUtil {
   
   public static Object getExecutionListenerBO(PictogramElement pe, Diagram diagram) {
-  	Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(diagram));
+  	BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(diagram));
     Object bo = null;
     if(pe instanceof Diagram) {
       bo = model.getBpmnModel().getMainProcess();
@@ -49,7 +49,7 @@ public class BpmnBOUtil {
       listenerList = ((HasExecutionListeners) bo).getExecutionListeners();
     } else if(bo instanceof Pool) {
       Pool pool = ((Pool) bo);
-      Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(diagram));
+      BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(diagram));
       listenerList = model.getBpmnModel().getProcess(pool.getId()).getExecutionListeners();
     }
     return listenerList;
@@ -60,7 +60,7 @@ public class BpmnBOUtil {
     	((HasExecutionListeners) bo).getExecutionListeners().add(listener);
     } else if(bo instanceof Pool) {
       Pool pool = ((Pool) bo);
-      Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(diagram));
+      BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(diagram));
       model.getBpmnModel().getProcess(pool.getId()).getExecutionListeners().add(listener);
     }
   }
@@ -70,7 +70,7 @@ public class BpmnBOUtil {
     	((HasExecutionListeners) bo).getExecutionListeners().set(index, listener);
     } else if(bo instanceof Pool) {
       Pool pool = ((Pool) bo);
-      Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(diagram));
+      BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(diagram));
       model.getBpmnModel().getProcess(pool.getId()).getExecutionListeners().set(index, listener);
     }
   }
@@ -80,7 +80,7 @@ public class BpmnBOUtil {
     	((HasExecutionListeners) bo).getExecutionListeners().remove(listener);
     } else if(bo instanceof Pool) {
       Pool pool = ((Pool) bo);
-      Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(diagram));
+      BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(diagram));
       model.getBpmnModel().getProcess(pool.getId()).getExecutionListeners().remove(listener);
     }
   }

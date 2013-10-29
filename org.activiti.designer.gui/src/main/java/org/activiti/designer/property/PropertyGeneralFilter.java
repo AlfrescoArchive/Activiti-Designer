@@ -16,10 +16,9 @@
 package org.activiti.designer.property;
 
 import org.activiti.bpmn.model.BaseElement;
-import org.activiti.designer.util.property.ActivitiPropertyFilter;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 
-public class PropertyBpmnFilter extends ActivitiPropertyFilter {
+public class PropertyGeneralFilter extends ActivitiPropertyFilter {
 
   @Override
   protected boolean accept(PictogramElement pe) {

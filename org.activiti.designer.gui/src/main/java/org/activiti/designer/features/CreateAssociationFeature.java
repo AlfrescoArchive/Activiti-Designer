@@ -6,7 +6,7 @@ import org.activiti.bpmn.model.Lane;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.bpmn.model.TextAnnotation;
 import org.activiti.designer.PluginImage;
-import org.activiti.designer.util.editor.Bpmn2MemoryModel;
+import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -73,7 +73,7 @@ public class CreateAssociationFeature extends AbstractCreateBPMNConnectionFeatur
     final ContainerShape parentContainer = targetContainer.getContainer();
     
     if (parentContainer instanceof Diagram) {
-      final Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+      final BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
       if (model.getBpmnModel().getPools().size() > 0) {
         String poolRef = model.getBpmnModel().getPools().get(0).getId();
         model.getBpmnModel().getProcess(poolRef).addArtifact(association);

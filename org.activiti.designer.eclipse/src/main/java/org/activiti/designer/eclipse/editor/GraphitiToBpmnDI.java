@@ -16,7 +16,7 @@ import org.activiti.bpmn.model.Pool;
 import org.activiti.bpmn.model.Process;
 import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.bpmn.model.SubProcess;
-import org.activiti.designer.util.editor.Bpmn2MemoryModel;
+import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.graphiti.datatypes.ILocation;
@@ -30,10 +30,10 @@ import org.eclipse.graphiti.services.Graphiti;
 
 public class GraphitiToBpmnDI {
   
-  protected Bpmn2MemoryModel model;
+  protected BpmnMemoryModel model;
   protected IFeatureProvider featureProvider;
   
-  public GraphitiToBpmnDI(Bpmn2MemoryModel model, IFeatureProvider featureProvider) {
+  public GraphitiToBpmnDI(BpmnMemoryModel model, IFeatureProvider featureProvider) {
     this.model = model;
     this.featureProvider = featureProvider;
   }

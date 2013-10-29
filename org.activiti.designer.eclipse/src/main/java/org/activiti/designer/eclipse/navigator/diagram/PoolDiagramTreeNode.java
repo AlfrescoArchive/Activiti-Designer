@@ -16,7 +16,7 @@ package org.activiti.designer.eclipse.navigator.diagram;
 import org.activiti.bpmn.model.Pool;
 import org.activiti.bpmn.model.Process;
 import org.activiti.designer.eclipse.navigator.TreeNode;
-import org.activiti.designer.util.editor.Bpmn2MemoryModel;
+import org.activiti.designer.util.editor.BpmnMemoryModel;
 
 /**
  * @author Tiese Barrell
@@ -32,13 +32,13 @@ public class PoolDiagramTreeNode extends AbstractDiagramTreeNode<Pool> {
 
     final String poolId = getModelObject().getId();
 
-    final Bpmn2MemoryModel rootModel = findRootModel();
+    final BpmnMemoryModel rootModel = findRootModel();
 
     processChildren(poolId, rootModel);
 
   }
 
-  private void processChildren(String poolId, Bpmn2MemoryModel rootModel) {
+  private void processChildren(String poolId, BpmnMemoryModel rootModel) {
     if (poolId != null && rootModel != null) {
       final Process foundProcess = rootModel.getBpmnModel().getProcess(poolId);
       addProcessChild(foundProcess);

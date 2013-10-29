@@ -1,8 +1,8 @@
-package org.activiti.designer.util.property;
+package org.activiti.designer.property;
 
 import org.activiti.bpmn.model.FieldExtension;
 import org.activiti.bpmn.model.ServiceTask;
-import org.activiti.designer.util.editor.Bpmn2MemoryModel;
+import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -15,7 +15,7 @@ public class ActivitiPropertyFilter extends AbstractPropertySectionFilter {
 	protected Object getBusinessObject(PictogramElement element) {
 	  if (element == null) return null;
 		Diagram diagram = getContainer(element);
-		Bpmn2MemoryModel model = (ModelHandler.getModel(EcoreUtil.getURI(diagram)));
+		BpmnMemoryModel model = (ModelHandler.getModel(EcoreUtil.getURI(diagram)));
   	if(model != null) {
   		return model.getFeatureProvider().getBusinessObjectForPictogramElement(element);
   	}

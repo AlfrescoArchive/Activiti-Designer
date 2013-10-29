@@ -26,8 +26,6 @@ import org.eclipse.ui.ide.IDE;
 
 public class Bpmn2DiagramCreator {
   
-  private final static String TEMPFILE_EXTENSION = "bpmn2d";
-
   public ActivitiDiagramEditorInput createBpmnDiagram(final IFile dataFile, final IFile diagramFile, final ActivitiDiagramEditor diagramEditor,
           final String templateContent, final boolean openEditor) {
     

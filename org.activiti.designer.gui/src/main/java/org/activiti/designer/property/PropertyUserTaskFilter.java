@@ -2,7 +2,6 @@ package org.activiti.designer.property;
 
 import org.activiti.bpmn.model.UserTask;
 import org.activiti.bpmn.model.alfresco.AlfrescoUserTask;
-import org.activiti.designer.util.property.ActivitiPropertyFilter;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 
 public class PropertyUserTaskFilter extends ActivitiPropertyFilter {

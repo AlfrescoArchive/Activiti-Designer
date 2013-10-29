@@ -2,7 +2,7 @@ package com.alfresco.designer.gui.property;
 
 import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.bpmn.model.alfresco.AlfrescoScriptTask;
-import org.activiti.designer.util.property.ActivitiPropertyFilter;
+import org.activiti.designer.property.ActivitiPropertyFilter;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 
 public class PropertyAlfrescoMailTaskFilter extends ActivitiPropertyFilter {

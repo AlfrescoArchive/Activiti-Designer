@@ -2,7 +2,6 @@ package org.activiti.designer.property;
 
 import org.activiti.bpmn.model.BoundaryEvent;
 import org.activiti.bpmn.model.MessageEventDefinition;
-import org.activiti.designer.util.property.ActivitiPropertyFilter;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 
 public class PropertyBoundaryMessageFilter extends ActivitiPropertyFilter {

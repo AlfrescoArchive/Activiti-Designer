@@ -15,7 +15,7 @@ package org.activiti.designer.eclipse.navigator.diagram;
 
 import org.activiti.designer.eclipse.navigator.AbstractTreeNode;
 import org.activiti.designer.eclipse.util.ExtensionPointUtil;
-import org.activiti.designer.util.editor.Bpmn2MemoryModel;
+import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.eclipse.swt.graphics.Image;
 
 /**
@@ -28,8 +28,8 @@ public abstract class AbstractDiagramTreeNode<T extends Object> extends Abstract
     super(parent, modelObject, name);
   }
 
-  protected final Bpmn2MemoryModel findRootModel() {
-    Bpmn2MemoryModel result = null;
+  protected final BpmnMemoryModel findRootModel() {
+    BpmnMemoryModel result = null;
 
     if (hasRootModel()) {
       result = getRootModel();
@@ -44,7 +44,7 @@ public abstract class AbstractDiagramTreeNode<T extends Object> extends Abstract
     return false;
   }
 
-  protected Bpmn2MemoryModel getRootModel() {
+  protected BpmnMemoryModel getRootModel() {
     return null;
   }
 

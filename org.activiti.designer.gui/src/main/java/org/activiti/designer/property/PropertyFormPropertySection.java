@@ -6,7 +6,6 @@ import org.activiti.bpmn.model.FormProperty;
 import org.activiti.bpmn.model.StartEvent;
 import org.activiti.bpmn.model.UserTask;
 import org.activiti.designer.property.ui.FormPropertyEditor;
-import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
@@ -14,25 +13,19 @@ import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
-import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
 public class PropertyFormPropertySection extends ActivitiPropertySection implements ITabbedPropertyConstants {
 
   private FormPropertyEditor formPropertyEditor;
-
+  
   @Override
-  public void createControls(Composite parent, TabbedPropertySheetPage tabbedPropertySheetPage) {
-    super.createControls(parent, tabbedPropertySheetPage);
-
-    TabbedPropertySheetWidgetFactory factory = getWidgetFactory();
-    Composite composite = factory.createFlatFormComposite(parent);
-    FormData data;
-    
-    Composite formPropertiesComposite = factory.createComposite(composite, SWT.WRAP);
-    data = new FormData();
+  public void createFormControls(TabbedPropertySheetPage aTabbedPropertySheetPage) {
+    Composite formPropertiesComposite = getWidgetFactory().createComposite(formComposite, SWT.WRAP);
+    FormData data = new FormData();
     data.left = new FormAttachment(0, 150);
     data.right = new FormAttachment(100, 0);
     data.top = new FormAttachment(0, VSPACE);
@@ -44,7 +37,7 @@ public class PropertyFormPropertySection extends ActivitiPropertySection impleme
     formPropertyEditor = new FormPropertyEditor("formPropertyEditor", formPropertiesComposite);
     formPropertyEditor.getLabelControl(formPropertiesComposite).setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
     
-    CLabel formPropertiesLabel = factory.createCLabel(composite, "Form properties:"); //$NON-NLS-1$
+    CLabel formPropertiesLabel = getWidgetFactory().createCLabel(formComposite, "Form properties:"); //$NON-NLS-1$
     data = new FormData();
     data.left = new FormAttachment(0, 0);
     data.right = new FormAttachment(formPropertiesComposite, -HSPACE);
@@ -53,13 +46,12 @@ public class PropertyFormPropertySection extends ActivitiPropertySection impleme
   }
 
   @Override
-  public void refresh() {
-    
+  protected Object getModelValueForControl(Control control, Object businessObject) {
     PictogramElement pe = getSelectedPictogramElement();
     if (pe != null) {
       Object bo = getBusinessObject(pe);
       if (bo == null)
-        return;
+        return null;
       
       List<FormProperty> formPropertyList = null;
       if(bo instanceof UserTask) {
@@ -67,14 +59,19 @@ public class PropertyFormPropertySection extends ActivitiPropertySection impleme
       } else if(bo instanceof StartEvent) {
         formPropertyList = ((StartEvent) bo).getFormProperties();
       } else {
-        return;
+        return null;
       }
       
       formPropertyEditor.pictogramElement = pe;
       formPropertyEditor.diagramEditor = getDiagramEditor();
       formPropertyEditor.diagram = getDiagram();
       formPropertyEditor.initialize(formPropertyList);
-   }
+    }
+    return null;
   }
 
+  @Override
+  protected void storeValueInModel(Control control, Object businessObject) {
+    // nothing to do
+  }
 }

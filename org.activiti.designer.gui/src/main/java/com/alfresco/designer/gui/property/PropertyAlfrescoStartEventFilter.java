@@ -1,7 +1,7 @@
 package com.alfresco.designer.gui.property;
 
 import org.activiti.bpmn.model.alfresco.AlfrescoStartEvent;
-import org.activiti.designer.util.property.ActivitiPropertyFilter;
+import org.activiti.designer.property.ActivitiPropertyFilter;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 
 public class PropertyAlfrescoStartEventFilter extends ActivitiPropertyFilter {

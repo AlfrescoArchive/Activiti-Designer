@@ -21,7 +21,7 @@ import org.activiti.bpmn.model.Process;
 import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.bpmn.model.Task;
-import org.activiti.designer.util.editor.Bpmn2MemoryModel;
+import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -207,7 +207,7 @@ public class DeleteFlowElementFeature extends DefaultDeleteFeature {
   }
 
 	private FlowElement getFlowElement(FlowElement flowElement) {
-	  Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+	  BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
 	  for (Process process : model.getBpmnModel().getProcesses()) {
 	    FlowElement processElement = getFlowElementInProcess(flowElement, process.getFlowElements());
 	    if(processElement != null) return processElement;

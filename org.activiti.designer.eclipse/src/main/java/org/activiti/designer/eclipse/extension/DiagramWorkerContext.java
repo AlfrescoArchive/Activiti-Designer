@@ -1,6 +1,6 @@
 package org.activiti.designer.eclipse.extension;
 
-import org.activiti.designer.util.editor.Bpmn2MemoryModel;
+import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.eclipse.core.runtime.IProgressMonitor;
 
 /**
@@ -29,6 +29,6 @@ public interface DiagramWorkerContext {
    * 
    * @return the Bpmn2MemoryModel of the diagram
    */
-  public Bpmn2MemoryModel getBpmnModel();
+  public BpmnMemoryModel getBpmnModel();
 
 }

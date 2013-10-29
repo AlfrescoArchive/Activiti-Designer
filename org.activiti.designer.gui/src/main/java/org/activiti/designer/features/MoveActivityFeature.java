@@ -8,7 +8,7 @@ import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.Lane;
 import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.bpmn.model.SubProcess;
-import org.activiti.designer.util.editor.Bpmn2MemoryModel;
+import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.datatypes.ILocation;
@@ -68,7 +68,7 @@ public class MoveActivityFeature extends DefaultMoveShapeFeature {
 		ILocation shapeLocationAfterMove = Graphiti.getLayoutService().getLocationRelativeToDiagram(shape);
 		moveActivityChilds(activity, shapeLocationAfterMove);
 		
-		Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+		BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
 		
 		if (context.getSourceContainer() != context.getTargetContainer()) {
 		  if (context.getSourceContainer() instanceof Diagram == false) {

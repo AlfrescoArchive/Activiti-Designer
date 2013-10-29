@@ -1,79 +1,26 @@
 package org.activiti.designer.diagram;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.activiti.bpmn.model.Activity;
 import org.activiti.bpmn.model.Artifact;
-import org.activiti.bpmn.model.Association;
 import org.activiti.bpmn.model.BoundaryEvent;
-import org.activiti.bpmn.model.BusinessRuleTask;
 import org.activiti.bpmn.model.CallActivity;
-import org.activiti.bpmn.model.EndEvent;
-import org.activiti.bpmn.model.ErrorEventDefinition;
 import org.activiti.bpmn.model.Event;
-import org.activiti.bpmn.model.EventDefinition;
-import org.activiti.bpmn.model.EventGateway;
-import org.activiti.bpmn.model.EventSubProcess;
-import org.activiti.bpmn.model.ExclusiveGateway;
-import org.activiti.bpmn.model.FieldExtension;
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.Gateway;
-import org.activiti.bpmn.model.InclusiveGateway;
-import org.activiti.bpmn.model.IntermediateCatchEvent;
 import org.activiti.bpmn.model.Lane;
-import org.activiti.bpmn.model.ManualTask;
-import org.activiti.bpmn.model.MessageEventDefinition;
-import org.activiti.bpmn.model.ParallelGateway;
 import org.activiti.bpmn.model.Pool;
-import org.activiti.bpmn.model.ReceiveTask;
-import org.activiti.bpmn.model.ScriptTask;
-import org.activiti.bpmn.model.SequenceFlow;
-import org.activiti.bpmn.model.ServiceTask;
-import org.activiti.bpmn.model.SignalEventDefinition;
-import org.activiti.bpmn.model.StartEvent;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.bpmn.model.Task;
-import org.activiti.bpmn.model.TerminateEventDefinition;
 import org.activiti.bpmn.model.TextAnnotation;
-import org.activiti.bpmn.model.ThrowEvent;
-import org.activiti.bpmn.model.TimerEventDefinition;
 import org.activiti.bpmn.model.UserTask;
-import org.activiti.bpmn.model.alfresco.AlfrescoScriptTask;
-import org.activiti.bpmn.model.alfresco.AlfrescoStartEvent;
-import org.activiti.bpmn.model.alfresco.AlfrescoUserTask;
-import org.activiti.designer.features.AddAssociationFeature;
-import org.activiti.designer.features.AddBoundaryErrorFeature;
-import org.activiti.designer.features.AddBoundaryMessageFeature;
-import org.activiti.designer.features.AddBoundarySignalFeature;
-import org.activiti.designer.features.AddBoundaryTimerFeature;
-import org.activiti.designer.features.AddBusinessRuleTaskFeature;
-import org.activiti.designer.features.AddCallActivityFeature;
-import org.activiti.designer.features.AddEmbeddedSubProcessFeature;
-import org.activiti.designer.features.AddEndEventFeature;
-import org.activiti.designer.features.AddErrorEndEventFeature;
-import org.activiti.designer.features.AddErrorStartEventFeature;
-import org.activiti.designer.features.AddEventGatewayFeature;
-import org.activiti.designer.features.AddEventSubProcessFeature;
-import org.activiti.designer.features.AddExclusiveGatewayFeature;
-import org.activiti.designer.features.AddInclusiveGatewayFeature;
-import org.activiti.designer.features.AddLaneFeature;
-import org.activiti.designer.features.AddMailTaskFeature;
-import org.activiti.designer.features.AddManualTaskFeature;
-import org.activiti.designer.features.AddMessageCatchingEventFeature;
-import org.activiti.designer.features.AddMessageStartEventFeature;
-import org.activiti.designer.features.AddNoneThrowingEventFeature;
-import org.activiti.designer.features.AddParallelGatewayFeature;
-import org.activiti.designer.features.AddPoolFeature;
-import org.activiti.designer.features.AddReceiveTaskFeature;
-import org.activiti.designer.features.AddScriptTaskFeature;
-import org.activiti.designer.features.AddSequenceFlowFeature;
-import org.activiti.designer.features.AddServiceTaskFeature;
-import org.activiti.designer.features.AddSignalCatchingEventFeature;
-import org.activiti.designer.features.AddSignalThrowingEventFeature;
-import org.activiti.designer.features.AddStartEventFeature;
-import org.activiti.designer.features.AddTerminateEndEventFeature;
-import org.activiti.designer.features.AddTextAnnotationFeature;
-import org.activiti.designer.features.AddTimerCatchingEventFeature;
-import org.activiti.designer.features.AddTimerStartEventFeature;
-import org.activiti.designer.features.AddUserTaskFeature;
+import org.activiti.designer.command.BpmnProcessModelUpdater;
+import org.activiti.designer.command.UserTaskModelUpdater;
+import org.activiti.designer.controller.BusinessObjectShapeController;
+import org.activiti.designer.controller.TaskShapeController;
+import org.activiti.designer.features.AddBaseElementFeature;
 import org.activiti.designer.features.ChangeElementTypeFeature;
 import org.activiti.designer.features.ContainerResizeFeature;
 import org.activiti.designer.features.CopyFlowElementFeature;
@@ -130,7 +77,7 @@ import org.activiti.designer.features.TaskResizeFeature;
 import org.activiti.designer.features.UpdateFlowElementFeature;
 import org.activiti.designer.features.UpdatePoolAndLaneFeature;
 import org.activiti.designer.features.UpdateTextAnnotationFeature;
-import org.activiti.designer.util.editor.POJOIndependenceSolver;
+import org.activiti.designer.util.editor.BpmnIndependenceSolver;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.ICopyFeature;
@@ -163,10 +110,6 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
 
-import com.alfresco.designer.gui.features.AddAlfrescoMailTaskFeature;
-import com.alfresco.designer.gui.features.AddAlfrescoScriptTaskFeature;
-import com.alfresco.designer.gui.features.AddAlfrescoStartEventFeature;
-import com.alfresco.designer.gui.features.AddAlfrescoUserTaskFeature;
 import com.alfresco.designer.gui.features.CreateAlfrescoMailTaskFeature;
 import com.alfresco.designer.gui.features.CreateAlfrescoScriptTaskFeature;
 import com.alfresco.designer.gui.features.CreateAlfrescoStartEventFeature;
@@ -174,17 +117,59 @@ import com.alfresco.designer.gui.features.CreateAlfrescoUserTaskFeature;
 
 public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 
-  public POJOIndependenceSolver independenceResolver;
+  protected List<BusinessObjectShapeController> shapeControllers;
 
   public ActivitiBPMNFeatureProvider(IDiagramTypeProvider dtp) {
     super(dtp);
-    setIndependenceSolver(new POJOIndependenceSolver());
-    independenceResolver = (POJOIndependenceSolver) getIndependenceSolver();
+    setIndependenceSolver(new BpmnIndependenceSolver(dtp));
+    
+    this.shapeControllers = new ArrayList<BusinessObjectShapeController>();
+    shapeControllers.add(new TaskShapeController(this));
+  }
+  
+  /**
+   * @param businessObject object to get a {@link BusinessObjectShapeController} for
+   * @return a {@link BusinessObjectShapeControllr} capable of creating/updating shapes
+   * of for the given businessObject.
+   * @throws IllegalArgumentException When no controller can be found for the given object.
+   */
+  public BusinessObjectShapeController getShapeController(Object businessObject) {
+    for(BusinessObjectShapeController controller : shapeControllers) {
+      if(controller.canControlShapeFor(businessObject)) {
+        return controller;
+      }
+    }
+    throw new IllegalArgumentException("No controller can be found for object: " + businessObject);
+  }
+  
+  /**
+   * @return true, if a {@link BusinessObjectShapeController} is available for the given business object.
+   */
+  public boolean hasShapeController(Object businessObject) {
+    for(BusinessObjectShapeController controller : shapeControllers) {
+        if(controller.canControlShapeFor(businessObject)) {
+          return true;
+        }
+      }
+    return false;
+  }
+  
+  /**
+   * @param businessObject the business-object to update
+   * @param pictogramElement optional pictogram-element to refresh after update is performed. When null
+   * is provided, no additional update besides the actual model update is done.
+   * @return the updater capable of updating the given object. Null, if the object cannot be updated.
+   */
+  public BpmnProcessModelUpdater<?> getModelUpdaterFor(Object businessObject, PictogramElement pictogramElement) {
+    if (businessObject instanceof UserTask) {
+      return new UserTaskModelUpdater((UserTask) businessObject, pictogramElement, this);
+    }
+    return null;
   }
 
   @Override
   public IAddFeature getAddFeature(IAddContext context) {
-    if (context.getNewObject() instanceof StartEvent) {
+    /*if (context.getNewObject() instanceof StartEvent) {
       if (context.getNewObject() instanceof AlfrescoStartEvent) {
         return new AddAlfrescoStartEventFeature(this);
       } else {
@@ -303,8 +288,8 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
       return new AddCallActivityFeature(this);
     } else if (context.getNewObject() instanceof TextAnnotation) {
       return new AddTextAnnotationFeature(this);
-    }
-    return super.getAddFeature(context);
+    }*/
+    return new AddBaseElementFeature(this);
   }
 
   @Override
@@ -445,9 +430,5 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
   @Override
   public ICustomFeature[] getCustomFeatures(ICustomContext context) {
     return new ICustomFeature[] { new DeletePoolFeature(this), new ChangeElementTypeFeature(this) };
-  }
-
-  public POJOIndependenceSolver getPojoIndependenceSolver() {
-    return independenceResolver;
   }
 }

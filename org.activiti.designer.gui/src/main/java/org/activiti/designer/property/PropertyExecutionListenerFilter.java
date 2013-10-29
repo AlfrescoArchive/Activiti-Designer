@@ -3,7 +3,6 @@ package org.activiti.designer.property;
 import org.activiti.bpmn.model.Activity;
 import org.activiti.bpmn.model.Pool;
 import org.activiti.bpmn.model.SequenceFlow;
-import org.activiti.designer.util.property.ActivitiPropertyFilter;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 

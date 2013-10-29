@@ -20,7 +20,7 @@ import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.bpmn.model.Task;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
-import org.activiti.designer.util.editor.Bpmn2MemoryModel;
+import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -112,7 +112,7 @@ public abstract class AbstractCreateBPMNFeature extends AbstractCreateFeature {
   
   protected void addBaseElementToContainer(ContainerShape targetContainer, BaseElement baseElement) {
     if (targetContainer instanceof Diagram) {
-      final Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+      final BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
       if (model.getBpmnModel().getMainProcess() == null) {
         model.addMainProcess();
       }

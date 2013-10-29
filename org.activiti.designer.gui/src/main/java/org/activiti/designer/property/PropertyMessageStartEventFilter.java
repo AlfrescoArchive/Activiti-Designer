@@ -5,7 +5,6 @@ package org.activiti.designer.property;
 import org.activiti.bpmn.model.MessageEventDefinition;
 import org.activiti.bpmn.model.StartEvent;
 import org.activiti.bpmn.model.alfresco.AlfrescoStartEvent;
-import org.activiti.designer.util.property.ActivitiPropertyFilter;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 
 public class PropertyMessageStartEventFilter extends ActivitiPropertyFilter {

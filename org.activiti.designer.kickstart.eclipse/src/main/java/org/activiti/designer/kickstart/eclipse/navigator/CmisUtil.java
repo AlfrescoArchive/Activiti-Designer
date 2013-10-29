@@ -158,7 +158,7 @@ public class CmisUtil {
 
   	// content
   	InputStream stream = new ByteArrayInputStream(content);
-  	ContentStream contentStream = new ContentStreamImpl(fileName, BigInteger.valueOf(content.length), "text/plain", stream);
+  	ContentStream contentStream = new ContentStreamImpl(fileName, BigInteger.valueOf(content.length), "application/zip", stream);
 
   	// create document
   	return folder.createDocument(properties, contentStream, VersioningState.MAJOR).getId();
@@ -166,7 +166,7 @@ public class CmisUtil {
   
   public static void overwriteDocumentContent(Document document, byte[] content, String mimetype) {
   	InputStream stream = new ByteArrayInputStream(content);
-  	ContentStream contentStream = new ContentStreamImpl(document.getName(), BigInteger.valueOf(content.length), "text/plain", stream);
+  	ContentStream contentStream = new ContentStreamImpl(document.getName(), BigInteger.valueOf(content.length), "application/zip", stream);
   	document.setContentStream(contentStream, true);
   }
   

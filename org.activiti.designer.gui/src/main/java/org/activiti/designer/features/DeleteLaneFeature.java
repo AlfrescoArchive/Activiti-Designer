@@ -12,7 +12,7 @@ import org.activiti.bpmn.model.Pool;
 import org.activiti.bpmn.model.Process;
 import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.bpmn.model.SubProcess;
-import org.activiti.designer.util.editor.Bpmn2MemoryModel;
+import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -55,7 +55,7 @@ public class DeleteLaneFeature extends DefaultDeleteFeature {
 
   protected void deleteBusinessObject(Object bo) {
 		if (bo instanceof Lane) {
-		  Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+		  BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
 		  Lane lane = (Lane) bo;
 		  
 		  Pool parentPool = null;
@@ -159,7 +159,7 @@ public class DeleteLaneFeature extends DefaultDeleteFeature {
         removeFeature.remove(rc);
       }
       
-      Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+      BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
       FlowNode sourceNode = (FlowNode) model.getFlowElement(deleteObject.getSourceRef());
       FlowNode targetNode = (FlowNode) model.getFlowElement(deleteObject.getTargetRef());
       

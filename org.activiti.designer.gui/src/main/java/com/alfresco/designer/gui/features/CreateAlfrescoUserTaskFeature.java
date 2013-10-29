@@ -8,7 +8,7 @@ import org.activiti.bpmn.model.alfresco.AlfrescoUserTask;
 import org.activiti.designer.PluginImage;
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.features.AbstractCreateFastBPMNFeature;
-import org.activiti.designer.util.editor.Bpmn2MemoryModel;
+import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.designer.util.preferences.Preferences;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -53,7 +53,7 @@ public class CreateAlfrescoUserTaskFeature extends AbstractCreateFastBPMNFeature
       lane.getParentProcess().addFlowElement(newUserTask);
       
     } else {
-      Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+      BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
       if (model.getBpmnModel().getMainProcess() == null) {
         model.addMainProcess();
       }

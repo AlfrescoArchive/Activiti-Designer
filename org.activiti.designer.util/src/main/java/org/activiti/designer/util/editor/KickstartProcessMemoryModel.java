@@ -14,7 +14,7 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 
 public class KickstartProcessMemoryModel {
   
-    public static final String KICKSTART_PROCESS_CONTENT_TYPE = "org.activiti.designer.kickstart.editor.process.contenttype";
+  public static final String KICKSTART_PROCESS_CONTENT_TYPE = "org.activiti.designer.kickstart.editor.process.contenttype";
   
 	protected IFeatureProvider featureProvider;
 	protected IFile modelFile;

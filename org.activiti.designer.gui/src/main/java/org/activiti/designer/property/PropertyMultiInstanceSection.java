@@ -17,265 +17,74 @@ package org.activiti.designer.property;
 
 import org.activiti.bpmn.model.Activity;
 import org.activiti.bpmn.model.MultiInstanceLoopCharacteristics;
-import org.activiti.designer.util.eclipse.ActivitiUiUtil;
-import org.activiti.designer.util.property.ActivitiPropertySection;
-import org.apache.commons.lang.StringUtils;
-import org.eclipse.emf.transaction.TransactionalEditingDomain;
-import org.eclipse.graphiti.features.IFeature;
-import org.eclipse.graphiti.features.context.IContext;
-import org.eclipse.graphiti.features.context.impl.CustomContext;
-import org.eclipse.graphiti.features.impl.AbstractFeature;
-import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.ui.editor.DiagramEditor;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.events.SelectionListener;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.layout.RowLayout;
-import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
-import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
 public class PropertyMultiInstanceSection extends ActivitiPropertySection implements ITabbedPropertyConstants {
 
-  private Button yesButton;
-  private Button noButton;
+  private Combo sequentialCombo;
 	private Text loopCardinaltyText;
 	private Text collectionText;
 	private Text elementVariableText;
 	private Text completionConditionText;
-
-	@Override
-	public void createControls(Composite parent, TabbedPropertySheetPage tabbedPropertySheetPage) {
-		super.createControls(parent, tabbedPropertySheetPage);
-
-		TabbedPropertySheetWidgetFactory factory = getWidgetFactory();
-		Composite composite = factory.createFlatFormComposite(parent);
-		
-		Composite radioTypeComposite = new Composite(composite, SWT.NULL);
-    radioTypeComposite.setBackground(composite.getBackground());
-    FormData data = new FormData();
-    data.left = new FormAttachment(0, 160);
-    data.right = new FormAttachment(100, 0);
-    radioTypeComposite.setLayoutData(data);
-    radioTypeComposite.setLayout(new RowLayout());
-      
-    yesButton = new Button(radioTypeComposite, SWT.RADIO);
-    yesButton.setText("Yes");
-    yesButton.addSelectionListener(new SelectionListener() {
-
-      @Override
-      public void widgetSelected(SelectionEvent event) {
-        saveSequential(true);
-      }
-
-      @Override
-      public void widgetDefaultSelected(SelectionEvent event) {
-        //
-      }
-      
-    });
-    noButton = new Button(radioTypeComposite, SWT.RADIO);
-    noButton.setText("No");
-    noButton.setSelection(true);
-    noButton.addSelectionListener(new SelectionListener() {
-
-      @Override
-      public void widgetSelected(SelectionEvent event) {
-        saveSequential(false);
-      }
-
-      @Override
-      public void widgetDefaultSelected(SelectionEvent event) {
-        //
-      }
-      
-    });
-    
-    createLabel("Sequential", composite, factory, radioTypeComposite);
-
-		loopCardinaltyText = createText(composite, factory, radioTypeComposite);
-		createLabel("Loop cardinality", composite, factory, loopCardinaltyText);
-
-		collectionText = createText(composite, factory, loopCardinaltyText);
-		createLabel("Collection", composite, factory, collectionText);
-		
-		elementVariableText = createText(composite, factory, collectionText);
-    createLabel("Element variable", composite, factory, elementVariableText);
-    
-    completionConditionText = createText(composite, factory, elementVariableText);
-    createLabel("Completion condition", composite, factory, completionConditionText);
-	}
-
-	@Override
-	public void refresh() {
-	  PictogramElement pe = getSelectedPictogramElement();
-    if (pe == null) return;
-    
-    Object bo = getBusinessObject(pe);
-    if (bo == null || bo instanceof Activity == false)
-      return;
-    
-    Activity activity = (Activity) bo;
-    MultiInstanceLoopCharacteristics multiInstanceDef = (MultiInstanceLoopCharacteristics) activity.getLoopCharacteristics();
-    
-	  loopCardinaltyText.removeFocusListener(listener);
-	  collectionText.removeFocusListener(listener);
-	  elementVariableText.removeFocusListener(listener);
-	  completionConditionText.removeFocusListener(listener);
-	  
-    
-	  if(multiInstanceDef != null && multiInstanceDef.isSequential() == true) {
-	    yesButton.setSelection(true);
-	    noButton.setSelection(false);
-    } else {
-      yesButton.setSelection(false);
-      noButton.setSelection(true);
-    }
-	  
-    if(multiInstanceDef != null && StringUtils.isNotEmpty(multiInstanceDef.getLoopCardinality())) {
-      loopCardinaltyText.setText(multiInstanceDef.getLoopCardinality());
-    } else {
-    	loopCardinaltyText.setText("");
-    }
-		
-    if(multiInstanceDef != null && StringUtils.isNotEmpty(multiInstanceDef.getInputDataItem())) {
-      collectionText.setText(multiInstanceDef.getInputDataItem());
-    } else {
-    	collectionText.setText("");
-    }
-    
-    if(multiInstanceDef != null && StringUtils.isNotEmpty(multiInstanceDef.getElementVariable())) {
-      elementVariableText.setText(multiInstanceDef.getElementVariable());
-    } else {
-    	elementVariableText.setText("");
-    }
-    
-    if(multiInstanceDef != null && StringUtils.isNotEmpty(multiInstanceDef.getCompletionCondition())) {
-      completionConditionText.setText(multiInstanceDef.getCompletionCondition());
-    } else {
-    	completionConditionText.setText("");
-    }
-    
-		loopCardinaltyText.addFocusListener(listener);
-		collectionText.addFocusListener(listener);
-		elementVariableText.addFocusListener(listener);
-		completionConditionText.addFocusListener(listener);
-	}
+	private String[] sequentialValues = new String[] {"true", "false"};
 	
-	private void saveSequential(final boolean sequential) {
-	  PictogramElement pe = getSelectedPictogramElement();
-    if (pe == null) return;
-    
-    final Object bo = getBusinessObject(pe);
-    if (bo instanceof Activity == false) return;
-    final Activity activity = (Activity) bo;
-    MultiInstanceLoopCharacteristics multiInstance = getMultiInstanceDef(activity);
-    if (multiInstance.isSequential() != sequential) {
-      DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
-      TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
-      ActivitiUiUtil.runModelChange(new Runnable() {
-        public void run() {
-          getMultiInstanceDef(activity).setSequential(sequential);
-        }
-      }, editingDomain, "Model Update");
+	@Override
+  public void createFormControls(TabbedPropertySheetPage aTabbedPropertySheetPage) {
+	  sequentialCombo = createCombobox(sequentialValues, 1);
+    createLabel("Sequential", sequentialCombo);
+    loopCardinaltyText = createTextControl(false);
+    createLabel("Loop cardinality", loopCardinaltyText);
+    collectionText = createTextControl(false);
+    createLabel("Collection", collectionText);
+    elementVariableText = createTextControl(false);
+    createLabel("Element variable", elementVariableText);
+    completionConditionText = createTextControl(false);
+    createLabel("Completion condition", completionConditionText);
+  }
+
+  @Override
+  protected Object getModelValueForControl(Control control, Object businessObject) {
+    Activity activity = (Activity) businessObject;
+    MultiInstanceLoopCharacteristics multiInstanceDef = activity.getLoopCharacteristics();
+    if (multiInstanceDef != null) {
+      if (control == sequentialCombo) {
+        return multiInstanceDef.isSequential();
+      } else if (control == loopCardinaltyText) {
+        return multiInstanceDef.getLoopCardinality();
+      } else if (control == collectionText) {
+        return multiInstanceDef.getInputDataItem();
+      } else if (control == elementVariableText) {
+        return multiInstanceDef.getElementVariable();
+      } else if (control == completionConditionText) {
+        return multiInstanceDef.getCompletionCondition();
+      }
     }
-	}
+    return null;
+  }
 
-	private FocusListener listener = new FocusListener() {
-
-		public void focusGained(final FocusEvent e) {
-		}
-
-		public void focusLost(final FocusEvent e) {
-		  PictogramElement pe = getSelectedPictogramElement();
-      if (pe == null) return;
-      
-      Object bo = getBusinessObject(pe);
-      if (bo instanceof Activity == false) return;
-      final Activity activity = (Activity) bo;
-      
-			updateMultiInstance(getMultiInstanceDef(activity), e.getSource());
-		}
-	};
-	
-	protected void updateMultiInstance(final MultiInstanceLoopCharacteristics multiInstance, final Object source) {
-    String oldValue = null;
-    final String newValue = ((Text) source).getText();
-    if (source == loopCardinaltyText) {
-      oldValue = multiInstance.getLoopCardinality();
-    } else if (source == collectionText) {
-      oldValue = multiInstance.getInputDataItem();
-    } else if (source == elementVariableText) {
-      oldValue = multiInstance.getElementVariable();
-    } else if (source == completionConditionText) {
-      oldValue = multiInstance.getCompletionCondition();
+  @Override
+  protected void storeValueInModel(Control control, Object businessObject) {
+    Activity activity = (Activity) businessObject;
+    MultiInstanceLoopCharacteristics multiInstanceDef = activity.getLoopCharacteristics();
+    if (multiInstanceDef == null) {
+      multiInstanceDef = new MultiInstanceLoopCharacteristics();
+      activity.setLoopCharacteristics(multiInstanceDef);
     }
     
-    if ((StringUtils.isEmpty(oldValue) && StringUtils.isNotEmpty(newValue)) || (StringUtils.isNotEmpty(oldValue) && newValue.equals(oldValue) == false)) {
-      IFeature feature = new AbstractFeature(getDiagramTypeProvider().getFeatureProvider()) {
-        
-        @Override
-        public void execute(IContext context) {
-          if (source == loopCardinaltyText) {
-            multiInstance.setLoopCardinality(newValue);
-          } else if (source == collectionText) {
-            multiInstance.setInputDataItem(newValue);
-          } else if (source == elementVariableText) {
-            multiInstance.setElementVariable(newValue);
-          } else if (source == completionConditionText) {
-            multiInstance.setCompletionCondition(newValue);
-          }
-        }
-        
-        @Override
-        public boolean canExecute(IContext context) {
-          return true;
-        }
-      };
-      CustomContext context = new CustomContext();
-      execute(feature, context);
+    if (control == sequentialCombo) {
+      multiInstanceDef.setSequential(Boolean.valueOf(sequentialValues[sequentialCombo.getSelectionIndex()]));
+    } else if (control == loopCardinaltyText) {
+      multiInstanceDef.setLoopCardinality(loopCardinaltyText.getText());
+    } else if (control == collectionText) {
+      multiInstanceDef.setInputDataItem(collectionText.getText());
+    } else if (control == elementVariableText) {
+      multiInstanceDef.setElementVariable(elementVariableText.getText());
+    } else if (control == completionConditionText) {
+      multiInstanceDef.setCompletionCondition(completionConditionText.getText());
     }
   }
-	
-	private MultiInstanceLoopCharacteristics getMultiInstanceDef(Activity activity) {
-	  if(activity.getLoopCharacteristics() == null) {
-	    activity.setLoopCharacteristics(new MultiInstanceLoopCharacteristics());
-	  }
-	  return (MultiInstanceLoopCharacteristics) activity.getLoopCharacteristics();
-	}
-	
-	private Text createText(Composite parent, TabbedPropertySheetWidgetFactory factory, Control top) {
-	  Text text = factory.createText(parent, ""); //$NON-NLS-1$
-	  FormData data = new FormData();
-    data.left = new FormAttachment(0, 160);
-    data.right = new FormAttachment(100, -HSPACE);
-    if(top == null) {
-      data.top = new FormAttachment(0, VSPACE);
-    } else {
-      data.top = new FormAttachment(top, VSPACE);
-    }
-    text.setLayoutData(data);
-    text.addFocusListener(listener);
-    return text;
-	}
-	
-	private CLabel createLabel(String text, Composite parent, TabbedPropertySheetWidgetFactory factory, Control control) {
-	  CLabel label = factory.createCLabel(parent, text);
-	  FormData data = new FormData();
-    data.left = new FormAttachment(0, 0);
-    data.right = new FormAttachment(control, -HSPACE);
-    data.top = new FormAttachment(control, 0, SWT.CENTER);
-    label.setLayoutData(data);
-    return label;
-	}
-
 }

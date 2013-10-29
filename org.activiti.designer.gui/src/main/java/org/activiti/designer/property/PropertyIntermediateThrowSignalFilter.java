@@ -1,7 +1,6 @@
 package org.activiti.designer.property;
 
 import org.activiti.bpmn.model.ThrowEvent;
-import org.activiti.designer.util.property.ActivitiPropertyFilter;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 
 public class PropertyIntermediateThrowSignalFilter extends ActivitiPropertyFilter {

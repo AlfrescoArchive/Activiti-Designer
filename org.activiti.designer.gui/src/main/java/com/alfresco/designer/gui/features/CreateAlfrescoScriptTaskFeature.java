@@ -7,7 +7,7 @@ import org.activiti.bpmn.model.SubProcess;
 import org.activiti.bpmn.model.alfresco.AlfrescoScriptTask;
 import org.activiti.designer.PluginImage;
 import org.activiti.designer.features.AbstractCreateFastBPMNFeature;
-import org.activiti.designer.util.editor.Bpmn2MemoryModel;
+import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -47,7 +47,7 @@ public class CreateAlfrescoScriptTaskFeature extends AbstractCreateFastBPMNFeatu
       lane.getParentProcess().addFlowElement(newScriptTask);
       
     } else {
-      Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+      BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
       if (model.getBpmnModel().getMainProcess() == null) {
         model.addMainProcess();
       }

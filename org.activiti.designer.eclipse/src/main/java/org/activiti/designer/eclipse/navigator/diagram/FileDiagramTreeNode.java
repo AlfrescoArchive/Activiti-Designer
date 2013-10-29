@@ -26,7 +26,7 @@ import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.bpmn.model.Pool;
 import org.activiti.bpmn.model.Process;
 import org.activiti.designer.eclipse.navigator.TreeNode;
-import org.activiti.designer.util.editor.Bpmn2MemoryModel;
+import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.eclipse.core.resources.IFile;
 
 /**
@@ -34,7 +34,7 @@ import org.eclipse.core.resources.IFile;
  */
 public class FileDiagramTreeNode extends AbstractDiagramTreeNode<IFile> {
 
-  private Bpmn2MemoryModel model;
+  private BpmnMemoryModel model;
 
   public FileDiagramTreeNode(final IFile parent) {
     super(parent, null, "Diagram Root Node");
@@ -62,7 +62,7 @@ public class FileDiagramTreeNode extends AbstractDiagramTreeNode<IFile> {
   }
 
   @Override
-  protected Bpmn2MemoryModel getRootModel() {
+  protected BpmnMemoryModel getRootModel() {
     return model;
   }
 
@@ -70,35 +70,35 @@ public class FileDiagramTreeNode extends AbstractDiagramTreeNode<IFile> {
     return getParent() instanceof IFile;
   }
 
-  private boolean hasMainProcessOnly(final Bpmn2MemoryModel model) {
+  private boolean hasMainProcessOnly(final BpmnMemoryModel model) {
     return hasMainProcess(model) && hasNoPools(model);
   }
 
-  private boolean hasPoolsOnly(final Bpmn2MemoryModel model) {
+  private boolean hasPoolsOnly(final BpmnMemoryModel model) {
     return hasPools(model) && hasNoMainProcess(model);
   }
 
-  private boolean hasMixedPoolsAndMainProcess(final Bpmn2MemoryModel model) {
+  private boolean hasMixedPoolsAndMainProcess(final BpmnMemoryModel model) {
     return hasPools(model) && hasMainProcess(model);
   }
 
-  private boolean hasMainProcess(final Bpmn2MemoryModel model) {
+  private boolean hasMainProcess(final BpmnMemoryModel model) {
     return model.getBpmnModel().getMainProcess() != null;
   }
 
-  private boolean hasNoMainProcess(final Bpmn2MemoryModel model) {
+  private boolean hasNoMainProcess(final BpmnMemoryModel model) {
     return !hasMainProcess(model) || model.getBpmnModel().getMainProcess().getFlowElements().isEmpty();
   }
 
-  private boolean hasNoPools(final Bpmn2MemoryModel model) {
+  private boolean hasNoPools(final BpmnMemoryModel model) {
     return model.getBpmnModel().getPools() == null || model.getBpmnModel().getPools().isEmpty();
   }
 
-  private boolean hasPools(final Bpmn2MemoryModel model) {
+  private boolean hasPools(final BpmnMemoryModel model) {
     return model.getBpmnModel().getPools() != null && !model.getBpmnModel().getPools().isEmpty();
   }
 
-  private void extractChildrenForMainProcessOnly(final Bpmn2MemoryModel model) {
+  private void extractChildrenForMainProcessOnly(final BpmnMemoryModel model) {
     extractTransparentProcess(this, model.getBpmnModel().getMainProcess());
   }
 
@@ -111,7 +111,7 @@ public class FileDiagramTreeNode extends AbstractDiagramTreeNode<IFile> {
     referenceChildNodesToOwnChildren(transparentProcessNode);
   }
 
-  private void extractChildrenForPoolsOnly(final Bpmn2MemoryModel model) {
+  private void extractChildrenForPoolsOnly(final BpmnMemoryModel model) {
     extractPools(model.getBpmnModel().getPools());
   }
 
@@ -121,13 +121,13 @@ public class FileDiagramTreeNode extends AbstractDiagramTreeNode<IFile> {
     }
   }
 
-  private void extractChildrenForPoolsAndMainProcess(final Bpmn2MemoryModel model) {
+  private void extractChildrenForPoolsAndMainProcess(final BpmnMemoryModel model) {
     extractProcess(this, model.getBpmnModel().getMainProcess());
     extractPools(model.getBpmnModel().getPools());
   }
 
-  private Bpmn2MemoryModel buildModel(final IFile modelFile) {
-    final Bpmn2MemoryModel result = new Bpmn2MemoryModel(null, modelFile);
+  private BpmnMemoryModel buildModel(final IFile modelFile) {
+    final BpmnMemoryModel result = new BpmnMemoryModel(null, modelFile);
 
     String filePath = modelFile.getLocationURI().getPath();
     File bpmnFile = new File(filePath);

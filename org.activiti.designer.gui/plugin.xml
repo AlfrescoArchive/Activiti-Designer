@@ -145,8 +145,8 @@
                tab="org.activiti.designer.mainConfigTab">
          </propertySection>
          <propertySection
-               class="org.activiti.designer.property.PropertyBpmnSection"
-               filter="org.activiti.designer.property.PropertyBpmnFilter"
+               class="org.activiti.designer.property.PropertyGeneralSection"
+               filter="org.activiti.designer.property.PropertyGeneralFilter"
                id="org.activiti.designer.generalTab.flowelement"
                tab="org.activiti.designer.generalTab">
          </propertySection>

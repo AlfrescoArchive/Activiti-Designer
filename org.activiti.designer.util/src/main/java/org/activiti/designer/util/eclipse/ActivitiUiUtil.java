@@ -14,7 +14,7 @@ import org.activiti.bpmn.model.Pool;
 import org.activiti.bpmn.model.Process;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.bpmn.model.TextAnnotation;
-import org.activiti.designer.util.editor.Bpmn2MemoryModel;
+import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.KickstartProcessMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.workflow.simple.definition.StepDefinition;
@@ -201,7 +201,7 @@ public class ActivitiUiUtil {
   }
 
   public static final String getNextId(final Class<? extends BaseElement> featureClass, final String featureIdKey, final Diagram diagram) {
-    Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(diagram));
+    BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(diagram));
     int determinedId = 0;
     
     if (featureClass.equals(Pool.class)) {

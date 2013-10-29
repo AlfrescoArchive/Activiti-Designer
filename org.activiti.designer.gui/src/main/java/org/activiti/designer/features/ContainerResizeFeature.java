@@ -23,7 +23,7 @@ import org.activiti.bpmn.model.Lane;
 import org.activiti.bpmn.model.Pool;
 import org.activiti.bpmn.model.Process;
 import org.activiti.bpmn.model.SubProcess;
-import org.activiti.designer.util.editor.Bpmn2MemoryModel;
+import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -116,7 +116,7 @@ public class ContainerResizeFeature extends DefaultResizeShapeFeature {
     } else if (bo instanceof Pool) {
       
       if(context.getProperty("org.activiti.designer.lane.create") == null) {
-        Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+        BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
         Pool pool = (Pool) bo;
         Process process = model.getBpmnModel().getProcess(pool.getId());
         if (process != null) {

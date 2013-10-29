@@ -21,7 +21,7 @@ import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.Lane;
 import org.activiti.bpmn.model.Pool;
 import org.activiti.bpmn.model.Process;
-import org.activiti.designer.util.editor.Bpmn2MemoryModel;
+import org.activiti.designer.util.editor.BpmnMemoryModel;
 
 /**
  * @author Tiese Barrell
@@ -63,7 +63,7 @@ public class LaneDiagramTreeNode extends AbstractDiagramTreeNode<Lane> {
     if (parentPool != null) {
       final String poolId = parentPool.getId();
 
-      final Bpmn2MemoryModel bpmn2MemoryModel = findRootModel();
+      final BpmnMemoryModel bpmn2MemoryModel = findRootModel();
 
       result = bpmn2MemoryModel.getBpmnModel().getProcess(poolId);
 

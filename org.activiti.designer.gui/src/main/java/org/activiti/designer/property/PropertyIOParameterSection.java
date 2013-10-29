@@ -5,34 +5,26 @@ import java.util.List;
 import org.activiti.bpmn.model.CallActivity;
 import org.activiti.bpmn.model.IOParameter;
 import org.activiti.designer.property.ui.IOParameterEditor;
-import org.activiti.designer.util.property.ActivitiPropertySection;
-import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
-import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
 public class PropertyIOParameterSection extends ActivitiPropertySection implements ITabbedPropertyConstants {
 
   private IOParameterEditor inParameterEditor;
   private IOParameterEditor outParameterEditor;
-
+  
   @Override
-  public void createControls(Composite parent, TabbedPropertySheetPage tabbedPropertySheetPage) {
-    super.createControls(parent, tabbedPropertySheetPage);
-
-    TabbedPropertySheetWidgetFactory factory = getWidgetFactory();
-    Composite composite = factory.createFlatFormComposite(parent);
-    FormData data;
-    
-    Composite inParametersComposite = factory.createComposite(composite, SWT.WRAP);
-    data = new FormData();
+  public void createFormControls(TabbedPropertySheetPage aTabbedPropertySheetPage) {
+    Composite inParametersComposite = getWidgetFactory().createComposite(formComposite, SWT.WRAP);
+    FormData data = new FormData();
     data.left = new FormAttachment(0, 150);
     data.right = new FormAttachment(100, 0);
     data.top = new FormAttachment(0, VSPACE);
@@ -44,14 +36,14 @@ public class PropertyIOParameterSection extends ActivitiPropertySection implemen
     inParameterEditor = new IOParameterEditor("inputParameterEditor", inParametersComposite);
     inParameterEditor.getLabelControl(inParametersComposite).setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
     
-    CLabel inParametersLabel = factory.createCLabel(composite, "Input parameters:"); //$NON-NLS-1$
+    CLabel inParametersLabel = getWidgetFactory().createCLabel(formComposite, "Input parameters:"); //$NON-NLS-1$
     data = new FormData();
     data.left = new FormAttachment(0, 0);
     data.right = new FormAttachment(inParametersComposite, -HSPACE);
     data.top = new FormAttachment(inParametersComposite, 0, SWT.TOP);
     inParametersLabel.setLayoutData(data);
     
-    Composite outParametersComposite = factory.createComposite(composite, SWT.WRAP);
+    Composite outParametersComposite = getWidgetFactory().createComposite(formComposite, SWT.WRAP);
     data = new FormData();
     data.left = new FormAttachment(0, 150);
     data.right = new FormAttachment(100, 0);
@@ -64,7 +56,7 @@ public class PropertyIOParameterSection extends ActivitiPropertySection implemen
     outParameterEditor = new IOParameterEditor("outputParameterEditor", outParametersComposite);
     outParameterEditor.getLabelControl(outParametersComposite).setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
     
-    CLabel outParametersLabel = factory.createCLabel(composite, "Output parameters:"); //$NON-NLS-1$
+    CLabel outParametersLabel = getWidgetFactory().createCLabel(formComposite, "Output parameters:"); //$NON-NLS-1$
     data = new FormData();
     data.left = new FormAttachment(0, 0);
     data.right = new FormAttachment(outParametersComposite, -HSPACE);
@@ -73,30 +65,27 @@ public class PropertyIOParameterSection extends ActivitiPropertySection implemen
   }
 
   @Override
-  public void refresh() {
+  protected Object getModelValueForControl(Control control, Object businessObject) {
+    List<IOParameter> inParameterList = ((CallActivity) businessObject).getInParameters();
     
-    PictogramElement pe = getSelectedPictogramElement();
-    if (pe != null) {
-      Object bo = getBusinessObject(pe);
-      if (bo == null)
-        return;
-      
-      List<IOParameter> inParameterList = ((CallActivity) bo).getInParameters();
-      
-      inParameterEditor.pictogramElement = pe;
-      inParameterEditor.diagramEditor = getDiagramEditor();
-      inParameterEditor.diagram = getDiagram();
-      inParameterEditor.isInputParameters = true;
-      inParameterEditor.initialize(inParameterList);
-      
-      List<IOParameter> outParameterList = ((CallActivity) bo).getOutParameters();
-      
-      outParameterEditor.pictogramElement = pe;
-      outParameterEditor.diagramEditor = getDiagramEditor();
-      outParameterEditor.diagram = getDiagram();
-      outParameterEditor.isInputParameters = false;
-      outParameterEditor.initialize(outParameterList);
-   }
+    inParameterEditor.pictogramElement = getSelectedPictogramElement();
+    inParameterEditor.diagramEditor = getDiagramEditor();
+    inParameterEditor.diagram = getDiagram();
+    inParameterEditor.isInputParameters = true;
+    inParameterEditor.initialize(inParameterList);
+    
+    List<IOParameter> outParameterList = ((CallActivity) businessObject).getOutParameters();
+    
+    outParameterEditor.pictogramElement = getSelectedPictogramElement();
+    outParameterEditor.diagramEditor = getDiagramEditor();
+    outParameterEditor.diagram = getDiagram();
+    outParameterEditor.isInputParameters = false;
+    outParameterEditor.initialize(outParameterList);
+    return null;
   }
 
+  @Override
+  protected void storeValueInModel(Control control, Object businessObject) {
+    // nothing to do
+  }
 }

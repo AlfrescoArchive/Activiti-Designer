@@ -7,7 +7,7 @@ import java.util.List;
 
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.designer.util.CloneUtil;
-import org.activiti.designer.util.editor.Bpmn2MemoryModel;
+import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IAddFeature;
@@ -58,7 +58,7 @@ public class PasteFlowElementFeature extends AbstractPasteFeature {
 
   public void paste(IPasteContext context) {
     // we already verified, that we paste directly in the diagram
-  	Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+  	BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
   	List<FlowElement> copyList = model.getClipboard();
 
     for (FlowElement element : copyList) {

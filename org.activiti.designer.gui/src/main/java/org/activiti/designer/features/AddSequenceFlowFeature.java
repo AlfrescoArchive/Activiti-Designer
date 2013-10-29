@@ -10,7 +10,7 @@ import org.activiti.bpmn.model.GraphicInfo;
 import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.designer.util.TextUtil;
-import org.activiti.designer.util.editor.Bpmn2MemoryModel;
+import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.designer.util.platform.OSEnum;
 import org.activiti.designer.util.platform.OSUtil;
@@ -100,7 +100,7 @@ public class AddSequenceFlowFeature extends AbstractAddFeature {
 		sourceAnchor.getOutgoingConnections().add(connection);
 		targetAnchor.getIncomingConnections().add(connection);
 
-		Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+		BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
 		
 		FlowElement sourceElement = model.getFlowElement(addedSequenceFlow.getSourceRef());
     FlowElement targetElement = model.getFlowElement(addedSequenceFlow.getTargetRef());

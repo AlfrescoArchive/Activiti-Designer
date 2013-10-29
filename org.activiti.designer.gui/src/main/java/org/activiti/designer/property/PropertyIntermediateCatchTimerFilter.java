@@ -3,7 +3,6 @@ package org.activiti.designer.property;
 import org.activiti.bpmn.model.EventDefinition;
 import org.activiti.bpmn.model.IntermediateCatchEvent;
 import org.activiti.bpmn.model.TimerEventDefinition;
-import org.activiti.designer.util.property.ActivitiPropertyFilter;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 
 public class PropertyIntermediateCatchTimerFilter extends ActivitiPropertyFilter {

@@ -1,7 +1,6 @@
 package org.activiti.designer.property;
 
 import org.activiti.bpmn.model.BusinessRuleTask;
-import org.activiti.designer.util.property.ActivitiPropertyFilter;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 
 public class PropertyBusinessRuleTaskFilter extends ActivitiPropertyFilter {

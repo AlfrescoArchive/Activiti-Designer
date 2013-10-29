@@ -24,7 +24,6 @@ import org.activiti.designer.property.extension.field.FieldInfo;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.extension.ExtensionUtil;
 import org.activiti.designer.util.extension.FormToolTip;
-import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
@@ -48,11 +47,10 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.IWorkbenchPart;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
-public class PropertyCustomServiceTaskSection extends ActivitiPropertySection implements ITabbedPropertyConstants {
+public class PropertyCustomServiceTaskSection extends BaseActivitiPropertySection {
 
   public static Font boldFont;
   public static Font italicFont;

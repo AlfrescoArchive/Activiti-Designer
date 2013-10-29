@@ -12,31 +12,23 @@ import org.activiti.designer.PluginImage;
 import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.util.ActivitiConstants;
 import org.activiti.designer.util.dialog.ActivitiResourceSelectionDialog;
-import org.activiti.designer.util.eclipse.ActivitiUiUtil;
-import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.activiti.designer.util.workspace.ActivitiWorkspaceUtil;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.events.ModifyEvent;
-import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IWorkbenchPage;
@@ -47,7 +39,6 @@ import org.eclipse.ui.ide.IDE;
 import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
-import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
 /**
  * Adds the called element of the call activity to the "Main Config" properties sheet. Provides a
@@ -56,8 +47,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
  *
  * @since 5.12
  */
-public class PropertyCallActivitySection extends ActivitiPropertySection
-  implements ITabbedPropertyConstants {
+public class PropertyCallActivitySection extends ActivitiPropertySection implements ITabbedPropertyConstants {
 
   /** The text field of the process ID to call */
   private Text calledElementText;
@@ -72,6 +62,48 @@ public class PropertyCallActivitySection extends ActivitiPropertySection
    * A button that allows to choose a called element among all currently found processes.
    */
   private Button chooseCalledElementButton;
+  
+  
+  @Override
+  public void createFormControls(TabbedPropertySheetPage aTabbedPropertySheetPage) {
+    openCalledElementButton = getWidgetFactory().createButton(formComposite, StringUtils.EMPTY, SWT.PUSH);
+    openCalledElementButton.setImage(Activator.getImage(PluginImage.ACTION_GO));
+    FormData data = new FormData();
+    data.right = new FormAttachment(100, -HSPACE);
+    openCalledElementButton.setLayoutData(data);
+    openCalledElementButton.addSelectionListener(openCalledElementSelected);
+
+    chooseCalledElementButton = getWidgetFactory().createButton(formComposite, "\u2026", SWT.PUSH);
+    chooseCalledElementButton.setToolTipText(
+            "Click to open a dialog to choose from all found processes.");
+
+    data = new FormData();
+    data.right = new FormAttachment(openCalledElementButton, -HSPACE);
+    chooseCalledElementButton.setLayoutData(data);
+    chooseCalledElementButton.addSelectionListener(chooseCalledElementSelected);
+    
+    calledElementText = createTextControl(false);
+    createLabel("Called element", calledElementText);
+  }
+
+  @Override
+  protected Object getModelValueForControl(Control control, Object businessObject) {
+    CallActivity activity = (CallActivity) businessObject;
+    if (control == calledElementText) {
+      return activity.getCalledElement();
+    }
+    return null;
+  }
+
+  @Override
+  protected void storeValueInModel(Control control, Object businessObject) {
+    CallActivity activity = (CallActivity) businessObject;
+    
+    if (control == calledElementText) {
+      evaluateOpenCalledElementButtonEnabledStatus();
+      activity.setCalledElement(calledElementText.getText());
+    }
+  }
 
   /**
    * Checks, whether the given process ID refers to a process this call activity might lead to.
@@ -100,89 +132,6 @@ public class PropertyCallActivitySection extends ActivitiPropertySection
       openCalledElementButton.setEnabled(true);
       openCalledElementButton.setToolTipText("Click to open the called element's process diagram");
     }
-  }
-
-  /**
-   * This modification listener will call {@link #evaluateOpenCalledElementButtonEnabledStatus()}
-   * in case the text in the field {@link #calledElementText} has changed.
-   */
-  private ModifyListener calledElementTextModified = new ModifyListener() {
-
-    @Override
-    public void modifyText(ModifyEvent event) {
-      evaluateOpenCalledElementButtonEnabledStatus();
-    }
-
-  };
-
-  /**
-   * This will be triggered as soon as the focus of the field {@link #calledElementText} changed. It
-   * reacts on focus loss and checks, whether the new value of the text is no longer equal to the
-   * call activity. In that case it runs a model change to reflect the change in the diagram.
-   */
-  private FocusListener calledElementTextFocusChanged = new FocusListener() {
-
-    @Override
-    public void focusLost(FocusEvent event) {
-      final CallActivity callActivity = getDefaultBusinessObject(CallActivity.class);
-      final String calledElement = calledElementText.getText();
-
-      if (callActivity != null
-              && !StringUtils.equals(calledElement, callActivity.getCalledElement())) {
-        final TransactionalEditingDomain ted = getTransactionalEditingDomain();
-
-        ActivitiUiUtil.runModelChange(new Runnable() {
-
-          @Override
-          public void run() {
-            callActivity.setCalledElement(calledElement);
-          }
-        }, ted, ActivitiConstants.DEFAULT_MODEL_CHANGE_TEXT);
-      }
-    }
-
-    @Override
-    public void focusGained(FocusEvent event) {
-      // intentionally left blank
-    }
-  };
-
-  /**
-   * A private process ID label provider that simply returns the second element of the pair built
-   * from process ID and data file. This is used in the selection list for an available process.
-   */
-  private static class ProcessIdLabelProvider extends LabelProvider {
-
-    @Override
-    public String getText(Object element) {
-
-      return (String) ((Object[]) element)[1];
-    }
-
-  }
-
-  /**
-   * This label provider is used in the selection list for a diagram in the lower list. It utilizes
-   * a workbench label provider to retrieve the appropriate image for the diagram.
-   */
-  private static class DiagramLabelProvider extends LabelProvider {
-
-    private WorkbenchLabelProvider labelProvider = new WorkbenchLabelProvider();
-
-    @Override
-    public Image getImage(Object element) {
-      final IResource resource = (IResource) ((Object[]) element)[0];
-
-      return labelProvider.getImage(resource);
-    }
-
-    @Override
-    public String getText(Object element) {
-      final IResource resource = (IResource) ((Object[]) element)[0];
-
-      return resource.getFullPath().makeRelative().toString();
-    }
-
   }
 
   /**
@@ -296,67 +245,42 @@ public class PropertyCallActivitySection extends ActivitiPropertySection
       widgetSelected(event);
     }
   };
+  
+  /**
+   * A private process ID label provider that simply returns the second element of the pair built
+   * from process ID and data file. This is used in the selection list for an available process.
+   */
+  private static class ProcessIdLabelProvider extends LabelProvider {
 
-  @Override
-  public void createControls(Composite parent, TabbedPropertySheetPage tabbedPropertySheetPage) {
-    super.createControls(parent, tabbedPropertySheetPage);
+    @Override
+    public String getText(Object element) {
 
-    final TabbedPropertySheetWidgetFactory factory = getWidgetFactory();
-    final Composite composite = factory.createFlatFormComposite(parent);
-    FormData data = null;
-
-    openCalledElementButton = factory.createButton(composite, StringUtils.EMPTY, SWT.PUSH);
-    openCalledElementButton.setImage(Activator.getImage(PluginImage.ACTION_GO));
-    data = new FormData();
-    data.right = new FormAttachment(100, -HSPACE);
-    openCalledElementButton.setLayoutData(data);
-    openCalledElementButton.addSelectionListener(openCalledElementSelected);
-
-    chooseCalledElementButton = factory.createButton(composite, "\u2026", SWT.PUSH);
-    chooseCalledElementButton.setToolTipText(
-            "Click to open a dialog to choose from all found processes.");
-
-    data = new FormData();
-    data.right = new FormAttachment(openCalledElementButton, -HSPACE);
-    chooseCalledElementButton.setLayoutData(data);
-    chooseCalledElementButton.addSelectionListener(chooseCalledElementSelected);
-
-    // by default, we set the text field to an empty text. The update() method will deal with this
-    calledElementText = factory.createText(composite, ActivitiConstants.EMPTY_STRING);
-    data = new FormData();
-    data.left = new FormAttachment(0, 150);
-    data.right = new FormAttachment(chooseCalledElementButton, -HSPACE);
-    data.top = new FormAttachment(0, VSPACE);
-    calledElementText.setLayoutData(data);
-    calledElementText.addModifyListener(calledElementTextModified);
-    calledElementText.addFocusListener(calledElementTextFocusChanged);
-
-    CLabel elementLabel = factory.createCLabel(composite, "Called Element:");
-    data = new FormData();
-    data.left = new FormAttachment(0, 0);
-    data.right = new FormAttachment(calledElementText, -HSPACE);
-    data.top = new FormAttachment(calledElementText, 0, SWT.TOP);
-    elementLabel.setLayoutData(data);
-  }
-
-  @Override
-  public void refresh() {
-
-    calledElementText.removeFocusListener(calledElementTextFocusChanged);
-    calledElementText.removeModifyListener(calledElementTextModified);
-
-    final CallActivity callActivity = getDefaultBusinessObject(CallActivity.class);
-    if (callActivity != null) {
-      final String calledElement = callActivity.getCalledElement();
-
-      if (calledElement == null) {
-        calledElementText.setText(ActivitiConstants.EMPTY_STRING);
-      } else {
-        calledElementText.setText(calledElement);
-      }
+      return (String) ((Object[]) element)[1];
     }
 
-    calledElementText.addModifyListener(calledElementTextModified);
-    calledElementText.addFocusListener(calledElementTextFocusChanged);
+  }
+
+  /**
+   * This label provider is used in the selection list for a diagram in the lower list. It utilizes
+   * a workbench label provider to retrieve the appropriate image for the diagram.
+   */
+  private static class DiagramLabelProvider extends LabelProvider {
+
+    private WorkbenchLabelProvider labelProvider = new WorkbenchLabelProvider();
+
+    @Override
+    public Image getImage(Object element) {
+      final IResource resource = (IResource) ((Object[]) element)[0];
+
+      return labelProvider.getImage(resource);
+    }
+
+    @Override
+    public String getText(Object element) {
+      final IResource resource = (IResource) ((Object[]) element)[0];
+
+      return resource.getFullPath().makeRelative().toString();
+    }
+
   }
 }

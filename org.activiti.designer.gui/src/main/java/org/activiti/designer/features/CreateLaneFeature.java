@@ -6,7 +6,7 @@ import org.activiti.bpmn.model.Lane;
 import org.activiti.bpmn.model.Pool;
 import org.activiti.bpmn.model.Process;
 import org.activiti.designer.PluginImage;
-import org.activiti.designer.util.editor.Bpmn2MemoryModel;
+import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -40,7 +40,7 @@ public class CreateLaneFeature extends AbstractCreateBPMNFeature {
   @Override
   public Object[] create(ICreateContext context) {
 
-    Bpmn2MemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+    BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
     Object parentBo = getFeatureProvider().getBusinessObjectForPictogramElement(context.getTargetContainer());
     Pool parentPool = null;
     if (parentBo instanceof Pool) {

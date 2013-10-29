@@ -25,8 +25,6 @@ Export-Package: org.activiti.designer.util,
  org.activiti.designer.util.extension,
  org.activiti.designer.util.platform,
  org.activiti.designer.util.preferences,
- org.activiti.designer.util.property,
  org.activiti.designer.util.style,
  org.activiti.designer.util.workspace
-Bundle-ClassPath: .,
- activiti-simple-workflow-5.14-SNAPSHOT.jar
+Bundle-ClassPath: .
