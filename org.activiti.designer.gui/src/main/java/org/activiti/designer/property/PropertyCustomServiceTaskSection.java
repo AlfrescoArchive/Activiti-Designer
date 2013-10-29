@@ -28,7 +28,7 @@ import org.activiti.designer.util.property.ActivitiPropertySection;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.ui.editor.DiagramEditor;
+import org.eclipse.graphiti.platform.IDiagramContainer;
 import org.eclipse.jface.viewers.ISelection;
 import org.eclipse.jface.window.ToolTip;
 import org.eclipse.swt.SWT;
@@ -439,8 +439,8 @@ public class PropertyCustomServiceTaskSection extends ActivitiPropertySection im
     if (pe != null) {
       Object bo = getBusinessObject(pe);
       if (bo instanceof ServiceTask) {
-        DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
-        TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
+        IDiagramContainer diagramContainer = getDiagramContainer();
+        TransactionalEditingDomain editingDomain = diagramContainer.getDiagramBehavior().getEditingDomain();
         ActivitiUiUtil.runModelChange(runnable, editingDomain, "Model Update");
       }
     }

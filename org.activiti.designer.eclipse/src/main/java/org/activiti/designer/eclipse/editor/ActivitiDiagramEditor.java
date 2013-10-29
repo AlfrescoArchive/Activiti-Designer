@@ -34,7 +34,6 @@ import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.designer.eclipse.extension.export.ExportMarshaller;
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
-import org.activiti.designer.eclipse.ui.ActivitiEditorContextMenuProvider;
 import org.activiti.designer.eclipse.ui.ExportMarshallerRunnable;
 import org.activiti.designer.eclipse.util.ExtensionPointUtil;
 import org.activiti.designer.eclipse.util.FileService;
@@ -59,7 +58,6 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.transaction.RecordingCommand;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
-import org.eclipse.gef.ContextMenuProvider;
 import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.LayerConstants;
 import org.eclipse.gef.editparts.LayerManager;
@@ -74,6 +72,7 @@ import org.eclipse.graphiti.mm.pictograms.ChopboxAnchor;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
+import org.eclipse.graphiti.ui.editor.DiagramBehavior;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 import org.eclipse.swt.SWT;
@@ -93,22 +92,18 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 
   private static GraphicalViewer activeGraphicalViewer;
 
-  private ActivitiBpmnModelChangeListener activitiBpmnModelChangeListener;
-
   private TransactionalEditingDomain transactionalEditingDomain;
 
   public ActivitiDiagramEditor() {
     super();
   }
-
+  
   @Override
-  protected void registerBusinessObjectsListener() {
-    activitiBpmnModelChangeListener = new ActivitiBpmnModelChangeListener(this);
-
-    final TransactionalEditingDomain ted = getEditingDomain();
-    ted.addResourceSetListener(activitiBpmnModelChangeListener);
-  }
-
+	protected DiagramBehavior createDiagramBehavior() {
+		// TODO Auto-generated method stub
+		return super.createDiagramBehavior();
+	}
+  
   @Override
   public TransactionalEditingDomain getEditingDomain() {
     TransactionalEditingDomain ted = super.getEditingDomain();
@@ -214,7 +209,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 
   private void marshallImage(Bpmn2MemoryModel model, String modelFileName) {
     try {
-      final GraphicalViewer graphicalViewer = (GraphicalViewer) ((DiagramEditor) model.getFeatureProvider().getDiagramTypeProvider().getDiagramEditor())
+      final GraphicalViewer graphicalViewer = (GraphicalViewer) ((DiagramEditor) model.getFeatureProvider().getDiagramTypeProvider().getDiagramBehavior().getDiagramContainer())
               .getAdapter(GraphicalViewer.class);
 
       if (graphicalViewer == null || graphicalViewer.getEditPartRegistry() == null) {
@@ -836,11 +831,6 @@ public class ActivitiDiagramEditor extends DiagramEditor {
       gridFigure.setVisible(false);
     }
     // setPartName("MyDiagram2");
-  }
-
-  @Override
-  protected ContextMenuProvider createContextMenuProvider() {
-    return new ActivitiEditorContextMenuProvider(getGraphicalViewer(), getActionRegistry(), getDiagramTypeProvider());
   }
 
   public static GraphicalViewer getActiveGraphicalViewer() {

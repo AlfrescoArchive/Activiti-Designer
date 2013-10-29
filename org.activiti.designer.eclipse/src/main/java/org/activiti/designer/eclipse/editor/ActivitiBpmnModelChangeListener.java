@@ -15,18 +15,18 @@ import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.notification.INotificationService;
-import org.eclipse.graphiti.platform.IDiagramEditor;
+import org.eclipse.graphiti.platform.IDiagramContainer;
 import org.eclipse.swt.widgets.Display;
 
 
 public class ActivitiBpmnModelChangeListener implements ResourceSetListener {
 
-  private final IDiagramEditor diagramEditor;
+  private final IDiagramContainer diagramContainer;
 
-  public ActivitiBpmnModelChangeListener(final IDiagramEditor diagramEditor) {
+  public ActivitiBpmnModelChangeListener(final IDiagramContainer diagramContainer) {
     super();
 
-    this.diagramEditor = diagramEditor;
+    this.diagramContainer = diagramContainer;
   }
 
   @Override
@@ -51,7 +51,7 @@ public class ActivitiBpmnModelChangeListener implements ResourceSetListener {
 
   @Override
   public void resourceSetChanged(ResourceSetChangeEvent event) {
-    final IDiagramTypeProvider provider = diagramEditor.getDiagramTypeProvider();
+    final IDiagramTypeProvider provider = diagramContainer.getDiagramTypeProvider();
     final Diagram diagram = provider.getDiagram();
 
     if (diagram != null && diagram.getPictogramLinks().isEmpty()) {
@@ -81,11 +81,11 @@ public class ActivitiBpmnModelChangeListener implements ResourceSetListener {
 
         @Override
         public void run() {
-          IDiagramEditor diagramEditor = provider.getDiagramEditor();
+          IDiagramContainer diagramEditor = provider.getDiagramBehavior().getDiagramContainer();
           if (provider.isAutoUpdateAtRuntime() && diagramEditor.isDirty()) {
             notificationService.updatePictogramElements(dirtyPEs);
           } else {
-            diagramEditor.refresh();
+            diagramEditor.getDiagramBehavior().refresh();
           }
         }
 

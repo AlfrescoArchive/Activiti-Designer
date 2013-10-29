@@ -65,7 +65,7 @@ public class PropertyTaskListenerSection extends ActivitiPropertySection impleme
       List<ActivitiListener> taskListenerList = userTask.getTaskListeners();
       
       listenerEditor.pictogramElement = pe;
-      listenerEditor.diagramEditor = getDiagramEditor();
+      listenerEditor.diagramContainer = getDiagramContainer();
       listenerEditor.diagram = getDiagram();
       listenerEditor.initialize(taskListenerList);
    }
