@@ -8,7 +8,7 @@
 	<name>Activiti Designer - Parent project</name>
 
 	<properties>
-		<tycho-version>0.18.0</tycho-version>
+		<tycho-version>0.18.1</tycho-version>
 	</properties>
 
 	<modules>
@@ -20,7 +20,11 @@
 		<module>../org.activiti.designer.feature</module>
 		<module>../org.activiti.designer.updatesite</module>
 		<module>../org.activiti.designer.integration</module>
-		<module>../org.activiti.designer.validation.bpmn20</module>
+<!-- 		<module>../org.activiti.designer.validation.bpmn20</module>
+		<module>../org.activiti.designer.kickstart.eclipse</module>
+		<module>../org.activiti.designer.kickstart.gui.process</module>
+		<module>../org.activiti.designer.kickstart.gui.form</module>
+		<module>../org.activiti.designer.kickstart.util</module> -->
 	</modules>
 
 	<repositories>

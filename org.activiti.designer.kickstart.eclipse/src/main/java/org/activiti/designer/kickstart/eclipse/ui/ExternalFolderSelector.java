@@ -1,0 +1,75 @@
+package org.activiti.designer.kickstart.eclipse.ui;
+
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.SelectionAdapter;
+import org.eclipse.swt.events.SelectionEvent;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
+import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.Text;
+
+/**
+ * Wrapper class around a component that allows selecting an external folder and displaying this in an
+ * editable textfield. Action widget to use exposed in {@link #getComposite()}.
+ * 
+ * @author Frederik Heremans
+ */
+public class ExternalFolderSelector {
+
+  private Text text;
+  private Button browseButton;
+  private Composite composite;
+  
+  private String currentPath;
+  
+  public ExternalFolderSelector(Composite parent) {
+    composite = new Composite(parent, SWT.NONE);
+    composite.setLayout(new GridLayout(2, false));
+    
+    GridData data = new GridData(SWT.FILL, SWT.CENTER, true, false);
+    text = new Text(composite, SWT.BORDER | SWT.SINGLE);
+    text.setLayoutData(data);
+    
+    browseButton = new Button(composite, SWT.PUSH);
+    browseButton.setText("Browse");
+    data = new GridData(SWT.CENTER, SWT.CENTER, false, false);
+    browseButton.setLayoutData(data);
+    
+    browseButton.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        DirectoryDialog dialog = new  DirectoryDialog(getComposite().getShell());
+        dialog.setText("Select a folder");
+        
+        if(text.getText() != null) {
+          dialog.setFilterPath(text.getText());
+        }
+        setCurrentPath(dialog.open());
+      }
+    });
+  }
+  
+  public String getCurrentPath() {
+    return currentPath;
+  }
+  
+  public void setCurrentPath(String currentPath) {
+    this.currentPath = currentPath;
+    if(currentPath != null) {
+      text.setText(currentPath);
+    } else {
+      text.setText("");
+    }
+  }
+  
+  public Composite getComposite() {
+    return composite; 
+  }
+
+  public void setEnabled(boolean selection) {
+    text.setEnabled(selection);
+    browseButton.setEnabled(selection);
+  }
+}

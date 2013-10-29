@@ -1,0 +1,331 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension
+         point="org.eclipse.ui.newWizards">
+      <category
+            id="org.activiti.designer.kickstart.eclipse.category"
+            name="Kickstart">
+      </category>
+      <wizard
+            category="org.activiti.designer.kickstart.eclipse.category"
+            class="org.activiti.designer.kickstart.eclipse.ui.wizard.project.CreateDefaultKickstartProjectWizard"
+            icon="icons/process-16.png"
+            id="org.activiti.designer.eclipse.ui.wizard.project.CreateDefaultActivitiProjectWizard"
+            name="Kickstart Project"
+            project="true">
+            <description>
+               Create a new Kickstart Project with a basic folder structure.
+            </description>
+      </wizard>
+      
+       <wizard
+            category="org.activiti.designer.kickstart.eclipse.category"
+            class="org.activiti.designer.kickstart.eclipse.ui.wizard.diagram.CreateDefaultKickstartDiagramWizard"
+            icon="icons/process-16.png"
+            id="org.activiti.designer.eclipse.ui.wizard.diagram.CreateDefaultActivitiDiagramWizard"
+            name="Kickstart Process Diagram">
+             <description>
+               Create a new Kickstart Process Diagram.
+            </description>
+      </wizard>
+       <wizard
+             category="org.activiti.designer.kickstart.eclipse.category"
+             class="org.activiti.designer.kickstart.eclipse.ui.wizard.form.CreateKickstartFormWizard"
+             icon="icons/form-16.png"
+             id="org.activiti.designer.kickstart.eclipse.ui.wizard.diagram.CreateKickstartFormWizard"
+             name="Kickstart Form">
+          <description>
+             Create a new Kickstart Process Diagram.
+          </description>
+       </wizard>
+   </extension>
+   <extension
+         point="org.eclipse.graphiti.ui.imageProviders">
+      <imageProvider
+            class="org.activiti.designer.kickstart.eclipse.common.ActivitiEclipseImageProvider"
+            id="org.activiti.designer.eclipse.common.ActivitiImageProvider">
+      </imageProvider>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+   <editor
+         class="org.activiti.designer.kickstart.eclipse.editor.KickstartProcessDiagramEditor"
+         contributorClass="org.eclipse.graphiti.ui.editor.DiagramEditorActionBarContributor"
+         default="true"
+         extensions="kickproc"
+         icon="icons/process-16.png"
+         id="org.activiti.designer.kickstart.editor.processEditor"
+         matchingStrategy="org.activiti.designer.kickstart.eclipse.editor.KickstartProcessDiagramMatchingStrategy"
+         name="Kickstart Process Editor">
+      <contentTypeBinding
+            contentTypeId="org.activiti.designer.kickstart.editor.process.contenttype">
+      </contentTypeBinding>
+   </editor>
+   <editor
+         class="org.activiti.designer.kickstart.eclipse.editor.KickstartFormEditor"
+         contributorClass="org.eclipse.graphiti.ui.editor.DiagramEditorActionBarContributor"
+         default="true"
+         extensions="kickform"
+         icon="icons/form-16.png"
+         id="org.activiti.designer.kickstart.editor.formEditor"
+         matchingStrategy="org.activiti.designer.kickstart.eclipse.editor.KickstartProcessDiagramMatchingStrategy"
+         name="Kickstart Form Editor">
+      <contentTypeBinding
+            contentTypeId="org.activiti.designer.kickstart.editor.form.contenttype">
+      </contentTypeBinding>
+   </editor>
+   </extension>
+ <extension
+       point="org.eclipse.core.contenttype.contentTypes">
+    <content-type
+          base-type="org.eclipse.core.runtime.text"
+          file-extensions="kickproc"
+          id="org.activiti.designer.kickstart.editor.process.contenttype"
+          name="Kickstart Process Editor File"
+          priority="normal">
+    </content-type>
+    <content-type
+          base-type="org.eclipse.core.runtime.text"
+          file-extensions="kickform"
+          id="org.activiti.designer.kickstart.editor.form.contenttype"
+          name="Kickstart Form Editor File"
+          priority="normal">
+    </content-type>
+ </extension>
+ <extension
+         point="org.eclipse.ui.views">
+      <category
+            id="org.activiti.designer.kickstart"
+            name="Activiti">
+      </category>
+      <view
+            category="org.activiti.designer.kickstart"
+            class="org.activiti.designer.kickstart.eclipse.navigator.CmisNavigator"
+            id="org.activiti.designer.kickstart.eclipse.cmisnavigator"
+            name="CMIS Navigator"
+            restorable="true">
+      </view>
+ </extension>
+ <extension
+       point="org.eclipse.ui.navigator.navigatorContent">
+    <navigatorContent
+          contentProvider="org.activiti.designer.kickstart.eclipse.navigator.CmisContentProvider"
+          id="org.activiti.designer.kickstart.eclipse.cmisnavigatorContent"
+          labelProvider="org.activiti.designer.kickstart.eclipse.navigator.CmisLabelProvider"
+          name="CMIS Navigator Content">
+       <triggerPoints>
+          <or>
+             <instanceof
+                   value="org.activiti.designer.kickstart.eclipse.navigator.Root">
+             </instanceof>
+             <instanceof
+                   value="org.activiti.designer.kickstart.eclipse.navigator.Parent">
+             </instanceof>
+          </or>
+          <or>
+             <instanceof
+                   value="org.activiti.designer.kickstart.eclipse.navigator.Parent">
+             </instanceof>
+             <instanceof
+                   value="org.activiti.designer.kickstart.eclipse.navigator.Child">
+             </instanceof>
+          </or>
+       </triggerPoints>
+    </navigatorContent>
+ </extension>
+ <extension
+       point="org.eclipse.ui.navigator.viewer">
+    <viewer
+          viewerId="org.activiti.designer.kickstart.eclipse.cmisnavigator">
+          <popupMenu
+            allowsPlatformContributions="true"
+            id="org.activiti.designer.kickstart.cmisnavigator.view.popup">
+      </popupMenu>
+    </viewer>
+    <viewerContentBinding
+          viewerId="org.activiti.designer.kickstart.eclipse.cmisnavigator">
+       <includes>
+          <contentExtension
+                isRoot="true"
+                pattern="org.activiti.designer.kickstart.eclipse.cmisnavigatorContent">
+          </contentExtension>
+       </includes>
+    </viewerContentBinding>
+ </extension>
+ 
+ <!-- Support for rightclick -> Sync process with repository -->
+<extension
+ 	point="org.eclipse.ui.popupMenus">
+	<objectContribution
+	    adaptable="false"
+        id="org.activiti.designer.kickstart.synchronize.process"
+        nameFilter="*.kickproc"
+        objectClass="org.eclipse.core.resources.IFile">
+        <menu
+            id="org.activiti.designer.kickstart.gui.menu"
+            label="Kickstart"
+            path="additions">
+            <separator name="group1"></separator>
+        </menu>
+        <action
+           class="org.activiti.designer.kickstart.eclipse.sync.SyncProcessWithRepositoryDelegate"
+           id="org.activiti.kickstart.designer.synchronizeProcessAction"
+           label="Synchronize with repository"
+           menubarPath="org.activiti.designer.kickstart.gui.menu/group1">
+        </action>
+     </objectContribution>
+</extension>
+ 
+ <extension
+      point="org.eclipse.ui.menus">
+      
+   <!-- The popup menu's for the cmis navigator -->
+   <menuContribution
+         locationURI="popup:org.activiti.designer.kickstart.cmisnavigator.view.popup">
+      <command
+            commandId="org.activiti.designer.kickstart.cmisnavigator.command.download"
+            id="org.activiti.designer.kickstart.cmisnavigator.command.download"
+            label="Download"
+            mnemonic="O"
+            style="push">
+      </command>
+      <command
+            commandId="org.activiti.designer.kickstart.cmisnavigator.command.delete"
+            id="org.activiti.designer.kickstart.cmisnavigator.command.delete"
+            label="Delete"
+            mnemonic="D"
+            style="push">
+      </command>
+      <command
+            commandId="org.activiti.designer.kickstart.cmisnavigator.command.remame"
+            id="org.activiti.designer.kickstart.cmisnavigator.command.rename"
+            label="Rename"
+            mnemonic="R"
+            style="push">
+      </command>
+   </menuContribution>
+ </extension>
+ 
+ <!-- The command handlers for the items in the cmis navigator popup-->
+ <extension
+      point="org.eclipse.ui.handlers">
+   <handler
+         class="org.activiti.designer.kickstart.eclipse.navigator.handlers.DeleteHandler"
+         commandId="org.activiti.designer.kickstart.cmisnavigator.command.delete">
+      <activeWhen>
+         <reference definitionId="org.activiti.designer.kickstart.cmisnavigator.isFolderOrDocument" />
+      </activeWhen>
+      <enabledWhen>
+         <reference definitionId="org.activiti.designer.kickstart.cmisnavigator.isFolderOrDocument" />
+      </enabledWhen>
+   </handler>
+</extension>
+ <extension
+      point="org.eclipse.ui.handlers">
+   <handler
+         class="org.activiti.designer.kickstart.eclipse.navigator.handlers.RenameHandler"
+         commandId="org.activiti.designer.kickstart.cmisnavigator.command.remame">
+      <activeWhen>
+         <reference definitionId="org.activiti.designer.kickstart.cmisnavigator.isSingleElementFolderOrDocument" />
+      </activeWhen>
+      <enabledWhen>
+         <reference definitionId="org.activiti.designer.kickstart.cmisnavigator.isSingleElementFolderOrDocument" />
+      </enabledWhen>
+   </handler>
+</extension>
+<extension
+      point="org.eclipse.ui.handlers">
+   <handler
+         class="org.activiti.designer.kickstart.eclipse.navigator.handlers.DownloadHandler"
+         commandId="org.activiti.designer.kickstart.cmisnavigator.command.download">
+      <activeWhen>
+         <reference definitionId="org.activiti.designer.kickstart.cmisnavigator.isDocument" />
+      </activeWhen>
+      <enabledWhen>
+         <reference definitionId="org.activiti.designer.kickstart.cmisnavigator.isDocument" />
+      </enabledWhen>
+   </handler>
+</extension>
+
+<!-- The expression to check if commands should be shown -->
+<extension
+      point="org.eclipse.core.expressions.definitions">
+   <definition id="org.activiti.designer.kickstart.cmisnavigator.isFolder">
+      <with variable="selection">
+         <iterate ifEmpty="false">
+            <instanceof value="org.apache.chemistry.opencmis.client.api.Folder" />
+         </iterate>
+      </with>
+   </definition>
+   <definition id="org.activiti.designer.kickstart.cmisnavigator.isDocument">
+      <with variable="selection">
+         <iterate ifEmpty="false">
+            <instanceof value="org.apache.chemistry.opencmis.client.api.Document" />
+         </iterate>
+      </with>
+   </definition>
+    <definition id="org.activiti.designer.kickstart.cmisnavigator.isFolderOrDocument">
+      <with variable="selection">
+         <iterate ifEmpty="false">
+         	<or>
+         		<instanceof value="org.apache.chemistry.opencmis.client.api.Folder" />
+         		<instanceof value="org.apache.chemistry.opencmis.client.api.Document" />
+         	</or>
+         </iterate>
+      </with>
+   </definition>
+   <definition id="org.activiti.designer.kickstart.cmisnavigator.isSingleElementFolderOrDocument">
+      <with variable="selection">
+         <iterate ifEmpty="false">
+         	<or>
+         		<instanceof value="org.apache.chemistry.opencmis.client.api.Folder" />
+         		<instanceof value="org.apache.chemistry.opencmis.client.api.Document" />
+         	</or>
+         </iterate>
+         <count
+               value="1">
+         </count>
+      </with>
+   </definition>
+</extension>
+<extension
+      point="org.eclipse.ui.exportWizards">
+   <wizard
+         category="org.activiti.designer.kickstart.eclipse.export.category"
+         class="org.activiti.designer.kickstart.eclipse.ui.wizard.diagram.ExportKickstartProcessWizard"
+         icon="icons/process-16.png"
+         id="org.activiti.designer.kickstart.eclipse.exportDiagramWizard"
+         name="Kickstart Process">
+   </wizard>
+   <category
+         id="org.activiti.designer.kickstart.eclipse.export.category"
+         name="Kickstart">
+   </category>
+</extension>
+<extension
+      point="org.eclipse.ui.preferencePages">
+   <page
+         class="org.activiti.designer.kickstart.eclipse.preferences.KickstartPreferencePage"
+         id="org.activiti.designer.kickstart.preferences"
+         name="Kickstart settings">
+   </page>
+</extension>
+<extension
+      point="org.eclipse.core.runtime.preferences">
+   <initializer
+         class="org.activiti.designer.kickstart.eclipse.preferences.KickstartPreferencesPageInitializer">
+   </initializer>
+</extension>
+<extension
+      point="org.eclipse.ui.commands">
+      <!-- Command for cmis navigator refresh is needed otherwise a big ugly warning is displayed in the logs -->
+	<command
+	    name="Refresh cmis navigator"
+	    description="Refresh cmis navigator"
+	    categoryId="org.activiti.designer.kickstart.eclipse.categor"
+	    id="org.activiti.designer.kickstart.command.refreshCmisNavigator">
+	</command>
+</extension>
+	 
+</plugin>

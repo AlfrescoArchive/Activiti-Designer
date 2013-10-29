@@ -1,0 +1,18 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<artifactId>org.activiti.designer.examples.textexportmarshaller</artifactId>
+	<packaging>eclipse-plugin</packaging>
+	<name>Activiti Designer Examples- Text Export Marshaller</name>
+	
+	<groupId>org.activiti.designer.examples</groupId>
+	<description>This project contains an example of a plugin extension that uses the ExportMarshaller extension point to Activiti Designer. The ExportMarshaller creates a simple text file with some of the information contained in the diagram's BPMN.</description>
+	<version>1.0.0-SNAPSHOT</version>
+	<parent>
+		<artifactId>org.activiti.designer.parent</artifactId>
+		<groupId>org.activiti.designer</groupId>
+		<version>5.12.1-SNAPSHOT</version>
+		<relativePath>../../org.activiti.designer.parent/pom.xml</relativePath>
+	</parent>
+</project>

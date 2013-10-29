@@ -40,5 +40,6 @@ Export-Package:
 Bundle-Activator: org.activiti.designer.eclipse.common.ActivitiPlugin
 Bundle-Vendor: Activiti
 Bundle-ClassPath: .,
+ activiti-simple-workflow-5.14-SNAPSHOT.jar,
  jdi.jar,
  jdimodel.jar

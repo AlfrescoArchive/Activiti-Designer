@@ -1,0 +1,17 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Activiti Designer Examples - Text Export Marshaller
+Bundle-SymbolicName: org.activiti.designer.examples.textexportmarshaller;singleton:=true
+Bundle-Version: 1.0.0.qualifier
+Bundle-Activator: org.activiti.designer.examples.textexportmarshaller.bundle.Activator
+Bundle-Vendor: Activiti
+Require-Bundle: org.eclipse.core.runtime,
+ org.eclipse.core.resources,
+ org.activiti.designer.eclipse,
+ org.activiti.designer.libs,
+ org.activiti.designer.util
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ActivationPolicy: lazy
+Bundle-ClassPath: .,
+ jdi.jar,
+ jdimodel.jar

@@ -5,12 +5,13 @@ package org.activiti.designer.validation.bpmn20.validation;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.activiti.bpmn.model.FlowElement;
 import org.activiti.designer.eclipse.extension.validation.AbstractProcessValidator;
 import org.activiti.designer.util.ActivitiConstants;
-import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.designer.validation.bpmn20.bundle.PluginConstants;
 import org.activiti.designer.validation.bpmn20.validation.worker.ProcessValidationWorkerInfo;
 import org.activiti.designer.validation.bpmn20.validation.worker.ProcessValidationWorkerMarker;
@@ -22,7 +23,6 @@ import org.activiti.designer.validation.bpmn20.validation.worker.impl.UserTaskVa
 import org.eclipse.core.resources.IMarker;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.SubProgressMonitor;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 
 /**
@@ -32,6 +32,8 @@ import org.eclipse.graphiti.mm.pictograms.Diagram;
  * 
  */
 public class BPMN20ProcessValidator extends AbstractProcessValidator {
+
+  private static final int EXTRACTION_WORK_UNIT = 10;
 
   private boolean overallResult;
 
@@ -64,10 +66,9 @@ public class BPMN20ProcessValidator extends AbstractProcessValidator {
     monitor.beginTask("", PluginConstants.WORK_TOTAL);
 
     // Clear problems for this diagram first
-    clearMarkers(getResource(diagram.eResource().getURI()));
+    clearMarkers(getDiagramResource());
 
-    final Map<String, List<Object>> processNodes = extractProcessConstructs(ModelHandler.getModel(EcoreUtil.getURI(diagram)).getBpmnModel().getMainProcess().getFlowElements(), 
-    		new SubProgressMonitor(monitor, PluginConstants.WORK_EXTRACT_CONSTRUCTS));
+    final Map<String, List<Object>> processNodes = extractProcessConstructs(new SubProgressMonitor(monitor, PluginConstants.WORK_EXTRACT_CONSTRUCTS));
 
     final List<ProcessValidationWorkerInfo> workers = getWorkers();
 
@@ -79,13 +80,13 @@ public class BPMN20ProcessValidator extends AbstractProcessValidator {
           final String markerMessage = String.format(PluginConstants.MARKER_MESSAGE_PATTERN, marker.getCode().getDisplayName(), marker.getMessage());
           switch (marker.getSeverity()) {
           case IMarker.SEVERITY_ERROR:
-            addProblemToDiagram(diagram, markerMessage, marker.getNodeId());
+            addProblemToDiagram(markerMessage, marker.getNodeId());
             break;
           case IMarker.SEVERITY_WARNING:
-            addWarningToDiagram(diagram, markerMessage, marker.getNodeId());
+            addWarningToDiagram(markerMessage, marker.getNodeId());
             break;
           case IMarker.SEVERITY_INFO:
-            addInfoToDiagram(diagram, markerMessage, marker.getNodeId());
+            addInfoToDiagram(markerMessage, marker.getNodeId());
             break;
           }
         }
@@ -97,6 +98,33 @@ public class BPMN20ProcessValidator extends AbstractProcessValidator {
     return overallResult;
   }
 
+  private Map<String, List<Object>> extractProcessConstructs(final IProgressMonitor monitor) {
+
+    Collection<FlowElement> flowElements = getDiagramWorkerContext().getBpmnModel().getBpmnModel().getMainProcess().getFlowElements();
+    monitor.beginTask("Analyzing process constructs", flowElements.size() * EXTRACTION_WORK_UNIT);
+
+    final Map<String, List<Object>> result = new HashMap<String, List<Object>>();
+
+    for (final FlowElement object : flowElements) {
+
+      String nodeType = null;
+
+      nodeType = object.getClass().getCanonicalName();
+
+      if (nodeType != null) {
+        if (!result.containsKey(nodeType)) {
+          result.put(nodeType, new ArrayList<Object>());
+        }
+        result.get(nodeType).add(object);
+      }
+
+      monitor.worked(EXTRACTION_WORK_UNIT);
+    }
+
+    monitor.done();
+
+    return result;
+  }
   private List<ProcessValidationWorkerInfo> getWorkers() {
 
     List<ProcessValidationWorkerInfo> result = new ArrayList<ProcessValidationWorkerInfo>();
@@ -112,8 +140,8 @@ public class BPMN20ProcessValidator extends AbstractProcessValidator {
   }
 
   @Override
-  protected void addProblemToDiagram(Diagram diagram, String message, String nodeId) {
-    super.addProblemToDiagram(diagram, message, nodeId);
+  protected void addProblemToDiagram(String message, String nodeId) {
+    super.addProblemToDiagram(message, nodeId);
     overallResult = false;
   }
 

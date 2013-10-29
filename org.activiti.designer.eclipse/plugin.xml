@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <?eclipse version="3.4"?>
 <plugin>
-   <extension-point id="org.activiti.designer.eclipse.extension.export.ExportMarshaller" name="Export Marshaller" schema="schema/org.activiti.designer.eclipse.extension.export.ExportMarshaller.exsd"/>
-   <extension-point id="org.activiti.designer.eclipse.extension.validation.ProcessValidator" name="ProcessValidator" schema="schema/org.activiti.designer.eclipse.extension.validation.ProcessValidator.exsd"/>
+   <extension-point id="org.activiti.designer.eclipse.extension.ExportMarshaller" name="Activiti Designer Export Marshaller" schema="schema/org.activiti.designer.eclipse.extension.ExportMarshaller.exsd"/>
+   <extension-point id="org.activiti.designer.eclipse.extension.ProcessValidator" name="Activiti Designer Process Validator" schema="schema/org.activiti.designer.eclipse.extension.ProcessValidator.exsd"/>
    <extension-point id="org.activiti.designer.eclipse.extension.IconProvider" name="Icon Provider" schema="schema/org.activiti.designer.eclipse.extension.IconProvider.exsd"/>
    <extension-point id="org.activiti.designer.eclipse.extension.PaletteExtensionProvider" name="Palette Extension Provider" schema="schema/org.activiti.designer.eclipse.extension.PaletteExtensionProvider.exsd"/>
    <extension

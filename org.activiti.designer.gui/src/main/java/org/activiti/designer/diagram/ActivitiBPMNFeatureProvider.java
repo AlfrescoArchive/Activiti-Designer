@@ -112,10 +112,10 @@ import org.activiti.designer.features.CreateTextAnnotationFeature;
 import org.activiti.designer.features.CreateTimerCatchingEventFeature;
 import org.activiti.designer.features.CreateTimerStartEventFeature;
 import org.activiti.designer.features.CreateUserTaskFeature;
+import org.activiti.designer.features.DeleteArtifactFeature;
 import org.activiti.designer.features.DeleteFlowElementFeature;
 import org.activiti.designer.features.DeleteLaneFeature;
 import org.activiti.designer.features.DeletePoolFeature;
-import org.activiti.designer.features.DeleteArtifactFeature;
 import org.activiti.designer.features.DirectEditFlowElementFeature;
 import org.activiti.designer.features.DirectEditTextAnnotationFeature;
 import org.activiti.designer.features.LayoutTextAnnotationFeature;
@@ -126,7 +126,6 @@ import org.activiti.designer.features.MoveGatewayFeature;
 import org.activiti.designer.features.MoveLaneFeature;
 import org.activiti.designer.features.PasteFlowElementFeature;
 import org.activiti.designer.features.ReconnectSequenceFlowFeature;
-import org.activiti.designer.features.SaveBpmnModelFeature;
 import org.activiti.designer.features.TaskResizeFeature;
 import org.activiti.designer.features.UpdateFlowElementFeature;
 import org.activiti.designer.features.UpdatePoolAndLaneFeature;
@@ -175,259 +174,234 @@ import com.alfresco.designer.gui.features.CreateAlfrescoUserTaskFeature;
 
 public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 
-	public POJOIndependenceSolver independenceResolver;
+  public POJOIndependenceSolver independenceResolver;
 
-	public ActivitiBPMNFeatureProvider(IDiagramTypeProvider dtp) {
-		super(dtp);
-		setIndependenceSolver(new POJOIndependenceSolver());
-		independenceResolver = (POJOIndependenceSolver) getIndependenceSolver();
-	}
+  public ActivitiBPMNFeatureProvider(IDiagramTypeProvider dtp) {
+    super(dtp);
+    setIndependenceSolver(new POJOIndependenceSolver());
+    independenceResolver = (POJOIndependenceSolver) getIndependenceSolver();
+  }
 
-	@Override
-	public IAddFeature getAddFeature(IAddContext context) {
-		if (context.getNewObject() instanceof StartEvent) {
-		  if (context.getNewObject() instanceof AlfrescoStartEvent) {
-		    return new AddAlfrescoStartEventFeature(this);
-		  } else {
-		    StartEvent startEvent = (StartEvent) context.getNewObject();
-		  	if (startEvent.getEventDefinitions().size() > 0) {
-		  		if (startEvent.getEventDefinitions().get(0) instanceof TimerEventDefinition) {
-		  			return new AddTimerStartEventFeature(this);
-		  		} if (startEvent.getEventDefinitions().get(0) instanceof MessageEventDefinition) {
-		  		  return new AddMessageStartEventFeature(this);
-		  		} else {
-		  			return new AddErrorStartEventFeature(this);
-		  		}
-		  	} else {
-		  		return new AddStartEventFeature(this);
-		  	}
-		  }
-		} else if (context.getNewObject() instanceof EndEvent) {
-		  EndEvent endEvent = (EndEvent) context.getNewObject();
-		  for (EventDefinition eventDefinition : endEvent.getEventDefinitions()) {
-		    if (eventDefinition instanceof ErrorEventDefinition) {
-		      return new AddErrorEndEventFeature(this);
-		    } else if (eventDefinition instanceof TerminateEventDefinition) {
-		      return new AddTerminateEndEventFeature(this);
-		    }
-		  }
-		  return new AddEndEventFeature(this);
+  @Override
+  public IAddFeature getAddFeature(IAddContext context) {
+    if (context.getNewObject() instanceof StartEvent) {
+      if (context.getNewObject() instanceof AlfrescoStartEvent) {
+        return new AddAlfrescoStartEventFeature(this);
+      } else {
+        StartEvent startEvent = (StartEvent) context.getNewObject();
+        if (startEvent.getEventDefinitions().size() > 0) {
+          if (startEvent.getEventDefinitions().get(0) instanceof TimerEventDefinition) {
+            return new AddTimerStartEventFeature(this);
+          }
+          if (startEvent.getEventDefinitions().get(0) instanceof MessageEventDefinition) {
+            return new AddMessageStartEventFeature(this);
+          } else {
+            return new AddErrorStartEventFeature(this);
+          }
+        } else {
+          return new AddStartEventFeature(this);
+        }
+      }
+    } else if (context.getNewObject() instanceof EndEvent) {
+      EndEvent endEvent = (EndEvent) context.getNewObject();
+      for (EventDefinition eventDefinition : endEvent.getEventDefinitions()) {
+        if (eventDefinition instanceof ErrorEventDefinition) {
+          return new AddErrorEndEventFeature(this);
+        } else if (eventDefinition instanceof TerminateEventDefinition) {
+          return new AddTerminateEndEventFeature(this);
+        }
+      }
+      return new AddEndEventFeature(this);
 
-		} else if (context.getNewObject() instanceof SequenceFlow) {
-		  return new AddSequenceFlowFeature(this);
+    } else if (context.getNewObject() instanceof SequenceFlow) {
+      return new AddSequenceFlowFeature(this);
 
-		} else if (context.getNewObject() instanceof Association) {
-		  return new AddAssociationFeature(this);
-		} else if (context.getNewObject() instanceof UserTask) {
-		  if(context.getNewObject() instanceof AlfrescoUserTask) {
-		    return new AddAlfrescoUserTaskFeature(this);
-		  } else {
-		    return new AddUserTaskFeature(this);
-		  }
-		} else if (context.getNewObject() instanceof ManualTask) {
-		  return new AddManualTaskFeature(this);
-		} else if (context.getNewObject() instanceof ReceiveTask) {
-		  return new AddReceiveTaskFeature(this);
-		} else if (context.getNewObject() instanceof BusinessRuleTask) {
-		  return new AddBusinessRuleTaskFeature(this);
-		} else if (context.getNewObject() instanceof ServiceTask) {
-		  ServiceTask serviceTask = (ServiceTask) context.getNewObject();
-		  if (ServiceTask.MAIL_TASK.equalsIgnoreCase(serviceTask.getType())) {
-		    return new AddMailTaskFeature(this);
-		  } else if (AlfrescoScriptTask.ALFRESCO_SCRIPT_DELEGATE.equalsIgnoreCase(serviceTask.getImplementation())) {
-		    boolean isMailTask = false;
-		    for (FieldExtension fieldExtension : serviceTask.getFieldExtensions()) {
-		      if ("script".equalsIgnoreCase(fieldExtension.getFieldName())) {
-		        if (fieldExtension.getStringValue().contains("mail.execute(bpm_package);")) {
-		          isMailTask = true;
-		        }
-		      }
-		    }
-		    if (isMailTask) {
-		      return new AddAlfrescoMailTaskFeature(this);
-		    } else {
-		      return new AddAlfrescoScriptTaskFeature(this);
-		    }
-		  } else {
-		    return new AddServiceTaskFeature(this);
-		  }
+    } else if (context.getNewObject() instanceof Association) {
+      return new AddAssociationFeature(this);
+    } else if (context.getNewObject() instanceof UserTask) {
+      if (context.getNewObject() instanceof AlfrescoUserTask) {
+        return new AddAlfrescoUserTaskFeature(this);
+      } else {
+        return new AddUserTaskFeature(this);
+      }
+    } else if (context.getNewObject() instanceof ManualTask) {
+      return new AddManualTaskFeature(this);
+    } else if (context.getNewObject() instanceof ReceiveTask) {
+      return new AddReceiveTaskFeature(this);
+    } else if (context.getNewObject() instanceof BusinessRuleTask) {
+      return new AddBusinessRuleTaskFeature(this);
+    } else if (context.getNewObject() instanceof ServiceTask) {
+      ServiceTask serviceTask = (ServiceTask) context.getNewObject();
+      if (ServiceTask.MAIL_TASK.equalsIgnoreCase(serviceTask.getType())) {
+        return new AddMailTaskFeature(this);
+      } else if (AlfrescoScriptTask.ALFRESCO_SCRIPT_DELEGATE.equalsIgnoreCase(serviceTask.getImplementation())) {
+        boolean isMailTask = false;
+        for (FieldExtension fieldExtension : serviceTask.getFieldExtensions()) {
+          if ("script".equalsIgnoreCase(fieldExtension.getFieldName())) {
+            if (fieldExtension.getStringValue().contains("mail.execute(bpm_package);")) {
+              isMailTask = true;
+            }
+          }
+        }
+        if (isMailTask) {
+          return new AddAlfrescoMailTaskFeature(this);
+        } else {
+          return new AddAlfrescoScriptTaskFeature(this);
+        }
+      } else {
+        return new AddServiceTaskFeature(this);
+      }
     } else if (context.getNewObject() instanceof ScriptTask) {
-		  return new AddScriptTaskFeature(this);
-		} else if (context.getNewObject() instanceof ExclusiveGateway) {
-		  return new AddExclusiveGatewayFeature(this);
-		} else if (context.getNewObject() instanceof InclusiveGateway) {
-		  return new AddInclusiveGatewayFeature(this);
-		} else if (context.getNewObject() instanceof ParallelGateway) {
-		  return new AddParallelGatewayFeature(this);
-		} else if (context.getNewObject() instanceof EventGateway) {
+      return new AddScriptTaskFeature(this);
+    } else if (context.getNewObject() instanceof ExclusiveGateway) {
+      return new AddExclusiveGatewayFeature(this);
+    } else if (context.getNewObject() instanceof InclusiveGateway) {
+      return new AddInclusiveGatewayFeature(this);
+    } else if (context.getNewObject() instanceof ParallelGateway) {
+      return new AddParallelGatewayFeature(this);
+    } else if (context.getNewObject() instanceof EventGateway) {
       return new AddEventGatewayFeature(this);
-		} else if (context.getNewObject() instanceof BoundaryEvent) {
-		  if(((BoundaryEvent) context.getNewObject()).getEventDefinitions().size() > 0) {
-		    EventDefinition definition = ((BoundaryEvent) context.getNewObject()).getEventDefinitions().get(0);
-		    if(definition instanceof ErrorEventDefinition) {
-		      return new AddBoundaryErrorFeature(this);
-		    } else if(definition instanceof SignalEventDefinition) {
-		    	return new AddBoundarySignalFeature(this);
-		    } else if(definition instanceof MessageEventDefinition) {
-		      return new AddBoundaryMessageFeature(this);
-		    } else {
-		      return new AddBoundaryTimerFeature(this);
-		    }
-		  }
-		} else if (context.getNewObject() instanceof IntermediateCatchEvent) {
-			if(((IntermediateCatchEvent) context.getNewObject()).getEventDefinitions().size() > 0) {
-		    EventDefinition definition = ((IntermediateCatchEvent) context.getNewObject()).getEventDefinitions().get(0);
-		    if(definition instanceof SignalEventDefinition) {
-		    	return new AddSignalCatchingEventFeature(this);
-		    } else if(definition instanceof MessageEventDefinition) {
+    } else if (context.getNewObject() instanceof BoundaryEvent) {
+      if (((BoundaryEvent) context.getNewObject()).getEventDefinitions().size() > 0) {
+        EventDefinition definition = ((BoundaryEvent) context.getNewObject()).getEventDefinitions().get(0);
+        if (definition instanceof ErrorEventDefinition) {
+          return new AddBoundaryErrorFeature(this);
+        } else if (definition instanceof SignalEventDefinition) {
+          return new AddBoundarySignalFeature(this);
+        } else if (definition instanceof MessageEventDefinition) {
+          return new AddBoundaryMessageFeature(this);
+        } else {
+          return new AddBoundaryTimerFeature(this);
+        }
+      }
+    } else if (context.getNewObject() instanceof IntermediateCatchEvent) {
+      if (((IntermediateCatchEvent) context.getNewObject()).getEventDefinitions().size() > 0) {
+        EventDefinition definition = ((IntermediateCatchEvent) context.getNewObject()).getEventDefinitions().get(0);
+        if (definition instanceof SignalEventDefinition) {
+          return new AddSignalCatchingEventFeature(this);
+        } else if (definition instanceof MessageEventDefinition) {
           return new AddMessageCatchingEventFeature(this);
-		    } else {
-		      return new AddTimerCatchingEventFeature(this);
-		    }
-		  }
-		} else if (context.getNewObject() instanceof ThrowEvent) {
-		  if(((ThrowEvent) context.getNewObject()).getEventDefinitions().size() > 0) {
-		    return new AddSignalThrowingEventFeature(this);
-		  } else {
-		    return new AddNoneThrowingEventFeature(this);
-		  }
-		} else if (context.getNewObject() instanceof EventSubProcess) {
+        } else {
+          return new AddTimerCatchingEventFeature(this);
+        }
+      }
+    } else if (context.getNewObject() instanceof ThrowEvent) {
+      if (((ThrowEvent) context.getNewObject()).getEventDefinitions().size() > 0) {
+        return new AddSignalThrowingEventFeature(this);
+      } else {
+        return new AddNoneThrowingEventFeature(this);
+      }
+    } else if (context.getNewObject() instanceof EventSubProcess) {
       return new AddEventSubProcessFeature(this);
-		} else if (context.getNewObject() instanceof SubProcess) {
-        return new AddEmbeddedSubProcessFeature(this);
-		} else if (context.getNewObject() instanceof Pool) {
-        return new AddPoolFeature(this);
-		} else if (context.getNewObject() instanceof Lane) {
-        return new AddLaneFeature(this);
-		} else if (context.getNewObject() instanceof CallActivity) {
-			return new AddCallActivityFeature(this);
+    } else if (context.getNewObject() instanceof SubProcess) {
+      return new AddEmbeddedSubProcessFeature(this);
+    } else if (context.getNewObject() instanceof Pool) {
+      return new AddPoolFeature(this);
+    } else if (context.getNewObject() instanceof Lane) {
+      return new AddLaneFeature(this);
+    } else if (context.getNewObject() instanceof CallActivity) {
+      return new AddCallActivityFeature(this);
     } else if (context.getNewObject() instanceof TextAnnotation) {
       return new AddTextAnnotationFeature(this);
     }
-		return super.getAddFeature(context);
-	}
+    return super.getAddFeature(context);
+  }
 
-	@Override
-	public ICreateFeature[] getCreateFeatures() {
-		return new ICreateFeature[] { new CreateAlfrescoStartEventFeature(this),
-						new CreateStartEventFeature(this),
-						new CreateTimerStartEventFeature(this),
-						new CreateMessageStartEventFeature(this),
-						new CreateErrorStartEventFeature(this),
-		        new CreateEndEventFeature(this),
-		        new CreateErrorEndEventFeature(this),
-		        new CreateTerminateEndEventFeature(this),
-		        new CreateUserTaskFeature(this),
-		        new CreateAlfrescoUserTaskFeature(this),
-		        new CreateScriptTaskFeature(this),
-		        new CreateServiceTaskFeature(this),
-		        new CreateMailTaskFeature(this),
-		        new CreateManualTaskFeature(this),
-		        new CreateReceiveTaskFeature(this),
-		        new CreateBusinessRuleTaskFeature(this),
-		        new CreateParallelGatewayFeature(this),
-		        new CreateExclusiveGatewayFeature(this),
-		        new CreateInclusiveGatewayFeature(this),
-		        new CreateEventGatewayFeature(this),
-		        new CreateBoundaryTimerFeature(this),
-		        new CreateBoundaryErrorFeature(this),
-		        new CreateBoundaryMessageFeature(this),
-		        new CreateBoundarySignalFeature(this),
-		        new CreateTimerCatchingEventFeature(this),
-		        new CreateSignalCatchingEventFeature(this),
-		        new CreateMessageCatchingEventFeature(this),
-		        new CreateSignalThrowingEventFeature(this),
-		        new CreateNoneThrowingEventFeature(this),
-		        new CreateEventSubProcessFeature(this),
-		        new CreateEmbeddedSubProcessFeature(this),
-		        new CreatePoolFeature(this),
-		        new CreateLaneFeature(this),
-		        new CreateCallActivityFeature(this),
-		        new CreateAlfrescoScriptTaskFeature(this),
-		        new CreateAlfrescoMailTaskFeature(this),
-		        new CreateTextAnnotationFeature(this)};
-	}
+  @Override
+  public ICreateFeature[] getCreateFeatures() {
+    return new ICreateFeature[] { new CreateAlfrescoStartEventFeature(this), new CreateStartEventFeature(this), new CreateTimerStartEventFeature(this),
+        new CreateMessageStartEventFeature(this), new CreateErrorStartEventFeature(this), new CreateEndEventFeature(this),
+        new CreateErrorEndEventFeature(this), new CreateTerminateEndEventFeature(this), new CreateUserTaskFeature(this),
+        new CreateAlfrescoUserTaskFeature(this), new CreateScriptTaskFeature(this), new CreateServiceTaskFeature(this), new CreateMailTaskFeature(this),
+        new CreateManualTaskFeature(this), new CreateReceiveTaskFeature(this), new CreateBusinessRuleTaskFeature(this), new CreateParallelGatewayFeature(this),
+        new CreateExclusiveGatewayFeature(this), new CreateInclusiveGatewayFeature(this), new CreateEventGatewayFeature(this),
+        new CreateBoundaryTimerFeature(this), new CreateBoundaryErrorFeature(this), new CreateBoundaryMessageFeature(this),
+        new CreateBoundarySignalFeature(this), new CreateTimerCatchingEventFeature(this), new CreateSignalCatchingEventFeature(this),
+        new CreateMessageCatchingEventFeature(this), new CreateSignalThrowingEventFeature(this), new CreateNoneThrowingEventFeature(this),
+        new CreateEventSubProcessFeature(this), new CreateEmbeddedSubProcessFeature(this), new CreatePoolFeature(this), new CreateLaneFeature(this),
+        new CreateCallActivityFeature(this), new CreateAlfrescoScriptTaskFeature(this), new CreateAlfrescoMailTaskFeature(this),
+        new CreateTextAnnotationFeature(this) };
+  }
 
-	@Override
-	public IDeleteFeature getDeleteFeature(IDeleteContext context) {
-	  PictogramElement pictogramElement = context.getPictogramElement();
+  @Override
+  public IDeleteFeature getDeleteFeature(IDeleteContext context) {
+    PictogramElement pictogramElement = context.getPictogramElement();
     Object bo = getBusinessObjectForPictogramElement(pictogramElement);
 
-    if(bo instanceof FlowElement) {
+    if (bo instanceof FlowElement) {
       return new DeleteFlowElementFeature(this);
-    } else if(bo instanceof Lane || bo instanceof Pool) {
+    } else if (bo instanceof Lane || bo instanceof Pool) {
       return new DeleteLaneFeature(this);
-    } else if(bo instanceof Artifact) {
+    } else if (bo instanceof Artifact) {
       return new DeleteArtifactFeature(this);
     }
-	  return super.getDeleteFeature(context);
-	}
+    return super.getDeleteFeature(context);
+  }
 
-	@Override
-	public ICopyFeature getCopyFeature(ICopyContext context) {
-		return new CopyFlowElementFeature(this);
-	}
+  @Override
+  public ICopyFeature getCopyFeature(ICopyContext context) {
+    return new CopyFlowElementFeature(this);
+  }
 
-	@Override
-	public IPasteFeature getPasteFeature(IPasteContext context) {
-		return new PasteFlowElementFeature(this);
-	}
+  @Override
+  public IPasteFeature getPasteFeature(IPasteContext context) {
+    return new PasteFlowElementFeature(this);
+  }
 
-	@Override
-	public ICreateConnectionFeature[] getCreateConnectionFeatures() {
+  @Override
+  public ICreateConnectionFeature[] getCreateConnectionFeatures() {
 
-		return new ICreateConnectionFeature[] { new CreateSequenceFlowFeature(this)
-		                                      , new CreateAssociationFeature(this) };
-	}
+    return new ICreateConnectionFeature[] { new CreateSequenceFlowFeature(this), new CreateAssociationFeature(this) };
+  }
 
-	@Override
-	public IReconnectionFeature getReconnectionFeature(IReconnectionContext context) {
-	  return new ReconnectSequenceFlowFeature(this);
-	}
+  @Override
+  public IReconnectionFeature getReconnectionFeature(IReconnectionContext context) {
+    return new ReconnectSequenceFlowFeature(this);
+  }
 
-	@Override
-	public IUpdateFeature getUpdateFeature(IUpdateContext context) {
-		PictogramElement pictogramElement = context.getPictogramElement();
-		Object bo = getBusinessObjectForPictogramElement(pictogramElement);
+  @Override
+  public IUpdateFeature getUpdateFeature(IUpdateContext context) {
+    PictogramElement pictogramElement = context.getPictogramElement();
+    Object bo = getBusinessObjectForPictogramElement(pictogramElement);
 
-		if (pictogramElement instanceof ContainerShape) {
-			if (bo instanceof FlowElement) {
-				return new UpdateFlowElementFeature(this);
-			} else if (bo instanceof Pool || bo instanceof Lane) {
-			  return new UpdatePoolAndLaneFeature(this);
-			} else if (bo instanceof TextAnnotation) {
-			  return new UpdateTextAnnotationFeature(this);
-			}
-		}
-		return super.getUpdateFeature(context);
-	}
+    if (pictogramElement instanceof ContainerShape) {
+      if (bo instanceof FlowElement) {
+        return new UpdateFlowElementFeature(this);
+      } else if (bo instanceof Pool || bo instanceof Lane) {
+        return new UpdatePoolAndLaneFeature(this);
+      } else if (bo instanceof TextAnnotation) {
+        return new UpdateTextAnnotationFeature(this);
+      }
+    }
+    return super.getUpdateFeature(context);
+  }
 
-	@Override
-	public IFeature[] getDragAndDropFeatures(IPictogramElementContext context) {
-		// simply return all create connection features
-		return getCreateConnectionFeatures();
-	}
+  @Override
+  public IFeature[] getDragAndDropFeatures(IPictogramElementContext context) {
+    // simply return all create connection features
+    return getCreateConnectionFeatures();
+  }
 
-	@Override
-	public IDirectEditingFeature getDirectEditingFeature(IDirectEditingContext context) {
-		PictogramElement pe = context.getPictogramElement();
-		Object bo = getBusinessObjectForPictogramElement(pe);
-		if (bo instanceof FlowElement) {
-			return new DirectEditFlowElementFeature(this);
-		} else if (bo instanceof TextAnnotation) {
-			return new DirectEditTextAnnotationFeature(this);
-		}
-		return super.getDirectEditingFeature(context);
-	}
+  @Override
+  public IDirectEditingFeature getDirectEditingFeature(IDirectEditingContext context) {
+    PictogramElement pe = context.getPictogramElement();
+    Object bo = getBusinessObjectForPictogramElement(pe);
+    if (bo instanceof FlowElement) {
+      return new DirectEditFlowElementFeature(this);
+    } else if (bo instanceof TextAnnotation) {
+      return new DirectEditTextAnnotationFeature(this);
+    }
+    return super.getDirectEditingFeature(context);
+  }
 
-	@Override
+  @Override
   public IResizeShapeFeature getResizeShapeFeature(IResizeShapeContext context) {
-	  Shape shape = context.getShape();
+    Shape shape = context.getShape();
     Object bo = getBusinessObjectForPictogramElement(shape);
     if (bo instanceof SubProcess || bo instanceof Pool || bo instanceof Lane) {
-    	return new ContainerResizeFeature(this);
+      return new ContainerResizeFeature(this);
     } else if (bo instanceof Task || bo instanceof CallActivity) {
-    	return new TaskResizeFeature(this);
+      return new TaskResizeFeature(this);
     }
     return super.getResizeShapeFeature(context);
   }
@@ -436,12 +410,13 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
   public IMoveShapeFeature getMoveShapeFeature(IMoveShapeContext context) {
     Shape shape = context.getShape();
     Object bo = getBusinessObjectForPictogramElement(shape);
-    if(bo instanceof BoundaryEvent) {
+    if (bo instanceof BoundaryEvent) {
       return new MoveBoundaryEventFeature(this);
 
     } else if (bo instanceof Activity) {
-    	// in case an activity is moved, make sure, attached boundary events will move too
-    	return new MoveActivityFeature(this);
+      // in case an activity is moved, make sure, attached boundary events will
+      // move too
+      return new MoveActivityFeature(this);
 
     } else if (bo instanceof Gateway) {
       return new MoveGatewayFeature(this);
@@ -455,24 +430,22 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
     return super.getMoveShapeFeature(context);
   }
 
-
   @Override
   public ILayoutFeature getLayoutFeature(ILayoutContext context) {
-	  final PictogramElement pe = context.getPictogramElement();
-	  final Object bo = getBusinessObjectForPictogramElement(pe);
+    final PictogramElement pe = context.getPictogramElement();
+    final Object bo = getBusinessObjectForPictogramElement(pe);
 
-	  if (bo instanceof TextAnnotation) {
-		  return new LayoutTextAnnotationFeature(this);
-	  }
+    if (bo instanceof TextAnnotation) {
+      return new LayoutTextAnnotationFeature(this);
+    }
 
-	  return super.getLayoutFeature(context);
+    return super.getLayoutFeature(context);
   }
 
   @Override
-	public ICustomFeature[] getCustomFeatures(ICustomContext context) {
-		return new ICustomFeature[] { new SaveBpmnModelFeature(this),
-				new DeletePoolFeature(this), new ChangeElementTypeFeature(this) };
-	}
+  public ICustomFeature[] getCustomFeatures(ICustomContext context) {
+    return new ICustomFeature[] { new DeletePoolFeature(this), new ChangeElementTypeFeature(this) };
+  }
 
   public POJOIndependenceSolver getPojoIndependenceSolver() {
     return independenceResolver;

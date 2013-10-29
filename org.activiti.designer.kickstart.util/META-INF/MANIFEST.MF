@@ -1,0 +1,20 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Activiti Kickstart - Util
+Bundle-SymbolicName: org.activiti.kickstart.util;singleton:=true
+Bundle-Version: 5.12.1.qualifier
+Bundle-Activator: org.activiti.designer.kickstart.util.KickstartActivator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.apache.commons.lang,
+ org.eclipse.core.resources,
+ org.activiti.designer.libs,
+ org.eclipse.ui.forms,
+ org.eclipse.graphiti.ui,
+ org.eclipse.graphiti
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Export-Package: org.activiti.designer.kickstart.util,
+ org.activiti.designer.kickstart.util.widget
+Bundle-ClassPath: .,
+ activiti-simple-workflow-5.14-SNAPSHOT.jar
