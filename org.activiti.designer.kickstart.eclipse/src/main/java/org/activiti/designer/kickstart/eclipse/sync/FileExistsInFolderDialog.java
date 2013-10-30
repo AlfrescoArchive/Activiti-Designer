@@ -138,7 +138,7 @@ public class FileExistsInFolderDialog extends TitleAreaDialog {
 
   @Override
   protected Point getInitialSize() {
-    return new Point(680, 200);
+    return new Point(780, 200);
   }
 
 } 

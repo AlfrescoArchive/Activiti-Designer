@@ -15,6 +15,7 @@ package org.activiti.designer.kickstart.eclipse.navigator.dialog;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
@@ -24,6 +25,7 @@ import org.activiti.designer.kickstart.eclipse.common.KickstartPlugin;
 import org.activiti.designer.kickstart.eclipse.editor.KickstartProcessDiagramCreator;
 import org.activiti.designer.kickstart.eclipse.navigator.CmisNavigatorSelectionHolder;
 import org.activiti.designer.kickstart.eclipse.navigator.CmisUtil;
+import org.activiti.designer.kickstart.eclipse.sync.SyncConstants;
 import org.activiti.designer.kickstart.eclipse.util.FileService;
 import org.activiti.designer.kickstart.util.KickstartConstants;
 import org.activiti.workflow.simple.alfresco.conversion.json.AlfrescoSimpleWorkflowJsonConverter;
@@ -54,6 +56,7 @@ import org.eclipse.swt.widgets.Shell;
 
 /**
  * @author jbarrez
+ * @author Tijs Rademakers
  */
 public class DownloadCurrentlySelectedFilesJob extends Job {
 	
@@ -116,7 +119,7 @@ public class DownloadCurrentlySelectedFilesJob extends Job {
 		        
 		        tempzipFolder.getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
 		        if (processFile != null) {
-		          openFile = processWorkflowDefinition(processFile, tempzipFolder);
+		          openFile = processWorkflowDefinition(processFile, tempzipFolder, document);
 		        }
 		      }
 		      
@@ -146,7 +149,7 @@ public class DownloadCurrentlySelectedFilesJob extends Job {
     return Status.OK_STATUS;
 	}
 	
-	protected IFile processWorkflowDefinition(IFile sourceFile, IFolder unzippedFolder) throws Exception {
+	protected IFile processWorkflowDefinition(IFile sourceFile, IFolder unzippedFolder, Document document) throws Exception {
 	  
 	  if (sourceFile.getProject().findMember(sourceFile.getName()) != null) {
 	    sourceFile.getProject().findMember(sourceFile.getName()).delete(true, new NullProgressMonitor());
@@ -190,6 +193,16 @@ public class DownloadCurrentlySelectedFilesJob extends Job {
     }
     
     walkthroughForms(definition.getSteps(), unzippedFolder);
+    
+    // Update the JSON node location
+    definition.getParameters().put(SyncConstants.REPOSITORY_NODE_ID, document.getId());
+    definition.getParameters().put(SyncConstants.VERSION, document.getVersionLabel());
+    
+    // Write
+    FileWriter writer = new FileWriter(new File(newProcessFile.getLocationURI().getPath()));
+    converter.writeWorkflowDefinition(definition, writer);
+    newProcessFile.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
+    
     return newProcessFile;
 	}
 	

@@ -22,6 +22,7 @@ import java.text.StringCharacterIterator;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
 import org.activiti.designer.kickstart.eclipse.Logger;
@@ -42,6 +43,7 @@ import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.chemistry.opencmis.commons.exceptions.CmisConstraintException;
 import org.apache.commons.lang.StringUtils;
+import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -187,9 +189,20 @@ public class SyncUtil {
     	public void run() {
     		String path = (cmisObject instanceof Folder) ? 
     				((Folder) cmisObject).getPath() : ((Document)cmisObject).getParents().get(0).getPath();
-    	  MessageDialog.openInformation(shell, "Process upload succesful", 
+    	  MessageDialog.openInformation(shell, "Process upload successful", 
         		"New version of process is stored at " + path);
     	}
+    });
+  }
+	
+	protected static void showSuccessMessageLocalCopy(final Shell shell, final CmisObject cmisObject) {
+    Display.getDefault().syncExec(new Runnable() {
+      public void run() {
+        String path = (cmisObject instanceof Folder) ? 
+            ((Folder) cmisObject).getPath() : ((Document)cmisObject).getParents().get(0).getPath();
+        MessageDialog.openInformation(shell, "Process download successful", 
+            "Copied process from " + path);
+      }
     });
   }
 	
@@ -199,9 +212,8 @@ public class SyncUtil {
 			protected IStatus run(IProgressMonitor monitor) {
 				try {
 					
-          sourceFile.setContents(CmisUtil.downloadDocument(destination), true, true, monitor);
-      		updateKickstartProcessJson(sourceFile, destination);
-					showSuccessMessage(shell, destination);
+				  downloadZipFile(sourceFile.getProject(), destination, shell, monitor);
+				  showSuccessMessageLocalCopy(shell, destination);
 					
           return Status.OK_STATUS;
         } catch (Exception e) {
@@ -240,6 +252,168 @@ public class SyncUtil {
 			return null;
 		}
 	}
+	
+	protected static IFile downloadZipFile(IProject project, Document document, final Shell shell, IProgressMonitor monitor) throws Exception {
+	  IFolder tempzipFolder = project.getFolder("tempzip");
+    if (tempzipFolder.exists()) {
+      tempzipFolder.delete(true, monitor);
+    }
+    
+    tempzipFolder.create(true, true, monitor);
+    
+    IFile file = tempzipFolder.getFile(new Path(document.getName()));
+    file.create(CmisUtil.downloadDocument(document), true, null);
+    
+    IFile openFile = null;
+    byte[] buffer = new byte[1024];
+    if ("zip".equalsIgnoreCase(file.getFileExtension())) {
+      final ZipInputStream zis = new ZipInputStream(new FileInputStream(file.getLocation().toFile()));
+      boolean hasMoreEntries = true;
+      IFile processFile = null;
+      while (hasMoreEntries) {
+        ZipEntry entry = zis.getNextEntry();
+        if (entry != null) {
+          IFile unzippedFile = tempzipFolder.getFile(entry.getName());
+          if ("kickproc".equalsIgnoreCase(unzippedFile.getFileExtension())) {
+            processFile = unzippedFile;
+          }
+          String filePath = unzippedFile.getLocationURI().getPath();
+          File extractFile = new File(filePath);
+          FileOutputStream fos = new FileOutputStream(extractFile);
+          int len;
+          while ((len = zis.read(buffer)) > 0) {
+            fos.write(buffer, 0, len);
+          }
+
+          fos.close(); 
+        } else {
+          hasMoreEntries = false;
+        }
+      }
+      zis.close();
+      
+      tempzipFolder.getProject().refreshLocal(IResource.DEPTH_INFINITE, monitor);
+      if (processFile != null) {
+        openFile = processWorkflowDefinition(processFile, tempzipFolder, document, shell, monitor);
+      }
+    }
+    
+    tempzipFolder.delete(true, monitor);
+    project.refreshLocal(IResource.DEPTH_INFINITE, monitor);
+    return openFile;
+	}
+	
+	protected static IFile processWorkflowDefinition(IFile sourceFile, IFolder unzippedFolder, Document document, final Shell shell, IProgressMonitor monitor) throws Exception {
+    
+    if (sourceFile.getProject().findMember(sourceFile.getName()) != null) {
+      sourceFile.getProject().findMember(sourceFile.getName()).delete(true, monitor);
+    }
+    unzippedFolder.getFile(sourceFile.getName()).copy(sourceFile.getProject().getFullPath().append(sourceFile.getName()), true, monitor);
+    IFile newProcessFile = sourceFile.getProject().getFile(sourceFile.getName());
+    
+    String filePath = newProcessFile.getLocationURI().getPath();
+    File processFile = new File(filePath);
+    FileInputStream fileStream = new FileInputStream(processFile);
+    AlfrescoSimpleWorkflowJsonConverter converter = new AlfrescoSimpleWorkflowJsonConverter();
+    WorkflowDefinition definition = null;
+    try {
+      definition = converter.readWorkflowDefinition(fileStream);
+    } catch (final Exception e) {
+      definition = new WorkflowDefinition();
+      Display.getDefault().syncExec(new Runnable() {
+        public void run() {
+          Status errorStatus = null;
+          if (e.getCause() != null) {
+            errorStatus = new Status(IStatus.ERROR, KickstartPlugin.PLUGIN_ID, e.getCause().getMessage());
+          } else {
+            errorStatus = new Status(IStatus.ERROR, KickstartPlugin.PLUGIN_ID, e.getMessage());
+          }
+          ErrorDialog.openError(shell, "Error", "An error occured while reading kickstart process file.", errorStatus);
+        }
+      });
+      return null;
+    }
+    
+    if (definition.getParameters().containsKey(KickstartConstants.PARAMETER_FORM_REFERENCE)) {
+      String startFormPath = (String) definition.getParameters().get(KickstartConstants.PARAMETER_FORM_REFERENCE);
+      IFile startFormFile = sourceFile.getProject().getFile(new Path(startFormPath));
+      if (unzippedFolder.getFile(startFormFile.getName()) != null) {
+        IContainer newFolder = makeDirs(startFormPath, sourceFile.getProject(), monitor);
+        if (newFolder.findMember(startFormFile.getName()) != null) {
+          newFolder.findMember(startFormFile.getName()).delete(true, monitor);
+        }
+        unzippedFolder.getFile(startFormFile.getName()).copy(newFolder.getFullPath().append(startFormFile.getName()), true, monitor);
+      }
+    }
+    
+    walkthroughForms(definition.getSteps(), unzippedFolder, monitor);
+    
+    // Update the JSON node location
+    definition.getParameters().put(SyncConstants.REPOSITORY_NODE_ID, document.getId());
+    definition.getParameters().put(SyncConstants.VERSION, document.getVersionLabel());
+    
+    // Write
+    FileWriter writer = new FileWriter(new File(newProcessFile.getLocationURI().getPath()));
+    converter.writeWorkflowDefinition(definition, writer);
+    newProcessFile.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
+    
+    return newProcessFile;
+  }
+  
+  protected static void walkthroughForms(List<StepDefinition> stepList, IFolder unzippedFolder, IProgressMonitor monitor) throws Exception {
+    for (StepDefinition step : stepList) {
+      if (step instanceof HumanStepDefinition) {
+        HumanStepDefinition humanStep = (HumanStepDefinition) step;
+
+        if (humanStep.getParameters().containsKey(KickstartConstants.PARAMETER_FORM_REFERENCE)) {
+          String formPath = (String) humanStep.getParameters().get(KickstartConstants.PARAMETER_FORM_REFERENCE);
+          IFile formFile = unzippedFolder.getProject().getFile(new Path(formPath));
+          if (unzippedFolder.getFile(formFile.getName()) != null) {
+            IContainer newFolder = makeDirs(formPath, formFile.getProject(), monitor);
+            if (newFolder.findMember(formFile.getName()) != null) {
+              newFolder.findMember(formFile.getName()).delete(true, monitor);
+            }
+            unzippedFolder.getFile(formFile.getName()).copy(newFolder.getFullPath().append(formFile.getName()), true, monitor);
+          }
+        }
+      } else if (step instanceof AbstractStepListContainer<?>) {
+        List<?> childList = ((AbstractStepListContainer<?>) step).getStepList();
+        for (Object object : childList) {
+          if (object instanceof ListStepDefinition<?>) {
+            walkthroughForms(((ListStepDefinition<?>) object).getSteps(), unzippedFolder, monitor);
+          }
+        }
+      
+      } else if (step instanceof AbstractConditionStepListContainer<?>) {
+        List<?> childList = ((AbstractConditionStepListContainer<?>) step).getStepList();
+        for (Object object : childList) {
+          if (object instanceof ListConditionStepDefinition<?>) {
+            walkthroughForms(((ListConditionStepDefinition<?>) object).getSteps(), unzippedFolder, monitor);
+          }
+        }
+      }
+    }
+  }
+  
+  protected static IContainer makeDirs(String filePath, IProject project, IProgressMonitor monitor) throws Exception {
+    String[] folders = filePath.split("/");
+    if (folders.length == 1) {
+      return project;
+    } else {
+      IFolder newFolder = project.getFolder(folders[0]);
+      if (newFolder.exists() == false) {
+        newFolder.create(true, true, monitor);
+      }
+      for (int i = 1; i < folders.length - 1; i++) {
+        IFolder childFolder = newFolder.getFolder(folders[i]);
+        if (childFolder.exists() == false) {
+          childFolder.create(true, true, monitor);
+        }
+        newFolder = childFolder;
+      }
+      return newFolder;
+    }
+  }
 	
 	protected static IFile createZipFile(final IFile sourceFile, final Shell shell) throws IOException, CoreException {
 	  String filePath = sourceFile.getLocationURI().getPath();
