@@ -11,7 +11,6 @@ import org.activiti.designer.diagram.ActivitiBPMNFeatureProvider;
 import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.BpmnMemoryModel.BpmnModelListener;
 import org.activiti.designer.util.editor.ModelHandler;
-import org.activiti.workflow.simple.definition.form.FormPropertyDefinition;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -495,19 +494,6 @@ public abstract class ActivitiPropertySection extends BaseActivitiPropertySectio
     
     registerControl(labelControl);
     return labelControl;
-  }
-  
-  protected Boolean getBooleanParameter(FormPropertyDefinition propDef, String key, boolean defaultValue) {
-    Boolean result = defaultValue;
-    if (propDef.getParameters() != null) {
-      Object value = propDef.getParameters().get(key);
-      if (value instanceof Boolean) {
-        result = (Boolean) value;
-      } else if (value != null) {
-        result = Boolean.valueOf(value.toString());
-      }
-    }
-    return result;
   }
   
   /**

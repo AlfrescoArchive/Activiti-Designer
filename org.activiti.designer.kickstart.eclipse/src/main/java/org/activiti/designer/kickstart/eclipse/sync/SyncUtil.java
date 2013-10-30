@@ -249,15 +249,19 @@ public class SyncUtil {
     WorkflowDefinition definition = null;
     try {
       definition = converter.readWorkflowDefinition(fileStream);
-    } catch (Exception e) {
+    } catch (final Exception e) {
       definition = new WorkflowDefinition();
-      Status errorStatus = null;
-      if(e.getCause() != null) {
-        errorStatus = new Status(IStatus.ERROR, KickstartPlugin.PLUGIN_ID, e.getCause().getMessage());
-      } else {
-        errorStatus = new Status(IStatus.ERROR, KickstartPlugin.PLUGIN_ID, e.getMessage());
-      }
-      ErrorDialog.openError(shell, "Error", "An error occured while reading kickstart process file.", errorStatus);
+      Display.getDefault().syncExec(new Runnable() {
+        public void run() {
+          Status errorStatus = null;
+          if (e.getCause() != null) {
+            errorStatus = new Status(IStatus.ERROR, KickstartPlugin.PLUGIN_ID, e.getCause().getMessage());
+          } else {
+            errorStatus = new Status(IStatus.ERROR, KickstartPlugin.PLUGIN_ID, e.getMessage());
+          }
+          ErrorDialog.openError(shell, "Error", "An error occured while reading kickstart process file.", errorStatus);
+        }
+      });
       return null;
     }
     
@@ -284,11 +288,20 @@ public class SyncUtil {
       itemResource.copy(tempzipFolder.getFile(itemFilename).getFullPath(), true, new NullProgressMonitor());
     }
     
+    IFolder targetFolder = sourceFile.getProject().getFolder("target");
+    if (targetFolder.exists() == false) {
+      targetFolder.create(true, true, new NullProgressMonitor());
+    }
+    
     try {
-      compressPackage(sourceFile.getProject().getFolder("target"), tempzipFolder, sourceFile.getName() + ".zip");
-    } catch (Exception e) {
-      ErrorDialog.openError(shell, "Error", "An error occured while zipping the kickstart process files.", 
+      compressPackage(targetFolder, tempzipFolder, sourceFile.getName() + ".zip");
+    } catch (final Exception e) {
+      Display.getDefault().syncExec(new Runnable() {
+        public void run() {
+          ErrorDialog.openError(shell, "Error", "An error occured while zipping the kickstart process files.", 
               new Status(IStatus.ERROR, KickstartPlugin.PLUGIN_ID, e.getMessage()));
+        }
+      });
       return null;
     }
     
@@ -298,9 +311,9 @@ public class SyncUtil {
       // ignore
     }
     
-    sourceFile.getProject().getFolder("target").refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
+    targetFolder.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
     
-    return sourceFile.getProject().getFile("target/" + sourceFile.getName() + ".zip");
+    return targetFolder.getFile(sourceFile.getName() + ".zip");
 	}
 	
 	protected static void addFormsToList(List<StepDefinition> stepList, List<IFile> zipItemList, IProject project) {
