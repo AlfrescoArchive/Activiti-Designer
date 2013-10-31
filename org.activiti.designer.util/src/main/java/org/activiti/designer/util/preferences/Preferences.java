@@ -13,6 +13,7 @@ package org.activiti.designer.util.preferences;
  */
 public enum Preferences {
 
+  
   ECLIPSE_ACTIVITI_JAR_LOCATION("org.activiti.designer.preferences.eclipse.activitiJarLocation"),
   ALFRESCO_ENABLE("com.alfresco.designer.preferences.enable"),
   ALFRESCO_FORMTYPES_STARTEVENT("com.alfresco.designer.preferences.formtypes.startevent"),
@@ -24,8 +25,21 @@ public enum Preferences {
   
   CMIS_URL("org.activiti.designer.kickstart.preferences.cmis.url"),
   CMIS_USERNAME("org.activiti.designer.kickstart.preferences.cmis.username"),
-  CMIS_PASSWORD("org.activiti.designer.kickstart.preferences.cmis.password");
+  CMIS_PASSWORD("org.activiti.designer.kickstart.preferences.cmis.password"),
+  
+  PROCESS_TARGET_LOCATION_REPOSITORY("target-location-repository"),
+  PROCESS_TARGET_LOCATION_SHARE("target-location-share"),
+  PROCESS_EXPORT_TYPE("export-type"),
+  CMIS_WORKFLOW_DEFINITION_PATH("cmis-workflow-definition-path"),
+  CMIS_MODELS_PATH("cmis-models-path"),
+  CMIS_SHARE_CONFIG_PATH("cmis-share-config-path"),
+  SHARE_RELOAD_URL("share-reload-url"),
+  SHARE_ENABLED("share-enabled");
 
+  public static final String PROCESS_EXPORT_TYPE_TARGET = "target";
+  public static final String PROCESS_EXPORT_TYPE_FS = "fs";
+  public static final String PROCESS_EXPORT_TYPE_CMIS = "cmis";
+  
   private String preferenceId;
 
   private Preferences(final String preferenceId) {

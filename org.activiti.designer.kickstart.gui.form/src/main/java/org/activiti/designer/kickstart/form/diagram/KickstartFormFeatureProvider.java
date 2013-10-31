@@ -12,6 +12,7 @@ import org.activiti.designer.kickstart.form.diagram.shape.BusinessObjectShapeCon
 import org.activiti.designer.kickstart.form.diagram.shape.DatePropertyShapeController;
 import org.activiti.designer.kickstart.form.diagram.shape.DueDatePropertyShapeController;
 import org.activiti.designer.kickstart.form.diagram.shape.ListPropertyShapeController;
+import org.activiti.designer.kickstart.form.diagram.shape.NumberPropertyShapeController;
 import org.activiti.designer.kickstart.form.diagram.shape.PackageItemsPropertyShapeController;
 import org.activiti.designer.kickstart.form.diagram.shape.PriorityPropertyShapeController;
 import org.activiti.designer.kickstart.form.diagram.shape.PropertyGroupShapeController;
@@ -20,11 +21,13 @@ import org.activiti.designer.kickstart.form.diagram.shape.TextPropertyShapeContr
 import org.activiti.designer.kickstart.form.diagram.shape.WorkflowDescriptionShapeController;
 import org.activiti.designer.kickstart.form.features.AddFormComponentFeature;
 import org.activiti.designer.kickstart.form.features.CreateBooleanPropertyFeature;
+import org.activiti.designer.kickstart.form.features.CreateContentSelectPropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateDatePropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateDueDatePropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateFormGroupFeature;
 import org.activiti.designer.kickstart.form.features.CreateGroupSelectPropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateListPropertyFeature;
+import org.activiti.designer.kickstart.form.features.CreateNumberInputPropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreatePackageItemsPropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreatePeopleSelectPropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreatePriorityPropertyFeature;
@@ -75,6 +78,7 @@ public class KickstartFormFeatureProvider extends DefaultFeatureProvider {
 		this.shapeControllers = new ArrayList<BusinessObjectShapeController>();
 		shapeControllers.add(new DatePropertyShapeController(this));
 		shapeControllers.add(new TextPropertyShapeController(this));
+		shapeControllers.add(new NumberPropertyShapeController(this));
 		shapeControllers.add(new PropertyGroupShapeController(this));
 		shapeControllers.add(new ListPropertyShapeController(this));
 		shapeControllers.add(new BooleanPropertyShapeController(this));
@@ -133,9 +137,9 @@ public class KickstartFormFeatureProvider extends DefaultFeatureProvider {
 	@Override
 	public ICreateFeature[] getCreateFeatures() {
 	  return new ICreateFeature[]{ 
-	      new CreateTextInputPropertyFeature(this), new CreateTextAreaPropertyFeature(this),
+	      new CreateTextInputPropertyFeature(this), new CreateNumberInputPropertyFeature(this), new CreateTextAreaPropertyFeature(this),
 	      new CreateDatePropertyFeature(this), new CreateBooleanPropertyFeature(this), new CreateFormGroupFeature(this), new CreateListPropertyFeature(this),
-	      new CreatePeopleSelectPropertyFeature(this), new CreateGroupSelectPropertyFeature(this),
+	      new CreatePeopleSelectPropertyFeature(this), new CreateGroupSelectPropertyFeature(this), new CreateContentSelectPropertyFeature(this),
 	      new CreateDueDatePropertyFeature(this), new CreatePackageItemsPropertyFeature(this), new CreatePriorityPropertyFeature(this),
 	      new CreateWorkflowDescriptionPropertyFeature(this), new CreateReferencePropertyFeature(this)
 	  };

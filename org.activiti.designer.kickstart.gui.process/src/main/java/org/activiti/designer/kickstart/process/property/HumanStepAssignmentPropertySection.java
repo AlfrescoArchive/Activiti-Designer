@@ -3,6 +3,7 @@ package org.activiti.designer.kickstart.process.property;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
+import org.activiti.designer.kickstart.util.widget.ToggleContainerViewer;
 import org.activiti.designer.util.editor.KickstartProcessMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.workflow.simple.definition.HumanStepAssignment.HumanStepAssignmentType;

@@ -117,9 +117,21 @@
          </propertySection>
          <propertySection
                class="org.activiti.designer.kickstart.process.property.EmailStepDefinitionFormPropertySection"
-               filter="org.activiti.designer.kickstart.process.property.EmailDelayStepDefinitionPropertyFilter"
+               filter="org.activiti.designer.kickstart.process.property.EmailStepDefinitionPropertyFilter"
                id="org.activiti.designer.kickstart.process.emailStepDefinition"
                tab="org.activiti.designer.kickstart.process.emailTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.kickstart.process.property.ReviewStepDefinitionPropertySection"
+               filter="org.activiti.designer.kickstart.process.property.ReviewStepDefinitionPropertyFilter"
+               id="org.activiti.designer.kickstart.process.reviewStepDefinition"
+               tab="org.activiti.designer.kickstart.process.generalTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.kickstart.process.property.ReviewStepDefinitionAssignmentPropertySection"
+               filter="org.activiti.designer.kickstart.process.property.ReviewStepDefinitionPropertyFilter"
+               id="org.activiti.designer.kickstart.process.reviewStepDefinitionAssignment"
+               tab="org.activiti.designer.kickstart.process.assignmentTab">
          </propertySection>
          
       </propertySections>

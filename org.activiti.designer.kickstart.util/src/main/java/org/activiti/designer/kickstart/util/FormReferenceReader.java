@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.activiti.workflow.simple.alfresco.conversion.json.AlfrescoSimpleWorkflowJsonConverter;
+import org.activiti.workflow.simple.alfresco.step.AlfrescoReviewStepDefinition;
 import org.activiti.workflow.simple.definition.HumanStepDefinition;
 import org.activiti.workflow.simple.definition.StepDefinition;
 import org.activiti.workflow.simple.definition.WorkflowDefinition;
@@ -24,7 +25,7 @@ import org.eclipse.core.runtime.Path;
 public class FormReferenceReader {
 
   private boolean startFormAdded = false;
-  private Set<HumanStepDefinition> definitionsTouched = new HashSet<HumanStepDefinition>();
+  private Set<StepDefinition> definitionsTouched = new HashSet<StepDefinition>();
   private WorkflowDefinition definition;
   private IProject project;
   private AlfrescoSimpleWorkflowJsonConverter converter;
@@ -83,21 +84,18 @@ public class FormReferenceReader {
 
       // Add all forms
       for (StepDefinition step : definition.getSteps()) {
-        if (step instanceof HumanStepDefinition) {
-          HumanStepDefinition humanStep = (HumanStepDefinition) step;
-
-          // TODO: REMOVE
-          if (humanStep.getId() == null) {
-            humanStep.setId(humanStep.getName().replace(" ", "").toLowerCase());
-          }
-
-          if (humanStep.getParameters().containsKey(KickstartConstants.PARAMETER_FORM_REFERENCE)) {
-            String formPath = (String) humanStep.getParameters().get(KickstartConstants.PARAMETER_FORM_REFERENCE);
+        if (step instanceof HumanStepDefinition || step instanceof AlfrescoReviewStepDefinition) {
+          if (step.getParameters().containsKey(KickstartConstants.PARAMETER_FORM_REFERENCE)) {
+            String formPath = (String) step.getParameters().get(KickstartConstants.PARAMETER_FORM_REFERENCE);
             IFile formFile = project.getFile(new Path(formPath));
             FormDefinition form = converter.readFormDefinition(new FileInputStream(formFile.getLocation().toFile()));
-            humanStep.setForm(form);
-
-            definitionsTouched.add(humanStep);
+            
+            if(step instanceof HumanStepDefinition) {
+              ((HumanStepDefinition) step).setForm(form);
+            } else {
+              ((AlfrescoReviewStepDefinition) step).setForm(form);
+            }
+            definitionsTouched.add(step);
           }
         }
       }
@@ -111,8 +109,12 @@ public class FormReferenceReader {
       definition.setStartFormDefinition(null);
     }
 
-    for (HumanStepDefinition step : definitionsTouched) {
-      step.setForm(null);
+    for (StepDefinition step : definitionsTouched) {
+      if(step instanceof HumanStepDefinition) {
+        ((HumanStepDefinition) step).setForm(null);
+      } else if(step instanceof AlfrescoReviewStepDefinition) {
+        ((AlfrescoReviewStepDefinition) step).setForm(null);
+      }
     }
   }
 }

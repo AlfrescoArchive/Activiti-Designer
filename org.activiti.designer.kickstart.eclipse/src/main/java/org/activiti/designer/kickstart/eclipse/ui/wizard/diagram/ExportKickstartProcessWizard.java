@@ -2,17 +2,23 @@ package org.activiti.designer.kickstart.eclipse.ui.wizard.diagram;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
+import java.net.HttpURLConnection;
+import java.net.URL;
 
 import org.activiti.designer.kickstart.eclipse.Logger;
-import org.activiti.designer.kickstart.eclipse.common.KickstartPlugin;
-import org.activiti.designer.kickstart.eclipse.util.KickstartConstants;
+import org.activiti.designer.kickstart.eclipse.navigator.CmisUtil;
+import org.activiti.designer.kickstart.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.kickstart.util.FormReferenceReader;
 import org.activiti.designer.util.editor.KickstartProcessMemoryModel;
+import org.activiti.designer.util.preferences.Preferences;
 import org.activiti.workflow.simple.alfresco.conversion.AlfrescoWorkflowDefinitionConversionFactory;
 import org.activiti.workflow.simple.alfresco.conversion.json.AlfrescoSimpleWorkflowJsonConverter;
 import org.activiti.workflow.simple.converter.WorkflowDefinitionConversion;
 import org.activiti.workflow.simple.definition.WorkflowDefinition;
+import org.apache.chemistry.opencmis.client.api.CmisObject;
+import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -22,14 +28,13 @@ import org.eclipse.core.runtime.CoreException;
 import org.eclipse.core.runtime.IAdaptable;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.content.IContentDescription;
-import org.eclipse.core.runtime.preferences.IEclipsePreferences;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 import org.eclipse.jface.operation.IRunnableWithProgress;
+import org.eclipse.jface.preference.IPersistentPreferenceStore;
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.Wizard;
 import org.eclipse.ui.IExportWizard;
 import org.eclipse.ui.IWorkbench;
-import org.osgi.service.prefs.BackingStoreException;
 
 public class ExportKickstartProcessWizard extends Wizard implements IExportWizard {
 
@@ -105,8 +110,10 @@ public class ExportKickstartProcessWizard extends Wizard implements IExportWizar
 
   protected void exportProcess(IProgressMonitor monitor) {
     storePreferences();
-    if (targetPage.isCustomLocationUsed()) {
-
+    
+    AlfrescoWorkflowDefinitionConversionFactory factory = new AlfrescoWorkflowDefinitionConversionFactory();
+    
+    if (Preferences.PROCESS_EXPORT_TYPE_FS.equals(targetPage.getTargetType())) {
       if (StringUtils.isEmpty(targetPage.getCustomRepositoryFolder())
           || StringUtils.isEmpty(targetPage.getCustomShareFolder())) {
         error = "Please select target folders for the artifacts";
@@ -124,16 +131,17 @@ public class ExportKickstartProcessWizard extends Wizard implements IExportWizar
     } else {
       ensureTargetExists(monitor);
     }
-
+    
     if (error == null) {
       // We have valid folder locations, finally export the actual process
 
       FormReferenceReader merger = null;
       try {
         monitor.beginTask("Converting process", IProgressMonitor.UNKNOWN);
-        // TODO: perhaps create once and share?
-        AlfrescoWorkflowDefinitionConversionFactory factory = new AlfrescoWorkflowDefinitionConversionFactory();
 
+        boolean isCmis = Preferences.PROCESS_EXPORT_TYPE_CMIS.equals(targetPage.getTargetType());
+        
+        // TODO: perhaps create once and share?
         AlfrescoSimpleWorkflowJsonConverter converter = new AlfrescoSimpleWorkflowJsonConverter();
         FileInputStream fis = new FileInputStream(processResource.getLocation().toFile());
         WorkflowDefinition definition = converter.readWorkflowDefinition(fis);
@@ -146,7 +154,62 @@ public class ExportKickstartProcessWizard extends Wizard implements IExportWizar
         definitionConversion.convert();
 
         monitor.beginTask("Exporting artifacts", IProgressMonitor.UNKNOWN);
-        factory.getArtifactExporter().exportArtifacts(definitionConversion, repoFolder, shareFolder);
+        factory.getArtifactExporter().exportArtifacts(definitionConversion, repoFolder, shareFolder, isCmis);
+        
+        
+        if(isCmis) {
+          // Upload the created files through CMIS
+          File modelsFile = new File(repoFolder, factory.getArtifactExporter()
+              .getContentModelFileName(definitionConversion));
+          
+          
+          monitor.beginTask("Checking cmis folders", IProgressMonitor.UNKNOWN);
+          File processFile = new File(repoFolder, factory.getArtifactExporter().getBpmnFileName(definitionConversion));
+          Folder modelsFolder = CmisUtil.getFolderByPath(targetPage.getCmisModelsPath());
+          Folder processFolder = CmisUtil.getFolderByPath(targetPage.getCmisModelsPath());
+          
+          CmisObject existingProcess = CmisUtil.getFolderChild(processFolder, processFile.getName());
+          CmisObject existingModel = CmisUtil.getFolderChild(modelsFolder, modelsFile.getName());
+          
+          // First, delete the process since the model cannot be deleted when process uses it
+          if(existingProcess != null) {
+            monitor.beginTask("Deleting previous artifacts", IProgressMonitor.UNKNOWN);
+            CmisUtil.deleteCmisObjects(existingProcess);
+          }
+          
+          // Delete model
+          if(existingModel != null) {
+            CmisUtil.deleteCmisObjects(existingModel);
+          }
+          
+          monitor.beginTask("Uploading model and workflow", IProgressMonitor.UNKNOWN);
+          // Upload the model and process
+          CmisUtil.uploadModel(modelsFolder, modelsFile);
+          CmisUtil.uploadProcess(processFolder, processFile);
+          
+          // Also upload share config, if needed
+          if(targetPage.isEnableShare()) {
+            monitor.beginTask("Uploading share config", IProgressMonitor.UNKNOWN);
+            Folder surfConfigFolder = CmisUtil.getFolderByPath(targetPage.getCmisSharePath());
+            Folder modulesFolder = CmisUtil.getOrCreateChildFolder(surfConfigFolder, "module-deployments");
+            Folder extensionsFolder = CmisUtil.getOrCreateChildFolder(surfConfigFolder, "extensions");
+            File shareConfigFile = new File(shareFolder, factory.getArtifactExporter().getShareConfigFileName(definitionConversion));
+            File shareModuleDeploymentFile = new File(shareFolder, factory.getArtifactExporter().getShareModuleDeploymentFileName(definitionConversion));
+            
+            CmisUtil.uploadPersistedExtensions(extensionsFolder, shareConfigFile);
+            CmisUtil.uploadModuleDeployment(modulesFolder, shareModuleDeploymentFile);
+            
+            monitor.beginTask("Forcing reload of modules in share", IProgressMonitor.UNKNOWN);
+            
+            URL url = new URL(targetPage.getShareReloadUrl());
+            HttpURLConnection connection = (HttpURLConnection)url.openConnection();
+            connection.setRequestMethod("GET");
+            
+            connection.getResponseCode();
+            connection.disconnect();
+          }
+        }
+        
       } catch (final Throwable t) {
         Logger.logError("Error while exporting process", t);
         error = "Error while exporting process: " + t.toString();
@@ -189,17 +252,27 @@ public class ExportKickstartProcessWizard extends Wizard implements IExportWizar
   }
 
   protected void storePreferences() {
-    IEclipsePreferences preferences = InstanceScope.INSTANCE.getNode(KickstartPlugin.PLUGIN_ID);
-    preferences.putBoolean(KickstartConstants.PREFERENCE_USE_CUSTOM_LCOATION, targetPage.isCustomLocationUsed());
+    IPreferenceStore preferences = PreferencesUtil.getActivitiDesignerPreferenceStore();
     
-    if(targetPage.isCustomLocationUsed()) {
-      preferences.put(KickstartConstants.PREFERENCE_TARGET_LOCATION_REPOSITORY, targetPage.getCustomRepositoryFolder());
-      preferences.put(KickstartConstants.PREFERENCE_TARGET_LOCATION_SHARE, targetPage.getCustomShareFolder());
+    preferences.setValue(Preferences.PROCESS_EXPORT_TYPE.getPreferenceId(), targetPage.getTargetType());
+    if(Preferences.PROCESS_EXPORT_TYPE_FS.equals(targetPage.getTargetType())) {
+      preferences.setValue(Preferences.PROCESS_TARGET_LOCATION_REPOSITORY.getPreferenceId(), targetPage.getCustomRepositoryFolder());
+      preferences.setValue(Preferences.PROCESS_TARGET_LOCATION_SHARE.getPreferenceId(), targetPage.getCustomShareFolder());
+    } else if(Preferences.PROCESS_EXPORT_TYPE_CMIS.equals(targetPage.getTargetType())) {
+      preferences.setValue(Preferences.CMIS_MODELS_PATH.getPreferenceId(), targetPage.getCmisModelsPath());
+      preferences.setValue(Preferences.CMIS_WORKFLOW_DEFINITION_PATH.getPreferenceId(), targetPage.getCmisWorkflowDefinitionsPath());
+      preferences.setValue(Preferences.CMIS_SHARE_CONFIG_PATH.getPreferenceId(), targetPage.getCmisSharePath());
+      
+      
+      preferences.setValue(Preferences.SHARE_ENABLED.getPreferenceId(), targetPage.isEnableShare());
+      preferences.setValue(Preferences.SHARE_RELOAD_URL.getPreferenceId(), targetPage.getShareReloadUrl());
     }
 
     try {
-      preferences.flush();
-    } catch (BackingStoreException e) {
+      if(preferences instanceof IPersistentPreferenceStore) {
+        ((IPersistentPreferenceStore) preferences).save();
+      }
+    } catch (IOException e) {
       // Inability to store preferences should not fail the wizard, just log the problem
       Logger.logError("Error while storing target paths in preferences", e);
     }

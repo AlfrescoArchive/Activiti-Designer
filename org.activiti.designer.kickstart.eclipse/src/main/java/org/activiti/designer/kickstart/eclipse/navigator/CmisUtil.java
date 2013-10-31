@@ -13,6 +13,9 @@
 package org.activiti.designer.kickstart.eclipse.navigator;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -147,6 +150,12 @@ public class CmisUtil {
 	  }
   }
   
+  public static void deleteCmisObjects(CmisObject... cmisObjects) {
+    for (CmisObject cmisObject : cmisObjects) {
+      getCurrentSession().delete(new ObjectIdImpl(cmisObject.getId()));
+    }
+}
+  
   public static InputStream downloadDocument(Document document) {
   	return getCurrentSession().getContentStream(new ObjectIdImpl(document.getId())).getStream();
   }
@@ -162,6 +171,93 @@ public class CmisUtil {
 
   	// create document
   	return folder.createDocument(properties, contentStream, VersioningState.MAJOR).getId();
+  }
+  
+  public static String uploadModel(Folder folder, File file) throws IOException {
+    Map<String, Object> properties = new HashMap<String, Object>();
+    properties.put(PropertyIds.OBJECT_TYPE_ID,  "D:cm:dictionaryModel");
+    properties.put(PropertyIds.NAME, file.getName());
+    properties.put("cm:modelActive", Boolean.TRUE);
+
+    InputStream stream = new FileInputStream(file);
+    ContentStream contentStream = new ContentStreamImpl(file.getName(), new BigInteger("-1"), "application/xml", stream);
+
+    // create document
+    return folder.createDocument(properties, contentStream, VersioningState.MAJOR).getId();
+  }
+  
+  public static String uploadProcess(Folder folder, File file) throws IOException {
+    Map<String, Object> properties = new HashMap<String, Object>();
+    properties.put(PropertyIds.OBJECT_TYPE_ID,  "D:bpm:workflowDefinition");
+    properties.put(PropertyIds.NAME, file.getName());
+    properties.put("bpm:definitionDeployed", Boolean.TRUE);
+    properties.put("bpm:engineId", "activiti");
+
+    InputStream stream = new FileInputStream(file);
+    ContentStream contentStream = new ContentStreamImpl(file.getName(), new BigInteger("-1"), "application/xml", stream);
+
+    // create document
+    return folder.createDocument(properties, contentStream, VersioningState.MAJOR).getId();
+  }
+  
+  public static void uploadPersistedExtensions(Folder folder, File file) throws Exception {
+    String fileName = "default-persisted-extension.xml";
+    CmisObject persistedExtensions = CmisUtil.getFolderChild(folder, fileName);
+    if(persistedExtensions != null) {
+      Document pwc = (Document) getCurrentSession().getObject(((Document) persistedExtensions).checkOut());
+      InputStream stream = new FileInputStream(file);
+      ContentStream contentStream = getCurrentSession().getObjectFactory().createContentStream(
+          fileName, -1, "application/xml", stream);
+      try {
+          pwc.checkIn(false, null, contentStream, "minor version").getId();
+      } catch (Exception e) {
+          pwc.cancelCheckOut();
+      }
+    } else {
+      Map<String, Object> properties = new HashMap<String, Object>();
+      properties.put(PropertyIds.OBJECT_TYPE_ID,  "cmis:document");
+      properties.put(PropertyIds.NAME, fileName);
+      properties.put(PropertyIds.CONTENT_STREAM_MIME_TYPE, "application/xml");
+      
+      InputStream stream = new FileInputStream(file);
+      ContentStreamImpl contentStream = new ContentStreamImpl(file.getName(), new BigInteger("-1"), "application/xml", stream);
+      folder.createDocument(properties, contentStream, VersioningState.MAJOR).getId();
+    }
+  }
+  
+  public static void uploadModuleDeployment(Folder folder, File file) throws Exception {
+    CmisObject persistedExtensions = CmisUtil.getFolderChild(folder, file.getName());
+    if(persistedExtensions != null) {
+      Document pwc = (Document) getCurrentSession().getObject(((Document) persistedExtensions).checkOut());
+      InputStream stream = new FileInputStream(file);
+      ContentStream contentStream = getCurrentSession().getObjectFactory().createContentStream(
+          file.getName(), -1, "application/xml", stream);
+      try {
+          pwc.checkIn(false, null, contentStream, "minor version").getId();
+      } catch (Exception e) {
+          pwc.cancelCheckOut();
+      }
+    } else {
+      Map<String, Object> properties = new HashMap<String, Object>();
+      properties.put(PropertyIds.OBJECT_TYPE_ID,  "cmis:document");
+      properties.put(PropertyIds.NAME, file.getName());
+      properties.put(PropertyIds.CONTENT_STREAM_MIME_TYPE, "application/xml");
+      
+      InputStream stream = new FileInputStream(file);
+      ContentStreamImpl contentStream = new ContentStreamImpl(file.getName(), new BigInteger("-1"), "application/xml", stream);
+      folder.createDocument(properties, contentStream, VersioningState.MAJOR).getId();
+    }
+  }
+  
+  public static CmisObject getFolderChild(Folder folder, String fileName) {
+    String path = folder.getPath() + "/" + fileName;
+    CmisObject child = null;
+    try {
+      child = getCurrentSession().getObjectByPath(path);
+    } catch(CmisObjectNotFoundException onfe) {
+      // Ignore, return null
+    }
+    return child;
   }
   
   public static void overwriteDocumentContent(Document document, byte[] content, String mimetype) {
@@ -187,6 +283,31 @@ public class CmisUtil {
   	Map<String, String> properties = new HashMap<String, String>();
   	properties.put(PropertyIds.NAME, newName);
   	cmisObject.updateProperties(properties);
+  }
+
+  public static Folder getFolderByPath(String cmisModelsPath) {
+    CmisObject objectByPath = getCurrentSession().getObjectByPath(cmisModelsPath);
+    if(objectByPath instanceof Folder) {
+      return (Folder) objectByPath;
+    }
+    return null;
+  }
+
+  public static Folder getOrCreateChildFolder(Folder folder, String folderName) {
+    String path = folder.getPath() + "/" + folderName;
+    CmisObject child = null;
+    try {
+      child = getCurrentSession().getObjectByPath(path);
+    } catch(CmisObjectNotFoundException onfe) {
+      // Create the folder
+      Map<String, Object> folderProps = new HashMap<String, Object>();
+      folderProps.put(PropertyIds.NAME, folderName);
+      folderProps.put(PropertyIds.OBJECT_TYPE_ID, FolderType.FOLDER_BASETYPE_ID);
+
+      ObjectId folderObjectId = getCurrentSession().createFolder(folderProps, folder, null, null, null);
+      child = getCurrentSession().getObject(folderObjectId);
+    }
+    return (Folder) child;
   }
   
 }

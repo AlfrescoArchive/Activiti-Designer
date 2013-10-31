@@ -4,6 +4,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 
 import org.activiti.designer.kickstart.process.command.KickstartProcessModelUpdater;
+import org.activiti.designer.kickstart.util.widget.ToggleContainerViewer;
 import org.activiti.designer.util.editor.KickstartProcessMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.workflow.simple.definition.DelayStepDefinition;
@@ -45,7 +46,7 @@ public class DelayStepDefinitionFormPropertySection extends AbstractKickstartPro
     options.setLayout(new GridLayout(2, true));
     options.setBackground(formComposite.getBackground());
     durationOption = new Button(options, SWT.RADIO);
-    durationOption.setText("Select step end date");
+    durationOption.setText("Fixed step duration");
     durationOption.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -57,7 +58,7 @@ public class DelayStepDefinitionFormPropertySection extends AbstractKickstartPro
     });
     
     dateTimeOption = new Button(options, SWT.RADIO);
-    dateTimeOption.setText("Fixed step duration");
+    dateTimeOption.setText("Select step end date");
     dateTimeOption.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {

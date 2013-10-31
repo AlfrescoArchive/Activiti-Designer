@@ -7,6 +7,7 @@ import org.activiti.designer.kickstart.process.diagram.shape.WrappingChildShapeC
 import org.activiti.designer.kickstart.process.features.DeleteStepFeature;
 import org.activiti.designer.util.editor.KickstartProcessMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
+import org.activiti.workflow.simple.alfresco.step.AlfrescoReviewStepDefinition;
 import org.activiti.workflow.simple.definition.ChoiceStepsDefinition;
 import org.activiti.workflow.simple.definition.ListConditionStepDefinition;
 import org.activiti.workflow.simple.definition.ListStepDefinition;
@@ -34,14 +35,21 @@ public class KickstartProcessLayouter {
   protected StepDefinitionHorizontalLayout parallelLayout;
   protected StepDefinitionVerticalLayout serialLayout;
   protected StepDefinitionVerticalLayout serialLayoutWithLabel;
+  protected StepDefinitionVerticalLayout serialLayoutReview;
 
   public KickstartProcessLayouter() {
     defaultLayout = new ProcessStepsVerticalLayout();
     parallelLayout = new StepDefinitionHorizontalLayout();
     serialLayout = new StepDefinitionVerticalLayout();
+    
     serialLayoutWithLabel = new StepDefinitionVerticalLayout();
     serialLayoutWithLabel.setTopPadding(20);
     serialLayoutWithLabel.setSkipFirstShape(true);
+    
+    serialLayoutReview = new StepDefinitionVerticalLayout();
+    serialLayoutReview.setTopPadding(50);
+    serialLayoutReview.setBottomPadding(10);
+    serialLayoutReview.setSkipFirstShape(true);
   }
 
   /**
@@ -65,7 +73,8 @@ public class KickstartProcessLayouter {
     } else {
       Object containerObject = model.getFeatureProvider().getBusinessObjectForPictogramElement(containerShape);
       if (containerObject instanceof ParallelStepsDefinition || containerObject instanceof ListStepDefinition<?> 
-        || containerObject instanceof ChoiceStepsDefinition || containerObject instanceof ListConditionStepDefinition<?>) {
+        || containerObject instanceof ChoiceStepsDefinition || containerObject instanceof ListConditionStepDefinition<?>
+        || containerObject instanceof AlfrescoReviewStepDefinition) {
         // Shape represent a parallel step-definition, this has it's own layout
         return containerShape;
       } else {
@@ -236,6 +245,8 @@ public class KickstartProcessLayouter {
         return serialLayout;
       } else if (businessObject instanceof ListConditionStepDefinition<?>) {
         return serialLayoutWithLabel;
+      } else if(businessObject instanceof AlfrescoReviewStepDefinition) {
+        return serialLayoutReview;
       }
     }
     return null;

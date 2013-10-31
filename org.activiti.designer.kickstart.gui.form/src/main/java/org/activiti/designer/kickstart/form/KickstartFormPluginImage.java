@@ -22,6 +22,7 @@ public enum KickstartFormPluginImage {
 
   PROCESS("process.icon", "process-16.png"),
   NEW_TEXT_INPUT("new.textinput.icon", "textinput-16.png"),
+  NEW_NUMBER_INPUT("new.numberinput.icon", "number-16.png"),
   NEW_TEXT_AREA("new.textarea.icon", "textarea-16.png"),
   NEW_DATE_INPUT("new.dateinput.icon", "dateinput-16.png"),
   NEW_LIST_INPUT("new.listinput.icon", "listinput-16.png"),

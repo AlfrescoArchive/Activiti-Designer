@@ -8,6 +8,7 @@ import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
+import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 /**
@@ -21,12 +22,22 @@ public class ExternalFolderSelector {
   private Text text;
   private Button browseButton;
   private Composite composite;
+  private Label label;
   
   private String currentPath;
   
-  public ExternalFolderSelector(Composite parent) {
+  public ExternalFolderSelector(Composite parent, String labelText) {
+    int cols = labelText != null ? 3 : 2;
     composite = new Composite(parent, SWT.NONE);
-    composite.setLayout(new GridLayout(2, false));
+    composite.setLayout(new GridLayout(cols, false));
+
+    if(labelText != null) {
+      label = new Label(composite, SWT.NONE);
+      label.setText(labelText);
+      GridData data = new GridData(SWT.LEFT, SWT.CENTER, false, false);
+      data.widthHint = 150;
+      label.setLayoutData(data);
+    }
     
     GridData data = new GridData(SWT.FILL, SWT.CENTER, true, false);
     text = new Text(composite, SWT.BORDER | SWT.SINGLE);
@@ -49,6 +60,11 @@ public class ExternalFolderSelector {
         setCurrentPath(dialog.open());
       }
     });
+  }
+  
+  
+  public ExternalFolderSelector(Composite parent) {
+    this(parent, null);
   }
   
   public String getCurrentPath() {

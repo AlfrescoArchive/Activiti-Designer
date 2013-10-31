@@ -225,8 +225,14 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
         boolean isMailTask = false;
         for (FieldExtension fieldExtension : serviceTask.getFieldExtensions()) {
           if ("script".equalsIgnoreCase(fieldExtension.getFieldName())) {
-            if (fieldExtension.getStringValue().contains("mail.execute(bpm_package);")) {
-              isMailTask = true;
+            if(fieldExtension.getStringValue() != null) {
+              if (fieldExtension.getStringValue().contains("mail.execute(bpm_package);")) {
+                isMailTask = true;
+              }
+            } else if(fieldExtension.getExpression() != null) {
+              if (fieldExtension.getExpression().contains("mail.execute(bpm_package);")) {
+                isMailTask = true;
+              }
             }
           }
         }

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<beans xmlns="http://www.springframework.org/schema/beans" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-2.0.xsd">
+   <!-- Webscript to reload module deployments configuration. Temporary, until we implement it 'the right way' -->
+   <bean id="webscript.org.alfresco.web.script.module-deployments-reload.get" parent="webscript" 
+        class="org.alfresco.web.scripts.ReloadModuleDeploymentsWebscript">
+   </bean>
+</beans>
+   

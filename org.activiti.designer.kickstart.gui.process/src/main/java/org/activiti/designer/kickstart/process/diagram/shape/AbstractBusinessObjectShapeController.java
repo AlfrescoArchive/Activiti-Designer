@@ -1,7 +1,7 @@
 package org.activiti.designer.kickstart.process.diagram.shape;
 
 import org.activiti.designer.kickstart.process.diagram.KickstartProcessFeatureProvider;
-import org.activiti.workflow.simple.definition.AbstractNamedStepDefinition;
+import org.activiti.workflow.simple.definition.NamedStepDefinition;
 import org.eclipse.graphiti.mm.algorithms.MultiText;
 import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
@@ -93,7 +93,7 @@ public abstract class AbstractBusinessObjectShapeController implements BusinessO
     return null;
   }
   
-  protected String getLabelTextValue(AbstractNamedStepDefinition definition) {
+  protected String getLabelTextValue(NamedStepDefinition definition) {
     String value =  definition.getName() != null ?  definition.getName() : "";
     return value;
   }
