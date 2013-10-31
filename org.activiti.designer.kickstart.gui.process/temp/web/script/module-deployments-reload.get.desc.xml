@@ -1,6 +1,0 @@
-<webscript>
-   <shortname>Reload Module Deployments</shortname>
-   <description>Reload Module Deployments</description>
-   <url>/reload-module-deployments</url>
-   <format default="json"/>
-</webscript>
