@@ -290,9 +290,9 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
       addContextButton(otherElementButton, new CreateEndEventFeature(getFeatureProvider()), taskContext, "Create end event", "Create a new end event",
               PluginImage.IMG_ENDEVENT_NONE);
       addContextButton(otherElementButton, new CreateErrorEndEventFeature(getFeatureProvider()), taskContext, "Create error end event",
-              "Create a new error end event", PluginImage.IMG_ENDEVENT_ERROR);
+              "Create a new error end event", PluginImage.IMG_EVENT_ERROR);
       addContextButton(otherElementButton, new CreateTerminateEndEventFeature(getFeatureProvider()), taskContext, "Create terminate end event",
-              "Create a new terminate end event", PluginImage.IMG_ENDEVENT_TERMINATE);
+              "Create a new terminate end event", PluginImage.IMG_EVENT_TERMINATE);
       addContextButton(otherElementButton, new CreateAlfrescoScriptTaskFeature(getFeatureProvider()), taskContext, "Create alfresco script task",
               "Create a new alfresco script task", PluginImage.IMG_SERVICETASK);
       addContextButton(otherElementButton, new CreateAlfrescoUserTaskFeature(getFeatureProvider()), taskContext, "Create alfresco user task",
@@ -368,15 +368,15 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     }
     if ("timer".equals(startEventType) == false) {
       addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "timerstartevent"), customContext,
-              "Change to timer start event", "Change to a timer start event", PluginImage.IMG_BOUNDARY_TIMER);
+              "Change to timer start event", "Change to a timer start event", PluginImage.IMG_EVENT_TIMER);
     }
     if ("message".equals(startEventType) == false) {
       addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "messagestartevent"), customContext,
-              "Change to message start event", "Change to a message start event", PluginImage.IMG_STARTEVENT_MESSAGE);
+              "Change to message start event", "Change to a message start event", PluginImage.IMG_EVENT_MESSAGE);
     }
     if ("error".equals(startEventType) == false) {
       addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "errorstartevent"), customContext,
-              "Change to error start event", "Change to an error start event", PluginImage.IMG_BOUNDARY_ERROR);
+              "Change to error start event", "Change to an error start event", PluginImage.IMG_EVENT_ERROR);
     }
   }
 
@@ -399,11 +399,11 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     }
     if ("error".equals(endEventType) == false) {
       addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "errorendevent"), customContext,
-              "Change to error end event", "Change to an error end event", PluginImage.IMG_ENDEVENT_ERROR);
+              "Change to error end event", "Change to an error end event", PluginImage.IMG_EVENT_ERROR);
     }
     if ("terminate".equals(endEventType) == false) {
       addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "terminateendevent"), customContext,
-              "Change to terminate end event", "Change to a terminate end event", PluginImage.IMG_ENDEVENT_TERMINATE);
+              "Change to terminate end event", "Change to a terminate end event", PluginImage.IMG_EVENT_TERMINATE);
     }
   }
 
@@ -426,22 +426,22 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
 
     if ("timer".equals(eventType) == false) {
       addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "timerboundaryevent"), customContext,
-              "Change to timer boundary event", "Change to a timer boundary event", PluginImage.IMG_BOUNDARY_TIMER);
+              "Change to timer boundary event", "Change to a timer boundary event", PluginImage.IMG_EVENT_TIMER);
     }
     if ("message".equals(eventType) == false) {
       addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "messageboundaryevent"), customContext,
-              "Change to message boundary event", "Change to a message boundary event", PluginImage.IMG_BOUNDARY_MESSAGE);
+              "Change to message boundary event", "Change to a message boundary event", PluginImage.IMG_EVENT_MESSAGE);
     }
     if ("error".equals(eventType) == false) {
       Object parentObject = notBoundaryEvent.getAttachedToRef();
       if (parentObject instanceof SubProcess || parentObject instanceof CallActivity || parentObject instanceof ServiceTask) {
         addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "errorboundaryevent"), customContext,
-                "Change to error boundary event", "Change to an error boundary event", PluginImage.IMG_BOUNDARY_ERROR);
+                "Change to error boundary event", "Change to an error boundary event", PluginImage.IMG_EVENT_ERROR);
       }
     }
     if ("signal".equals(eventType) == false) {
       addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "signalboundaryevent"), customContext,
-              "Change to signal boundary event", "Change to a signal boundary event", PluginImage.IMG_BOUNDARY_SIGNAL);
+              "Change to signal boundary event", "Change to a signal boundary event", PluginImage.IMG_EVENT_SIGNAL);
     }
   }
 

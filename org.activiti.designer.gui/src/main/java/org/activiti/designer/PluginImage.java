@@ -32,11 +32,12 @@ public enum PluginImage {
   // Event image icons
   IMG_STARTEVENT_NONE("startevent.none", "type.startevent.none.png"), //$NON-NLS-1$
   IMG_ENDEVENT_NONE("endevent.none", "type.endevent.none.png"), //$NON-NLS-1$
-  IMG_ENDEVENT_ERROR("endevent.error", "error.png"), //$NON-NLS-1$
-  IMG_ENDEVENT_TERMINATE("endevent.terminate", "terminate.png"), //$NON-NLS-1$
+  IMG_EVENT_ERROR("event.error", "error.png"), //$NON-NLS-1$
+  IMG_EVENT_TERMINATE("event.terminate", "terminate.png"), //$NON-NLS-1$
   IMG_STARTEVENT_MESSAGEICON("message.startevent.none", "type.startevent.message.png"),
-  IMG_STARTEVENT_MESSAGE("message.startevent.message", "letter.png"),
-
+  IMG_EVENT_MESSAGE("event.message", "letter.png"),
+  IMG_EVENT_TIMER("event.timer", "timer.png"), //$NON-NLS-1$
+  IMG_EVENT_SIGNAL("event.signal", "signal.png"), //$NON-NLS-1$
 
   // Gateway image icons
   IMG_GATEWAY_PARALLEL("gateway.parallel", "type.gateway.parallel.png"), //$NON-NLS-1$
@@ -62,11 +63,6 @@ public enum PluginImage {
   IMG_LANE("lane", "lane.png"), //$NON-NLS-1$
 
   IMG_ACTION_ZOOM("action.magnifier", "action.magnifier.png"), //$NON-NLS-1$
-
-  IMG_BOUNDARY_TIMER("boundary.timer", "timer.png"), //$NON-NLS-1$
-  IMG_BOUNDARY_ERROR("boundary.error", "error.png"), //$NON-NLS-1$
-  IMG_BOUNDARY_MESSAGE("boundary.message", "letter.png"), //$NON-NLS-1$
-  IMG_BOUNDARY_SIGNAL("boundary.signal", "signal.png"), //$NON-NLS-1$
 
   IMG_THROW_SIGNAL("throw.signal", "throw.signal.png"), //$NON-NLS-1$
   IMG_THROW_NONE("throw.none", "throw.none.png"), //$NON-NLS-1$

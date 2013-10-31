@@ -27,7 +27,7 @@ public class CreateSignalCatchingEventFeature extends AbstractCreateFastBPMNFeat
 
   @Override
   public String getCreateImageId() {
-    return PluginImage.IMG_BOUNDARY_SIGNAL.getImageKey();
+    return PluginImage.IMG_EVENT_SIGNAL.getImageKey();
   }
 
   @Override

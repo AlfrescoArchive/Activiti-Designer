@@ -87,11 +87,11 @@ public class AddEventFeature extends AbstractAddShapeFeature {
       final Shape shape = peCreateService.createShape(containerShape, false);
       Image image = null;
       if (startEvent.getEventDefinitions().get(0) instanceof TimerEventDefinition) {
-        image = gaService.createImage(shape, PluginImage.IMG_BOUNDARY_TIMER.getImageKey());
+        image = gaService.createImage(shape, PluginImage.IMG_EVENT_TIMER.getImageKey());
       } else if (startEvent.getEventDefinitions().get(0) instanceof MessageEventDefinition){
-        image = gaService.createImage(shape, PluginImage.IMG_STARTEVENT_MESSAGE.getImageKey());
+        image = gaService.createImage(shape, PluginImage.IMG_EVENT_MESSAGE.getImageKey());
       } else
-        image = gaService.createImage(shape, PluginImage.IMG_BOUNDARY_ERROR.getImageKey());
+        image = gaService.createImage(shape, PluginImage.IMG_EVENT_ERROR.getImageKey());
       
       image.setWidth(IMAGE_SIZE);
       image.setHeight(IMAGE_SIZE);

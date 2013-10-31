@@ -62,7 +62,7 @@ public class AddTerminateEndEventFeature extends AddEventFeature {
 
     {
       final Shape shape = peCreateService.createShape(containerShape, false);
-      final Image image = gaService.createImage(shape, PluginImage.IMG_ENDEVENT_TERMINATE.getImageKey());
+      final Image image = gaService.createImage(shape, PluginImage.IMG_EVENT_TERMINATE.getImageKey());
 
       gaService.setLocationAndSize(image, 5, 5, 25, 25);
     }

@@ -27,7 +27,7 @@ public class CreateTerminateEndEventFeature extends AbstractCreateFastBPMNFeatur
 
   @Override
   public String getCreateImageId() {
-    return PluginImage.IMG_ENDEVENT_TERMINATE.getImageKey();
+    return PluginImage.IMG_EVENT_TERMINATE.getImageKey();
   }
 
   @Override

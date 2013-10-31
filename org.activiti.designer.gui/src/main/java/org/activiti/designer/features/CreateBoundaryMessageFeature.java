@@ -41,7 +41,7 @@ public class CreateBoundaryMessageFeature extends AbstractCreateBPMNFeature {
 
   @Override
   public String getCreateImageId() {
-    return PluginImage.IMG_BOUNDARY_MESSAGE.getImageKey();
+    return PluginImage.IMG_EVENT_MESSAGE.getImageKey();
   }
 
   @Override

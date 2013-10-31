@@ -27,7 +27,7 @@ public class CreateErrorEndEventFeature extends AbstractCreateFastBPMNFeature {
 
   @Override
   public String getCreateImageId() {
-    return PluginImage.IMG_ENDEVENT_ERROR.getImageKey();
+    return PluginImage.IMG_EVENT_ERROR.getImageKey();
   }
 
   @Override

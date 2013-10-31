@@ -19,6 +19,7 @@ import org.activiti.bpmn.model.UserTask;
 import org.activiti.designer.command.BpmnProcessModelUpdater;
 import org.activiti.designer.command.UserTaskModelUpdater;
 import org.activiti.designer.controller.BusinessObjectShapeController;
+import org.activiti.designer.controller.ExclusiveGatewayShapeController;
 import org.activiti.designer.controller.TaskShapeController;
 import org.activiti.designer.features.AddBaseElementFeature;
 import org.activiti.designer.features.ChangeElementTypeFeature;
@@ -125,6 +126,7 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
     
     this.shapeControllers = new ArrayList<BusinessObjectShapeController>();
     shapeControllers.add(new TaskShapeController(this));
+    shapeControllers.add(new ExclusiveGatewayShapeController(this));
   }
   
   /**

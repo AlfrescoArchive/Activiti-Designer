@@ -44,7 +44,7 @@ public class CreateBoundaryErrorFeature extends AbstractCreateBPMNFeature {
 
   @Override
   public String getCreateImageId() {
-    return PluginImage.IMG_ENDEVENT_ERROR.getImageKey();
+    return PluginImage.IMG_EVENT_ERROR.getImageKey();
   }
 
   @Override

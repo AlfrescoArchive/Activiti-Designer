@@ -27,7 +27,7 @@ public class CreateTimerCatchingEventFeature extends AbstractCreateFastBPMNFeatu
 
   @Override
   public String getCreateImageId() {
-    return PluginImage.IMG_BOUNDARY_TIMER.getImageKey();
+    return PluginImage.IMG_EVENT_TIMER.getImageKey();
   }
 
   @Override

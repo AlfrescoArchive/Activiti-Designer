@@ -61,7 +61,7 @@ public class AddSignalCatchingEventFeature extends AddEventFeature {
 
     {
       final Shape shape = peCreateService.createShape(containerShape, false);
-      final Image image = gaService.createImage(shape, PluginImage.IMG_BOUNDARY_SIGNAL.getImageKey());
+      final Image image = gaService.createImage(shape, PluginImage.IMG_EVENT_SIGNAL.getImageKey());
       image.setWidth(20);
       image.setHeight(20);
       gaService.setLocationAndSize(image, (width - 20) / 2, (height - 20) / 2, 20, 20);

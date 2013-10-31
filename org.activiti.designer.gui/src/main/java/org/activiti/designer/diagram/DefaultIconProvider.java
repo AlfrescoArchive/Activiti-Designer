@@ -124,9 +124,9 @@ public class DefaultIconProvider implements IconProvider {
       } else {
         if(((StartEvent) context).getEventDefinitions().size() > 0) {
           if(((StartEvent) context).getEventDefinitions().get(0) instanceof TimerEventDefinition) {
-            result = Activator.getImage(PluginImage.IMG_BOUNDARY_TIMER);
+            result = Activator.getImage(PluginImage.IMG_EVENT_TIMER);
           } else {
-            result = Activator.getImage(PluginImage.IMG_BOUNDARY_ERROR);
+            result = Activator.getImage(PluginImage.IMG_EVENT_ERROR);
           }
         } else {
           result = Activator.getImage(PluginImage.IMG_STARTEVENT_NONE);
@@ -137,9 +137,9 @@ public class DefaultIconProvider implements IconProvider {
       EndEvent endEvent = (EndEvent) context;
       for (EventDefinition eventDefinition : endEvent.getEventDefinitions()) {
         if (eventDefinition instanceof ErrorEventDefinition) {
-          result = Activator.getImage(PluginImage.IMG_ENDEVENT_ERROR);
+          result = Activator.getImage(PluginImage.IMG_EVENT_ERROR);
         } else if (eventDefinition instanceof TerminateEventDefinition) {
-          result = Activator.getImage(PluginImage.IMG_ENDEVENT_TERMINATE);
+          result = Activator.getImage(PluginImage.IMG_EVENT_TERMINATE);
         }
       }
       if (result == null) {
@@ -150,29 +150,29 @@ public class DefaultIconProvider implements IconProvider {
       if(((BoundaryEvent) context).getEventDefinitions().size() > 0) {
         EventDefinition definition = ((BoundaryEvent) context).getEventDefinitions().get(0);
         if (definition instanceof ErrorEventDefinition) {
-          result = Activator.getImage(PluginImage.IMG_BOUNDARY_ERROR);
+          result = Activator.getImage(PluginImage.IMG_EVENT_ERROR);
         } else if (definition instanceof SignalEventDefinition) {
-          result = Activator.getImage(PluginImage.IMG_BOUNDARY_SIGNAL);
+          result = Activator.getImage(PluginImage.IMG_EVENT_SIGNAL);
         } else if (definition instanceof MessageEventDefinition) {
-          result = Activator.getImage(PluginImage.IMG_BOUNDARY_MESSAGE);
+          result = Activator.getImage(PluginImage.IMG_EVENT_MESSAGE);
         } else {
-          result = Activator.getImage(PluginImage.IMG_BOUNDARY_TIMER);
+          result = Activator.getImage(PluginImage.IMG_EVENT_TIMER);
         }
       }
     } else if (context instanceof IntermediateCatchEvent) {
       if(((IntermediateCatchEvent) context).getEventDefinitions().size() > 0) {
         EventDefinition definition = ((IntermediateCatchEvent) context).getEventDefinitions().get(0);
         if(definition instanceof SignalEventDefinition) {
-          result = Activator.getImage(PluginImage.IMG_BOUNDARY_SIGNAL);
+          result = Activator.getImage(PluginImage.IMG_EVENT_SIGNAL);
         } else {
-          result = Activator.getImage(PluginImage.IMG_BOUNDARY_TIMER);
+          result = Activator.getImage(PluginImage.IMG_EVENT_TIMER);
         }
       }
     } else if (context instanceof ThrowEvent) {
       if(((ThrowEvent) context).getEventDefinitions().size() > 0) {
-        result = Activator.getImage(PluginImage.IMG_BOUNDARY_SIGNAL);
+        result = Activator.getImage(PluginImage.IMG_EVENT_SIGNAL);
       } else {
-        result = Activator.getImage(PluginImage.IMG_BOUNDARY_TIMER);
+        result = Activator.getImage(PluginImage.IMG_EVENT_TIMER);
       }
     } else {
       throw new IllegalArgumentException("This provider has no Icon for the provided context");

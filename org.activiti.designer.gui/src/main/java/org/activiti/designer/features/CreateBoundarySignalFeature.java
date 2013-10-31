@@ -41,7 +41,7 @@ public class CreateBoundarySignalFeature extends AbstractCreateBPMNFeature {
 
   @Override
   public String getCreateImageId() {
-    return PluginImage.IMG_BOUNDARY_SIGNAL.getImageKey();
+    return PluginImage.IMG_EVENT_SIGNAL.getImageKey();
   }
 
   @Override

@@ -27,7 +27,7 @@ public class CreateMessageCatchingEventFeature extends AbstractCreateFastBPMNFea
 
   @Override
   public String getCreateImageId() {
-    return PluginImage.IMG_STARTEVENT_MESSAGE.getImageKey();
+    return PluginImage.IMG_EVENT_MESSAGE.getImageKey();
   }
 
   @Override
