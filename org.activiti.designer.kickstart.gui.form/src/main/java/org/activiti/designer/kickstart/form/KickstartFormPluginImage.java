@@ -22,6 +22,7 @@ public enum KickstartFormPluginImage {
 
   PROCESS("process.icon", "process-16.png"),
   NEW_TEXT_INPUT("new.textinput.icon", "textinput-16.png"),
+  NEW_NUMBER_INPUT("new.numberinput.icon", "number-16.png"),
   NEW_TEXT_AREA("new.textarea.icon", "textarea-16.png"),
   NEW_DATE_INPUT("new.dateinput.icon", "dateinput-16.png"),
   NEW_LIST_INPUT("new.listinput.icon", "listinput-16.png"),
@@ -33,7 +34,8 @@ public enum KickstartFormPluginImage {
   NEW_FIELD_REFERENCE("new.reference.icon", "reference-16.png"),
   NEW_CHECKBOX("new.checkbox.icon", "checkbox-16.png"),
   NEW_PEOPLE_SELECT("new.peopleselect.icon", "user-select-16.png"),
-  NEW_GROUP_SELECT("new.groupselect.icon", "group-select-16.png")
+  NEW_GROUP_SELECT("new.groupselect.icon", "group-select-16.png"), 
+  NEW_EMAIL_NOTIFICATION("new.emailnotification.icon", "email-16.png")
   ;
 
   private static final String KEY_PREFIX = KickstartFormActivator.PLUGIN_ID;

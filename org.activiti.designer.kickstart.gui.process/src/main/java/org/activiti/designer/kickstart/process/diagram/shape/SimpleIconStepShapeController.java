@@ -5,7 +5,7 @@ import org.activiti.designer.kickstart.process.diagram.KickstartProcessFeaturePr
 import org.activiti.designer.kickstart.process.util.StepDefinitionStyles;
 import org.activiti.designer.util.platform.OSEnum;
 import org.activiti.designer.util.platform.OSUtil;
-import org.activiti.workflow.simple.definition.AbstractNamedStepDefinition;
+import org.activiti.workflow.simple.definition.NamedStepDefinition;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
@@ -23,7 +23,7 @@ import org.eclipse.graphiti.services.IPeCreateService;
 
 /**
  * A {@link BusinessObjectShapeController} capable of creating and updating shapes for
- * {@link AbstractNamedStepDefinition} objects, represented by a shape with a name and an icon (see {@link #getIcon()}.
+ * {@link NamedStepDefinition} objects, represented by a shape with a name and an icon (see {@link #getIcon()}.
  *  
  * @author Frederik Heremans
  */
@@ -41,7 +41,7 @@ public abstract class SimpleIconStepShapeController extends AbstractBusinessObje
     
     Diagram diagram = getFeatureProvider().getDiagramTypeProvider().getDiagram();
     
-    AbstractNamedStepDefinition definition = (AbstractNamedStepDefinition) businessObject;
+    NamedStepDefinition definition = (NamedStepDefinition) businessObject;
 
     // If no size has been supplied, revert to the default sizes
     if(width < 0) {
@@ -94,7 +94,7 @@ public abstract class SimpleIconStepShapeController extends AbstractBusinessObje
 
   @Override
   public void updateShape(ContainerShape shape, Object businessObject, int width, int height) {
-    AbstractNamedStepDefinition propDef = (AbstractNamedStepDefinition) businessObject;
+    NamedStepDefinition propDef = (NamedStepDefinition) businessObject;
     
     // Update the label
     MultiText labelText = findNameMultiText(shape);
@@ -127,7 +127,7 @@ public abstract class SimpleIconStepShapeController extends AbstractBusinessObje
   
   @Override
   public boolean isShapeUpdateNeeded(ContainerShape shape, Object businessObject) {
-    AbstractNamedStepDefinition propDef = (AbstractNamedStepDefinition) businessObject;
+    NamedStepDefinition propDef = (NamedStepDefinition) businessObject;
     
     // Check label text
     String currentLabel = (String) extractShapeData(LABEL_DATA_KEY, shape);

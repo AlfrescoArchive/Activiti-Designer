@@ -14,6 +14,7 @@ public class GroupSelectPropertySection extends AbstractKickstartFormComponentSe
   protected Button editableControl;
   protected Button mandatoryControl;
   protected Button manyControl;
+  protected Button outputPropertyControl;
 
   @Override
   public void createFormControls(TabbedPropertySheetPage aTabbedPropertySheetPage) {
@@ -21,6 +22,7 @@ public class GroupSelectPropertySection extends AbstractKickstartFormComponentSe
     mandatoryControl = createCheckboxControl("Mandatory");
     createSeparator();
     manyControl = createCheckboxControl("Allow selecting multiple groups");
+    outputPropertyControl = createCheckboxControl("Output property to workflow");
   }
 
   @Override
@@ -32,6 +34,8 @@ public class GroupSelectPropertySection extends AbstractKickstartFormComponentSe
       return propDef.isMandatory();
     } else if(control == manyControl) {
       return getBooleanParameter(propDef, AlfrescoConversionConstants.PARAMETER_REFERENCE_MANY, false);
+    } else if(control == outputPropertyControl) {
+      return getBooleanParameter(propDef, AlfrescoConversionConstants.PARAMETER_ADD_PROPERTY_TO_OUTPUT, false);
     }
     return null;
   }
@@ -45,6 +49,8 @@ public class GroupSelectPropertySection extends AbstractKickstartFormComponentSe
       propDef.setMandatory(mandatoryControl.getSelection());
     } else if(control == manyControl) {
       propDef.getParameters().put(AlfrescoConversionConstants.PARAMETER_REFERENCE_MANY, manyControl.getSelection());
+    } else if(control == outputPropertyControl) {
+      propDef.getParameters().put(AlfrescoConversionConstants.PARAMETER_ADD_PROPERTY_TO_OUTPUT, outputPropertyControl.getSelection());
     }
   }
 }

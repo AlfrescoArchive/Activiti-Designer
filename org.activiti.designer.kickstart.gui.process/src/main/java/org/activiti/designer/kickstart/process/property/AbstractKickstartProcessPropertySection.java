@@ -21,6 +21,8 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.FocusListener;
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
@@ -35,6 +37,7 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.Spinner;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
@@ -63,6 +66,7 @@ public abstract class AbstractKickstartProcessPropertySection extends GFProperty
    */
   protected FocusListener focusListener;
   protected SelectionListener selectionListener;
+  protected ModifyListener modifyListener;
   protected KickstartProcessModelListener modelListener;
   protected boolean modelChangesEnabled = true;
   
@@ -112,6 +116,15 @@ public abstract class AbstractKickstartProcessPropertySection extends GFProperty
           if(bo != null && bo.equals(updatedObject)) {
             refresh();
           }
+        }
+      }
+    };
+    
+    modifyListener = new ModifyListener() {
+      @Override
+      public void modifyText(ModifyEvent e) {
+        if(e.widget instanceof Control) {
+          flushControlValue((Control) e.widget);
         }
       }
     };
@@ -327,6 +340,16 @@ public abstract class AbstractKickstartProcessPropertySection extends GFProperty
         }
       }
       comboControl.select(newIndex);
+      
+    } else if(control instanceof Spinner) {
+      Spinner spinner = (Spinner) control;
+      if(valueFromModel == null) {
+        spinner.setSelection(spinner.getMinimum());
+      } else if(valueFromModel instanceof Integer) {
+        spinner.setSelection((Integer) valueFromModel);
+      } else {
+        throw new IllegalArgumentException("Spinner control expects an Integer model value");
+      }
     } else if((!(control instanceof Label) || !(control instanceof CLabel)) && valueFromModel != null){
       throw new IllegalArgumentException("Request to populate unsupported control based on model");
     }
@@ -339,6 +362,8 @@ public abstract class AbstractKickstartProcessPropertySection extends GFProperty
       return ((Button) control).getSelection();
     } else if(control instanceof Combo) {
       return ((Combo)control).getText();
+    } else if(control instanceof Spinner) {
+      return ((Spinner)control).getSelection();
     }
     throw new IllegalArgumentException("Unsupported control: "+ control.getClass().getName());
   }
@@ -359,6 +384,11 @@ public abstract class AbstractKickstartProcessPropertySection extends GFProperty
       button.removeSelectionListener(selectionListener);
       button.setSelection(false);
       button.addSelectionListener(selectionListener);
+    } else if(control instanceof Spinner) {
+      Spinner spinner = (Spinner) control;
+      spinner.removeModifyListener(modifyListener);
+      spinner.setSelection(spinner.getSelection());
+      spinner.addModifyListener(modifyListener);
     }
   }
   
@@ -492,6 +522,25 @@ public abstract class AbstractKickstartProcessPropertySection extends GFProperty
     comboControl.addSelectionListener(selectionListener);
     registerControl(comboControl);
     return comboControl;
+  }
+  
+  /**
+   * @param values values for the combo
+   * @param defaultSelectionIndex index of the default selection. If there is no default selection,
+   * pass in a negative number.
+   * @return the combo component
+   */
+  protected Spinner createSpinner(int minValue, int maxValue) {
+    Spinner spinnerControl = new Spinner(formComposite, SWT.BORDER);
+    FormData data = new FormData();
+    data.left = new FormAttachment(0, LABEL_WIDTH);
+    data.right = new FormAttachment(100, 0);
+    data.top = createTopFormAttachment();
+    spinnerControl.setLayoutData(data);
+    
+    spinnerControl.addSelectionListener(selectionListener);
+    registerControl(spinnerControl);
+    return spinnerControl;
   }
 
   protected CLabel createLabel(String labelName, Control control) {

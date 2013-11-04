@@ -26,7 +26,8 @@ public enum KickstartProcessPluginImage {
   PARALLEL_STEP_ICON("parallelstep.icon", "parallel-16.png"),
   CHOICE_STEP_ICON("choicestep.icon", "choice-16.png"),
   DELAY_STEP_ICON("delaystep.icon", "delay-16.png"),
-  EMAIL_STEP_ICON("emailstep.icon", "email-16.png");
+  EMAIL_STEP_ICON("emailstep.icon", "email-16.png"),
+  REVIEW_STEP_ICON("reviestep.icon", "review-16.png") ;
 
   private static final String KEY_PREFIX = Activator.PLUGIN_ID;
   private static final String DEFAULT_IMAGE_DIR = "icons/";

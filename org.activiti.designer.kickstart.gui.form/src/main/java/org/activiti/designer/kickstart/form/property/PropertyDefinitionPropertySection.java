@@ -24,7 +24,7 @@ public class PropertyDefinitionPropertySection extends AbstractKickstartFormComp
 
     mandatoryControl = createCheckboxControl("Mandatory");
     writableControl = createCheckboxControl("Editable");
-    outputPropertyControl = createCheckboxControl("Output property to process");
+    outputPropertyControl = createCheckboxControl("Output property to workflow");
   }
 
   @Override

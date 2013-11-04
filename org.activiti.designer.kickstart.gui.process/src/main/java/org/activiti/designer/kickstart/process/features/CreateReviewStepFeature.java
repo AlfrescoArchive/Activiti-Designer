@@ -2,16 +2,16 @@ package org.activiti.designer.kickstart.process.features;
 
 import org.activiti.designer.kickstart.process.KickstartProcessPluginImage;
 import org.activiti.designer.kickstart.process.diagram.KickstartProcessFeatureProvider;
-import org.activiti.workflow.simple.definition.HumanStepDefinition;
+import org.activiti.workflow.simple.alfresco.step.AlfrescoReviewStepDefinition;
 import org.activiti.workflow.simple.definition.StepDefinition;
 import org.eclipse.graphiti.features.context.ICreateContext;
 
-public class CreateHumanStepFeature extends AbstractCreateStepDefinitionFeature {
+public class CreateReviewStepFeature extends AbstractCreateStepDefinitionFeature {
 
-  public static final String FEATURE_ID_KEY = "human-step";
+  public static final String FEATURE_ID_KEY = "review-step";
 
-  public CreateHumanStepFeature(KickstartProcessFeatureProvider fp) {
-    super(fp, "Human step", "Add a human step");
+  public CreateReviewStepFeature(KickstartProcessFeatureProvider fp) {
+    super(fp, "Review step", "Add a review step");
   }
 
   @Override
@@ -21,13 +21,13 @@ public class CreateHumanStepFeature extends AbstractCreateStepDefinitionFeature 
   
   @Override
   protected StepDefinition createStepDefinition(ICreateContext context) {
-    HumanStepDefinition definition = new HumanStepDefinition();
-    definition.setName("Human step");
+    AlfrescoReviewStepDefinition definition = new AlfrescoReviewStepDefinition();
+    definition.setName("Review step");
     return definition;
   }
 
   @Override
   public String getCreateImageId() {
-    return KickstartProcessPluginImage.HUMAN_STEP_ICON.getImageKey();
+    return KickstartProcessPluginImage.REVIEW_STEP_ICON.getImageKey();
   }
 }

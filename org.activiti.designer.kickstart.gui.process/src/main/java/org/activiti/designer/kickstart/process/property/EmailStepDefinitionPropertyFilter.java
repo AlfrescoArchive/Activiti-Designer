@@ -6,7 +6,7 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 /**
  * @author Frederik Heremans
  */
-public class EmailDelayStepDefinitionPropertyFilter extends AbstractKickstartProcessPropertyFilter {
+public class EmailStepDefinitionPropertyFilter extends AbstractKickstartProcessPropertyFilter {
 
   @Override
   protected boolean accept(PictogramElement pictogramElement) {

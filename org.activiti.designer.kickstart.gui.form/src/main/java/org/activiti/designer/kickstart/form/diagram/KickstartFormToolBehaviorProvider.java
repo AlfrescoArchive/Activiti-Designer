@@ -6,11 +6,15 @@ import java.util.Set;
 import org.activiti.designer.eclipse.Logger;
 import org.activiti.designer.kickstart.form.diagram.shape.BusinessObjectShapeController;
 import org.activiti.designer.kickstart.form.features.CreateBooleanPropertyFeature;
+import org.activiti.designer.kickstart.form.features.CreateCommentPropertyFeature;
+import org.activiti.designer.kickstart.form.features.CreateContentSelectPropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateDatePropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateDueDatePropertyFeature;
+import org.activiti.designer.kickstart.form.features.CreateEmailNotificationPropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateFormGroupFeature;
 import org.activiti.designer.kickstart.form.features.CreateGroupSelectPropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateListPropertyFeature;
+import org.activiti.designer.kickstart.form.features.CreateNumberInputPropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreatePackageItemsPropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreatePeopleSelectPropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreatePriorityPropertyFeature;
@@ -37,20 +41,26 @@ public class KickstartFormToolBehaviorProvider extends DefaultToolBehaviorProvid
   protected static final Set<Class<?>> contolToolClasses = new HashSet<Class<?>>(); 
   protected static final Set<Class<?>> fixedToolClasses = new HashSet<Class<?>>(); 
   protected static final Set<Class<?>> containerToolClasses = new HashSet<Class<?>>();
+  protected static final Set<Class<?>> referenceToolClasses = new HashSet<Class<?>>();
   
   static {
     contolToolClasses.add(CreateTextAreaPropertyFeature.class);
     contolToolClasses.add(CreateTextInputPropertyFeature.class);
+    contolToolClasses.add(CreateNumberInputPropertyFeature.class);
     contolToolClasses.add(CreateDatePropertyFeature.class);
     contolToolClasses.add(CreateBooleanPropertyFeature.class);
     contolToolClasses.add(CreateListPropertyFeature.class);
-    contolToolClasses.add(CreatePeopleSelectPropertyFeature.class);
-    contolToolClasses.add(CreateGroupSelectPropertyFeature.class);
+    
+    referenceToolClasses.add(CreatePeopleSelectPropertyFeature.class);
+    referenceToolClasses.add(CreateGroupSelectPropertyFeature.class);
+    referenceToolClasses.add(CreateContentSelectPropertyFeature.class);
     
     fixedToolClasses.add(CreateDueDatePropertyFeature.class);
     fixedToolClasses.add(CreatePriorityPropertyFeature.class);
     fixedToolClasses.add(CreatePackageItemsPropertyFeature.class);
     fixedToolClasses.add(CreateWorkflowDescriptionPropertyFeature.class);
+    fixedToolClasses.add(CreateCommentPropertyFeature.class);
+    fixedToolClasses.add(CreateEmailNotificationPropertyFeature.class);
     fixedToolClasses.add(CreateReferencePropertyFeature.class);
     
     containerToolClasses.add(CreateFormGroupFeature.class);
@@ -82,9 +92,10 @@ public class KickstartFormToolBehaviorProvider extends DefaultToolBehaviorProvid
   public IPaletteCompartmentEntry[] getPalette() {
     IPaletteCompartmentEntry inputControls = new PaletteCompartmentEntry("Controls", null);
     IPaletteCompartmentEntry fixedControls = new PaletteCompartmentEntry("Fixed controls", null);
+    IPaletteCompartmentEntry referenceControls = new PaletteCompartmentEntry("Reference controls", null);
     IPaletteCompartmentEntry containerControls = new PaletteCompartmentEntry("Containers", null);
     
-    IPaletteCompartmentEntry[] entries = new IPaletteCompartmentEntry[] {inputControls, fixedControls, containerControls};
+    IPaletteCompartmentEntry[] entries = new IPaletteCompartmentEntry[] {inputControls, referenceControls, fixedControls, containerControls};
     IPaletteCompartmentEntry[] palette = super.getPalette();
     
     // Superclass returns 2 compartments: connections and objects. Reorganize the objects
@@ -101,6 +112,8 @@ public class KickstartFormToolBehaviorProvider extends DefaultToolBehaviorProvid
           fixedControls.getToolEntries().add(tool);
         } else if(containerToolClasses.contains(creationTool.getCreateFeature().getClass())) {
           containerControls.getToolEntries().add(tool);
+        } else if(referenceToolClasses.contains(creationTool.getCreateFeature().getClass())) {
+          referenceControls.getToolEntries().add(tool);
         } else {
           Logger.log(IStatus.WARNING, IStatus.OK, "Palette wil not contain entry for: " + creationTool.getLabel(), null);
         }

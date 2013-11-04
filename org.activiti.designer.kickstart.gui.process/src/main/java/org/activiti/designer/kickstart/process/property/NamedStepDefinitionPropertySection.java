@@ -1,6 +1,6 @@
 package org.activiti.designer.kickstart.process.property;
 
-import org.activiti.workflow.simple.definition.AbstractNamedStepDefinition;
+import org.activiti.workflow.simple.definition.NamedStepDefinition;
 import org.activiti.workflow.simple.definition.StepDefinition;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
@@ -26,7 +26,7 @@ public class NamedStepDefinitionPropertySection extends AbstractKickstartProcess
 
   @Override
   protected Object getModelValueForControl(Control control, Object businessObject) {
-    AbstractNamedStepDefinition stepDefinition = (AbstractNamedStepDefinition) businessObject;
+    NamedStepDefinition stepDefinition = (NamedStepDefinition) businessObject;
     if(control == nameControl) {
       return stepDefinition.getName() != null ? stepDefinition.getName() : "";
     } else if(control == descriptionControl) {
@@ -37,7 +37,7 @@ public class NamedStepDefinitionPropertySection extends AbstractKickstartProcess
 
   @Override
   protected void storeValueInModel(Control control, Object businessObject) {
-    AbstractNamedStepDefinition stepDefinition = (AbstractNamedStepDefinition) businessObject;
+    NamedStepDefinition stepDefinition = (NamedStepDefinition) businessObject;
     if(control == nameControl) {
       stepDefinition.setName(nameControl.getText());
     } else if(control == descriptionControl) {

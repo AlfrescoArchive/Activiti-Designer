@@ -2,7 +2,7 @@ package org.activiti.designer.kickstart.process.features;
 
 import org.activiti.designer.kickstart.process.command.KickstartProcessModelUpdater;
 import org.activiti.designer.kickstart.process.diagram.KickstartProcessFeatureProvider;
-import org.activiti.workflow.simple.definition.AbstractNamedStepDefinition;
+import org.activiti.workflow.simple.definition.NamedStepDefinition;
 import org.activiti.workflow.simple.definition.StepDefinition;
 import org.eclipse.graphiti.features.ICustomUndoableFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -34,8 +34,8 @@ public class DirectEditStepDefinitionFeature extends AbstractDirectEditingFeatur
   public String getInitialValue(IDirectEditingContext context) {
     // Return the current name of the EClass
     Object businessObject = getBusinessObjectForPictogramElement(context.getPictogramElement());
-    if (businessObject instanceof AbstractNamedStepDefinition) {
-      return ((AbstractNamedStepDefinition) businessObject).getName();
+    if (businessObject instanceof NamedStepDefinition) {
+      return ((NamedStepDefinition) businessObject).getName();
     }
     return null;
   }
@@ -54,8 +54,8 @@ public class DirectEditStepDefinitionFeature extends AbstractDirectEditingFeatur
     updater = ((KickstartProcessFeatureProvider) getFeatureProvider()).getModelUpdaterFor(businessObject, context.getPictogramElement());
     if (updater != null) {
       // Set the new value in the updateable definition
-      if(businessObject instanceof AbstractNamedStepDefinition) {
-        ((AbstractNamedStepDefinition) updater.getUpdatableBusinessObject()).setName(value);
+      if(businessObject instanceof NamedStepDefinition) {
+        ((NamedStepDefinition) updater.getUpdatableBusinessObject()).setName(value);
       }
       updater.doUpdate();
     }

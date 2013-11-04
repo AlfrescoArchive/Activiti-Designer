@@ -2,9 +2,8 @@ package org.activiti.designer.kickstart.form.diagram.shape;
 
 import org.activiti.designer.kickstart.form.KickstartFormPluginImage;
 import org.activiti.designer.kickstart.form.diagram.KickstartFormFeatureProvider;
-import org.activiti.workflow.simple.alfresco.conversion.AlfrescoConversionConstants;
 import org.activiti.workflow.simple.definition.form.FormPropertyDefinition;
-import org.activiti.workflow.simple.definition.form.ReferencePropertyDefinition;
+import org.activiti.workflow.simple.definition.form.NumberPropertyDefinition;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.algorithms.MultiText;
@@ -15,51 +14,43 @@ import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 
 /**
- * A {@link BusinessObjectShapeController} capable of creating and updating shapes for
- * {@link ReferencePropertyDefinition} objects, which represent a reference to an existing field.
- *  
+ * A {@link BusinessObjectShapeController} capable of creating and updating shapes for {@link NumberPropertyDefinition}
+ * objects.
+ * 
  * @author Frederik Heremans
  */
-public class ReferencePropertyShapeController extends SimpleIconInputShapeController {
-  
-  public ReferencePropertyShapeController(KickstartFormFeatureProvider featureProvider) {
+public class NumberPropertyShapeController extends SimpleIconInputShapeController {
+
+  public NumberPropertyShapeController(KickstartFormFeatureProvider featureProvider) {
     super(featureProvider);
   }
 
   @Override
   public boolean canControlShapeFor(Object businessObject) {
-    boolean valid =  businessObject instanceof ReferencePropertyDefinition;
-    if(valid) {
-      ReferencePropertyDefinition ref = (ReferencePropertyDefinition) businessObject;
-      valid = AlfrescoConversionConstants.FORM_REFERENCE_FIELD.equals(ref.getType())
-          || AlfrescoConversionConstants.CONTENT_TYPE_PEOPLE.equals(ref.getType())
-          || AlfrescoConversionConstants.CONTENT_TYPE_GROUP.equals(ref.getType())
-          || AlfrescoConversionConstants.CONTENT_TYPE_CONTENT.equals(ref.getType());
+    return businessObject instanceof NumberPropertyDefinition;
+  }
+
+  @Override
+  public boolean isShapeUpdateNeeded(ContainerShape shape, Object businessObject) {
+    NumberPropertyDefinition propDef = (NumberPropertyDefinition) businessObject;
+
+    // Check label text
+    String currentLabel = (String) extractShapeData(LABEL_DATA_KEY, shape);
+    String newLabel = getLabelTextValue(propDef);
+    if (!StringUtils.equals(currentLabel, newLabel)) {
+      return true;
     }
-    return valid;
+    return false;
   }
 
   @Override
   public GraphicsAlgorithm getGraphicsAlgorithmForDirectEdit(ContainerShape container) {
     return container.getChildren().get(0).getGraphicsAlgorithm();
   }
-
-  @Override
-  public boolean isShapeUpdateNeeded(ContainerShape shape, Object businessObject) {
-    FormPropertyDefinition propDef = (FormPropertyDefinition) businessObject;
-    
-    // Check label text
-    String currentLabel = (String) extractShapeData(LABEL_DATA_KEY, shape);
-    String newLabel = getLabelTextValue(propDef);
-    if(!StringUtils.equals(currentLabel, newLabel)) {
-      return true;
-    }
-    return false;
-  }
   
   @Override
   public void updateShape(ContainerShape shape, Object businessObject, int width, int height) {
-    ReferencePropertyDefinition propDef = (ReferencePropertyDefinition) businessObject;
+    NumberPropertyDefinition propDef = (NumberPropertyDefinition) businessObject;
     
     // Update the label
     MultiText labelText = findNameMultiText(shape);
@@ -84,22 +75,15 @@ public class ReferencePropertyShapeController extends SimpleIconInputShapeContro
       gaService.setWidth(labelShape.getGraphicsAlgorithm(), width);
     }
   }
-
+  
+  @Override
   protected boolean isQuickEditEnabled() {
-    return true;
+    // TODO Auto-generated method stub
+    return super.isQuickEditEnabled();
   }
 
   @Override
   protected String getIconKey(FormPropertyDefinition definition) {
-    ReferencePropertyDefinition ref = (ReferencePropertyDefinition) definition;
-    if(AlfrescoConversionConstants.CONTENT_TYPE_PEOPLE.equals(ref.getType())) {
-      return KickstartFormPluginImage.NEW_PEOPLE_SELECT.getImageKey();
-    } else if(AlfrescoConversionConstants.CONTENT_TYPE_GROUP.equals(ref.getType())) {
-      return KickstartFormPluginImage.NEW_GROUP_SELECT.getImageKey();
-    } else if(AlfrescoConversionConstants.CONTENT_TYPE_CONTENT.equals(ref.getType())) {
-      return KickstartFormPluginImage.NEW_PACKAGE_ITEMS.getImageKey();
-    } else {
-      return KickstartFormPluginImage.NEW_FIELD_REFERENCE.getImageKey();
-    }
+    return KickstartFormPluginImage.NEW_NUMBER_INPUT.getImageKey();
   }
 }

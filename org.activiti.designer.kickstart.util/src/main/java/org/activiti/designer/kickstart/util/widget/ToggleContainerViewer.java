@@ -1,4 +1,4 @@
-package org.activiti.designer.kickstart.process.property;
+package org.activiti.designer.kickstart.util.widget;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -20,12 +20,18 @@ public class ToggleContainerViewer {
 
   protected Composite composite;
   protected Map<String, ToggleContainerViewer.ToggleContainerChild> children;
+  protected boolean pack = true;
+  
  
   public ToggleContainerViewer(Composite parent) {
     composite = new Composite(parent, SWT.NONE);
     composite.setLayout(new GridLayout());
     composite.setBackground(parent.getBackground());
     children = new HashMap<String, ToggleContainerViewer.ToggleContainerChild>();
+  }
+  
+  public void setPack(boolean pack) {
+    this.pack = pack;
   }
   
   public void showChild(String key) {
@@ -39,7 +45,11 @@ public class ToggleContainerViewer {
     
     // Force the gridlayout to re-layout
     composite.layout(true);
-    composite.getParent().getParent().getParent().pack(true);
+    if(pack) {
+      composite.getParent().getParent().getParent().pack(true);
+    } else {
+      composite.getParent().layout(true);
+    }
   }
   
   public void hideAll() {
@@ -49,7 +59,11 @@ public class ToggleContainerViewer {
     
     // Force the gridlayout to re-layout
     composite.layout(true);
-    composite.getParent().getParent().getParent().pack(true);
+    if(pack) {
+      composite.getParent().getParent().getParent().pack(true);
+    } else {
+      composite.getParent().layout(true);
+    }
   }
   
   public void addControl(String key, Control control) {
@@ -82,7 +96,11 @@ public class ToggleContainerViewer {
     
     public void showControl() {
       gridData.exclude = false;
+      gridData.widthHint = composite.getSize().y;
       control.setVisible(true);
+      if(pack) {
+        control.pack(true);
+      }
     }
   }    
 

@@ -42,16 +42,19 @@ public class DeleteStepFeature extends DefaultDeleteFeature implements ICustomUn
       if(parentObject instanceof StepDefinition) {
         definitionContainer = (StepDefinition) parentObject ;
       }
-      deletedObject = (StepDefinition) getBusinessObjectForPictogramElement(context.getPictogramElement());
-      
-      super.delete(context);
-      
-      // Call redo, which contains the model-update only
-      redo(context);
-      
-      // When deleting, force a re-layout of the parent container after shape has been removed
-      if(context.getPictogramElement() instanceof ContainerShape) {
-        getFormLayouter().relayout(parent, (KickstartProcessFeatureProvider) getFeatureProvider());
+      Object bo = getBusinessObjectForPictogramElement(context.getPictogramElement());
+      if(bo instanceof StepDefinition) {
+        deletedObject = (StepDefinition) bo; 
+        
+        super.delete(context);
+        
+        // Call redo, which contains the model-update only
+        redo(context);
+        
+        // When deleting, force a re-layout of the parent container after shape has been removed
+        if(context.getPictogramElement() instanceof ContainerShape) {
+          getFormLayouter().relayout(parent, (KickstartProcessFeatureProvider) getFeatureProvider());
+        }
       }
     } else {
       super.delete(context);

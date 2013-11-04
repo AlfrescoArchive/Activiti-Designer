@@ -4,8 +4,7 @@ import org.activiti.designer.kickstart.process.diagram.KickstartProcessFeaturePr
 import org.activiti.designer.kickstart.process.util.StepDefinitionStyles;
 import org.activiti.designer.util.platform.OSEnum;
 import org.activiti.designer.util.platform.OSUtil;
-import org.activiti.workflow.simple.definition.ListConditionStepDefinition;
-import org.activiti.workflow.simple.definition.ParallelStepsDefinition;
+import org.activiti.workflow.simple.alfresco.step.AlfrescoReviewStepDefinition;
 import org.activiti.workflow.simple.definition.StepDefinition;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
@@ -26,22 +25,21 @@ import org.eclipse.graphiti.services.IPeCreateService;
 
 /**
  * A {@link BusinessObjectShapeController} capable of creating and updating shapes for
- * {@link ParallelStepsDefinition} objects.
+ * {@link AlfrescoReviewStepDefinition} objects.
  *  
  * @author Frederik Heremans
  */
-public class ListConditionStepShapeController extends AbstractBusinessObjectShapeController {
+public class ReviewStepShapeController extends AbstractBusinessObjectShapeController {
   
-  public ListConditionStepShapeController(KickstartProcessFeatureProvider featureProvider) {
+  public ReviewStepShapeController(KickstartProcessFeatureProvider featureProvider) {
     super(featureProvider);
   }
 
   @Override
   public boolean canControlShapeFor(Object businessObject) {
-    return businessObject instanceof ListConditionStepDefinition<?>;
+    return businessObject instanceof AlfrescoReviewStepDefinition;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public ContainerShape createShape(Object businessObject, ContainerShape layoutParent, int width, int height) {
     final IPeCreateService peCreateService = Graphiti.getPeCreateService();
@@ -50,7 +48,7 @@ public class ListConditionStepShapeController extends AbstractBusinessObjectShap
     
     Diagram diagram = getFeatureProvider().getDiagramTypeProvider().getDiagram();
     
-    ListConditionStepDefinition<StepDefinition> definition = (ListConditionStepDefinition<StepDefinition>) businessObject;
+    AlfrescoReviewStepDefinition definition = (AlfrescoReviewStepDefinition) businessObject;
 
     // If no size has been supplied, revert to the default sizes
     if(width < 0) {
@@ -65,13 +63,30 @@ public class ListConditionStepShapeController extends AbstractBusinessObjectShap
 
     // Create and set visible rectangle inside invisible rectangle
     rectangle = gaService.createRoundedRectangle(invisibleRectangle, 2, 2);
-    rectangle.setLineStyle(LineStyle.DASH);
-    rectangle.setForeground(StepDefinitionStyles.getSubtleForegroundColor(diagram));
-    rectangle.setBackground(StepDefinitionStyles.getSubtleBackgroundColor(diagram));
+    rectangle.setForeground(StepDefinitionStyles.getDefaultForegroundColor(diagram));
+    rectangle.setBackground(StepDefinitionStyles.getDefaultBackgroundColor(diagram));
     rectangle.setLineWidth(1);
     rectangle.setFilled(true);
     rectangle.setParentGraphicsAlgorithm(invisibleRectangle);
     gaService.setLocationAndSize(rectangle, 0, 0, width, height);
+    
+    Rectangle childContainerRect = gaService.createRectangle(rectangle);
+    childContainerRect.setForeground(StepDefinitionStyles.getSubtleForegroundColor(diagram));
+    childContainerRect.setBackground(StepDefinitionStyles.getSubtleBackgroundColor(diagram));
+    childContainerRect.setLineWidth(1);
+    childContainerRect.setFilled(true);
+    childContainerRect.setLineStyle(LineStyle.DASH);
+    childContainerRect.setParentGraphicsAlgorithm(rectangle);
+    gaService.setLocationAndSize(childContainerRect, 10, 30, width - 20, height - 40);
+    
+    // Add rejection label
+    final MultiText rejectText = gaService.createDefaultMultiText(diagram, childContainerRect, "Rejected");
+    rejectText.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
+    rejectText.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);
+    if (OSUtil.getOperatingSystem() == OSEnum.Mac) {
+      rejectText.setFont(gaService.manageFont(getFeatureProvider().getDiagramTypeProvider().getDiagram(), rejectText.getFont().getName(), 11));
+    }
+    gaService.setLocationAndSize(rejectText, 0, 5, width - 20, StepDefinitionStyles.DEFAULT_LABEL_HEIGHT);
     
     // Add label
     final Shape shape = peCreateService.createShape(containerShape, false);
@@ -82,6 +97,14 @@ public class ListConditionStepShapeController extends AbstractBusinessObjectShap
       text.setFont(gaService.manageFont(getFeatureProvider().getDiagramTypeProvider().getDiagram(), text.getFont().getName(), 11));
     }
     gaService.setLocationAndSize(text, 0, 5, width, StepDefinitionStyles.DEFAULT_LABEL_HEIGHT);
+    
+    // Add "process end" marker
+    Rectangle endProcessMarker = gaService.createRectangle(childContainerRect);
+    endProcessMarker.setLineVisible(false);
+    endProcessMarker.setFilled(true);
+    endProcessMarker.setBackground(StepDefinitionStyles.getSevereBackgroundColor(diagram));
+    
+    gaService.setLocationAndSize(endProcessMarker, 0, height - 45, width - 10, 5);
     
     getFeatureProvider().link(containerShape, new Object[] {definition});
     
@@ -101,7 +124,7 @@ public class ListConditionStepShapeController extends AbstractBusinessObjectShap
       }
     }
     
- // Allow quick-edit
+    // Allow quick-edit
     final IDirectEditingInfo directEditingInfo = getFeatureProvider().getDirectEditingInfo();
     // set container shape for direct editing after object creation
     directEditingInfo.setMainPictogramElement(containerShape);
@@ -110,19 +133,22 @@ public class ListConditionStepShapeController extends AbstractBusinessObjectShap
     directEditingInfo.setPictogramElement(containerShape);
     directEditingInfo.setGraphicsAlgorithm(text);
     directEditingInfo.setActive(true);
-    
     return containerShape;
   }
 
-  @SuppressWarnings("unchecked")
   @Override
   public void updateShape(ContainerShape shape, Object businessObject, int width, int height) {
-    
-    ListConditionStepDefinition<StepDefinition> step = (ListConditionStepDefinition<StepDefinition>) businessObject;
+    AlfrescoReviewStepDefinition step = (AlfrescoReviewStepDefinition) businessObject;
     // Update the label
     MultiText labelText = findNameMultiText(shape);
     if(labelText != null) {
       labelText.setValue(getLabelTextValue(step));
+    }
+    
+    GraphicsAlgorithm endMarker = getEndProcessMarker(shape);
+    
+    if(step.isEndProcessOnReject() != endMarker.getFilled()) {
+      endMarker.setFilled(step.isEndProcessOnReject());
     }
     
     boolean updateWidth = (width > 0 && width != shape.getGraphicsAlgorithm().getWidth());
@@ -134,21 +160,26 @@ public class ListConditionStepShapeController extends AbstractBusinessObjectShap
       // Resize main shape rectangle and box shape
       Rectangle invisibleRectangle = (Rectangle) shape.getGraphicsAlgorithm();
       GraphicsAlgorithm box = (GraphicsAlgorithm) invisibleRectangle.eContents().get(0);
+      GraphicsAlgorithm boxChild = (GraphicsAlgorithm) box.eContents().get(0);
       
       if(updateWidth) {
+        Shape labelShape = shape.getChildren().get(0);
+        GraphicsAlgorithm boxLabelShape = (GraphicsAlgorithm) boxChild.eContents().get(0);
+        
         gaService.setWidth(invisibleRectangle, width);
         gaService.setWidth(box, width);
-        
-        // Resize label shape 
-        Shape labelShape = shape.getChildren().get(0);
-        gaService.setWidth(labelShape.getGraphicsAlgorithm(), width);
+        gaService.setWidth(boxChild, width - 20);
+        gaService.setWidth(labelShape.getGraphicsAlgorithm(), width - 20);
+        gaService.setWidth(boxLabelShape, width - 40);
+        gaService.setWidth(endMarker, width - 20);
       }
       
       if(updateHeight) {
         gaService.setHeight(invisibleRectangle, height);
         gaService.setHeight(box, height);
+        gaService.setHeight(boxChild, height - 40);
+        gaService.setLocation(endMarker, 0, height - 45);
       }
-      
     }
   }
   
@@ -158,9 +189,8 @@ public class ListConditionStepShapeController extends AbstractBusinessObjectShap
   }
   
   @Override
-  @SuppressWarnings("unchecked")
   public boolean isShapeUpdateNeeded(ContainerShape shape, Object businessObject) {
-    ListConditionStepDefinition<StepDefinition> step = (ListConditionStepDefinition<StepDefinition>) businessObject;
+    AlfrescoReviewStepDefinition step = (AlfrescoReviewStepDefinition) businessObject;
     
     // Check label text
     String currentLabel = (String) extractShapeData(LABEL_DATA_KEY, shape);
@@ -168,14 +198,24 @@ public class ListConditionStepShapeController extends AbstractBusinessObjectShap
     if(!StringUtils.equals(currentLabel, newLabel)) {
       return true;
     }
+    
+    // Check end-marker
+    GraphicsAlgorithm endMarker = getEndProcessMarker(shape);
+    if(endMarker != null) {
+      return step.isEndProcessOnReject() != endMarker.getFilled();
+    }
     return false;
   }
   
-  protected String getLabelTextValue(ListConditionStepDefinition<StepDefinition> definition) {
+  protected GraphicsAlgorithm getEndProcessMarker(ContainerShape shape) {
+    return (GraphicsAlgorithm) shape.getGraphicsAlgorithm().eContents().get(0).eContents().get(0).eContents().get(1);
+  }
+  
+  protected String getLabelTextValue(AlfrescoReviewStepDefinition definition) {
     if(definition.getName() != null) {
       return definition.getName();
     } else {
-      return "Nameless choice";
+      return "Nameless review";
     }
   }
 }

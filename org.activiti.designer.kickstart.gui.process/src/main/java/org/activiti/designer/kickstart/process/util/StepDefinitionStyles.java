@@ -26,6 +26,7 @@ public final class StepDefinitionStyles {
   private static final IColorConstant SUBTLE_FOREGROUND_COLOR = new ColorConstant(200, 200, 200);
   private static final IColorConstant DEFAULT_BACKGROUND_COLOR = new ColorConstant(255, 255, 255);
   private static final IColorConstant SUBTLE_BACKGROUND_COLOR = new ColorConstant(240, 240, 240);
+  private static final IColorConstant SEVERE_BACKGROUND_COLOR = new ColorConstant(211, 95, 95);
 
   // Sizes for components
   public static final int DEFAULT_COMPONENT_WIDTH = 600;
@@ -69,6 +70,11 @@ public final class StepDefinitionStyles {
   
   public static Color getDefaultBackgroundColor(Diagram diagram) {
     return Graphiti.getGaService().manageColor(diagram, DEFAULT_BACKGROUND_COLOR);
+  }
+
+  public static Color getSevereBackgroundColor(Diagram diagram) {
+    // TODO Auto-generated method stub
+    return Graphiti.getGaService().manageColor(diagram, SEVERE_BACKGROUND_COLOR);
   }
   
 }

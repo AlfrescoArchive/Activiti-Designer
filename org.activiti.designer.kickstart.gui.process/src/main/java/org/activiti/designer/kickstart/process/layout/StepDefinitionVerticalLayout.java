@@ -29,6 +29,7 @@ public class StepDefinitionVerticalLayout implements ProcessComponentLayout {
   private int horizontalPadding = 20;
   private int verticalSpacing = 10;
   private int topPadding = 10;
+  private int bottomPadding = 0;
   private boolean skipFirstShape = false;
   
   public void relayout(KickstartProcessLayouter layouter, ContainerShape targetContainer) {
@@ -71,7 +72,7 @@ public class StepDefinitionVerticalLayout implements ProcessComponentLayout {
     }
     
     if(updateGraphicsAllowed) {
-      height = Math.max(height, StepDefinitionStyles.DEFAULT_COMPONENT_BOX_HEIGHT);
+      height = Math.max(height + bottomPadding, StepDefinitionStyles.DEFAULT_COMPONENT_BOX_HEIGHT);
       if(targetContainer.getGraphicsAlgorithm().getHeight() != height) {
         // Also, request an update of the shape itself, adapting it to the available height
         Object bo = featureProvider.getBusinessObjectForPictogramElement(targetContainer);
@@ -169,5 +170,11 @@ public class StepDefinitionVerticalLayout implements ProcessComponentLayout {
   
   protected int getFirstIndex() {
     return skipFirstShape ? 1 : 0;
+  }
+
+
+  public void setBottomPadding(int bottomPadding) {
+    this.bottomPadding = bottomPadding;
+    
   }
 }

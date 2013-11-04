@@ -1,14 +1,22 @@
 package org.activiti.designer.kickstart.util;
 
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.activiti.workflow.simple.alfresco.conversion.json.AlfrescoSimpleWorkflowJsonConverter;
-import org.activiti.workflow.simple.definition.HumanStepDefinition;
+import org.activiti.workflow.simple.definition.AbstractConditionStepListContainer;
+import org.activiti.workflow.simple.definition.AbstractStepDefinitionContainer;
+import org.activiti.workflow.simple.definition.AbstractStepListContainer;
+import org.activiti.workflow.simple.definition.FormStepDefinition;
+import org.activiti.workflow.simple.definition.ListConditionStepDefinition;
+import org.activiti.workflow.simple.definition.ListStepDefinition;
+import org.activiti.workflow.simple.definition.NamedStepDefinition;
 import org.activiti.workflow.simple.definition.StepDefinition;
 import org.activiti.workflow.simple.definition.WorkflowDefinition;
 import org.activiti.workflow.simple.definition.form.FormDefinition;
@@ -24,7 +32,7 @@ import org.eclipse.core.runtime.Path;
 public class FormReferenceReader {
 
   private boolean startFormAdded = false;
-  private Set<HumanStepDefinition> definitionsTouched = new HashSet<HumanStepDefinition>();
+  private Set<StepDefinition> definitionsTouched = new HashSet<StepDefinition>();
   private WorkflowDefinition definition;
   private IProject project;
   private AlfrescoSimpleWorkflowJsonConverter converter;
@@ -39,24 +47,49 @@ public class FormReferenceReader {
   public Map<String, FormDefinition> getReferencedForms() {
     Map<String, FormDefinition> definitions = new HashMap<String, FormDefinition>();
     try {
-      for (StepDefinition step : definition.getSteps()) {
-        if (step instanceof HumanStepDefinition) {
-          HumanStepDefinition humanStep = (HumanStepDefinition) step;
-
-          if (humanStep.getParameters().containsKey(KickstartConstants.PARAMETER_FORM_REFERENCE)) {
-            String formPath = (String) humanStep.getParameters().get(KickstartConstants.PARAMETER_FORM_REFERENCE);
-            IFile formFile = project.getFile(new Path(formPath));
-            FormDefinition form = converter.readFormDefinition(new FileInputStream(formFile.getLocation().toFile()));
-            definitions.put(humanStep.getName(), form);
-          }
-        }
-      }
+      addReferencedForms(definition.getSteps(), definitions, false);
     } catch (IOException ioe) {
       throw new RuntimeException("Error while getting referenced forms: " + ioe);
     }
     return definitions;
   }
 
+  @SuppressWarnings({ "unchecked", "rawtypes" })
+  protected void addReferencedForms(List<StepDefinition> steps, Map<String, FormDefinition> definitions, boolean applyToModel) throws FileNotFoundException {
+    for (StepDefinition step : steps) {
+      if (step instanceof FormStepDefinition) {
+        FormStepDefinition formStep = (FormStepDefinition) step;
+        if (formStep.getParameters().containsKey(KickstartConstants.PARAMETER_FORM_REFERENCE)) {
+          String formPath = (String) formStep.getParameters().get(KickstartConstants.PARAMETER_FORM_REFERENCE);
+          IFile formFile = project.getFile(new Path(formPath));
+          FormDefinition form = converter.readFormDefinition(new FileInputStream(formFile.getLocation().toFile()));
+
+          // Add to result map, if needed
+          if(definitions != null) {
+            definitions.put(((NamedStepDefinition) formStep).getName(), form);
+          }
+          
+          if(applyToModel) {
+            definitionsTouched.add(step);
+            formStep.setForm(form);
+          }
+        }
+      } else if(step instanceof AbstractStepListContainer<?>) {
+        List<ListStepDefinition<?>> stepList = ((AbstractStepListContainer) step).getStepList();
+        for(ListStepDefinition<?> list : stepList) {
+          addReferencedForms(list.getSteps(), definitions, applyToModel);
+        }
+      } else if(step instanceof AbstractConditionStepListContainer<?>) {
+        List<ListConditionStepDefinition<?>> stepList = ((AbstractConditionStepListContainer) step).getStepList();
+        for(ListConditionStepDefinition<?> list : stepList) {
+          addReferencedForms(list.getSteps(), definitions, applyToModel);
+        }
+      } else if(step instanceof AbstractStepDefinitionContainer<?>) {
+        addReferencedForms(((AbstractStepDefinitionContainer) step).getSteps(), definitions, applyToModel);
+      }
+    }
+  }
+  
   public FormDefinition getReferenceStartForm() {
     try {
       if (definition.getParameters().containsKey(KickstartConstants.PARAMETER_FORM_REFERENCE)) {
@@ -81,26 +114,7 @@ public class FormReferenceReader {
         definition.setStartFormDefinition(getReferenceStartForm());
       }
 
-      // Add all forms
-      for (StepDefinition step : definition.getSteps()) {
-        if (step instanceof HumanStepDefinition) {
-          HumanStepDefinition humanStep = (HumanStepDefinition) step;
-
-          // TODO: REMOVE
-          if (humanStep.getId() == null) {
-            humanStep.setId(humanStep.getName().replace(" ", "").toLowerCase());
-          }
-
-          if (humanStep.getParameters().containsKey(KickstartConstants.PARAMETER_FORM_REFERENCE)) {
-            String formPath = (String) humanStep.getParameters().get(KickstartConstants.PARAMETER_FORM_REFERENCE);
-            IFile formFile = project.getFile(new Path(formPath));
-            FormDefinition form = converter.readFormDefinition(new FileInputStream(formFile.getLocation().toFile()));
-            humanStep.setForm(form);
-
-            definitionsTouched.add(humanStep);
-          }
-        }
-      }
+      addReferencedForms(definition.getSteps(), null, true);
     } catch (IOException ioe) {
       throw new RuntimeException("Error while merging forms into workflow definition: " + ioe);
     }
@@ -111,8 +125,10 @@ public class FormReferenceReader {
       definition.setStartFormDefinition(null);
     }
 
-    for (HumanStepDefinition step : definitionsTouched) {
-      step.setForm(null);
+    for (StepDefinition step : definitionsTouched) {
+      if(step instanceof FormStepDefinition) {
+        ((FormStepDefinition) step).setForm(null);
+      }
     }
   }
 }
