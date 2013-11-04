@@ -9,8 +9,10 @@ import org.activiti.designer.kickstart.form.command.KickstartModelUpdater;
 import org.activiti.designer.kickstart.form.diagram.layout.KickstartFormLayouter;
 import org.activiti.designer.kickstart.form.diagram.shape.BooleanPropertyShapeController;
 import org.activiti.designer.kickstart.form.diagram.shape.BusinessObjectShapeController;
+import org.activiti.designer.kickstart.form.diagram.shape.CommentPropertyShapeController;
 import org.activiti.designer.kickstart.form.diagram.shape.DatePropertyShapeController;
 import org.activiti.designer.kickstart.form.diagram.shape.DueDatePropertyShapeController;
+import org.activiti.designer.kickstart.form.diagram.shape.EmailNotificationPropertyShapeController;
 import org.activiti.designer.kickstart.form.diagram.shape.ListPropertyShapeController;
 import org.activiti.designer.kickstart.form.diagram.shape.NumberPropertyShapeController;
 import org.activiti.designer.kickstart.form.diagram.shape.PackageItemsPropertyShapeController;
@@ -21,9 +23,11 @@ import org.activiti.designer.kickstart.form.diagram.shape.TextPropertyShapeContr
 import org.activiti.designer.kickstart.form.diagram.shape.WorkflowDescriptionShapeController;
 import org.activiti.designer.kickstart.form.features.AddFormComponentFeature;
 import org.activiti.designer.kickstart.form.features.CreateBooleanPropertyFeature;
+import org.activiti.designer.kickstart.form.features.CreateCommentPropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateContentSelectPropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateDatePropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateDueDatePropertyFeature;
+import org.activiti.designer.kickstart.form.features.CreateEmailNotificationPropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateFormGroupFeature;
 import org.activiti.designer.kickstart.form.features.CreateGroupSelectPropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateListPropertyFeature;
@@ -85,6 +89,8 @@ public class KickstartFormFeatureProvider extends DefaultFeatureProvider {
 
 		// Fixed elements
 		shapeControllers.add(new DueDatePropertyShapeController(this));
+		shapeControllers.add(new CommentPropertyShapeController(this));
+		shapeControllers.add(new EmailNotificationPropertyShapeController(this));
 		shapeControllers.add(new PackageItemsPropertyShapeController(this));
 		shapeControllers.add(new PriorityPropertyShapeController(this));
 		shapeControllers.add(new WorkflowDescriptionShapeController(this));
@@ -141,7 +147,7 @@ public class KickstartFormFeatureProvider extends DefaultFeatureProvider {
 	      new CreateDatePropertyFeature(this), new CreateBooleanPropertyFeature(this), new CreateFormGroupFeature(this), new CreateListPropertyFeature(this),
 	      new CreatePeopleSelectPropertyFeature(this), new CreateGroupSelectPropertyFeature(this), new CreateContentSelectPropertyFeature(this),
 	      new CreateDueDatePropertyFeature(this), new CreatePackageItemsPropertyFeature(this), new CreatePriorityPropertyFeature(this),
-	      new CreateWorkflowDescriptionPropertyFeature(this), new CreateReferencePropertyFeature(this)
+	      new CreateWorkflowDescriptionPropertyFeature(this), new CreateCommentPropertyFeature(this), new CreateEmailNotificationPropertyFeature(this), new CreateReferencePropertyFeature(this)
 	  };
 	}
 	

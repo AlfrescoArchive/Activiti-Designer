@@ -6,9 +6,11 @@ import java.util.Set;
 import org.activiti.designer.eclipse.Logger;
 import org.activiti.designer.kickstart.form.diagram.shape.BusinessObjectShapeController;
 import org.activiti.designer.kickstart.form.features.CreateBooleanPropertyFeature;
+import org.activiti.designer.kickstart.form.features.CreateCommentPropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateContentSelectPropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateDatePropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateDueDatePropertyFeature;
+import org.activiti.designer.kickstart.form.features.CreateEmailNotificationPropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateFormGroupFeature;
 import org.activiti.designer.kickstart.form.features.CreateGroupSelectPropertyFeature;
 import org.activiti.designer.kickstart.form.features.CreateListPropertyFeature;
@@ -57,6 +59,8 @@ public class KickstartFormToolBehaviorProvider extends DefaultToolBehaviorProvid
     fixedToolClasses.add(CreatePriorityPropertyFeature.class);
     fixedToolClasses.add(CreatePackageItemsPropertyFeature.class);
     fixedToolClasses.add(CreateWorkflowDescriptionPropertyFeature.class);
+    fixedToolClasses.add(CreateCommentPropertyFeature.class);
+    fixedToolClasses.add(CreateEmailNotificationPropertyFeature.class);
     fixedToolClasses.add(CreateReferencePropertyFeature.class);
     
     containerToolClasses.add(CreateFormGroupFeature.class);

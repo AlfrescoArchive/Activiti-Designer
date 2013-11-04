@@ -140,6 +140,18 @@
                 id="org.activiti.designer.kickstart.generalTab.contentSelect"
                 tab="org.activiti.designer.kickstart.generalTab">
           </propertySection>
+          <propertySection
+                class="org.activiti.designer.kickstart.form.property.EmailNotificationPropertySection"
+                filter="org.activiti.designer.kickstart.form.property.EmailNotificationPropertyFilter"
+                id="org.activiti.designer.kickstart.generalTab.emailNotifications"
+                tab="org.activiti.designer.kickstart.generalTab">
+          </propertySection>
+          <propertySection
+                class="org.activiti.designer.kickstart.form.property.CommentPropertySection"
+                filter="org.activiti.designer.kickstart.form.property.CommentPropertyFilter"
+                id="org.activiti.designer.kickstart.generalTab.comment"
+                tab="org.activiti.designer.kickstart.generalTab">
+          </propertySection>
       </propertySections>
    </extension>
 
