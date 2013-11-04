@@ -4,7 +4,7 @@ package org.activiti.designer.controller;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
-import org.eclipse.graphiti.mm.pictograms.Shape;
+import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 
 /**
  * Interface describing a controller capable of creating and updating
@@ -24,7 +24,7 @@ public interface BusinessObjectShapeController {
    * @return true, if the values in the given businessObject differ from the corresponding
    * values found in the given shape.
    */
-  boolean isShapeUpdateNeeded(ContainerShape shape, Object businessObject);
+  boolean isShapeUpdateNeeded(PictogramElement element, Object businessObject);
   
   /**
    * @param businessObject object to create shape for
@@ -33,7 +33,7 @@ public interface BusinessObjectShapeController {
    * @param height the preferred height, can be ignored by implementations.
    * @return new shape, representing the given business-object.
    */
-  ContainerShape createShape(Object businessObject, ContainerShape layoutParent, int width, int height, IAddContext context);
+  PictogramElement createShape(Object businessObject, ContainerShape layoutParent, int width, int height, IAddContext context);
   
   /**
    * @param businessObject object to update shape for
@@ -41,7 +41,7 @@ public interface BusinessObjectShapeController {
    * @param width the preferred width, can be ignored by implementations.
    * @param height the preferred height, can be ignored by implementations.
    */
-  void updateShape(ContainerShape shape, Object businessObject, int width, int height);
+  void updateShape(PictogramElement element, Object businessObject, int width, int height);
   
   /**
    * Extract data from the given shape, hiding away any complexity related to child-shape iteration
@@ -53,12 +53,12 @@ public interface BusinessObjectShapeController {
    * @return the shape data value that can be extracted from the given shape for the given key. Returns
    * null if the data cannot be extracted or if the data is null.
    */
-  Object extractShapeData(String key, Shape shape);
+  Object extractShapeData(String key, PictogramElement element);
   
   /**
    * @param container
    * @return the graphics algorithm that should be used to position the default direct editor for
    * the given container shape.
    */
-   GraphicsAlgorithm getGraphicsAlgorithmForDirectEdit(ContainerShape container);
+   GraphicsAlgorithm getGraphicsAlgorithmForDirectEdit(PictogramElement element);
 }

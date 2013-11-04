@@ -32,7 +32,7 @@ public class AddBaseElementFeature extends AbstractAddShapeFeature {
         .getShapeController(context.getNewObject());
    
     // Request a new shape from the controller
-    final ContainerShape containerShape = shapeController.createShape(context.getNewObject(), 
+    final PictogramElement containerShape = shapeController.createShape(context.getNewObject(), 
         parent, context.getWidth(), context.getHeight(), context);
         
     // Create link between shape and business object

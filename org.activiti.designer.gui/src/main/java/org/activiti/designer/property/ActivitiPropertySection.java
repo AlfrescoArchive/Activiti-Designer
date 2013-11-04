@@ -53,7 +53,7 @@ public abstract class ActivitiPropertySection extends BaseActivitiPropertySectio
   /**
    * Cached updater.
    */
-  private BpmnProcessModelUpdater<?> currentUpdater;
+  private BpmnProcessModelUpdater currentUpdater;
   
   /**
    * Shared focus-listener added to all controls created. Makes sure value-updates are performed
@@ -205,7 +205,7 @@ public abstract class ActivitiPropertySection extends BaseActivitiPropertySectio
         try {
           modelChangesEnabled = false;
           
-          BpmnProcessModelUpdater<?> updater = getModelUpdater();
+          BpmnProcessModelUpdater updater = getModelUpdater();
 
           // Perform the changes on the updatable BO instead of the original
           Object updatableBo = updater.getUpdatableBusinessObject();
@@ -242,7 +242,7 @@ public abstract class ActivitiPropertySection extends BaseActivitiPropertySectio
   /**
    * @return an {@link UpdateBusinessObjectCommand} that will be used to record model updates. 
    */
-  protected BpmnProcessModelUpdater<?> createModelUpdater() {
+  protected BpmnProcessModelUpdater createModelUpdater() {
     PictogramElement element = getSelectedPictogramElement();
     ActivitiBPMNFeatureProvider featureProvider = getFeatureProvider(element);
     if (featureProvider != null) {
@@ -259,7 +259,7 @@ public abstract class ActivitiPropertySection extends BaseActivitiPropertySectio
     }
   }
   
-  protected BpmnProcessModelUpdater<?> getModelUpdater() {
+  protected BpmnProcessModelUpdater getModelUpdater() {
     if(currentUpdater == null) {
       currentUpdater = createModelUpdater();
     }

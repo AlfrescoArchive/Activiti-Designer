@@ -8,6 +8,7 @@ import org.activiti.bpmn.model.MessageEventDefinition;
 import org.activiti.bpmn.model.SignalEventDefinition;
 import org.activiti.bpmn.model.StartEvent;
 import org.activiti.bpmn.model.Task;
+import org.activiti.bpmn.model.TerminateEventDefinition;
 import org.activiti.bpmn.model.TimerEventDefinition;
 import org.activiti.designer.PluginImage;
 import org.activiti.designer.diagram.ActivitiBPMNFeatureProvider;
@@ -20,6 +21,7 @@ import org.eclipse.graphiti.mm.algorithms.Image;
 import org.eclipse.graphiti.mm.pictograms.BoxRelativeAnchor;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
+import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
@@ -48,7 +50,7 @@ public class EventShapeController extends AbstractBusinessObjectShapeController 
   }
 
   @Override
-  public ContainerShape createShape(Object businessObject, ContainerShape layoutParent, int width, int height, IAddContext context) {
+  public PictogramElement createShape(Object businessObject, ContainerShape layoutParent, int width, int height, IAddContext context) {
     final IPeCreateService peCreateService = Graphiti.getPeCreateService();
     final ContainerShape containerShape = peCreateService.createContainerShape(layoutParent, true);
     final IGaService gaService = Graphiti.getGaService();
@@ -101,6 +103,8 @@ public class EventShapeController extends AbstractBusinessObjectShapeController 
         image = gaService.createImage(shape, PluginImage.IMG_EVENT_ERROR.getImageKey());
       } else if (eventDefinition instanceof SignalEventDefinition) {
         image = gaService.createImage(shape, PluginImage.IMG_EVENT_SIGNAL.getImageKey());
+      } else if (eventDefinition instanceof TerminateEventDefinition) {
+        image = gaService.createImage(shape, PluginImage.IMG_EVENT_TERMINATE.getImageKey());
       }
       
       if (image != null) {
@@ -115,17 +119,17 @@ public class EventShapeController extends AbstractBusinessObjectShapeController 
   }
   
   @Override
-  public void updateShape(ContainerShape shape, Object businessObject, int width, int height) {
+  public void updateShape(PictogramElement element, Object businessObject, int width, int height) {
     // nothing to do
   }
   
   @Override
-  public GraphicsAlgorithm getGraphicsAlgorithmForDirectEdit(ContainerShape container) {
-    return container.getChildren().get(0).getGraphicsAlgorithm();
+  public GraphicsAlgorithm getGraphicsAlgorithmForDirectEdit(PictogramElement element) {
+    return ((ContainerShape) element).getChildren().get(0).getGraphicsAlgorithm();
   }
   
   @Override
-  public boolean isShapeUpdateNeeded(ContainerShape shape, Object businessObject) {
+  public boolean isShapeUpdateNeeded(PictogramElement element, Object businessObject) {
     return false;
   }
 }

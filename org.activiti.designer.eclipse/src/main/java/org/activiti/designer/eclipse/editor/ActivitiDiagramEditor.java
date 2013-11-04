@@ -552,7 +552,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 
               if (addFeature.canAdd(boundaryContext)) {
                 PictogramElement newBoundaryContainer = addFeature.add(boundaryContext);
-                featureProvider.link(newBoundaryContainer, new Object[] { boundaryEvent });
+                //featureProvider.link(newBoundaryContainer, new Object[] { boundaryEvent });
               }
             }
           }

@@ -12,9 +12,9 @@ import org.eclipse.emf.transaction.TransactionalEditingDomain;
  */
 public class UpdateBusinessObjectCommand extends AbstractOverrideableCommand {
 
-  private BpmnProcessModelUpdater<?> updater;
+  private BpmnProcessModelUpdater updater;
 
-  public UpdateBusinessObjectCommand(EditingDomain domain, BpmnProcessModelUpdater<?> updater) {
+  public UpdateBusinessObjectCommand(EditingDomain domain, BpmnProcessModelUpdater updater) {
     super(domain);
     this.updater = updater;
   } 

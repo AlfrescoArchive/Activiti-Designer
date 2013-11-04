@@ -52,7 +52,7 @@ public class PropertyMultiInstanceSection extends ActivitiPropertySection implem
     MultiInstanceLoopCharacteristics multiInstanceDef = activity.getLoopCharacteristics();
     if (multiInstanceDef != null) {
       if (control == sequentialCombo) {
-        return multiInstanceDef.isSequential();
+        return String.valueOf(multiInstanceDef.isSequential());
       } else if (control == loopCardinaltyText) {
         return multiInstanceDef.getLoopCardinality();
       } else if (control == collectionText) {

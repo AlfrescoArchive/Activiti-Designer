@@ -1,6 +1,6 @@
 package org.activiti.designer.controller;
 
-import org.activiti.bpmn.model.ExclusiveGateway;
+import org.activiti.bpmn.model.InclusiveGateway;
 import org.activiti.bpmn.model.Task;
 import org.activiti.designer.diagram.ActivitiBPMNFeatureProvider;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
@@ -11,12 +11,10 @@ import org.eclipse.graphiti.mm.algorithms.Ellipse;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.algorithms.MultiText;
 import org.eclipse.graphiti.mm.algorithms.Polygon;
-import org.eclipse.graphiti.mm.algorithms.Polyline;
 import org.eclipse.graphiti.mm.pictograms.BoxRelativeAnchor;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
@@ -26,15 +24,15 @@ import org.eclipse.graphiti.services.IPeCreateService;
  *  
  * @author Tijs Rademakers
  */
-public class ExclusiveGatewayShapeController extends AbstractBusinessObjectShapeController {
+public class InclusiveGatewayShapeController extends AbstractBusinessObjectShapeController {
   
-  public ExclusiveGatewayShapeController(ActivitiBPMNFeatureProvider featureProvider) {
+  public InclusiveGatewayShapeController(ActivitiBPMNFeatureProvider featureProvider) {
     super(featureProvider);
   }
 
   @Override
   public boolean canControlShapeFor(Object businessObject) {
-    if (businessObject instanceof ExclusiveGateway) {
+    if (businessObject instanceof InclusiveGateway) {
       return true;
     } else {
       return false;
@@ -60,26 +58,24 @@ public class ExclusiveGatewayShapeController extends AbstractBusinessObjectShape
     invisiblePolygon.setLineVisible(false);
     gaService.setLocationAndSize(invisiblePolygon, context.getX(), context.getY(), width, height);
 
-    // create and set visible circle inside invisible circle
+    // create and set visible polygon inside invisible polygon
     Polygon polygon = gaService.createPolygon(invisiblePolygon, xy);
     polygon.setParentGraphicsAlgorithm(invisiblePolygon);
     polygon.setStyle(StyleUtil.getStyleForEvent(diagram));
     gaService.setLocationAndSize(polygon, 0, 0, width, height);
-    
-    Shape shape = peCreateService.createShape(containerShape, false);
-      
-    Polyline polyline = gaService.createPolyline(shape, new int[] { width - 10, 10, 10, height - 10 });
-    polyline.setLineWidth(5);
-    polyline.setStyle(StyleUtil.getStyleForEvent(diagram));
-    
-    shape = peCreateService.createShape(containerShape, false);
-    polyline = gaService.createPolyline(shape, new int[] { 10, 10, width - 10, height - 10});
-    polyline.setLineWidth(5);
-    polyline.setStyle(StyleUtil.getStyleForEvent(diagram));
 
+    // This draws the circle inside the rhombus
+    
+    // create and set the circle inside the polygon
+    final Ellipse circle = gaService.createEllipse(polygon);
+    circle.setStyle(StyleUtil.getStyleForEvent(diagram));
+    circle.setLineWidth(3);
+    circle.setParentGraphicsAlgorithm(polygon);
+    gaService.setLocationAndSize(circle, 10, 10, 20, 20);
+    
     // add a chopbox anchor to the shape
     peCreateService.createChopboxAnchor(containerShape);
-    BoxRelativeAnchor boxAnchor = peCreateService.createBoxRelativeAnchor(containerShape);
+    final BoxRelativeAnchor boxAnchor = peCreateService.createBoxRelativeAnchor(containerShape);
     boxAnchor.setRelativeWidth(0.51);
     boxAnchor.setRelativeHeight(0.10);
     boxAnchor.setReferencedGraphicsAlgorithm(polygon);
@@ -88,11 +84,11 @@ public class ExclusiveGatewayShapeController extends AbstractBusinessObjectShape
 
     // add a another chopbox anchor to the shape
     peCreateService.createChopboxAnchor(containerShape);
-    boxAnchor = peCreateService.createBoxRelativeAnchor(containerShape);
-    boxAnchor.setRelativeWidth(0.51);
-    boxAnchor.setRelativeHeight(0.93);
-    boxAnchor.setReferencedGraphicsAlgorithm(polygon);
-    ellipse = ActivitiUiUtil.createInvisibleEllipse(boxAnchor, gaService);
+    final BoxRelativeAnchor boxAnchor2 = peCreateService.createBoxRelativeAnchor(containerShape);
+    boxAnchor2.setRelativeWidth(0.51);
+    boxAnchor2.setRelativeHeight(0.93);
+    boxAnchor2.setReferencedGraphicsAlgorithm(polygon);
+    ellipse = ActivitiUiUtil.createInvisibleEllipse(boxAnchor2, gaService);
     gaService.setLocationAndSize(ellipse, 0, 0, 0, 0);
 
     return containerShape;
@@ -100,7 +96,7 @@ public class ExclusiveGatewayShapeController extends AbstractBusinessObjectShape
   
   @Override
   public void updateShape(PictogramElement element, Object businessObject, int width, int height) {
-    ExclusiveGateway gateway = (ExclusiveGateway) businessObject;
+    InclusiveGateway gateway = (InclusiveGateway) businessObject;
     
     // Update the label
     MultiText labelText = findNameMultiText(element);
@@ -116,7 +112,7 @@ public class ExclusiveGatewayShapeController extends AbstractBusinessObjectShape
   
   @Override
   public boolean isShapeUpdateNeeded(PictogramElement element, Object businessObject) {
-    ExclusiveGateway gateway = (ExclusiveGateway) businessObject;
+    InclusiveGateway gateway = (InclusiveGateway) businessObject;
     
     // Check label text
     String currentLabel = (String) extractShapeData(LABEL_DATA_KEY, element);

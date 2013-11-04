@@ -1,20 +1,19 @@
 package org.activiti.designer.controller;
 
-import org.activiti.bpmn.model.BoundaryEvent;
-import org.activiti.bpmn.model.ErrorEventDefinition;
+import org.activiti.bpmn.model.Event;
 import org.activiti.bpmn.model.EventDefinition;
-import org.activiti.bpmn.model.MessageEventDefinition;
 import org.activiti.bpmn.model.SignalEventDefinition;
 import org.activiti.bpmn.model.Task;
-import org.activiti.bpmn.model.TimerEventDefinition;
+import org.activiti.bpmn.model.ThrowEvent;
 import org.activiti.designer.PluginImage;
 import org.activiti.designer.diagram.ActivitiBPMNFeatureProvider;
+import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.style.StyleUtil;
-import org.eclipse.graphiti.datatypes.ILocation;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.mm.algorithms.Ellipse;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.algorithms.Image;
+import org.eclipse.graphiti.mm.pictograms.BoxRelativeAnchor;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
@@ -28,18 +27,17 @@ import org.eclipse.graphiti.services.IPeCreateService;
  *  
  * @author Tijs Rademakers
  */
-public class BoundaryEventShapeController extends AbstractBusinessObjectShapeController {
+public class ThrowEventShapeController extends AbstractBusinessObjectShapeController {
   
   private static final int IMAGE_SIZE = 20;
-  private static final int EVENT_SIZE = 30;
   
-  public BoundaryEventShapeController(ActivitiBPMNFeatureProvider featureProvider) {
+  public ThrowEventShapeController(ActivitiBPMNFeatureProvider featureProvider) {
     super(featureProvider);
   }
 
   @Override
   public boolean canControlShapeFor(Object businessObject) {
-    if (businessObject instanceof BoundaryEvent) {
+    if (businessObject instanceof ThrowEvent) {
       return true;
     } else {
       return false;
@@ -49,74 +47,65 @@ public class BoundaryEventShapeController extends AbstractBusinessObjectShapeCon
   @Override
   public PictogramElement createShape(Object businessObject, ContainerShape layoutParent, int width, int height, IAddContext context) {
     final IPeCreateService peCreateService = Graphiti.getPeCreateService();
+    final ContainerShape containerShape = peCreateService.createContainerShape(layoutParent, true);
     final IGaService gaService = Graphiti.getGaService();
     
     Diagram diagram = getFeatureProvider().getDiagramTypeProvider().getDiagram();
     
-    final BoundaryEvent addedEvent = (BoundaryEvent) context.getNewObject();
-    ContainerShape parent = context.getTargetContainer();
-    int x = context.getX();
-    int y = context.getY();
-
-    ILocation shapeLocation = Graphiti.getLayoutService().getLocationRelativeToDiagram(parent);
-    x += shapeLocation.getX();
-    y += shapeLocation.getY();
+    final Event addedEvent = (Event) businessObject;
     
-    parent = diagram;
-    
-    final ContainerShape containerShape = peCreateService.createContainerShape(parent, true);
-
     // check whether the context has a size (e.g. from a create feature)
     // otherwise define a default size for the shape
-    width = width <= 0 ? EVENT_SIZE : width;
-    height = height <= 0 ? EVENT_SIZE : height;
+    width = width <= 35 ? 35 : width;
+    height = height <= 35 ? 35 : height;
 
     final Ellipse invisibleCircle = gaService.createEllipse(containerShape);
     invisibleCircle.setFilled(false);
     invisibleCircle.setLineVisible(false);
-    gaService.setLocationAndSize(invisibleCircle, x, y, width, height);
+    gaService.setLocationAndSize(invisibleCircle, context.getX(), context.getY(), width, height);
 
     // create and set visible circle inside invisible circle
     Ellipse circle = gaService.createEllipse(invisibleCircle);
     circle.setParentGraphicsAlgorithm(invisibleCircle);
     circle.setStyle(StyleUtil.getStyleForEvent(diagram));
     gaService.setLocationAndSize(circle, 0, 0, width, height);
-
+    
+    // add another circle
     Ellipse secondCircle = gaService.createEllipse(circle);
     secondCircle.setParentGraphicsAlgorithm(circle);
     secondCircle.setStyle(StyleUtil.getStyleForEvent(diagram));
-    gaService.setLocationAndSize(secondCircle, 3, 3, width - 6, height - 6);
-    
-    String imageKey = getImageKey(addedEvent);
-    if (imageKey != null) {
-      final Shape shape = peCreateService.createShape(containerShape, false);
-      final Image image = gaService.createImage(shape, imageKey);
-      image.setWidth(IMAGE_SIZE);
-      image.setHeight(IMAGE_SIZE);
-      gaService.setLocationAndSize(image, (width - IMAGE_SIZE) / 2, (height - IMAGE_SIZE) / 2, IMAGE_SIZE, IMAGE_SIZE);
-    }
+    gaService.setLocationAndSize(secondCircle, 2, 2, width - 4, height - 4);
 
     // add a chopbox anchor to the shape
     peCreateService.createChopboxAnchor(containerShape);
+    
+    // create an additional box relative anchor at middle-right
+    final BoxRelativeAnchor boxAnchor = peCreateService.createBoxRelativeAnchor(containerShape);
+    boxAnchor.setRelativeWidth(1.0);
+    boxAnchor.setRelativeHeight(0.51);
+    boxAnchor.setReferencedGraphicsAlgorithm(circle);
+    final Ellipse ellipse = ActivitiUiUtil.createInvisibleEllipse(boxAnchor, gaService);
+    gaService.setLocationAndSize(ellipse, 0, 0, 0, 0);
 
-    return containerShape;
-  }
+    if (addedEvent.getEventDefinitions().size() > 0) {
+      EventDefinition eventDefinition = addedEvent.getEventDefinitions().get(0);
+      final Shape shape = peCreateService.createShape(containerShape, false);
+      Image image = null;
+      if (eventDefinition instanceof SignalEventDefinition) {
+        image = gaService.createImage(shape, PluginImage.IMG_THROW_SIGNAL.getImageKey());
+      } else {
+        image = gaService.createImage(shape, PluginImage.IMG_THROW_NONE.getImageKey());
+      }
+      
+      if (image != null) {
+        image.setWidth(IMAGE_SIZE);
+        image.setHeight(IMAGE_SIZE);
   
-  protected String getImageKey(BoundaryEvent event) {
-    String imageKey = null;
-    if (event.getEventDefinitions().size() > 0) {
-      EventDefinition eventDefinition = event.getEventDefinitions().get(0);
-      if (eventDefinition instanceof TimerEventDefinition) {
-        imageKey = PluginImage.IMG_EVENT_TIMER.getImageKey();
-      } else if (eventDefinition instanceof MessageEventDefinition) {
-        imageKey = PluginImage.IMG_EVENT_MESSAGE.getImageKey();
-      } else if (eventDefinition instanceof ErrorEventDefinition) {
-        imageKey = PluginImage.IMG_EVENT_ERROR.getImageKey();
-      } else if (eventDefinition instanceof SignalEventDefinition) {
-        imageKey = PluginImage.IMG_EVENT_SIGNAL.getImageKey();
+        gaService.setLocationAndSize(image, (width - IMAGE_SIZE) / 2, (height - IMAGE_SIZE) / 2, IMAGE_SIZE, IMAGE_SIZE);
       }
     }
-    return imageKey;
+
+    return containerShape;
   }
   
   @Override

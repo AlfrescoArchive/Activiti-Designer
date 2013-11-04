@@ -1,6 +1,6 @@
 package org.activiti.designer.controller;
 
-import org.activiti.bpmn.model.FlowNode;
+import org.activiti.bpmn.model.FlowElement;
 import org.activiti.designer.diagram.ActivitiBPMNFeatureProvider;
 import org.eclipse.graphiti.mm.algorithms.MultiText;
 import org.eclipse.graphiti.mm.algorithms.Text;
@@ -33,17 +33,17 @@ public abstract class AbstractBusinessObjectShapeController implements BusinessO
    * <p>Supported keys: {@value #LABEL_DATA_KEY}, {@value #DEFAULT_VALUE_DATA_KEY}</p>
    */
   @Override
-  public Object extractShapeData(String key, Shape shape) {
+  public Object extractShapeData(String key, PictogramElement element) {
     Object data = null;
     
     if(LABEL_DATA_KEY.equals(key)) {
       // Extract the label-value from the Multi-text field
-      MultiText labeltext = findNameMultiText(shape);
+      MultiText labeltext = findNameMultiText(element);
       if(labeltext != null) {
         data = labeltext.getValue();
       }
     } else if(DEFAULT_VALUE_DATA_KEY.equals(key)) {
-      Text defaultText = findFieldText(shape);
+      Text defaultText = findFieldText(element);
       if(defaultText != null) {
         data = defaultText.getValue();
       }
@@ -59,14 +59,14 @@ public abstract class AbstractBusinessObjectShapeController implements BusinessO
    * @return the first {@link MultiText} that is encountered in the child-hierarchy
    * of the given shape. Returns null, if not found.
    */
-  protected MultiText findNameMultiText(Shape shape) {
-    if(shape.getGraphicsAlgorithm() instanceof MultiText) {
-      return (MultiText) shape.getGraphicsAlgorithm();
+  protected MultiText findNameMultiText(PictogramElement element) {
+    if (element.getGraphicsAlgorithm() instanceof MultiText) {
+      return (MultiText) element.getGraphicsAlgorithm();
     }
     
     MultiText foundtext = null;
-    if(shape instanceof ContainerShape) {
-      for(Shape child : ((ContainerShape) shape).getChildren()) {
+    if(element instanceof ContainerShape) {
+      for(Shape child : ((ContainerShape) element).getChildren()) {
         foundtext = findNameMultiText(child);
         if(foundtext != null) {
           return foundtext;
@@ -76,14 +76,14 @@ public abstract class AbstractBusinessObjectShapeController implements BusinessO
     return null;
   }
   
-  protected Text findFieldText(PictogramElement shape) {
-    if(shape.getGraphicsAlgorithm() instanceof Text) {
-      return (Text) shape.getGraphicsAlgorithm();
+  protected Text findFieldText(PictogramElement element) {
+    if (element.getGraphicsAlgorithm() instanceof Text) {
+      return (Text) element.getGraphicsAlgorithm();
     }
     
     Text foundText = null;
-    if(shape instanceof ContainerShape) {
-      for(Shape child : ((ContainerShape) shape).getChildren()) {
+    if (element instanceof ContainerShape) {
+      for (Shape child : ((ContainerShape) element).getChildren()) {
         foundText = findFieldText(child);
         if(foundText != null) {
           return foundText;
@@ -93,7 +93,7 @@ public abstract class AbstractBusinessObjectShapeController implements BusinessO
     return null;
   }
   
-  protected String getLabelTextValue(FlowNode node) {
+  protected String getLabelTextValue(FlowElement node) {
     String value =  node.getName() != null ?  node.getName() : "";
     return value;
   }

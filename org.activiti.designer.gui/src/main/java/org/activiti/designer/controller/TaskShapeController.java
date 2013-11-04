@@ -32,6 +32,7 @@ import org.eclipse.graphiti.mm.algorithms.styles.Orientation;
 import org.eclipse.graphiti.mm.pictograms.BoxRelativeAnchor;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
+import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
@@ -63,7 +64,7 @@ public class TaskShapeController extends AbstractBusinessObjectShapeController {
   }
 
   @Override
-  public ContainerShape createShape(Object businessObject, ContainerShape layoutParent, int width, int height, IAddContext context) {
+  public PictogramElement createShape(Object businessObject, ContainerShape layoutParent, int width, int height, IAddContext context) {
     final IPeCreateService peCreateService = Graphiti.getPeCreateService();
     final ContainerShape containerShape = peCreateService.createContainerShape(layoutParent, true);
     final IGaService gaService = Graphiti.getGaService();
@@ -264,27 +265,27 @@ public class TaskShapeController extends AbstractBusinessObjectShapeController {
   }
 
   @Override
-  public void updateShape(ContainerShape shape, Object businessObject, int width, int height) {
+  public void updateShape(PictogramElement element, Object businessObject, int width, int height) {
     Task task = (Task) businessObject;
     
     // Update the label
-    MultiText labelText = findNameMultiText(shape);
+    MultiText labelText = findNameMultiText(element);
     if (labelText != null) {
       labelText.setValue(getLabelTextValue(task));
     }
   }
   
   @Override
-  public GraphicsAlgorithm getGraphicsAlgorithmForDirectEdit(ContainerShape container) {
-    return container.getChildren().get(0).getGraphicsAlgorithm();
+  public GraphicsAlgorithm getGraphicsAlgorithmForDirectEdit(PictogramElement element) {
+    return ((ContainerShape) element).getChildren().get(0).getGraphicsAlgorithm();
   }
   
   @Override
-  public boolean isShapeUpdateNeeded(ContainerShape shape, Object businessObject) {
+  public boolean isShapeUpdateNeeded(PictogramElement element, Object businessObject) {
     Task task = (Task) businessObject;
     
     // Check label text
-    String currentLabel = (String) extractShapeData(LABEL_DATA_KEY, shape);
+    String currentLabel = (String) extractShapeData(LABEL_DATA_KEY, element);
     String newLabel = getLabelTextValue(task);
     if (!StringUtils.equals(currentLabel, newLabel)) {
       return true;

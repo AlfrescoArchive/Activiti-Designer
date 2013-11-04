@@ -15,12 +15,34 @@ import org.activiti.bpmn.model.Pool;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.bpmn.model.Task;
 import org.activiti.bpmn.model.TextAnnotation;
-import org.activiti.bpmn.model.UserTask;
+import org.activiti.designer.command.BoundaryEventModelUpdater;
 import org.activiti.designer.command.BpmnProcessModelUpdater;
+import org.activiti.designer.command.BusinessRuleTaskModelUpdater;
+import org.activiti.designer.command.CallActivityModelUpdater;
+import org.activiti.designer.command.EndEventModelUpdater;
+import org.activiti.designer.command.IntermediateCatchEventModelUpdater;
+import org.activiti.designer.command.ManualTaskModelUpdater;
+import org.activiti.designer.command.ReceiveTaskModelUpdater;
+import org.activiti.designer.command.ScriptTaskModelUpdater;
+import org.activiti.designer.command.SendTaskModelUpdater;
+import org.activiti.designer.command.ServiceTaskModelUpdater;
+import org.activiti.designer.command.StartEventModelUpdater;
+import org.activiti.designer.command.SubProcessModelUpdater;
+import org.activiti.designer.command.ThrowEventModelUpdater;
 import org.activiti.designer.command.UserTaskModelUpdater;
+import org.activiti.designer.controller.BoundaryEventShapeController;
 import org.activiti.designer.controller.BusinessObjectShapeController;
+import org.activiti.designer.controller.CatchEventShapeController;
+import org.activiti.designer.controller.EventBasedGatewayShapeController;
+import org.activiti.designer.controller.EventShapeController;
+import org.activiti.designer.controller.EventSubProcessShapeController;
 import org.activiti.designer.controller.ExclusiveGatewayShapeController;
+import org.activiti.designer.controller.InclusiveGatewayShapeController;
+import org.activiti.designer.controller.ParallelGatewayShapeController;
+import org.activiti.designer.controller.SequenceFlowShapeController;
+import org.activiti.designer.controller.SubProcessShapeController;
 import org.activiti.designer.controller.TaskShapeController;
+import org.activiti.designer.controller.ThrowEventShapeController;
 import org.activiti.designer.features.AddBaseElementFeature;
 import org.activiti.designer.features.ChangeElementTypeFeature;
 import org.activiti.designer.features.ContainerResizeFeature;
@@ -119,14 +141,41 @@ import com.alfresco.designer.gui.features.CreateAlfrescoUserTaskFeature;
 public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 
   protected List<BusinessObjectShapeController> shapeControllers;
+  protected List<BpmnProcessModelUpdater> modelUpdaters;
 
   public ActivitiBPMNFeatureProvider(IDiagramTypeProvider dtp) {
     super(dtp);
     setIndependenceSolver(new BpmnIndependenceSolver(dtp));
     
     this.shapeControllers = new ArrayList<BusinessObjectShapeController>();
+    shapeControllers.add(new EventShapeController(this));
     shapeControllers.add(new TaskShapeController(this));
     shapeControllers.add(new ExclusiveGatewayShapeController(this));
+    shapeControllers.add(new EventBasedGatewayShapeController(this));
+    shapeControllers.add(new InclusiveGatewayShapeController(this));
+    shapeControllers.add(new ParallelGatewayShapeController(this));
+    shapeControllers.add(new CatchEventShapeController(this));
+    shapeControllers.add(new ThrowEventShapeController(this));
+    shapeControllers.add(new SubProcessShapeController(this));
+    shapeControllers.add(new EventSubProcessShapeController(this));
+    shapeControllers.add(new BoundaryEventShapeController(this));
+    shapeControllers.add(new SequenceFlowShapeController(this));
+    
+    this.modelUpdaters = new ArrayList<BpmnProcessModelUpdater>();
+    modelUpdaters.add(new StartEventModelUpdater(this));
+    modelUpdaters.add(new EndEventModelUpdater(this));
+    modelUpdaters.add(new UserTaskModelUpdater(this));
+    modelUpdaters.add(new ServiceTaskModelUpdater(this));
+    modelUpdaters.add(new ScriptTaskModelUpdater(this));
+    modelUpdaters.add(new ReceiveTaskModelUpdater(this));
+    modelUpdaters.add(new BusinessRuleTaskModelUpdater(this));
+    modelUpdaters.add(new SendTaskModelUpdater(this));
+    modelUpdaters.add(new ManualTaskModelUpdater(this));
+    modelUpdaters.add(new IntermediateCatchEventModelUpdater(this));
+    modelUpdaters.add(new ThrowEventModelUpdater(this));
+    modelUpdaters.add(new CallActivityModelUpdater(this));
+    modelUpdaters.add(new SubProcessModelUpdater(this));
+    modelUpdaters.add(new BoundaryEventModelUpdater(this));
   }
   
   /**
@@ -136,8 +185,8 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
    * @throws IllegalArgumentException When no controller can be found for the given object.
    */
   public BusinessObjectShapeController getShapeController(Object businessObject) {
-    for(BusinessObjectShapeController controller : shapeControllers) {
-      if(controller.canControlShapeFor(businessObject)) {
+    for (BusinessObjectShapeController controller : shapeControllers) {
+      if (controller.canControlShapeFor(businessObject)) {
         return controller;
       }
     }
@@ -148,8 +197,8 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
    * @return true, if a {@link BusinessObjectShapeController} is available for the given business object.
    */
   public boolean hasShapeController(Object businessObject) {
-    for(BusinessObjectShapeController controller : shapeControllers) {
-        if(controller.canControlShapeFor(businessObject)) {
+    for (BusinessObjectShapeController controller : shapeControllers) {
+        if (controller.canControlShapeFor(businessObject)) {
           return true;
         }
       }
@@ -162,11 +211,15 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
    * is provided, no additional update besides the actual model update is done.
    * @return the updater capable of updating the given object. Null, if the object cannot be updated.
    */
-  public BpmnProcessModelUpdater<?> getModelUpdaterFor(Object businessObject, PictogramElement pictogramElement) {
-    if (businessObject instanceof UserTask) {
-      return new UserTaskModelUpdater((UserTask) businessObject, pictogramElement, this);
+  public BpmnProcessModelUpdater getModelUpdaterFor(Object businessObject, PictogramElement pictogramElement) {
+    for (BpmnProcessModelUpdater updater : modelUpdaters) {
+      if (updater.canControlShapeFor(businessObject)) {
+        // creates a new BpmnProcessModelUpdater instances for undo/redo stack
+        BpmnProcessModelUpdater updaterObject = updater.init(businessObject, pictogramElement);
+        return updaterObject;
+      }
     }
-    return null;
+    throw new IllegalArgumentException("No updater can be found for object: " + businessObject);
   }
 
   @Override

@@ -1,17 +1,17 @@
 package org.activiti.designer.command;
 
-import org.activiti.bpmn.model.UserTask;
+import org.activiti.bpmn.model.SendTask;
 import org.eclipse.graphiti.features.IFeatureProvider;
 
-public class UserTaskModelUpdater extends BpmnProcessModelUpdater {
+public class SendTaskModelUpdater extends BpmnProcessModelUpdater {
 
-  public UserTaskModelUpdater(IFeatureProvider featureProvider) {
+  public SendTaskModelUpdater(IFeatureProvider featureProvider) {
     super(featureProvider);
   }
   
   @Override
   public boolean canControlShapeFor(Object businessObject) {
-    if (businessObject instanceof UserTask) {
+    if (businessObject instanceof SendTask) {
       return true;
     } else {
       return false;
@@ -19,17 +19,17 @@ public class UserTaskModelUpdater extends BpmnProcessModelUpdater {
   }
 
   @Override
-  protected UserTask cloneBusinessObject(Object businessObject) {
-    return ((UserTask) businessObject).clone();
+  protected SendTask cloneBusinessObject(Object businessObject) {
+    return ((SendTask) businessObject).clone();
   }
 
   @Override
   protected void performUpdates(Object valueObject, Object targetObject) {
-    ((UserTask) targetObject).setValues(((UserTask) valueObject));
+    ((SendTask) targetObject).setValues(((SendTask) valueObject));
   }
   
   @Override
   public BpmnProcessModelUpdater createUpdater(IFeatureProvider featureProvider) {
-    return new UserTaskModelUpdater(featureProvider);
+    return new SendTaskModelUpdater(featureProvider);
   }
 }

@@ -1,6 +1,6 @@
 package org.activiti.designer.controller;
 
-import org.activiti.bpmn.model.ExclusiveGateway;
+import org.activiti.bpmn.model.ParallelGateway;
 import org.activiti.bpmn.model.Task;
 import org.activiti.designer.diagram.ActivitiBPMNFeatureProvider;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
@@ -26,15 +26,15 @@ import org.eclipse.graphiti.services.IPeCreateService;
  *  
  * @author Tijs Rademakers
  */
-public class ExclusiveGatewayShapeController extends AbstractBusinessObjectShapeController {
+public class ParallelGatewayShapeController extends AbstractBusinessObjectShapeController {
   
-  public ExclusiveGatewayShapeController(ActivitiBPMNFeatureProvider featureProvider) {
+  public ParallelGatewayShapeController(ActivitiBPMNFeatureProvider featureProvider) {
     super(featureProvider);
   }
 
   @Override
   public boolean canControlShapeFor(Object businessObject) {
-    if (businessObject instanceof ExclusiveGateway) {
+    if (businessObject instanceof ParallelGateway) {
       return true;
     } else {
       return false;
@@ -65,21 +65,20 @@ public class ExclusiveGatewayShapeController extends AbstractBusinessObjectShape
     polygon.setParentGraphicsAlgorithm(invisiblePolygon);
     polygon.setStyle(StyleUtil.getStyleForEvent(diagram));
     gaService.setLocationAndSize(polygon, 0, 0, width, height);
-    
+
     Shape shape = peCreateService.createShape(containerShape, false);
-      
-    Polyline polyline = gaService.createPolyline(shape, new int[] { width - 10, 10, 10, height - 10 });
+    Polyline polyline = gaService.createPolyline(shape, new int[] { 6, 19, width - 6, 19 });
     polyline.setLineWidth(5);
     polyline.setStyle(StyleUtil.getStyleForEvent(diagram));
     
     shape = peCreateService.createShape(containerShape, false);
-    polyline = gaService.createPolyline(shape, new int[] { 10, 10, width - 10, height - 10});
+    polyline = gaService.createPolyline(shape, new int[] { 18, 6, 18, height - 6 });
     polyline.setLineWidth(5);
     polyline.setStyle(StyleUtil.getStyleForEvent(diagram));
-
+    
     // add a chopbox anchor to the shape
     peCreateService.createChopboxAnchor(containerShape);
-    BoxRelativeAnchor boxAnchor = peCreateService.createBoxRelativeAnchor(containerShape);
+    final BoxRelativeAnchor boxAnchor = peCreateService.createBoxRelativeAnchor(containerShape);
     boxAnchor.setRelativeWidth(0.51);
     boxAnchor.setRelativeHeight(0.10);
     boxAnchor.setReferencedGraphicsAlgorithm(polygon);
@@ -88,11 +87,11 @@ public class ExclusiveGatewayShapeController extends AbstractBusinessObjectShape
 
     // add a another chopbox anchor to the shape
     peCreateService.createChopboxAnchor(containerShape);
-    boxAnchor = peCreateService.createBoxRelativeAnchor(containerShape);
-    boxAnchor.setRelativeWidth(0.51);
-    boxAnchor.setRelativeHeight(0.93);
-    boxAnchor.setReferencedGraphicsAlgorithm(polygon);
-    ellipse = ActivitiUiUtil.createInvisibleEllipse(boxAnchor, gaService);
+    final BoxRelativeAnchor boxAnchor2 = peCreateService.createBoxRelativeAnchor(containerShape);
+    boxAnchor2.setRelativeWidth(0.51);
+    boxAnchor2.setRelativeHeight(0.93);
+    boxAnchor2.setReferencedGraphicsAlgorithm(polygon);
+    ellipse = ActivitiUiUtil.createInvisibleEllipse(boxAnchor2, gaService);
     gaService.setLocationAndSize(ellipse, 0, 0, 0, 0);
 
     return containerShape;
@@ -100,7 +99,7 @@ public class ExclusiveGatewayShapeController extends AbstractBusinessObjectShape
   
   @Override
   public void updateShape(PictogramElement element, Object businessObject, int width, int height) {
-    ExclusiveGateway gateway = (ExclusiveGateway) businessObject;
+    ParallelGateway gateway = (ParallelGateway) businessObject;
     
     // Update the label
     MultiText labelText = findNameMultiText(element);
@@ -116,7 +115,7 @@ public class ExclusiveGatewayShapeController extends AbstractBusinessObjectShape
   
   @Override
   public boolean isShapeUpdateNeeded(PictogramElement element, Object businessObject) {
-    ExclusiveGateway gateway = (ExclusiveGateway) businessObject;
+    ParallelGateway gateway = (ParallelGateway) businessObject;
     
     // Check label text
     String currentLabel = (String) extractShapeData(LABEL_DATA_KEY, element);
