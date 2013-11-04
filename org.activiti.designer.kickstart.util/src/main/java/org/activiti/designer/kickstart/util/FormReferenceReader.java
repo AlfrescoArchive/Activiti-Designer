@@ -11,12 +11,12 @@ import java.util.Set;
 
 import org.activiti.workflow.simple.alfresco.conversion.json.AlfrescoSimpleWorkflowJsonConverter;
 import org.activiti.workflow.simple.definition.AbstractConditionStepListContainer;
-import org.activiti.workflow.simple.definition.AbstractNamedStepDefinition;
 import org.activiti.workflow.simple.definition.AbstractStepDefinitionContainer;
 import org.activiti.workflow.simple.definition.AbstractStepListContainer;
 import org.activiti.workflow.simple.definition.FormStepDefinition;
 import org.activiti.workflow.simple.definition.ListConditionStepDefinition;
 import org.activiti.workflow.simple.definition.ListStepDefinition;
+import org.activiti.workflow.simple.definition.NamedStepDefinition;
 import org.activiti.workflow.simple.definition.StepDefinition;
 import org.activiti.workflow.simple.definition.WorkflowDefinition;
 import org.activiti.workflow.simple.definition.form.FormDefinition;
@@ -66,7 +66,7 @@ public class FormReferenceReader {
 
           // Add to result map, if needed
           if(definitions != null) {
-            definitions.put(((AbstractNamedStepDefinition) formStep).getName(), form);
+            definitions.put(((NamedStepDefinition) formStep).getName(), form);
           }
           
           if(applyToModel) {
