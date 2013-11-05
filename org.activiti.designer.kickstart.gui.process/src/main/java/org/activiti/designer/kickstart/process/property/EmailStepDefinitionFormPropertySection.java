@@ -81,6 +81,7 @@ public class EmailStepDefinitionFormPropertySection extends AbstractKickstartPro
   
   protected void insertIfNotEmpty(Text text, String selection) {
     if(selection != null && !selection.isEmpty()) {
+      text.setFocus();
       text.setText(text.getText() + selection);
       text.setSelection(text.getText().length());
     }
