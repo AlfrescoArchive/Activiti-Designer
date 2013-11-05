@@ -9,6 +9,9 @@ import org.activiti.bpmn.model.ScriptTask;
 import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.bpmn.model.Task;
 import org.activiti.bpmn.model.UserTask;
+import org.activiti.bpmn.model.alfresco.AlfrescoMailTask;
+import org.activiti.bpmn.model.alfresco.AlfrescoScriptTask;
+import org.activiti.bpmn.model.alfresco.AlfrescoUserTask;
 import org.activiti.designer.PluginImage;
 import org.activiti.designer.diagram.ActivitiBPMNFeatureProvider;
 import org.activiti.designer.integration.servicetask.CustomServiceTask;
@@ -53,8 +56,17 @@ public class TaskShapeController extends AbstractBusinessObjectShapeController {
 
   @Override
   public boolean canControlShapeFor(Object businessObject) {
-    if (businessObject instanceof ServiceTask || businessObject instanceof UserTask ||
-            businessObject instanceof BusinessRuleTask || businessObject instanceof ManualTask ||
+    if (businessObject instanceof AlfrescoUserTask || businessObject instanceof AlfrescoMailTask || businessObject instanceof AlfrescoScriptTask) {
+      return false;
+    } else if (businessObject instanceof ServiceTask) {
+      ServiceTask serviceTask = (ServiceTask) businessObject;
+      if (AlfrescoScriptTask.ALFRESCO_SCRIPT_DELEGATE.equalsIgnoreCase(serviceTask.getImplementation())) {
+        return false;
+      } else {
+        return true;
+      }
+      
+    } else if (businessObject instanceof UserTask || businessObject instanceof BusinessRuleTask || businessObject instanceof ManualTask ||
             businessObject instanceof ReceiveTask || businessObject instanceof ScriptTask) {
       
       return true;

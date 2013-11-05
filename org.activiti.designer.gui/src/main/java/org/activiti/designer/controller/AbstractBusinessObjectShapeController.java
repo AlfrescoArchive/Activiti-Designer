@@ -1,6 +1,8 @@
 package org.activiti.designer.controller;
 
 import org.activiti.bpmn.model.FlowElement;
+import org.activiti.bpmn.model.Lane;
+import org.activiti.bpmn.model.Pool;
 import org.activiti.designer.diagram.ActivitiBPMNFeatureProvider;
 import org.eclipse.graphiti.mm.algorithms.MultiText;
 import org.eclipse.graphiti.mm.algorithms.Text;
@@ -94,6 +96,16 @@ public abstract class AbstractBusinessObjectShapeController implements BusinessO
   }
   
   protected String getLabelTextValue(FlowElement node) {
+    String value =  node.getName() != null ?  node.getName() : "";
+    return value;
+  }
+  
+  protected String getLabelTextValue(Pool node) {
+    String value =  node.getName() != null ?  node.getName() : "";
+    return value;
+  }
+  
+  protected String getLabelTextValue(Lane node) {
     String value =  node.getName() != null ?  node.getName() : "";
     return value;
   }

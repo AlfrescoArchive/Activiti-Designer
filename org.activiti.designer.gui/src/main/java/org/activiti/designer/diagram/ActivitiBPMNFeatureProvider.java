@@ -20,8 +20,11 @@ import org.activiti.designer.command.BpmnProcessModelUpdater;
 import org.activiti.designer.command.BusinessRuleTaskModelUpdater;
 import org.activiti.designer.command.CallActivityModelUpdater;
 import org.activiti.designer.command.EndEventModelUpdater;
+import org.activiti.designer.command.GatewayModelUpdater;
 import org.activiti.designer.command.IntermediateCatchEventModelUpdater;
+import org.activiti.designer.command.LaneModelUpdater;
 import org.activiti.designer.command.ManualTaskModelUpdater;
+import org.activiti.designer.command.PoolModelUpdater;
 import org.activiti.designer.command.ReceiveTaskModelUpdater;
 import org.activiti.designer.command.ScriptTaskModelUpdater;
 import org.activiti.designer.command.SendTaskModelUpdater;
@@ -32,13 +35,16 @@ import org.activiti.designer.command.ThrowEventModelUpdater;
 import org.activiti.designer.command.UserTaskModelUpdater;
 import org.activiti.designer.controller.BoundaryEventShapeController;
 import org.activiti.designer.controller.BusinessObjectShapeController;
+import org.activiti.designer.controller.CallActivityShapeController;
 import org.activiti.designer.controller.CatchEventShapeController;
 import org.activiti.designer.controller.EventBasedGatewayShapeController;
 import org.activiti.designer.controller.EventShapeController;
 import org.activiti.designer.controller.EventSubProcessShapeController;
 import org.activiti.designer.controller.ExclusiveGatewayShapeController;
 import org.activiti.designer.controller.InclusiveGatewayShapeController;
+import org.activiti.designer.controller.LaneShapeController;
 import org.activiti.designer.controller.ParallelGatewayShapeController;
+import org.activiti.designer.controller.PoolShapeController;
 import org.activiti.designer.controller.SequenceFlowShapeController;
 import org.activiti.designer.controller.SubProcessShapeController;
 import org.activiti.designer.controller.TaskShapeController;
@@ -133,6 +139,8 @@ import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
 
+import com.alfresco.designer.gui.controller.AlfrescoStartEventShapeController;
+import com.alfresco.designer.gui.controller.AlfrescoTaskShapeController;
 import com.alfresco.designer.gui.features.CreateAlfrescoMailTaskFeature;
 import com.alfresco.designer.gui.features.CreateAlfrescoScriptTaskFeature;
 import com.alfresco.designer.gui.features.CreateAlfrescoStartEventFeature;
@@ -157,9 +165,14 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
     shapeControllers.add(new CatchEventShapeController(this));
     shapeControllers.add(new ThrowEventShapeController(this));
     shapeControllers.add(new SubProcessShapeController(this));
+    shapeControllers.add(new CallActivityShapeController(this));
     shapeControllers.add(new EventSubProcessShapeController(this));
     shapeControllers.add(new BoundaryEventShapeController(this));
+    shapeControllers.add(new PoolShapeController(this));
+    shapeControllers.add(new LaneShapeController(this));
     shapeControllers.add(new SequenceFlowShapeController(this));
+    shapeControllers.add(new AlfrescoStartEventShapeController(this));
+    shapeControllers.add(new AlfrescoTaskShapeController(this));
     
     this.modelUpdaters = new ArrayList<BpmnProcessModelUpdater>();
     modelUpdaters.add(new StartEventModelUpdater(this));
@@ -171,11 +184,14 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
     modelUpdaters.add(new BusinessRuleTaskModelUpdater(this));
     modelUpdaters.add(new SendTaskModelUpdater(this));
     modelUpdaters.add(new ManualTaskModelUpdater(this));
+    modelUpdaters.add(new GatewayModelUpdater(this));
     modelUpdaters.add(new IntermediateCatchEventModelUpdater(this));
     modelUpdaters.add(new ThrowEventModelUpdater(this));
     modelUpdaters.add(new CallActivityModelUpdater(this));
     modelUpdaters.add(new SubProcessModelUpdater(this));
     modelUpdaters.add(new BoundaryEventModelUpdater(this));
+    modelUpdaters.add(new PoolModelUpdater(this));
+    modelUpdaters.add(new LaneModelUpdater(this));
   }
   
   /**
