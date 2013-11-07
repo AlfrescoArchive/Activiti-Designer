@@ -26,6 +26,7 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -65,6 +66,7 @@ public abstract class AbstractKickstartProcessPropertySection extends GFProperty
    * and includes a fix for the focus-issue on Eclipse Juno.
    */
   protected FocusListener focusListener;
+  protected FocusListener rememberSelectionFocusListener;
   protected SelectionListener selectionListener;
   protected ModifyListener modifyListener;
   protected KickstartProcessModelListener modelListener;
@@ -75,6 +77,30 @@ public abstract class AbstractKickstartProcessPropertySection extends GFProperty
   public AbstractKickstartProcessPropertySection() {
     
     controls = new ArrayList<Control>();
+    
+    rememberSelectionFocusListener = new FocusListener() {
+      @Override
+      public void focusLost(FocusEvent e) {
+        if(e.getSource() instanceof Text) {
+          Text text = (Text) e.getSource();
+          if(text.getSelection() != null) {
+            text.setData(text.getSelection());
+          } else {
+            text.setData(null);
+          }
+        }
+      }
+      
+      @Override
+      public void focusGained(FocusEvent e) {
+        if(e.getSource() instanceof Text) {
+          Text text = (Text) e.getSource();
+          if(text.getData() != null && text.getData() instanceof Point) {
+            text.setSelection((Point)text.getData());
+          }
+        }
+      }
+    };
     
     focusListener = new FocusListener() {
       @Override
@@ -480,6 +506,7 @@ public abstract class AbstractKickstartProcessPropertySection extends GFProperty
     button.setLayoutData(data);
     
     registerControl(textControl);
+    ensureCaretPositionRetained(textControl);
     return textControl;
   }
   
@@ -610,6 +637,10 @@ public abstract class AbstractKickstartProcessPropertySection extends GFProperty
     } else {
       return getContainer(container.eContainer());
     }
+  }
+  
+  protected void ensureCaretPositionRetained(Text text) {
+    text.addFocusListener(rememberSelectionFocusListener);
   }
   
   protected String getSafeText(String string) {
