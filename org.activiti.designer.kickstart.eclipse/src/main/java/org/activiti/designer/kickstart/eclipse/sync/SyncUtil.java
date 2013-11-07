@@ -33,6 +33,7 @@ import org.activiti.designer.kickstart.util.KickstartConstants;
 import org.activiti.workflow.simple.alfresco.conversion.json.AlfrescoSimpleWorkflowJsonConverter;
 import org.activiti.workflow.simple.definition.AbstractConditionStepListContainer;
 import org.activiti.workflow.simple.definition.AbstractStepListContainer;
+import org.activiti.workflow.simple.definition.FormStepDefinition;
 import org.activiti.workflow.simple.definition.HumanStepDefinition;
 import org.activiti.workflow.simple.definition.ListConditionStepDefinition;
 import org.activiti.workflow.simple.definition.ListStepDefinition;
@@ -492,11 +493,10 @@ public class SyncUtil {
 	
 	protected static void addFormsToList(List<StepDefinition> stepList, List<IFile> zipItemList, IProject project) {
 	  for (StepDefinition step : stepList) {
-      if (step instanceof HumanStepDefinition) {
-        HumanStepDefinition humanStep = (HumanStepDefinition) step;
-
-        if (humanStep.getParameters().containsKey(KickstartConstants.PARAMETER_FORM_REFERENCE)) {
-          String formPath = (String) humanStep.getParameters().get(KickstartConstants.PARAMETER_FORM_REFERENCE);
+      if (step instanceof FormStepDefinition) {
+        FormStepDefinition formStep = (FormStepDefinition) step;
+        if (formStep.getParameters().containsKey(KickstartConstants.PARAMETER_FORM_REFERENCE)) {
+          String formPath = (String) formStep.getParameters().get(KickstartConstants.PARAMETER_FORM_REFERENCE);
           IFile formFile = project.getFile(new Path(formPath));
           zipItemList.add(formFile);
         }
