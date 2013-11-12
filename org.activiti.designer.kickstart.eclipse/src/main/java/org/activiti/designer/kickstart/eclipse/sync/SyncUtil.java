@@ -34,7 +34,6 @@ import org.activiti.workflow.simple.alfresco.conversion.json.AlfrescoSimpleWorkf
 import org.activiti.workflow.simple.definition.AbstractConditionStepListContainer;
 import org.activiti.workflow.simple.definition.AbstractStepListContainer;
 import org.activiti.workflow.simple.definition.FormStepDefinition;
-import org.activiti.workflow.simple.definition.HumanStepDefinition;
 import org.activiti.workflow.simple.definition.ListConditionStepDefinition;
 import org.activiti.workflow.simple.definition.ListStepDefinition;
 import org.activiti.workflow.simple.definition.StepDefinition;
@@ -363,11 +362,11 @@ public class SyncUtil {
   
   protected static void walkthroughForms(List<StepDefinition> stepList, IFolder unzippedFolder, IProgressMonitor monitor) throws Exception {
     for (StepDefinition step : stepList) {
-      if (step instanceof HumanStepDefinition) {
-        HumanStepDefinition humanStep = (HumanStepDefinition) step;
+      if (step instanceof FormStepDefinition) {
+        FormStepDefinition formStep = (FormStepDefinition) step;
 
-        if (humanStep.getParameters().containsKey(KickstartConstants.PARAMETER_FORM_REFERENCE)) {
-          String formPath = (String) humanStep.getParameters().get(KickstartConstants.PARAMETER_FORM_REFERENCE);
+        if (formStep.getParameters().containsKey(KickstartConstants.PARAMETER_FORM_REFERENCE)) {
+          String formPath = (String) formStep.getParameters().get(KickstartConstants.PARAMETER_FORM_REFERENCE);
           IFile formFile = unzippedFolder.getProject().getFile(new Path(formPath));
           if (unzippedFolder.getFile(formFile.getName()) != null) {
             IContainer newFolder = makeDirs(formPath, formFile.getProject(), monitor);

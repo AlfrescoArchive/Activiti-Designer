@@ -11,6 +11,7 @@ import org.activiti.designer.kickstart.process.features.CreateEmailStepFeature;
 import org.activiti.designer.kickstart.process.features.CreateHumanStepFeature;
 import org.activiti.designer.kickstart.process.features.CreateParallelStepFeature;
 import org.activiti.designer.kickstart.process.features.CreateReviewStepFeature;
+import org.activiti.designer.kickstart.process.features.CreateScriptStepFeature;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
@@ -38,6 +39,7 @@ public class KickstartProcessToolBehaviorProvider extends DefaultToolBehaviorPro
       stepToolClasses.add(CreateHumanStepFeature.class);
       stepToolClasses.add(CreateEmailStepFeature.class);
       stepToolClasses.add(CreateDelayStepFeature.class);
+      stepToolClasses.add(CreateScriptStepFeature.class);
     }
     
     public KickstartProcessToolBehaviorProvider(IDiagramTypeProvider dtp) {

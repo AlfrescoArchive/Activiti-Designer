@@ -133,6 +133,13 @@
                id="org.activiti.designer.kickstart.process.reviewStepDefinitionAssignment"
                tab="org.activiti.designer.kickstart.process.assignmentTab">
          </propertySection>
+         <propertySection
+               afterSection="org.activiti.designer.kickstart.process.namedStepDefinition"
+               class="org.activiti.designer.kickstart.process.property.ScriptStepDefinitionFormPropertySection"
+               filter="org.activiti.designer.kickstart.process.property.ScriptStepDefinitionPropertyFilter"
+               id="org.activiti.designer.kickstart.process.scriptStepDefinition"
+               tab="org.activiti.designer.kickstart.process.generalTab">
+         </propertySection>
          
       </propertySections>
    </extension>

@@ -9,7 +9,7 @@ import org.activiti.designer.kickstart.process.diagram.KickstartProcessFeaturePr
 import org.activiti.designer.util.editor.KickstartProcessMemoryModel;
 import org.activiti.designer.util.editor.KickstartProcessMemoryModel.KickstartProcessModelListener;
 import org.activiti.designer.util.editor.ModelHandler;
-import org.activiti.workflow.simple.definition.form.FormPropertyDefinition;
+import org.activiti.workflow.simple.definition.StepDefinition;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
@@ -604,14 +604,27 @@ public abstract class AbstractKickstartProcessPropertySection extends GFProperty
     return labelControl;
   }
   
-  protected Boolean getBooleanParameter(FormPropertyDefinition propDef, String key, boolean defaultValue) {
+  protected Boolean getBooleanParameter(StepDefinition stepdef, String key, boolean defaultValue) {
     Boolean result = defaultValue;
-    if (propDef.getParameters() != null) {
-      Object value = propDef.getParameters().get(key);
+    if (stepdef.getParameters() != null) {
+      Object value = stepdef.getParameters().get(key);
       if (value instanceof Boolean) {
         result = (Boolean) value;
       } else if (value != null) {
         result = Boolean.valueOf(value.toString());
+      }
+    }
+    return result;
+  }
+  
+  protected String getStringParameter(StepDefinition stepdef, String key, String defaultValue) {
+    String result = defaultValue;
+    if (stepdef.getParameters() != null) {
+      Object value = stepdef.getParameters().get(key);
+      if (value instanceof String) {
+        result = (String) value;
+      } else if (value != null) {
+        result = value.toString();
       }
     }
     return result;

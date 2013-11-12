@@ -15,6 +15,7 @@ import org.activiti.designer.kickstart.process.diagram.shape.ListConditionStepSh
 import org.activiti.designer.kickstart.process.diagram.shape.ListStepShapeController;
 import org.activiti.designer.kickstart.process.diagram.shape.ParallelStepShapeController;
 import org.activiti.designer.kickstart.process.diagram.shape.ReviewStepShapeController;
+import org.activiti.designer.kickstart.process.diagram.shape.ScriptStepShapeController;
 import org.activiti.designer.kickstart.process.features.AddStepDefinitionFeature;
 import org.activiti.designer.kickstart.process.features.CreateChoiceStepFeature;
 import org.activiti.designer.kickstart.process.features.CreateDelayStepFeature;
@@ -22,6 +23,7 @@ import org.activiti.designer.kickstart.process.features.CreateEmailStepFeature;
 import org.activiti.designer.kickstart.process.features.CreateHumanStepFeature;
 import org.activiti.designer.kickstart.process.features.CreateParallelStepFeature;
 import org.activiti.designer.kickstart.process.features.CreateReviewStepFeature;
+import org.activiti.designer.kickstart.process.features.CreateScriptStepFeature;
 import org.activiti.designer.kickstart.process.features.DeleteStepFeature;
 import org.activiti.designer.kickstart.process.features.DirectEditStepDefinitionFeature;
 import org.activiti.designer.kickstart.process.features.MoveStepDefinitionFeature;
@@ -73,6 +75,7 @@ public class KickstartProcessFeatureProvider extends DefaultFeatureProvider {
     shapeControllers.add(new DelayStepShapeController(this));
     shapeControllers.add(new EmailStepShapeController(this));
     shapeControllers.add(new ReviewStepShapeController(this));
+    shapeControllers.add(new ScriptStepShapeController(this));
   }
 
   /**
@@ -130,7 +133,8 @@ public class KickstartProcessFeatureProvider extends DefaultFeatureProvider {
   public ICreateFeature[] getCreateFeatures() {
     return new ICreateFeature[] { 
         new CreateHumanStepFeature(this), new CreateParallelStepFeature(this) , new CreateChoiceStepFeature(this),
-        new CreateDelayStepFeature(this), new CreateEmailStepFeature(this), new CreateReviewStepFeature(this)
+        new CreateDelayStepFeature(this), new CreateEmailStepFeature(this), new CreateReviewStepFeature(this),
+        new CreateScriptStepFeature(this)
     };
   }
 
