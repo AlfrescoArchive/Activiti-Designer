@@ -166,7 +166,7 @@ public class ExportKickstartProcessWizard extends Wizard implements IExportWizar
           monitor.beginTask("Checking cmis folders", IProgressMonitor.UNKNOWN);
           File processFile = new File(repoFolder, factory.getArtifactExporter().getBpmnFileName(definitionConversion));
           Folder modelsFolder = CmisUtil.getFolderByPath(targetPage.getCmisModelsPath());
-          Folder processFolder = CmisUtil.getFolderByPath(targetPage.getCmisModelsPath());
+          Folder processFolder = CmisUtil.getFolderByPath(targetPage.getCmisWorkflowDefinitionsPath());
           
           CmisObject existingProcess = CmisUtil.getFolderChild(processFolder, processFile.getName());
           CmisObject existingModel = CmisUtil.getFolderChild(modelsFolder, modelsFile.getName());
@@ -178,13 +178,14 @@ public class ExportKickstartProcessWizard extends Wizard implements IExportWizar
           }
           
           // Delete model
-          if(existingModel != null) {
+          if(existingModel != null && targetPage.isDeleteModels()) {
             CmisUtil.deleteCmisObjects(existingModel);
+            existingModel = null;
           }
           
           monitor.beginTask("Uploading model and workflow", IProgressMonitor.UNKNOWN);
           // Upload the model and process
-          CmisUtil.uploadModel(modelsFolder, modelsFile);
+          CmisUtil.uploadModel(modelsFolder, modelsFile, existingModel);
           CmisUtil.uploadProcess(processFolder, processFile);
           
           // Also upload share config, if needed
@@ -260,6 +261,7 @@ public class ExportKickstartProcessWizard extends Wizard implements IExportWizar
       preferences.setValue(Preferences.PROCESS_TARGET_LOCATION_SHARE.getPreferenceId(), targetPage.getCustomShareFolder());
     } else if(Preferences.PROCESS_EXPORT_TYPE_CMIS.equals(targetPage.getTargetType())) {
       preferences.setValue(Preferences.CMIS_MODELS_PATH.getPreferenceId(), targetPage.getCmisModelsPath());
+      preferences.setValue(Preferences.CMIS_MODELS_DELETE.getPreferenceId(), targetPage.isDeleteModels());
       preferences.setValue(Preferences.CMIS_WORKFLOW_DEFINITION_PATH.getPreferenceId(), targetPage.getCmisWorkflowDefinitionsPath());
       preferences.setValue(Preferences.CMIS_SHARE_CONFIG_PATH.getPreferenceId(), targetPage.getCmisSharePath());
       

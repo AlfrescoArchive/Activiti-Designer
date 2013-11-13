@@ -173,17 +173,31 @@ public class CmisUtil {
   	return folder.createDocument(properties, contentStream, VersioningState.MAJOR).getId();
   }
   
-  public static String uploadModel(Folder folder, File file) throws IOException {
-    Map<String, Object> properties = new HashMap<String, Object>();
-    properties.put(PropertyIds.OBJECT_TYPE_ID,  "D:cm:dictionaryModel");
-    properties.put(PropertyIds.NAME, file.getName());
-    properties.put("cm:modelActive", Boolean.TRUE);
-
-    InputStream stream = new FileInputStream(file);
-    ContentStream contentStream = new ContentStreamImpl(file.getName(), new BigInteger("-1"), "application/xml", stream);
-
-    // create document
-    return folder.createDocument(properties, contentStream, VersioningState.MAJOR).getId();
+  public static String uploadModel(Folder folder, File file, CmisObject existingModel) throws IOException {
+    if(existingModel != null) {
+      Document pwc = (Document) getCurrentSession().getObject(((Document) existingModel).checkOut());
+      InputStream stream = new FileInputStream(file);
+      ContentStream contentStream = getCurrentSession().getObjectFactory().createContentStream(
+          file.getName(), -1, "application/xml", stream);
+      try {
+          pwc.checkIn(false, null, contentStream, "minor version").getId();
+      } catch (Exception e) {
+          pwc.cancelCheckOut();
+          throw new IOException("Error while checking in new version of model", e);
+      }
+      return existingModel.getId();
+    } else {
+      Map<String, Object> properties = new HashMap<String, Object>();
+      properties.put(PropertyIds.OBJECT_TYPE_ID,  "D:cm:dictionaryModel");
+      properties.put(PropertyIds.NAME, file.getName());
+      properties.put("cm:modelActive", Boolean.TRUE);
+      
+      InputStream stream = new FileInputStream(file);
+      ContentStream contentStream = new ContentStreamImpl(file.getName(), new BigInteger("-1"), "application/xml", stream);
+      
+      // create document
+      return folder.createDocument(properties, contentStream, VersioningState.MAJOR).getId();
+    }
   }
   
   public static String uploadProcess(Folder folder, File file) throws IOException {

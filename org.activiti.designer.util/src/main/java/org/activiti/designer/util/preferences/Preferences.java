@@ -32,6 +32,7 @@ public enum Preferences {
   PROCESS_EXPORT_TYPE("export-type"),
   CMIS_WORKFLOW_DEFINITION_PATH("cmis-workflow-definition-path"),
   CMIS_MODELS_PATH("cmis-models-path"),
+  CMIS_MODELS_DELETE("cmis-models-delete"),
   CMIS_SHARE_CONFIG_PATH("cmis-share-config-path"),
   SHARE_RELOAD_URL("share-reload-url"),
   SHARE_ENABLED("share-enabled");
