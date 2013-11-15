@@ -15,8 +15,8 @@ import org.eclipse.jface.preference.IPreferenceStore;
  */
 public class ActivitiSavePreferencesPageInitializer extends AbstractPreferenceInitializer {
   
-  private static final String FORMTYPES_STARTEVENT = "wf:submitAdhocTask±wf:submitReviewTask±wf:submitGroupReviewTask±wf:submitParallelReviewTask";
-  private static final String FORMTYPES_USERTASK = "wf:adhocTask±wf:completedAdhocTask±wf:activitiReviewTask±wf:approvedTask±wf:rejectedTask±wf:approvedParallelTask±wf:rejectedParallelTask";
+  private static final String FORMTYPES_STARTEVENT = "wf:submitAdhocTask;wf:submitReviewTask;wf:submitGroupReviewTask;wf:submitParallelReviewTask";
+  private static final String FORMTYPES_USERTASK = "wf:adhocTask;wf:completedAdhocTask;wf:activitiReviewTask;wf:approvedTask;wf:rejectedTask;wf:approvedParallelTask;wf:rejectedParallelTask";
 
   public ActivitiSavePreferencesPageInitializer() {
   }

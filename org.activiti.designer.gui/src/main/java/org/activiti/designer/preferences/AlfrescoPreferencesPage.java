@@ -36,7 +36,7 @@ public class AlfrescoPreferencesPage extends FieldEditorPreferencePage implement
       @Override
       protected String[] parseString(String input) {
         if(input != null && input.length() > 0) {
-          return input.split("±");
+          return input.split(";");
         }
         return new String[] {};
       }
@@ -69,7 +69,7 @@ public class AlfrescoPreferencesPage extends FieldEditorPreferencePage implement
         if(outputArray != null && outputArray.length > 0) {
           for (String string : outputArray) {
             if(output.length() > 0) {
-              output.append("±");
+              output.append(";");
             }
             output.append(string);
           }
@@ -86,7 +86,7 @@ public class AlfrescoPreferencesPage extends FieldEditorPreferencePage implement
       @Override
       protected String[] parseString(String input) {
         if(input != null && input.length() > 0) {
-          return input.split("±");
+          return input.split(";");
         }
         return new String[] {};
       }
@@ -119,7 +119,7 @@ public class AlfrescoPreferencesPage extends FieldEditorPreferencePage implement
         if(outputArray != null && outputArray.length > 0) {
           for (String string : outputArray) {
             if(output.length() > 0) {
-              output.append("±");
+              output.append(";");
             }
             output.append(string);
           }

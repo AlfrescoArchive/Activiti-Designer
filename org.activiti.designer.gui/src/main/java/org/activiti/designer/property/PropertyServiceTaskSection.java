@@ -36,7 +36,6 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 	protected Combo taskTypeButton;
 	protected Text classNameText;
 	protected Button classSelectButton;
-	protected CLabel classSelectLabel;
 	protected Text expressionText;
 	protected CLabel expressionLabel;
 	protected Text delegateExpressionText;
@@ -222,7 +221,6 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 	private void setVisibleClassType(boolean visible) {
 		classNameText.setVisible(visible);
 		classSelectButton.setVisible(visible);
-		classSelectLabel.setVisible(visible);
 	}
 
 	private void setVisibleExpressionType(boolean visible) {
