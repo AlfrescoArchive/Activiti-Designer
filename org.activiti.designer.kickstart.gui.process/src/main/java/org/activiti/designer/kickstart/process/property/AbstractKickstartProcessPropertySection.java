@@ -9,7 +9,7 @@ import org.activiti.designer.kickstart.process.diagram.KickstartProcessFeaturePr
 import org.activiti.designer.util.editor.KickstartProcessMemoryModel;
 import org.activiti.designer.util.editor.KickstartProcessMemoryModel.KickstartProcessModelListener;
 import org.activiti.designer.util.editor.ModelHandler;
-import org.activiti.workflow.simple.definition.form.FormPropertyDefinition;
+import org.activiti.workflow.simple.definition.StepDefinition;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
@@ -26,6 +26,7 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
@@ -65,6 +66,7 @@ public abstract class AbstractKickstartProcessPropertySection extends GFProperty
    * and includes a fix for the focus-issue on Eclipse Juno.
    */
   protected FocusListener focusListener;
+  protected FocusListener rememberSelectionFocusListener;
   protected SelectionListener selectionListener;
   protected ModifyListener modifyListener;
   protected KickstartProcessModelListener modelListener;
@@ -75,6 +77,30 @@ public abstract class AbstractKickstartProcessPropertySection extends GFProperty
   public AbstractKickstartProcessPropertySection() {
     
     controls = new ArrayList<Control>();
+    
+    rememberSelectionFocusListener = new FocusListener() {
+      @Override
+      public void focusLost(FocusEvent e) {
+        if(e.getSource() instanceof Text) {
+          Text text = (Text) e.getSource();
+          if(text.getSelection() != null) {
+            text.setData(text.getSelection());
+          } else {
+            text.setData(null);
+          }
+        }
+      }
+      
+      @Override
+      public void focusGained(FocusEvent e) {
+        if(e.getSource() instanceof Text) {
+          Text text = (Text) e.getSource();
+          if(text.getData() != null && text.getData() instanceof Point) {
+            text.setSelection((Point)text.getData());
+          }
+        }
+      }
+    };
     
     focusListener = new FocusListener() {
       @Override
@@ -480,6 +506,7 @@ public abstract class AbstractKickstartProcessPropertySection extends GFProperty
     button.setLayoutData(data);
     
     registerControl(textControl);
+    ensureCaretPositionRetained(textControl);
     return textControl;
   }
   
@@ -577,14 +604,27 @@ public abstract class AbstractKickstartProcessPropertySection extends GFProperty
     return labelControl;
   }
   
-  protected Boolean getBooleanParameter(FormPropertyDefinition propDef, String key, boolean defaultValue) {
+  protected Boolean getBooleanParameter(StepDefinition stepdef, String key, boolean defaultValue) {
     Boolean result = defaultValue;
-    if (propDef.getParameters() != null) {
-      Object value = propDef.getParameters().get(key);
+    if (stepdef.getParameters() != null) {
+      Object value = stepdef.getParameters().get(key);
       if (value instanceof Boolean) {
         result = (Boolean) value;
       } else if (value != null) {
         result = Boolean.valueOf(value.toString());
+      }
+    }
+    return result;
+  }
+  
+  protected String getStringParameter(StepDefinition stepdef, String key, String defaultValue) {
+    String result = defaultValue;
+    if (stepdef.getParameters() != null) {
+      Object value = stepdef.getParameters().get(key);
+      if (value instanceof String) {
+        result = (String) value;
+      } else if (value != null) {
+        result = value.toString();
       }
     }
     return result;
@@ -610,6 +650,10 @@ public abstract class AbstractKickstartProcessPropertySection extends GFProperty
     } else {
       return getContainer(container.eContainer());
     }
+  }
+  
+  protected void ensureCaretPositionRetained(Text text) {
+    text.addFocusListener(rememberSelectionFocusListener);
   }
   
   protected String getSafeText(String string) {

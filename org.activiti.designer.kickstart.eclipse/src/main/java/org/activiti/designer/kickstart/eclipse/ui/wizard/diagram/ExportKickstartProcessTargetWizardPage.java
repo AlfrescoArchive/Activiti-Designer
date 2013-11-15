@@ -38,12 +38,14 @@ public class ExportKickstartProcessTargetWizardPage extends WizardPage {
   protected Text cmisShareText;
   protected Text shareReloadText;
   protected Button enableShareButton;
+  protected Button deleteModelButton;
   protected String cmisWorkflowPath;
   protected String cmisModelsPath;
   protected String cmisSharePath;
   protected String targetType;
   protected String shareReloadUrl;
   protected boolean enableShare;
+  protected boolean deleteModels;
   
   public ExportKickstartProcessTargetWizardPage(String title) {
     super("select-traget");
@@ -106,7 +108,6 @@ public class ExportKickstartProcessTargetWizardPage extends WizardPage {
     shareFolderSelect = new ExternalFolderSelector(fsComposite, "Share folder");
     shareFolderSelect.getComposite().setLayoutData(new GridData(SWT.FILL, SWT.TOP, true, false));
     
-    
     // Add cmis widgets
     Composite cmisComposite = new Composite(toggleContainer.getComposite(), SWT.NONE);
     cmisComposite.setLayout(new GridLayout(1, true));
@@ -123,6 +124,9 @@ public class ExportKickstartProcessTargetWizardPage extends WizardPage {
     
     cmisModelsText = new Text(createCompositeWithLabel(cmisComposite, "Models path"), SWT.BORDER | SWT.SINGLE);
     cmisModelsText.setLayoutData(createFillHorizontalGridData());
+    
+    deleteModelButton = new Button(createCompositeWithLabel(cmisComposite, "Delete and recreate model"), SWT.CHECK);
+    deleteModelButton.setLayoutData(createFillHorizontalGridData());
     
     enableShareButton = new Button(createCompositeWithLabel(cmisComposite, "Reload share"), SWT.CHECK);
     enableShareButton.setLayoutData(createFillHorizontalGridData());
@@ -171,6 +175,13 @@ public class ExportKickstartProcessTargetWizardPage extends WizardPage {
         enableShare = enableShareButton.getSelection();
         cmisShareText.setEnabled(enableShare);
         shareReloadText.setEnabled(enableShare);
+      }
+    });
+    
+    deleteModelButton.addSelectionListener(new SelectionAdapter() {
+      @Override
+      public void widgetSelected(SelectionEvent e) {
+        deleteModels = deleteModelButton.getSelection();
       }
     });
     
@@ -233,6 +244,7 @@ public class ExportKickstartProcessTargetWizardPage extends WizardPage {
     String cmisSharePath = PreferencesUtil.getStringPreference(Preferences.CMIS_SHARE_CONFIG_PATH);
     String shareReloadUrl = PreferencesUtil.getStringPreference(Preferences.SHARE_RELOAD_URL);
     enableShare = PreferencesUtil.getBooleanPreference(Preferences.SHARE_ENABLED);
+    deleteModels = PreferencesUtil.getBooleanPreference(Preferences.CMIS_MODELS_DELETE);
     
     // Update widgets according to preferences
     String targetType = PreferencesUtil.getStringPreference(Preferences.PROCESS_EXPORT_TYPE);
@@ -262,6 +274,7 @@ public class ExportKickstartProcessTargetWizardPage extends WizardPage {
     shareReloadText.setEnabled(enableShare);
     cmisShareText.setEnabled(enableShare);
     enableShareButton.setSelection(enableShare);
+    deleteModelButton.setSelection(deleteModels);
   }
 
   public String getCustomRepositoryFolder() {
@@ -294,6 +307,10 @@ public class ExportKickstartProcessTargetWizardPage extends WizardPage {
 
   public boolean isEnableShare() {
     return enableShare;
+  }
+  
+  public boolean isDeleteModels() {
+    return deleteModels;
   }
   
   protected void createLabel(String text, Control control, Composite parent) {

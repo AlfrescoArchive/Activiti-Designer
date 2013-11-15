@@ -25,6 +25,7 @@ public class CreateContentSelectPropertyFeature extends AbstractCreateFormProper
     ReferencePropertyDefinition definition = new ReferencePropertyDefinition();
     definition.setName("Select content");
     definition.setWritable(true);
+    definition.getParameters().put(AlfrescoConversionConstants.PARAMETER_REFERENCE_MANY, Boolean.TRUE);
     definition.setType(AlfrescoConversionConstants.CONTENT_TYPE_CONTENT);
     return definition;
   }

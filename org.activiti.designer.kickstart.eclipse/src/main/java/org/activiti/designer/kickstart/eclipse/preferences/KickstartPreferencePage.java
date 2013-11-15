@@ -30,6 +30,7 @@ public class KickstartPreferencePage extends FieldEditorPreferencePage implement
       
       addField(new StringFieldEditor(Preferences.CMIS_WORKFLOW_DEFINITION_PATH.getPreferenceId(), "CMIS Workflow Definitions Path", getFieldEditorParent()));
       addField(new StringFieldEditor(Preferences.CMIS_MODELS_PATH.getPreferenceId(), "CMIS Models Path", getFieldEditorParent()));
+      addField(new BooleanFieldEditor(Preferences.CMIS_MODELS_DELETE.getPreferenceId(), "Delete and recreate model", getFieldEditorParent()));
       addField(new StringFieldEditor(Preferences.CMIS_SHARE_CONFIG_PATH.getPreferenceId(), "CMIS Share config Path", getFieldEditorParent()));
       addField(new StringFieldEditor(Preferences.SHARE_RELOAD_URL.getPreferenceId(), "Share reload webscript URL", getFieldEditorParent()));
       addField(new BooleanFieldEditor(Preferences.SHARE_ENABLED.getPreferenceId(), "Share reload enabled", getFieldEditorParent()));

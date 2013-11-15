@@ -25,6 +25,7 @@ public class KickstartPreferencesPageInitializer extends AbstractPreferenceIniti
     store.setDefault(Preferences.PROCESS_EXPORT_TYPE.getPreferenceId(), Preferences.PROCESS_EXPORT_TYPE_TARGET);
     store.setDefault(Preferences.CMIS_WORKFLOW_DEFINITION_PATH.getPreferenceId(), "/Data Dictionary/Workflow Definitions");
     store.setDefault(Preferences.CMIS_MODELS_PATH.getPreferenceId(), "/Data Dictionary/Models");
+    store.setDefault(Preferences.CMIS_MODELS_DELETE.getPreferenceId(), Boolean.TRUE);
     store.setDefault(Preferences.CMIS_SHARE_CONFIG_PATH.getPreferenceId(), "/Sites/surf-config");
     store.setDefault(Preferences.PROCESS_TARGET_LOCATION_REPOSITORY.getPreferenceId(), ".../shared/classes/alfresco/extension");
     store.setDefault(Preferences.PROCESS_TARGET_LOCATION_SHARE.getPreferenceId(), ".../shared/classes/alfresco/web-extension");

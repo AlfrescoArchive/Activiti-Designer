@@ -3,10 +3,9 @@ package org.activiti.designer.kickstart.process.diagram.shape;
 import org.activiti.designer.kickstart.process.KickstartProcessPluginImage;
 import org.activiti.designer.kickstart.process.diagram.KickstartProcessFeatureProvider;
 import org.activiti.workflow.simple.alfresco.step.AlfrescoEmailStepDefinition;
-import org.activiti.workflow.simple.definition.DelayStepDefinition;
 
 /**
- * A {@link BusinessObjectShapeController} capable of creating and updating shapes for {@link DelayStepDefinition}
+ * A {@link BusinessObjectShapeController} capable of creating and updating shapes for {@link AlfrescoEmailStepDefinition}
  * objects.
  * 
  * @author Frederik Heremans
