@@ -25,6 +25,7 @@ import org.activiti.designer.command.IntermediateCatchEventModelUpdater;
 import org.activiti.designer.command.LaneModelUpdater;
 import org.activiti.designer.command.ManualTaskModelUpdater;
 import org.activiti.designer.command.PoolModelUpdater;
+import org.activiti.designer.command.ProcessModelUpdater;
 import org.activiti.designer.command.ReceiveTaskModelUpdater;
 import org.activiti.designer.command.ScriptTaskModelUpdater;
 import org.activiti.designer.command.SendTaskModelUpdater;
@@ -192,6 +193,7 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
     modelUpdaters.add(new BoundaryEventModelUpdater(this));
     modelUpdaters.add(new PoolModelUpdater(this));
     modelUpdaters.add(new LaneModelUpdater(this));
+    modelUpdaters.add(new ProcessModelUpdater(this));
   }
   
   /**

@@ -34,7 +34,7 @@ public class PropertyFormPropertySection extends ActivitiPropertySection impleme
     layout.marginTop = 0;
     layout.numColumns = 1;
     formPropertiesComposite.setLayout(layout);
-    formPropertyEditor = new FormPropertyEditor("formPropertyEditor", formPropertiesComposite);
+    formPropertyEditor = new FormPropertyEditor("formPropertyEditor", formPropertiesComposite, (ModelUpdater) this);
     formPropertyEditor.getLabelControl(formPropertiesComposite).setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
     
     CLabel formPropertiesLabel = getWidgetFactory().createCLabel(formComposite, "Form properties:"); //$NON-NLS-1$
@@ -44,22 +44,22 @@ public class PropertyFormPropertySection extends ActivitiPropertySection impleme
     data.top = new FormAttachment(formPropertiesComposite, 0, SWT.TOP);
     formPropertiesLabel.setLayoutData(data);
   }
-
+  
   @Override
-  protected Object getModelValueForControl(Control control, Object businessObject) {
+  public void refresh() {
     PictogramElement pe = getSelectedPictogramElement();
     if (pe != null) {
-      Object bo = getBusinessObject(pe);
-      if (bo == null)
-        return null;
       
+      PictogramElement element = getSelectedPictogramElement();
+      Object bo = getBusinessObject(element);
+
       List<FormProperty> formPropertyList = null;
-      if(bo instanceof UserTask) {
+      if (bo instanceof UserTask) {
         formPropertyList = ((UserTask) bo).getFormProperties();
-      } else if(bo instanceof StartEvent) {
+      } else if (bo instanceof StartEvent) {
         formPropertyList = ((StartEvent) bo).getFormProperties();
       } else {
-        return null;
+        return;
       }
       
       formPropertyEditor.pictogramElement = pe;
@@ -67,6 +67,10 @@ public class PropertyFormPropertySection extends ActivitiPropertySection impleme
       formPropertyEditor.diagram = getDiagram();
       formPropertyEditor.initialize(formPropertyList);
     }
+  }
+
+  @Override
+  protected Object getModelValueForControl(Control control, Object businessObject) {
     return null;
   }
 

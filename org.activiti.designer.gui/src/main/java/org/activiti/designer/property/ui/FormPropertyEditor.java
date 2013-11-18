@@ -7,11 +7,8 @@ import org.activiti.bpmn.model.FormProperty;
 import org.activiti.bpmn.model.FormValue;
 import org.activiti.bpmn.model.StartEvent;
 import org.activiti.bpmn.model.UserTask;
-import org.activiti.designer.util.eclipse.ActivitiUiUtil;
-import org.activiti.designer.util.editor.ModelHandler;
+import org.activiti.designer.property.ModelUpdater;
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.platform.IDiagramEditor;
@@ -23,15 +20,17 @@ import org.eclipse.swt.widgets.TableItem;
 public class FormPropertyEditor extends TableFieldEditor {
   
   protected Composite parent;
+  protected ModelUpdater modelUpdater;
   public PictogramElement pictogramElement;
   public IDiagramEditor diagramEditor;
   public Diagram diagram;
 	
-  public FormPropertyEditor(String key, Composite parent) {
+  public FormPropertyEditor(String key, Composite parent, ModelUpdater modelUpdater) {
     
     super(key, "", new String[] {"Id", "Name", "Type", "Expression", "Variable", "Default", "Pattern", "Required", "Readable", "Writeable", "Form values"},
         new int[] {60, 100, 60, 100, 80, 80, 60, 60, 60, 60, 120}, parent);
     this.parent = parent;
+    this.modelUpdater = modelUpdater;
   }
 
   public void initialize(List<FormProperty> formPropertyList) {
@@ -142,69 +141,62 @@ public class FormPropertyEditor extends TableFieldEditor {
   
   private void saveFormProperties() {
     if (pictogramElement != null) {
-      final Object bo = ModelHandler.getModel(EcoreUtil.getURI(diagram)).getFeatureProvider().getBusinessObjectForPictogramElement(pictogramElement);
-      if (bo == null) {
-        return;
-      }
-      final List<FormProperty> formPropertyList = getFormProperties(bo);
+      Object updatableBo = modelUpdater.getProcessModelUpdater().getUpdatableBusinessObject();
+      final List<FormProperty> formPropertyList = getFormProperties(updatableBo);
       if(formPropertyList == null) return;
       
-      TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
-      ActivitiUiUtil.runModelChange(new Runnable() {
-        public void run() {
-        	List<FormProperty> newFormList = new ArrayList<FormProperty>();
-          for (TableItem item : getItems()) {
-            String id = item.getText(0);
-            String name = item.getText(1);
-            String type = item.getText(2);
-            String expression = item.getText(3);
-            String variable = item.getText(4);
-            String defaultExpression = item.getText(5);
-            String datePattern = item.getText(6);
-            String required = item.getText(7);
-            String readable = item.getText(8);
-            String writeable = item.getText(9);
-            String formValues = item.getText(10);
-            if(id != null && id.length() > 0) {
-              
-              FormProperty newFormProperty = new FormProperty();
-              newFormProperty.setId(id);
-              newFormProperty.setName(name);
-              newFormProperty.setType(type);
-              newFormProperty.setExpression(expression);
-              newFormProperty.setVariable(variable);
-              newFormProperty.setDefaultExpression(defaultExpression);
-              newFormProperty.setDatePattern(datePattern);
-              if(StringUtils.isNotEmpty(required)) {
-                newFormProperty.setRequired(Boolean.valueOf(required.toLowerCase()));
-              }
-              if(StringUtils.isNotEmpty(readable)) {
-                newFormProperty.setReadable(Boolean.valueOf(readable.toLowerCase()));
-              }
-              if(StringUtils.isNotEmpty(writeable)) {
-                newFormProperty.setWriteable(Boolean.valueOf(writeable.toLowerCase()));
-              }
-              
-              List<FormValue> formValueList = new ArrayList<FormValue>();
-              if(formValues != null && formValues.length() > 0) {
-              	String[] formValueArray = formValues.split(";");
-              	if(formValueArray != null) {
-              		for(String formValue : formValueArray) {
-              			FormValue formValueObj = new FormValue();
-              			formValueObj.setId(formValue.substring(0, formValue.lastIndexOf(":")));
-              			formValueObj.setName(formValue.substring(formValue.lastIndexOf(":") + 1));
-              			formValueList.add(formValueObj);
-              		}
-              	}
-              }
-              newFormProperty.getFormValues().addAll(formValueList);
-              
-              newFormList.add(newFormProperty);
-            }
+      List<FormProperty> newFormList = new ArrayList<FormProperty>();
+      for (TableItem item : getItems()) {
+        String id = item.getText(0);
+        String name = item.getText(1);
+        String type = item.getText(2);
+        String expression = item.getText(3);
+        String variable = item.getText(4);
+        String defaultExpression = item.getText(5);
+        String datePattern = item.getText(6);
+        String required = item.getText(7);
+        String readable = item.getText(8);
+        String writeable = item.getText(9);
+        String formValues = item.getText(10);
+        if(id != null && id.length() > 0) {
+          
+          FormProperty newFormProperty = new FormProperty();
+          newFormProperty.setId(id);
+          newFormProperty.setName(name);
+          newFormProperty.setType(type);
+          newFormProperty.setExpression(expression);
+          newFormProperty.setVariable(variable);
+          newFormProperty.setDefaultExpression(defaultExpression);
+          newFormProperty.setDatePattern(datePattern);
+          if(StringUtils.isNotEmpty(required)) {
+            newFormProperty.setRequired(Boolean.valueOf(required.toLowerCase()));
           }
-          setFormProperties(bo, newFormList);
+          if(StringUtils.isNotEmpty(readable)) {
+            newFormProperty.setReadable(Boolean.valueOf(readable.toLowerCase()));
+          }
+          if(StringUtils.isNotEmpty(writeable)) {
+            newFormProperty.setWriteable(Boolean.valueOf(writeable.toLowerCase()));
+          }
+          
+          List<FormValue> formValueList = new ArrayList<FormValue>();
+          if(formValues != null && formValues.length() > 0) {
+          	String[] formValueArray = formValues.split(";");
+          	if(formValueArray != null) {
+          		for(String formValue : formValueArray) {
+          			FormValue formValueObj = new FormValue();
+          			formValueObj.setId(formValue.substring(0, formValue.lastIndexOf(":")));
+          			formValueObj.setName(formValue.substring(formValue.lastIndexOf(":") + 1));
+          			formValueList.add(formValueObj);
+          		}
+          	}
+          }
+          newFormProperty.getFormValues().addAll(formValueList);
+          
+          newFormList.add(newFormProperty);
         }
-      }, editingDomain, "Model Update");
+      }
+      setFormProperties(updatableBo, newFormList);
+      modelUpdater.executeModelUpdater();
     }
   }
 }

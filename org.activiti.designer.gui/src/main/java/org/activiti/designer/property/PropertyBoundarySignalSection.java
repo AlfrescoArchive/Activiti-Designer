@@ -26,7 +26,7 @@ public class PropertyBoundarySignalSection extends ActivitiPropertySection imple
   protected Object getModelValueForControl(Control control, Object businessObject) {
     BoundaryEvent event = (BoundaryEvent) businessObject;
     if (control == cancelActivityCombo) {
-      return event.isCancelActivity();
+      return String.valueOf(event.isCancelActivity());
       
     } else if (control == signalText) {
       if (event.getEventDefinitions().get(0) != null) {

@@ -19,7 +19,6 @@ import org.activiti.bpmn.model.Pool;
 import org.activiti.bpmn.model.Process;
 import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
@@ -27,12 +26,15 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 public class PropertyDiagramSection extends ActivitiPropertySection implements ITabbedPropertyConstants {
 
-	private Text idText;
-	private Text nameText;
-	private Text namespaceText;
-	private Text documentationText;
-	private Text candidateStarterUsersText;
-	private Text candidateStarterGroupsText;
+  protected Text idText;
+  protected Text nameText;
+  protected Text namespaceText;
+  protected Text documentationText;
+  protected Text candidateStarterUsersText;
+  protected Text candidateStarterGroupsText;
+	
+  protected BpmnMemoryModel model = null;
+	protected Process currentProcess = null;
 	
 	@Override
   public void createFormControls(TabbedPropertySheetPage aTabbedPropertySheetPage) {
@@ -49,31 +51,40 @@ public class PropertyDiagramSection extends ActivitiPropertySection implements I
     documentationText = createTextControl(true);
     createLabel("Documentation", documentationText);
   }
+	
+	
 
   @Override
-  protected Object getModelValueForControl(Control control, Object businessObject) {
-    Process process = null;
-    BpmnMemoryModel model = getModel(getSelectedPictogramElement());
-    if (getSelectedPictogramElement() instanceof Diagram) {
+  public void refresh() {
+    Object businessObject = getBusinessObject(getSelectedPictogramElement());
+    
+    model = getModel(getSelectedPictogramElement());
+    if (businessObject instanceof Process) {
+      currentProcess = (Process) businessObject;
       if (model.getBpmnModel().getPools().size() > 0) {
-        process = model.getBpmnModel().getProcess(model.getBpmnModel().getPools().get(0).getId());
         setEnabled(false);
       } else {
-        process = model.getBpmnModel().getMainProcess();
         setEnabled(true);
       }
-    
-    } else {
-      Pool pool = ((Pool) getBusinessObject(getSelectedPictogramElement()));
-      process = model.getBpmnModel().getProcess(pool.getId());
+      
+    } else if (businessObject instanceof Pool) {
+      Pool pool = (Pool) businessObject;
+      currentProcess = model.getBpmnModel().getProcess(pool.getId());
       setEnabled(true);
     }
     
+    super.refresh();
+  }
+
+
+
+  @Override
+  protected Object getModelValueForControl(Control control, Object businessObject) {
     if (control == idText) {
-      return process.getId();
+      return currentProcess.getId();
       
     } else if (control == nameText) {
-      return process.getName();
+      return currentProcess.getName();
     
     } else if (control == namespaceText) {
       if (StringUtils.isNotEmpty(model.getBpmnModel().getTargetNamespace())) {
@@ -83,13 +94,13 @@ public class PropertyDiagramSection extends ActivitiPropertySection implements I
       }
       
     } else if (control == candidateStarterUsersText) {
-      return getCommaSeperatedString(process.getCandidateStarterUsers());
+      return getCommaSeperatedString(currentProcess.getCandidateStarterUsers());
     
     } else if (control == candidateStarterGroupsText) {
-      return getCommaSeperatedString(process.getCandidateStarterGroups());
+      return getCommaSeperatedString(currentProcess.getCandidateStarterGroups());
       
     } else if (control == documentationText) {
-      return process.getDocumentation();
+      return currentProcess.getDocumentation();
     }
     
     return null;
@@ -97,40 +108,41 @@ public class PropertyDiagramSection extends ActivitiPropertySection implements I
 
   @Override
   protected void storeValueInModel(Control control, final Object businessObject) {
-    Process process = null;
-    BpmnMemoryModel model = getModel(getSelectedPictogramElement());
-    if (getSelectedPictogramElement() instanceof Diagram) {
-      if (model.getBpmnModel().getPools().size() > 0) {
-        process = model.getBpmnModel().getProcess(model.getBpmnModel().getPools().get(0).getId());
-        setEnabled(false);
-      } else {
-        process = model.getBpmnModel().getMainProcess();
-        setEnabled(true);
-      }
-    
-    } else {
-      Pool pool = ((Pool) getBusinessObject(getSelectedPictogramElement()));
-      process = model.getBpmnModel().getProcess(pool.getId());
-      setEnabled(true);
-    }
-    
     if (control == idText) {
-      process.setId(idText.getText());
+      currentProcess.setId(idText.getText());
+      if (businessObject instanceof Pool) {
+        Pool pool = (Pool) businessObject;
+        pool.setProcessRef(currentProcess.getId());
+      } else if (businessObject instanceof Process) {
+        ((Process) businessObject).setId(currentProcess.getId());
+      }
       
     } else if (control == nameText) {
-      process.setName(nameText.getText());
+      currentProcess.setName(nameText.getText());
+      if (businessObject instanceof Process) {
+        ((Process) businessObject).setName(currentProcess.getName());
+      }
     
     } else if (control == namespaceText) {
       model.getBpmnModel().setTargetNamespace(namespaceText.getText());
     
     } else if (control == candidateStarterUsersText) {
-      process.setCandidateStarterUsers(commaSeperatedStringToList(candidateStarterUsersText.getText()));
+      currentProcess.setCandidateStarterUsers(commaSeperatedStringToList(candidateStarterUsersText.getText()));
+      if (businessObject instanceof Process) {
+        ((Process) businessObject).setCandidateStarterUsers(currentProcess.getCandidateStarterUsers());
+      }
     
     } else if (control == candidateStarterGroupsText) {
-      process.setCandidateStarterGroups(commaSeperatedStringToList(candidateStarterGroupsText.getText()));
+      currentProcess.setCandidateStarterGroups(commaSeperatedStringToList(candidateStarterGroupsText.getText()));
+      if (businessObject instanceof Process) {
+        ((Process) businessObject).setCandidateStarterGroups(currentProcess.getCandidateStarterGroups());
+      }
     
     } else if (control == documentationText) {
-      process.setDocumentation(documentationText.getText());
+      currentProcess.setDocumentation(documentationText.getText());
+      if (businessObject instanceof Process) {
+        ((Process) businessObject).setDocumentation(currentProcess.getDocumentation());
+      }
     }
   }
 	

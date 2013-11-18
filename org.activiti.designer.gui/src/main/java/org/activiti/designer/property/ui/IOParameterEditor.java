@@ -5,11 +5,8 @@ import java.util.List;
 
 import org.activiti.bpmn.model.CallActivity;
 import org.activiti.bpmn.model.IOParameter;
-import org.activiti.designer.util.eclipse.ActivitiUiUtil;
-import org.activiti.designer.util.editor.ModelHandler;
+import org.activiti.designer.property.ModelUpdater;
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.platform.IDiagramEditor;
@@ -21,16 +18,19 @@ import org.eclipse.swt.widgets.TableItem;
 public class IOParameterEditor extends TableFieldEditor {
   
   protected Composite parent;
+  protected ModelUpdater modelUpdater;
+  
   public PictogramElement pictogramElement;
   public IDiagramEditor diagramEditor;
   public Diagram diagram;
   public boolean isInputParameters = false;
 	
-  public IOParameterEditor(String key, Composite parent) {
+  public IOParameterEditor(String key, Composite parent, ModelUpdater modelUpdater) {
     
     super(key, "", new String[] {"Source", "Source expression", "Target", "Target expression"},
         new int[] {150, 150, 150, 150}, parent);
     this.parent = parent;
+    this.modelUpdater = modelUpdater;
   }
 
   public void initialize(List<IOParameter> parameterList) {
@@ -104,40 +104,33 @@ public class IOParameterEditor extends TableFieldEditor {
   
   private void saveIOParameters() {
     if (pictogramElement != null) {
-      final Object bo = ModelHandler.getModel(EcoreUtil.getURI(diagram)).getFeatureProvider().getBusinessObjectForPictogramElement(pictogramElement);
-      if (bo == null) {
-        return;
-      }
+      Object updatableBo = modelUpdater.getProcessModelUpdater().getUpdatableBusinessObject();
       
-      TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
-      ActivitiUiUtil.runModelChange(new Runnable() {
-        public void run() {
-        	List<IOParameter> newParameterList = new ArrayList<IOParameter>();
-          for (TableItem item : getItems()) {
-            String source = item.getText(0);
-            String sourceExpression = item.getText(1);
-            String target = item.getText(2);
-            String targetExpression = item.getText(3);
-            if((StringUtils.isNotEmpty(source) || StringUtils.isNotEmpty(sourceExpression)) &&
-                (StringUtils.isNotEmpty(target) || StringUtils.isNotEmpty(targetExpression))) {
-              
-            	IOParameter newParameter = new IOParameter();
-            	newParameter.setSource(source);
-            	newParameter.setSourceExpression(sourceExpression);
-            	newParameter.setTarget(target);
-            	newParameter.setTargetExpression(targetExpression);
-              newParameterList.add(newParameter);
-            }
-          }
-          if(isInputParameters == true) {
-            ((CallActivity) bo).getInParameters().clear();
-            ((CallActivity) bo).getInParameters().addAll(newParameterList);
-          } else {
-            ((CallActivity) bo).getOutParameters().clear();
-            ((CallActivity) bo).getOutParameters().addAll(newParameterList);
-          }
+    	List<IOParameter> newParameterList = new ArrayList<IOParameter>();
+      for (TableItem item : getItems()) {
+        String source = item.getText(0);
+        String sourceExpression = item.getText(1);
+        String target = item.getText(2);
+        String targetExpression = item.getText(3);
+        if((StringUtils.isNotEmpty(source) || StringUtils.isNotEmpty(sourceExpression)) &&
+            (StringUtils.isNotEmpty(target) || StringUtils.isNotEmpty(targetExpression))) {
+          
+        	IOParameter newParameter = new IOParameter();
+        	newParameter.setSource(source);
+        	newParameter.setSourceExpression(sourceExpression);
+        	newParameter.setTarget(target);
+        	newParameter.setTargetExpression(targetExpression);
+          newParameterList.add(newParameter);
         }
-      }, editingDomain, "Model Update");
+      }
+      if(isInputParameters == true) {
+        ((CallActivity) updatableBo).getInParameters().clear();
+        ((CallActivity) updatableBo).getInParameters().addAll(newParameterList);
+      } else {
+        ((CallActivity) updatableBo).getOutParameters().clear();
+        ((CallActivity) updatableBo).getOutParameters().addAll(newParameterList);
+      }
+     modelUpdater.executeModelUpdater();
     }
   }
 }

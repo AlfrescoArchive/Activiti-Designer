@@ -43,7 +43,7 @@ import org.eclipse.ui.part.IContributedContentsView;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
-public abstract class ActivitiPropertySection extends BaseActivitiPropertySection {
+public abstract class ActivitiPropertySection extends BaseActivitiPropertySection implements ModelUpdater {
 
   /**
    * Internal list of controls added to this section.
@@ -205,7 +205,7 @@ public abstract class ActivitiPropertySection extends BaseActivitiPropertySectio
         try {
           modelChangesEnabled = false;
           
-          BpmnProcessModelUpdater updater = getModelUpdater();
+          BpmnProcessModelUpdater updater = getProcessModelUpdater();
 
           // Perform the changes on the updatable BO instead of the original
           Object updatableBo = updater.getUpdatableBusinessObject();
@@ -224,7 +224,7 @@ public abstract class ActivitiPropertySection extends BaseActivitiPropertySectio
    * Execute the updates queued in the given updated using the current transactional
    * edition domain. 
    */
-  protected void executeModelUpdater() {
+  public void executeModelUpdater() {
     // Make sure the update of the model is done in the transactional editing domain
     // to allow for "undoing" changes
     DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
@@ -242,11 +242,11 @@ public abstract class ActivitiPropertySection extends BaseActivitiPropertySectio
   /**
    * @return an {@link UpdateBusinessObjectCommand} that will be used to record model updates. 
    */
-  protected BpmnProcessModelUpdater createModelUpdater() {
+  protected BpmnProcessModelUpdater createProcessModelUpdater() {
     PictogramElement element = getSelectedPictogramElement();
     ActivitiBPMNFeatureProvider featureProvider = getFeatureProvider(element);
     if (featureProvider != null) {
-      return featureProvider.getModelUpdaterFor(featureProvider.getBusinessObjectForPictogramElement(element), element);
+      return featureProvider.getModelUpdaterFor(getBusinessObject(element), element);
     }
     return null;
   }
@@ -259,9 +259,9 @@ public abstract class ActivitiPropertySection extends BaseActivitiPropertySectio
     }
   }
   
-  protected BpmnProcessModelUpdater getModelUpdater() {
+  public BpmnProcessModelUpdater getProcessModelUpdater() {
     if(currentUpdater == null) {
-      currentUpdater = createModelUpdater();
+      currentUpdater = createProcessModelUpdater();
     }
     return currentUpdater;
   }
@@ -271,7 +271,7 @@ public abstract class ActivitiPropertySection extends BaseActivitiPropertySectio
    * current model state.
    */
   protected void resetModelUpdater() {
-    currentUpdater = createModelUpdater();
+    currentUpdater = createProcessModelUpdater();
   }
   
   /**
@@ -364,8 +364,18 @@ public abstract class ActivitiPropertySection extends BaseActivitiPropertySectio
   protected Object getBusinessObject(PictogramElement element) {
     if (element == null)
       return null;
+    
+    if (element instanceof Diagram) {
+      BpmnMemoryModel model = getModel(element);
+      if (model.getBpmnModel().getPools().size() > 0) {
+        return model.getBpmnModel().getProcess(model.getBpmnModel().getPools().get(0).getId());
+      } else {
+        return model.getBpmnModel().getMainProcess();
+      }
+    }
+    
     ActivitiBPMNFeatureProvider featureProvider = getFeatureProvider(element);
-    if(featureProvider != null) {
+    if( featureProvider != null) {
       return featureProvider.getBusinessObjectForPictogramElement(element);
     }
     return null;
@@ -413,7 +423,7 @@ public abstract class ActivitiPropertySection extends BaseActivitiPropertySectio
       textControl = getWidgetFactory().createText(formComposite, "", SWT.NONE);
       data = new FormData();
     }
-    data.left = new FormAttachment(0, 250);
+    data.left = new FormAttachment(0, 280);
     data.right = new FormAttachment(100, 0);
     data.top = createTopFormAttachment();
     textControl.setLayoutData(data);

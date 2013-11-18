@@ -75,18 +75,28 @@ public class BpmnBOUtil {
     }
   }
   
-  public static void removeExecutionListener(Object bo, ActivitiListener listener, Diagram diagram) {
-  	if(bo instanceof HasExecutionListeners) {
-    	((HasExecutionListeners) bo).getExecutionListeners().remove(listener);
+  public static void setExecutionListeners(Object bo, List<ActivitiListener> listeners, Diagram diagram) {
+    if(bo instanceof HasExecutionListeners) {
+      ((HasExecutionListeners) bo).setExecutionListeners(listeners);
     } else if(bo instanceof Pool) {
       Pool pool = ((Pool) bo);
       BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(diagram));
-      model.getBpmnModel().getProcess(pool.getId()).getExecutionListeners().remove(listener);
+      model.getBpmnModel().getProcess(pool.getId()).setExecutionListeners(listeners);
+    }
+  }
+  
+  public static void removeExecutionListener(Object bo, int index, Diagram diagram) {
+  	if(bo instanceof HasExecutionListeners) {
+    	((HasExecutionListeners) bo).getExecutionListeners().remove(index);
+    } else if(bo instanceof Pool) {
+      Pool pool = ((Pool) bo);
+      BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(diagram));
+      model.getBpmnModel().getProcess(pool.getId()).getExecutionListeners().remove(index);
     }
   }
   
   public static List<FieldExtension> getFieldModelList(String fieldString) {
-    String[] fieldStringList = fieldString.split("± ");
+    String[] fieldStringList = fieldString.split("|");
     List<FieldExtension> fieldList = new ArrayList<FieldExtension>();
     for (String field : fieldStringList) {
       String[] fieldExtensionStringList = field.split(":");

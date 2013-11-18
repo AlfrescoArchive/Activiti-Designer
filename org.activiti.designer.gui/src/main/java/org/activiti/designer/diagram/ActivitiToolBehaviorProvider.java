@@ -257,7 +257,8 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
       data.getDomainSpecificContextButtons().add(button);
     }
 
-    if (bo instanceof StartEvent || bo instanceof Task || bo instanceof CallActivity || bo instanceof Gateway) {
+    if (bo instanceof StartEvent || bo instanceof Task || bo instanceof CallActivity || 
+        bo instanceof SubProcess || bo instanceof Gateway || bo instanceof BoundaryEvent) {
 
       ContextButtonEntry otherElementButton = new ContextButtonEntry(null, null);
       otherElementButton.setText("new element"); //$NON-NLS-1$

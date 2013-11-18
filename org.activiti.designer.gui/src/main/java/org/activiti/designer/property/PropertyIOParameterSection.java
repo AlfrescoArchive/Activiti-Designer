@@ -5,6 +5,7 @@ import java.util.List;
 import org.activiti.bpmn.model.CallActivity;
 import org.activiti.bpmn.model.IOParameter;
 import org.activiti.designer.property.ui.IOParameterEditor;
+import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.layout.FormAttachment;
@@ -33,7 +34,7 @@ public class PropertyIOParameterSection extends ActivitiPropertySection implemen
     layout.marginTop = 0;
     layout.numColumns = 1;
     inParametersComposite.setLayout(layout);
-    inParameterEditor = new IOParameterEditor("inputParameterEditor", inParametersComposite);
+    inParameterEditor = new IOParameterEditor("inputParameterEditor", inParametersComposite, (ModelUpdater) this);
     inParameterEditor.getLabelControl(inParametersComposite).setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
     
     CLabel inParametersLabel = getWidgetFactory().createCLabel(formComposite, "Input parameters:"); //$NON-NLS-1$
@@ -53,7 +54,7 @@ public class PropertyIOParameterSection extends ActivitiPropertySection implemen
     layout.marginTop = 0;
     layout.numColumns = 1;
     outParametersComposite.setLayout(outLayout);
-    outParameterEditor = new IOParameterEditor("outputParameterEditor", outParametersComposite);
+    outParameterEditor = new IOParameterEditor("outputParameterEditor", outParametersComposite, (ModelUpdater) this);
     outParameterEditor.getLabelControl(outParametersComposite).setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
     
     CLabel outParametersLabel = getWidgetFactory().createCLabel(formComposite, "Output parameters:"); //$NON-NLS-1$
@@ -63,24 +64,35 @@ public class PropertyIOParameterSection extends ActivitiPropertySection implemen
     data.top = new FormAttachment(outParametersComposite, 0, SWT.TOP);
     outParametersLabel.setLayoutData(data);
   }
+  
+  @Override
+  public void refresh() {
+    PictogramElement pe = getSelectedPictogramElement();
+    if (pe != null) {
+      
+      PictogramElement element = getSelectedPictogramElement();
+      CallActivity bo = (CallActivity) getBusinessObject(element);
+
+      List<IOParameter> inParameterList = bo.getInParameters();
+      
+      inParameterEditor.pictogramElement = getSelectedPictogramElement();
+      inParameterEditor.diagramEditor = getDiagramEditor();
+      inParameterEditor.diagram = getDiagram();
+      inParameterEditor.isInputParameters = true;
+      inParameterEditor.initialize(inParameterList);
+      
+      List<IOParameter> outParameterList = bo.getOutParameters();
+      
+      outParameterEditor.pictogramElement = getSelectedPictogramElement();
+      outParameterEditor.diagramEditor = getDiagramEditor();
+      outParameterEditor.diagram = getDiagram();
+      outParameterEditor.isInputParameters = false;
+      outParameterEditor.initialize(outParameterList);
+    }
+  }
 
   @Override
   protected Object getModelValueForControl(Control control, Object businessObject) {
-    List<IOParameter> inParameterList = ((CallActivity) businessObject).getInParameters();
-    
-    inParameterEditor.pictogramElement = getSelectedPictogramElement();
-    inParameterEditor.diagramEditor = getDiagramEditor();
-    inParameterEditor.diagram = getDiagram();
-    inParameterEditor.isInputParameters = true;
-    inParameterEditor.initialize(inParameterList);
-    
-    List<IOParameter> outParameterList = ((CallActivity) businessObject).getOutParameters();
-    
-    outParameterEditor.pictogramElement = getSelectedPictogramElement();
-    outParameterEditor.diagramEditor = getDiagramEditor();
-    outParameterEditor.diagram = getDiagram();
-    outParameterEditor.isInputParameters = false;
-    outParameterEditor.initialize(outParameterList);
     return null;
   }
 

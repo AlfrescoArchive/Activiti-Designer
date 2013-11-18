@@ -33,7 +33,7 @@ public class PropertyBoundaryTimerSection extends ActivitiPropertySection implem
     BoundaryEvent event = (BoundaryEvent) businessObject;
     TimerEventDefinition timerDefinition = (TimerEventDefinition) event.getEventDefinitions().get(0);
     if (control == cancelActivityCombo) {
-      return event.isCancelActivity();
+      return String.valueOf(event.isCancelActivity());
       
     } else if (control == timeDurationText) {
       return timerDefinition.getTimeDuration();

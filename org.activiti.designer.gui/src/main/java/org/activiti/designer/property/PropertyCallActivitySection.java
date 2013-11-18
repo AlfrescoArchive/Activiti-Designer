@@ -83,6 +83,8 @@ public class PropertyCallActivitySection extends ActivitiPropertySection impleme
     chooseCalledElementButton.addSelectionListener(chooseCalledElementSelected);
     
     calledElementText = createTextControl(false);
+    FormData formData = (FormData) calledElementText.getLayoutData();
+    formData.right.offset = -80;
     createLabel("Called element", calledElementText);
   }
 

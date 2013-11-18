@@ -5,6 +5,7 @@ import java.util.List;
 import org.activiti.bpmn.model.ActivitiListener;
 import org.activiti.bpmn.model.UserTask;
 import org.activiti.designer.property.ui.TaskListenerEditor;
+import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.layout.FormAttachment;
@@ -25,15 +26,15 @@ public class PropertyTaskListenerSection extends ActivitiPropertySection impleme
     Composite listenersComposite = getWidgetFactory().createComposite(formComposite, SWT.WRAP);
     FormData data = new FormData();
     data = new FormData();
-    data.left = new FormAttachment(0, 140);
-    data.right = new FormAttachment(100, 0);
+    data.left = new FormAttachment(0, 180);
+    data.right = new FormAttachment(100, -20);
     data.top = new FormAttachment(0, VSPACE);
     listenersComposite.setLayoutData(data);
     GridLayout layout = new GridLayout();
     layout.marginTop = 0;
     layout.numColumns = 1;
     listenersComposite.setLayout(layout);
-    listenerEditor = new TaskListenerEditor("taskListenerEditor", listenersComposite);
+    listenerEditor = new TaskListenerEditor("taskListenerEditor", listenersComposite, (ModelUpdater) this);
     listenerEditor.getLabelControl(listenersComposite).setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
     
     CLabel listenersLabel = getWidgetFactory().createCLabel(formComposite, "Task listeners:"); //$NON-NLS-1$
@@ -43,16 +44,27 @@ public class PropertyTaskListenerSection extends ActivitiPropertySection impleme
     data.top = new FormAttachment(listenersComposite, 0, SWT.TOP);
     listenersLabel.setLayoutData(data);
   }
+	
+	@Override
+  public void refresh() {
+    PictogramElement pe = getSelectedPictogramElement();
+    if (pe != null) {
+      
+      PictogramElement element = getSelectedPictogramElement();
+      Object bo = getBusinessObject(element);
+
+      UserTask userTask = (UserTask) bo;
+      List<ActivitiListener> taskListenerList = userTask.getTaskListeners();
+
+      listenerEditor.pictogramElement = getSelectedPictogramElement();
+      listenerEditor.diagramEditor = getDiagramEditor();
+      listenerEditor.diagram = getDiagram();
+      listenerEditor.initialize(taskListenerList);
+    }
+  }
 
   @Override
   protected Object getModelValueForControl(Control control, Object businessObject) {
-    UserTask userTask = (UserTask) businessObject;
-    List<ActivitiListener> taskListenerList = userTask.getTaskListeners();
-    
-    listenerEditor.pictogramElement = getSelectedPictogramElement();
-    listenerEditor.diagramEditor = getDiagramEditor();
-    listenerEditor.diagram = getDiagram();
-    listenerEditor.initialize(taskListenerList);
     return null;
   }
 
