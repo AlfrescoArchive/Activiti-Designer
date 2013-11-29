@@ -247,36 +247,7 @@ public class SequenceFlowShapeController extends AbstractBusinessObjectShapeCont
 
     return connection;
   }
-  
-  @Override
-  public void updateShape(PictogramElement element, Object businessObject, int width, int height) {
-    SequenceFlow flow = (SequenceFlow) businessObject;
     
-    // Update the label
-    MultiText labelText = findNameMultiText(element);
-    if (labelText != null) {
-      labelText.setValue(getLabelTextValue(flow));
-    }
-  }
-  
-  @Override
-  public GraphicsAlgorithm getGraphicsAlgorithmForDirectEdit(PictogramElement element) {
-    return element.getGraphicsAlgorithm();
-  }
-  
-  @Override
-  public boolean isShapeUpdateNeeded(PictogramElement element, Object businessObject) {
-    SequenceFlow flow = (SequenceFlow) businessObject;
-    
-    // Check label text
-    String currentLabel = (String) extractShapeData(LABEL_DATA_KEY, element);
-    String newLabel = getLabelTextValue(flow);
-    if (!StringUtils.equals(currentLabel, newLabel)) {
-      return true;
-    }
-    return false;
-  }
-  
   protected Polygon createArrow(GraphicsAlgorithmContainer gaContainer, Diagram diagram) {
     int xy[] = new int[] { -10, -5, 0, 0, -10, 5, -8, 0 };
     int beforeAfter[] = new int[] { 3, 3, 0, 0, 3, 3, 3, 3 };

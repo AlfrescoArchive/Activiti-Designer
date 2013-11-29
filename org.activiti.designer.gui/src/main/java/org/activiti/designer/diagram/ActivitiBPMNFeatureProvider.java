@@ -15,6 +15,7 @@ import org.activiti.bpmn.model.Pool;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.bpmn.model.Task;
 import org.activiti.bpmn.model.TextAnnotation;
+import org.activiti.designer.command.AssociationModelUpdater;
 import org.activiti.designer.command.BoundaryEventModelUpdater;
 import org.activiti.designer.command.BpmnProcessModelUpdater;
 import org.activiti.designer.command.BusinessRuleTaskModelUpdater;
@@ -29,6 +30,7 @@ import org.activiti.designer.command.ProcessModelUpdater;
 import org.activiti.designer.command.ReceiveTaskModelUpdater;
 import org.activiti.designer.command.ScriptTaskModelUpdater;
 import org.activiti.designer.command.SendTaskModelUpdater;
+import org.activiti.designer.command.SequenceFlowModelUpdater;
 import org.activiti.designer.command.ServiceTaskModelUpdater;
 import org.activiti.designer.command.StartEventModelUpdater;
 import org.activiti.designer.command.SubProcessModelUpdater;
@@ -139,6 +141,7 @@ import org.eclipse.graphiti.features.context.IResizeShapeContext;
 import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.features.custom.ICustomFeature;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
+import org.eclipse.graphiti.mm.pictograms.FreeFormConnection;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.ui.features.DefaultFeatureProvider;
@@ -200,6 +203,8 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
     modelUpdaters.add(new LaneModelUpdater(this));
     modelUpdaters.add(new TextAnnotationModelUpdater(this));
     modelUpdaters.add(new ProcessModelUpdater(this));
+    modelUpdaters.add(new SequenceFlowModelUpdater(this));
+    modelUpdaters.add(new AssociationModelUpdater(this));
   }
   
   /**
@@ -315,6 +320,10 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
         return new UpdatePoolAndLaneFeature(this);
       } else if (bo instanceof TextAnnotation) {
         return new UpdateTextAnnotationFeature(this);
+      }
+    } else if (pictogramElement instanceof FreeFormConnection) {
+      if (bo instanceof FlowElement) {
+        return new UpdateFlowElementFeature(this);
       }
     }
     return super.getUpdateFeature(context);

@@ -216,21 +216,6 @@ public class AssociationShapeController extends AbstractBusinessObjectShapeContr
     return connection;
   }
   
-  @Override
-  public void updateShape(PictogramElement element, Object businessObject, int width, int height) {
-    // nothing to do
-  }
-  
-  @Override
-  public GraphicsAlgorithm getGraphicsAlgorithmForDirectEdit(PictogramElement element) {
-    return element.getGraphicsAlgorithm();
-  }
-  
-  @Override
-  public boolean isShapeUpdateNeeded(PictogramElement element, Object businessObject) {
-    return false;
-  }
-
   protected PictogramElement getPictogramElement(Object businessObject) {
     return getFeatureProvider().getPictogramElementForBusinessObject(businessObject);
   }

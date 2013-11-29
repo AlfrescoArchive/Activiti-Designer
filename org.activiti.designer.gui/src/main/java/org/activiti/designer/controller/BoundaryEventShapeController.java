@@ -13,7 +13,6 @@ import org.activiti.designer.util.style.StyleUtil;
 import org.eclipse.graphiti.datatypes.ILocation;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.mm.algorithms.Ellipse;
-import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.algorithms.Image;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
@@ -117,20 +116,5 @@ public class BoundaryEventShapeController extends AbstractBusinessObjectShapeCon
       }
     }
     return imageKey;
-  }
-  
-  @Override
-  public void updateShape(PictogramElement element, Object businessObject, int width, int height) {
-    // nothing to do
-  }
-  
-  @Override
-  public GraphicsAlgorithm getGraphicsAlgorithmForDirectEdit(PictogramElement element) {
-    return ((ContainerShape) element).getChildren().get(0).getGraphicsAlgorithm();
-  }
-  
-  @Override
-  public boolean isShapeUpdateNeeded(PictogramElement element, Object businessObject) {
-    return false;
   }
 }

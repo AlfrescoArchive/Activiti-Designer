@@ -6,10 +6,7 @@ import org.activiti.designer.diagram.ActivitiBPMNFeatureProvider;
 import org.activiti.designer.util.platform.OSEnum;
 import org.activiti.designer.util.platform.OSUtil;
 import org.activiti.designer.util.style.StyleUtil;
-import org.apache.commons.lang.StringUtils;
 import org.eclipse.graphiti.features.context.IAddContext;
-import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
-import org.eclipse.graphiti.mm.algorithms.MultiText;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.algorithms.styles.Font;
@@ -89,34 +86,5 @@ public class PoolShapeController extends AbstractBusinessObjectShapeController {
     getFeatureProvider().link(shape, addedPool);
 
     return containerShape;
-  }
-  
-  @Override
-  public void updateShape(PictogramElement element, Object businessObject, int width, int height) {
-    Pool pool = (Pool) businessObject;
-    
-    // Update the label
-    MultiText labelText = findNameMultiText(element);
-    if (labelText != null) {
-      labelText.setValue(getLabelTextValue(pool));
-    }
-  }
-  
-  @Override
-  public GraphicsAlgorithm getGraphicsAlgorithmForDirectEdit(PictogramElement element) {
-    return ((ContainerShape) element).getChildren().get(0).getGraphicsAlgorithm();
-  }
-  
-  @Override
-  public boolean isShapeUpdateNeeded(PictogramElement element, Object businessObject) {
-    Pool pool = (Pool) businessObject;
-    
-    // Check label text
-    String currentLabel = (String) extractShapeData(LABEL_DATA_KEY, element);
-    String newLabel = getLabelTextValue(pool);
-    if (!StringUtils.equals(currentLabel, newLabel)) {
-      return true;
-    }
-    return false;
   }
 }

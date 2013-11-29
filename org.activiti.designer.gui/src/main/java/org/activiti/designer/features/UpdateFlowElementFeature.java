@@ -1,6 +1,8 @@
 package org.activiti.designer.features;
 
 import org.activiti.bpmn.model.FlowElement;
+import org.activiti.designer.util.TextUtil;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.IReason;
 import org.eclipse.graphiti.features.context.IUpdateContext;
@@ -8,7 +10,9 @@ import org.eclipse.graphiti.features.impl.AbstractUpdateFeature;
 import org.eclipse.graphiti.features.impl.Reason;
 import org.eclipse.graphiti.mm.algorithms.MultiText;
 import org.eclipse.graphiti.mm.algorithms.Text;
+import org.eclipse.graphiti.mm.pictograms.ConnectionDecorator;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
+import org.eclipse.graphiti.mm.pictograms.FreeFormConnection;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 
@@ -33,17 +37,27 @@ public class UpdateFlowElementFeature extends AbstractUpdateFeature {
 				if (shape.getGraphicsAlgorithm() instanceof Text) {
 					Text text = (Text) shape.getGraphicsAlgorithm();
 					pictogramName = text.getValue();
-				}
+					
+				} else if (shape.getGraphicsAlgorithm() instanceof MultiText) {
+				  MultiText text = (MultiText) shape.getGraphicsAlgorithm();
+          pictogramName = text.getValue();
+        }
 			}
+		} else if (pictogramElement instanceof FreeFormConnection) {
+		
+      EList<ConnectionDecorator> decoratorList = ((FreeFormConnection) pictogramElement).getConnectionDecorators();
+      for (ConnectionDecorator decorator : decoratorList) {
+        if (decorator.getGraphicsAlgorithm() instanceof MultiText) {
+          MultiText text = (MultiText) decorator.getGraphicsAlgorithm();
+          pictogramName = text.getValue();
+        }
+      }
 		}
 
 		// retrieve name from business model
-		String businessName = null;
 		Object bo = getBusinessObjectForPictogramElement(pictogramElement);
-		if (bo instanceof FlowElement) {
-			FlowElement flowElement = (FlowElement) bo;
-			businessName = flowElement.getName();
-		}
+		FlowElement flowElement = (FlowElement) bo;
+		String businessName = flowElement.getName();
 
 		// update needed, if names are different
 		boolean updateNameNeeded = ((pictogramName == null && businessName != null) || 
@@ -81,7 +95,19 @@ public class UpdateFlowElementFeature extends AbstractUpdateFeature {
 					return true;
 				}
 			}
-		}
+		
+		} else if (pictogramElement instanceof FreeFormConnection) {
+    
+      EList<ConnectionDecorator> decoratorList = ((FreeFormConnection) pictogramElement).getConnectionDecorators();
+      for (ConnectionDecorator decorator : decoratorList) {
+        if (decorator.getGraphicsAlgorithm() instanceof MultiText) {
+          MultiText text = (MultiText) decorator.getGraphicsAlgorithm();
+          text.setValue(businessName);
+          TextUtil.setTextSize(text);
+          return true;
+        }
+      }
+    }
 
 		return false;
 	}

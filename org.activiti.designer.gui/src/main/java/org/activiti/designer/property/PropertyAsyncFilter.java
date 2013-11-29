@@ -16,6 +16,7 @@
 package org.activiti.designer.property;
 
 import org.activiti.bpmn.model.Activity;
+import org.activiti.bpmn.model.ThrowEvent;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 
 public class PropertyAsyncFilter extends ActivitiPropertyFilter {
@@ -23,7 +24,7 @@ public class PropertyAsyncFilter extends ActivitiPropertyFilter {
   @Override
   protected boolean accept(PictogramElement pe) {
   	Object bo = getBusinessObject(pe);
-  	if(bo != null && bo instanceof Activity) {
+  	if(bo != null && bo instanceof Activity || bo instanceof ThrowEvent) {
       return true;
   	}
     return false;

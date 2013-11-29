@@ -12,7 +12,6 @@ import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.style.StyleUtil;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.mm.algorithms.Ellipse;
-import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.algorithms.Image;
 import org.eclipse.graphiti.mm.pictograms.BoxRelativeAnchor;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
@@ -89,20 +88,5 @@ public class AlfrescoStartEventShapeController extends AbstractBusinessObjectSha
     gaService.setLocationAndSize(image, 10, 10, IMAGE_SIZE, IMAGE_SIZE);
 
     return containerShape;
-  }
-  
-  @Override
-  public void updateShape(PictogramElement element, Object businessObject, int width, int height) {
-    // nothing to do
-  }
-  
-  @Override
-  public GraphicsAlgorithm getGraphicsAlgorithmForDirectEdit(PictogramElement element) {
-    return ((ContainerShape) element).getChildren().get(0).getGraphicsAlgorithm();
-  }
-  
-  @Override
-  public boolean isShapeUpdateNeeded(PictogramElement element, Object businessObject) {
-    return false;
   }
 }
