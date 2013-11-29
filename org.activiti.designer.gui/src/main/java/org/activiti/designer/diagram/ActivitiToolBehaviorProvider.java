@@ -209,7 +209,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     taskContext.setTargetContainer((ContainerShape) pe.eContainer());
     taskContext.putProperty("org.activiti.designer.connectionContext", connectionContext);
 
-    if (bo instanceof StartEvent || bo instanceof Task || bo instanceof CallActivity || bo instanceof Gateway) {
+    if (bo instanceof StartEvent || bo instanceof Task || bo instanceof CallActivity || bo instanceof Gateway || bo instanceof BoundaryEvent) {
 
       CreateUserTaskFeature userTaskfeature = new CreateUserTaskFeature(getFeatureProvider());
       ContextButtonEntry newUserTaskButton = new ContextButtonEntry(userTaskfeature, taskContext);

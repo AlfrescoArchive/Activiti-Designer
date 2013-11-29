@@ -10,6 +10,7 @@ import org.activiti.bpmn.model.StartEvent;
 import org.activiti.bpmn.model.Task;
 import org.activiti.bpmn.model.TerminateEventDefinition;
 import org.activiti.bpmn.model.TimerEventDefinition;
+import org.activiti.bpmn.model.alfresco.AlfrescoStartEvent;
 import org.activiti.designer.PluginImage;
 import org.activiti.designer.diagram.ActivitiBPMNFeatureProvider;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
@@ -42,7 +43,9 @@ public class EventShapeController extends AbstractBusinessObjectShapeController 
 
   @Override
   public boolean canControlShapeFor(Object businessObject) {
-    if (businessObject instanceof StartEvent || businessObject instanceof EndEvent) {
+    if (businessObject instanceof AlfrescoStartEvent == false && 
+        (businessObject instanceof StartEvent || businessObject instanceof EndEvent)) {
+      
       return true;
     } else {
       return false;

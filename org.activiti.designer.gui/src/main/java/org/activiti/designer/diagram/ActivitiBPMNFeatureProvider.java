@@ -32,8 +32,10 @@ import org.activiti.designer.command.SendTaskModelUpdater;
 import org.activiti.designer.command.ServiceTaskModelUpdater;
 import org.activiti.designer.command.StartEventModelUpdater;
 import org.activiti.designer.command.SubProcessModelUpdater;
+import org.activiti.designer.command.TextAnnotationModelUpdater;
 import org.activiti.designer.command.ThrowEventModelUpdater;
 import org.activiti.designer.command.UserTaskModelUpdater;
+import org.activiti.designer.controller.AssociationShapeController;
 import org.activiti.designer.controller.BoundaryEventShapeController;
 import org.activiti.designer.controller.BusinessObjectShapeController;
 import org.activiti.designer.controller.CallActivityShapeController;
@@ -49,6 +51,7 @@ import org.activiti.designer.controller.PoolShapeController;
 import org.activiti.designer.controller.SequenceFlowShapeController;
 import org.activiti.designer.controller.SubProcessShapeController;
 import org.activiti.designer.controller.TaskShapeController;
+import org.activiti.designer.controller.TextAnnotationShapeController;
 import org.activiti.designer.controller.ThrowEventShapeController;
 import org.activiti.designer.features.AddBaseElementFeature;
 import org.activiti.designer.features.ChangeElementTypeFeature;
@@ -171,7 +174,9 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
     shapeControllers.add(new BoundaryEventShapeController(this));
     shapeControllers.add(new PoolShapeController(this));
     shapeControllers.add(new LaneShapeController(this));
+    shapeControllers.add(new TextAnnotationShapeController(this));
     shapeControllers.add(new SequenceFlowShapeController(this));
+    shapeControllers.add(new AssociationShapeController(this));
     shapeControllers.add(new AlfrescoStartEventShapeController(this));
     shapeControllers.add(new AlfrescoTaskShapeController(this));
     
@@ -193,6 +198,7 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
     modelUpdaters.add(new BoundaryEventModelUpdater(this));
     modelUpdaters.add(new PoolModelUpdater(this));
     modelUpdaters.add(new LaneModelUpdater(this));
+    modelUpdaters.add(new TextAnnotationModelUpdater(this));
     modelUpdaters.add(new ProcessModelUpdater(this));
   }
   
@@ -242,132 +248,6 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 
   @Override
   public IAddFeature getAddFeature(IAddContext context) {
-    /*if (context.getNewObject() instanceof StartEvent) {
-      if (context.getNewObject() instanceof AlfrescoStartEvent) {
-        return new AddAlfrescoStartEventFeature(this);
-      } else {
-        StartEvent startEvent = (StartEvent) context.getNewObject();
-        if (startEvent.getEventDefinitions().size() > 0) {
-          if (startEvent.getEventDefinitions().get(0) instanceof TimerEventDefinition) {
-            return new AddTimerStartEventFeature(this);
-          }
-          if (startEvent.getEventDefinitions().get(0) instanceof MessageEventDefinition) {
-            return new AddMessageStartEventFeature(this);
-          } else {
-            return new AddErrorStartEventFeature(this);
-          }
-        } else {
-          return new AddStartEventFeature(this);
-        }
-      }
-    } else if (context.getNewObject() instanceof EndEvent) {
-      EndEvent endEvent = (EndEvent) context.getNewObject();
-      for (EventDefinition eventDefinition : endEvent.getEventDefinitions()) {
-        if (eventDefinition instanceof ErrorEventDefinition) {
-          return new AddErrorEndEventFeature(this);
-        } else if (eventDefinition instanceof TerminateEventDefinition) {
-          return new AddTerminateEndEventFeature(this);
-        }
-      }
-      return new AddEndEventFeature(this);
-
-    } else if (context.getNewObject() instanceof SequenceFlow) {
-      return new AddSequenceFlowFeature(this);
-
-    } else if (context.getNewObject() instanceof Association) {
-      return new AddAssociationFeature(this);
-    } else if (context.getNewObject() instanceof UserTask) {
-      if (context.getNewObject() instanceof AlfrescoUserTask) {
-        return new AddAlfrescoUserTaskFeature(this);
-      } else {
-        return new AddUserTaskFeature(this);
-      }
-    } else if (context.getNewObject() instanceof ManualTask) {
-      return new AddManualTaskFeature(this);
-    } else if (context.getNewObject() instanceof ReceiveTask) {
-      return new AddReceiveTaskFeature(this);
-    } else if (context.getNewObject() instanceof BusinessRuleTask) {
-      return new AddBusinessRuleTaskFeature(this);
-    } else if (context.getNewObject() instanceof ServiceTask) {
-      ServiceTask serviceTask = (ServiceTask) context.getNewObject();
-      if (ServiceTask.MAIL_TASK.equalsIgnoreCase(serviceTask.getType())) {
-        return new AddMailTaskFeature(this);
-      } else if (AlfrescoScriptTask.ALFRESCO_SCRIPT_DELEGATE.equalsIgnoreCase(serviceTask.getImplementation())) {
-        boolean isMailTask = false;
-        for (FieldExtension fieldExtension : serviceTask.getFieldExtensions()) {
-          if ("script".equalsIgnoreCase(fieldExtension.getFieldName())) {
-            if(fieldExtension.getStringValue() != null) {
-              if (fieldExtension.getStringValue().contains("mail.execute(bpm_package);")) {
-                isMailTask = true;
-              }
-            } else if(fieldExtension.getExpression() != null) {
-              if (fieldExtension.getExpression().contains("mail.execute(bpm_package);")) {
-                isMailTask = true;
-              }
-            }
-          }
-        }
-        if (isMailTask) {
-          return new AddAlfrescoMailTaskFeature(this);
-        } else {
-          return new AddAlfrescoScriptTaskFeature(this);
-        }
-      } else {
-        return new AddServiceTaskFeature(this);
-      }
-    } else if (context.getNewObject() instanceof ScriptTask) {
-      return new AddScriptTaskFeature(this);
-    } else if (context.getNewObject() instanceof ExclusiveGateway) {
-      return new AddExclusiveGatewayFeature(this);
-    } else if (context.getNewObject() instanceof InclusiveGateway) {
-      return new AddInclusiveGatewayFeature(this);
-    } else if (context.getNewObject() instanceof ParallelGateway) {
-      return new AddParallelGatewayFeature(this);
-    } else if (context.getNewObject() instanceof EventGateway) {
-      return new AddEventGatewayFeature(this);
-    } else if (context.getNewObject() instanceof BoundaryEvent) {
-      if (((BoundaryEvent) context.getNewObject()).getEventDefinitions().size() > 0) {
-        EventDefinition definition = ((BoundaryEvent) context.getNewObject()).getEventDefinitions().get(0);
-        if (definition instanceof ErrorEventDefinition) {
-          return new AddBoundaryErrorFeature(this);
-        } else if (definition instanceof SignalEventDefinition) {
-          return new AddBoundarySignalFeature(this);
-        } else if (definition instanceof MessageEventDefinition) {
-          return new AddBoundaryMessageFeature(this);
-        } else {
-          return new AddBoundaryTimerFeature(this);
-        }
-      }
-    } else if (context.getNewObject() instanceof IntermediateCatchEvent) {
-      if (((IntermediateCatchEvent) context.getNewObject()).getEventDefinitions().size() > 0) {
-        EventDefinition definition = ((IntermediateCatchEvent) context.getNewObject()).getEventDefinitions().get(0);
-        if (definition instanceof SignalEventDefinition) {
-          return new AddSignalCatchingEventFeature(this);
-        } else if (definition instanceof MessageEventDefinition) {
-          return new AddMessageCatchingEventFeature(this);
-        } else {
-          return new AddTimerCatchingEventFeature(this);
-        }
-      }
-    } else if (context.getNewObject() instanceof ThrowEvent) {
-      if (((ThrowEvent) context.getNewObject()).getEventDefinitions().size() > 0) {
-        return new AddSignalThrowingEventFeature(this);
-      } else {
-        return new AddNoneThrowingEventFeature(this);
-      }
-    } else if (context.getNewObject() instanceof EventSubProcess) {
-      return new AddEventSubProcessFeature(this);
-    } else if (context.getNewObject() instanceof SubProcess) {
-      return new AddEmbeddedSubProcessFeature(this);
-    } else if (context.getNewObject() instanceof Pool) {
-      return new AddPoolFeature(this);
-    } else if (context.getNewObject() instanceof Lane) {
-      return new AddLaneFeature(this);
-    } else if (context.getNewObject() instanceof CallActivity) {
-      return new AddCallActivityFeature(this);
-    } else if (context.getNewObject() instanceof TextAnnotation) {
-      return new AddTextAnnotationFeature(this);
-    }*/
     return new AddBaseElementFeature(this);
   }
 

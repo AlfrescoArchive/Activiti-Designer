@@ -1,4 +1,4 @@
-package org.activiti.designer.features;
+package org.activiti.designer.controller;
 
 import java.util.List;
 
@@ -8,14 +8,14 @@ import org.activiti.bpmn.model.EndEvent;
 import org.activiti.bpmn.model.Gateway;
 import org.activiti.bpmn.model.GraphicInfo;
 import org.activiti.bpmn.model.SubProcess;
+import org.activiti.bpmn.model.Task;
+import org.activiti.designer.diagram.ActivitiBPMNFeatureProvider;
 import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.datatypes.ILocation;
-import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IAddConnectionContext;
 import org.eclipse.graphiti.features.context.IAddContext;
-import org.eclipse.graphiti.features.impl.AbstractAddFeature;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.algorithms.Polyline;
 import org.eclipse.graphiti.mm.algorithms.styles.LineStyle;
@@ -24,6 +24,7 @@ import org.eclipse.graphiti.mm.algorithms.styles.StylesFactory;
 import org.eclipse.graphiti.mm.pictograms.Anchor;
 import org.eclipse.graphiti.mm.pictograms.ChopboxAnchor;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
+import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.FreeFormConnection;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
@@ -32,39 +33,52 @@ import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
 import org.eclipse.graphiti.util.IColorConstant;
 
-public class AddAssociationFeature extends AbstractAddFeature {
- 
-  public AddAssociationFeature(final IFeatureProvider fp) {
-    super(fp);
+/**
+ * A {@link BusinessObjectShapeController} capable of creating and updating shapes for {@link Task} objects.
+ *  
+ * @author Tijs Rademakers
+ */
+public class AssociationShapeController extends AbstractBusinessObjectShapeController {
+  
+  public AssociationShapeController(ActivitiBPMNFeatureProvider featureProvider) {
+    super(featureProvider);
   }
 
   @Override
-  public boolean canAdd(final IAddContext context) {
-    return context instanceof IAddConnectionContext 
-            && context.getNewObject() instanceof Association;
+  public boolean canControlShapeFor(Object businessObject) {
+    if (businessObject instanceof Association) {
+      return true;
+    } else {
+      return false;
+    }
   }
 
+  @SuppressWarnings("unchecked")
   @Override
-	public PictogramElement add(final IAddContext context) {	  
-    final IAddConnectionContext addConnectionContext = (IAddConnectionContext) context;
-    final Association association = (Association) context.getNewObject();
+  public PictogramElement createShape(Object businessObject, ContainerShape layoutParent, int width, int height, IAddContext context) {
+    final IPeCreateService peCreateService = Graphiti.getPeCreateService();
+    final IGaService gaService = Graphiti.getGaService();
     
-    Anchor sourceAnchor = addConnectionContext.getSourceAnchor();
-    Anchor targetAnchor = addConnectionContext.getTargetAnchor(); 
+    Diagram diagram = getFeatureProvider().getDiagramTypeProvider().getDiagram();
+    
+    IAddConnectionContext addConContext = (IAddConnectionContext) context;
+    Association addedAssociation = (Association) context.getNewObject();
+    
+    Anchor sourceAnchor = addConContext.getSourceAnchor();
+    Anchor targetAnchor = addConContext.getTargetAnchor(); 
     
     if (sourceAnchor == null) {
-      final List<Shape> shapes = getDiagram().getChildren();
+      final List<Shape> shapes = diagram.getChildren();
       
       for (final Shape shape : shapes) {
-        final BaseElement baseElement 
-          = (BaseElement) getBusinessObjectForPictogramElement(shape.getGraphicsAlgorithm()
-                                                                  .getPictogramElement());
+        final BaseElement baseElement = (BaseElement) getFeatureProvider().getBusinessObjectForPictogramElement(
+            shape.getGraphicsAlgorithm().getPictogramElement());
         if (baseElement == null || baseElement.getId() == null 
-                || association.getSourceRef() == null || association.getTargetRef() == null) {
+                || addedAssociation.getSourceRef() == null || addedAssociation.getTargetRef() == null) {
           continue;
         }
         
-        if (baseElement.getId().equals(association.getSourceRef())) {
+        if (baseElement.getId().equals(addedAssociation.getSourceRef())) {
           final List<Anchor> anchors = ((ContainerShape) shape).getAnchors();
           for (final Anchor anchor : anchors) {
             if (anchor instanceof ChopboxAnchor) {
@@ -75,7 +89,7 @@ public class AddAssociationFeature extends AbstractAddFeature {
           }
         }
         
-        if (baseElement.getId().equals(association.getTargetRef())) {
+        if (baseElement.getId().equals(addedAssociation.getTargetRef())) {
           final List<Anchor> anchors = ((ContainerShape) shape).getAnchors();
           for (final Anchor anchor : anchors) {
             if (anchor instanceof ChopboxAnchor) {
@@ -92,10 +106,8 @@ public class AddAssociationFeature extends AbstractAddFeature {
       return null;
     }
     
-    final IPeCreateService peCreateService = Graphiti.getPeCreateService();
-    
     // CONNECTION WITH POLYLINE
-    final FreeFormConnection connection = peCreateService.createFreeFormConnection(getDiagram());
+    final FreeFormConnection connection = peCreateService.createFreeFormConnection(diagram);
     
     connection.setStart(sourceAnchor);
     connection.setEnd(targetAnchor);
@@ -103,22 +115,21 @@ public class AddAssociationFeature extends AbstractAddFeature {
     sourceAnchor.getOutgoingConnections().add(connection);
     targetAnchor.getIncomingConnections().add(connection);
     
-    BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+    BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(diagram));
     
-    BaseElement sourceElement = model.getFlowElement(association.getSourceRef());
+    BaseElement sourceElement = model.getFlowElement(addedAssociation.getSourceRef());
     if (sourceElement == null) {
-      sourceElement = model.getArtifact(association.getSourceRef());
+      sourceElement = model.getArtifact(addedAssociation.getSourceRef());
     }
-    BaseElement targetElement = model.getFlowElement(association.getTargetRef());
+    BaseElement targetElement = model.getFlowElement(addedAssociation.getTargetRef());
     if (targetElement == null) {
-      targetElement = model.getArtifact(association.getTargetRef());
+      targetElement = model.getArtifact(addedAssociation.getTargetRef());
     }
 
     final GraphicsAlgorithm sourceGraphics = getPictogramElement(sourceElement).getGraphicsAlgorithm();
     GraphicsAlgorithm targetGraphics = getPictogramElement(targetElement).getGraphicsAlgorithm();
     
-    @SuppressWarnings("unchecked")
-    List<GraphicInfo> bendpointList = (List<GraphicInfo>) addConnectionContext.getProperty("org.activiti.designer.bendpoints");
+    List<GraphicInfo> bendpointList = (List<GraphicInfo>) addConContext.getProperty("org.activiti.designer.bendpoints");
    
     if(bendpointList != null && bendpointList.size() >= 0) {
       for (GraphicInfo graphicInfo : bendpointList) {
@@ -197,19 +208,30 @@ public class AddAssociationFeature extends AbstractAddFeature {
       }
     }
     
-    IGaService gaService = Graphiti.getGaService();
     Polyline polyline = gaService.createPolyline(connection);
     polyline.setLineStyle(LineStyle.DOT);
     polyline.setLineWidth(2);
-    polyline.setForeground(Graphiti.getGaService().manageColor(getDiagram(), IColorConstant.BLACK));
-
-    // create link and wire it
-    link(connection, association);
+    polyline.setForeground(Graphiti.getGaService().manageColor(diagram, IColorConstant.BLACK));
 
     return connection;
-	}
+  }
+  
+  @Override
+  public void updateShape(PictogramElement element, Object businessObject, int width, int height) {
+    // nothing to do
+  }
+  
+  @Override
+  public GraphicsAlgorithm getGraphicsAlgorithmForDirectEdit(PictogramElement element) {
+    return element.getGraphicsAlgorithm();
+  }
+  
+  @Override
+  public boolean isShapeUpdateNeeded(PictogramElement element, Object businessObject) {
+    return false;
+  }
 
-  private PictogramElement getPictogramElement(final Object businessObject) {
+  protected PictogramElement getPictogramElement(Object businessObject) {
     return getFeatureProvider().getPictogramElementForBusinessObject(businessObject);
   }
 }
