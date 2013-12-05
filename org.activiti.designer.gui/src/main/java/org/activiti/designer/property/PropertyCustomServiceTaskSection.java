@@ -276,6 +276,10 @@ public class PropertyCustomServiceTaskSection extends BaseActivitiPropertySectio
           if (property.required()) {
             displayName += PROPERTY_REQUIRED_DISPLAY;
           }
+          
+          if (property.readOnly()) {
+        	  createdControl.setEnabled(false);
+          }
 
           displayName += ": ";
 

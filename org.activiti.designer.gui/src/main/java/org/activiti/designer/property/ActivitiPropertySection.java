@@ -73,7 +73,7 @@ public abstract class ActivitiPropertySection extends BaseActivitiPropertySectio
     focusListener = new FocusListener() {
       @Override
       public void focusLost(FocusEvent e) {
-        if(e.widget instanceof Control) {
+        if (e.widget instanceof Control) {
           flushControlValue((Control) e.widget);
         }
       }
@@ -84,7 +84,7 @@ public abstract class ActivitiPropertySection extends BaseActivitiPropertySectio
           // Fix for issue in Eclipse Juno where the text is filled with value from the previous active
           // text-control in some cases. We set the value based on the model on focus.
           Object bo = getBusinessObject(getSelectedPictogramElement());
-          if(bo != null) {
+          if (bo != null) {
             populateControl((Control) e.widget, bo);
           } else {
             resetControl((Control) e.widget);
@@ -137,6 +137,7 @@ public abstract class ActivitiPropertySection extends BaseActivitiPropertySectio
   public void refresh() {
     PictogramElement element = getSelectedPictogramElement();
     Object bo = getBusinessObject(element);
+    resetModelUpdater();
     if(bo != null) {
       // Populate all controls, based on the model
       for(Control control : controls) {
@@ -230,7 +231,7 @@ public abstract class ActivitiPropertySection extends BaseActivitiPropertySectio
     DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
     TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
     
-    if(currentUpdater != null) {
+    if (currentUpdater != null) {
       // Do the actual changes to the business-object in a command
       editingDomain.getCommandStack().execute(new UpdateBusinessObjectCommand(editingDomain, currentUpdater));
     }

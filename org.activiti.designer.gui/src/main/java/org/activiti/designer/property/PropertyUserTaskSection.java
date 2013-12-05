@@ -15,7 +15,6 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
   private Text formKeyText;
   private Text dueDateText;
   private Text priorityText;
-  private Text documentationText;
   
   @Override
   public void createFormControls(TabbedPropertySheetPage aTabbedPropertySheetPage) {
@@ -31,8 +30,6 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
     createLabel("Due date (variable)", dueDateText);
     priorityText = createTextControl(false);
     createLabel("Priority", priorityText);
-    documentationText = createTextControl(true);
-    createLabel("Documentation", documentationText);
   }
 
   @Override
@@ -50,8 +47,6 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
       return task.getDueDate();
     } else if(control == priorityText) {
       return task.getPriority();
-    } else if(control == documentationText) {
-      return task.getDocumentation();
     }
     return null;
   }
@@ -71,8 +66,6 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
       task.setDueDate(dueDateText.getText());
     } else if (control == priorityText) {
       task.setPriority(priorityText.getText());
-    } else if (control == documentationText) {
-      task.setDocumentation(documentationText.getText());
     }
   }
   

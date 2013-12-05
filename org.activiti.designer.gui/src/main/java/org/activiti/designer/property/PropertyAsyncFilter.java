@@ -16,6 +16,7 @@
 package org.activiti.designer.property;
 
 import org.activiti.bpmn.model.Activity;
+import org.activiti.bpmn.model.SignalEventDefinition;
 import org.activiti.bpmn.model.ThrowEvent;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 
@@ -24,8 +25,16 @@ public class PropertyAsyncFilter extends ActivitiPropertyFilter {
   @Override
   protected boolean accept(PictogramElement pe) {
   	Object bo = getBusinessObject(pe);
-  	if(bo != null && bo instanceof Activity || bo instanceof ThrowEvent) {
+  	if (bo != null && bo instanceof Activity) {
       return true;
+  	
+  	} else if (bo instanceof ThrowEvent) {
+  	  ThrowEvent event = (ThrowEvent) bo;
+  	  if (event.getEventDefinitions().size() == 1) {
+  	    if (event.getEventDefinitions().get(0) instanceof SignalEventDefinition) {
+  	      return true;
+  	    }
+  	  }
   	}
     return false;
   }

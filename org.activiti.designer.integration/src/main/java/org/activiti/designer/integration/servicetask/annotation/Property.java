@@ -41,6 +41,11 @@ public @interface Property {
    * Whether this {@link Property} denotes a required field.
    */
   boolean required() default false;
+  
+  /**
+   * Whether this {@link Property} denotes a read only field.
+   */
+  boolean readOnly() default false;
 
   /**
    * The order for the {@link Property} to appear in a list of {@link Property}

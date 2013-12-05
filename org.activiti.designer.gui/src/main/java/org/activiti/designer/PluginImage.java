@@ -54,6 +54,9 @@ public enum PluginImage {
   IMG_MANUALTASK("manual", "type.manual.png"), //$NON-NLS-1$
   IMG_BUSINESSRULETASK("businessrule", "type.business.rule.png"), //$NON-NLS-1$
   IMG_CALLACTIVITY("callactivity", "callactivity.png"), //$NON-NLS-1$
+  
+  IMG_MULTIINSTANCE_SEQUENTIAL("mi.sequential", "mi.sequential.png"),
+  IMG_MULTIINSTANCE_PARALLEL("mi.parallel", "mi.parallel.png"),
 
   // Container icons
   IMG_SUBPROCESS_COLLAPSED("subprocess.collapsed", "type.subprocess.collapsed.png"), //$NON-NLS-1$

@@ -63,17 +63,23 @@
          <propertyTab
                afterTab="org.activiti.designer.mainConfigTab"
                category="Activiti"
+               id="org.activiti.designer.documentationTab"
+               label="Documentation">
+         </propertyTab>
+         <propertyTab
+               afterTab="org.activiti.designer.documentationTab"
+               category="Activiti"
                id="org.activiti.designer.formTab"
                label="Form">
          </propertyTab>
          <propertyTab
-               afterTab="org.activiti.designer.mainConfigTab"
+               afterTab="org.activiti.designer.documentationTab"
                category="Activiti"
                id="org.activiti.designer.listenerTab"
                label="Listeners">
          </propertyTab>
          <propertyTab
-               afterTab="org.activiti.designer.mainConfigTab"
+               afterTab="org.activiti.designer.documentationTab"
                category="Activiti"
                id="org.activiti.designer.multiInstanceTab"
                label="Multi instance">
@@ -308,6 +314,12 @@
                filter="org.activiti.designer.property.PropertyAsyncFilter"
                id="org.activiti.designer.generalTab.async"
                tab="org.activiti.designer.generalTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyDocumentationSection"
+               filter="org.activiti.designer.property.PropertyDocumentationFilter"
+               id="org.activiti.designer.documentationTab.documentation"
+               tab="org.activiti.designer.documentationTab">
          </propertySection>
          
       </propertySections>

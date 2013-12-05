@@ -21,6 +21,7 @@ import org.activiti.bpmn.model.Activity;
 import org.activiti.bpmn.model.FlowNode;
 import org.activiti.bpmn.model.Gateway;
 import org.activiti.bpmn.model.SequenceFlow;
+import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
@@ -35,19 +36,26 @@ public class PropertyDefaultFlowSection extends ActivitiPropertySection implemen
     defaultCombo = createCombobox(new String[]{}, 0);
     createLabel("Default flow", defaultCombo);
   }
+  
+  
+
+  @Override
+  public void refresh() {
+    PictogramElement element = getSelectedPictogramElement();
+    FlowNode flowNode = (FlowNode) getBusinessObject(element);
+    List<SequenceFlow> flowList = flowNode.getOutgoingFlows();
+    defaultCombo.removeAll();
+    defaultCombo.add("");
+    for (SequenceFlow flow : flowList) {
+      defaultCombo.add(flow.getId());
+    }
+    
+    super.refresh();
+  }
 
   @Override
   protected Object getModelValueForControl(Control control, Object businessObject) {
-    FlowNode flowNode = (FlowNode) businessObject;
     if (control == defaultCombo) {
-      List<SequenceFlow> flowList = flowNode.getOutgoingFlows();
-      
-      defaultCombo.removeAll();
-          
-      for (SequenceFlow flow : flowList) {
-        defaultCombo.add(flow.getId());
-      }
-      
       String defaultFlow = null;
       if (businessObject instanceof Activity) {
         defaultFlow = ((Activity) businessObject).getDefaultFlow();

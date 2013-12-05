@@ -12,16 +12,19 @@ public class TextUtil {
   public static void setTextSize(MultiText textComponent) {
     IDimension textDimension = GraphitiUi.getUiLayoutService().calculateTextSize(textComponent.getValue(), textComponent.getFont());
     int lineCount = 1;
-    if(textDimension.getWidth() > 95) {
-      double width = textDimension.getWidth() / 95.0;
-      lineCount = (int) Math.floor(width);
-      if(lineCount < width) {
+    
+    if (textDimension != null) {
+      if (textDimension.getWidth() > 95) {
+        double width = textDimension.getWidth() / 95.0;
+        lineCount = (int) Math.floor(width);
+        if(lineCount < width) {
+          lineCount++;
+        }
         lineCount++;
       }
-      lineCount++;
+      IGaService gaService = Graphiti.getGaService();
+      gaService.setSize(textComponent, 100, lineCount * textDimension.getHeight());
     }
-    IGaService gaService = Graphiti.getGaService();
-    gaService.setSize(textComponent, 100, lineCount * textDimension.getHeight());
   }
   
   public static void setTextSize(int width, MultiText textComponent) {

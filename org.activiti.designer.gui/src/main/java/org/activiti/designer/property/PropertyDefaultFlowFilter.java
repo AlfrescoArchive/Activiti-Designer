@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.activiti.bpmn.model.Activity;
 import org.activiti.bpmn.model.ExclusiveGateway;
+import org.activiti.bpmn.model.FlowNode;
 import org.activiti.bpmn.model.InclusiveGateway;
 import org.activiti.bpmn.model.SequenceFlow;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
@@ -31,15 +32,9 @@ public class PropertyDefaultFlowFilter extends ActivitiPropertyFilter {
   	 if (bo instanceof Activity || bo instanceof ExclusiveGateway ||
              bo instanceof InclusiveGateway) {
        
-       List<SequenceFlow> flowList = null;
-       if(bo instanceof Activity) {
-         flowList = ((Activity) bo).getOutgoingFlows();
-       } else if(bo instanceof ExclusiveGateway) {
-         flowList = ((ExclusiveGateway) bo).getOutgoingFlows();
-       } else {
-         flowList = ((InclusiveGateway) bo).getOutgoingFlows();
-       }
-       if(flowList != null && flowList.size() > 1) {
+       List<SequenceFlow> flowList = ((FlowNode) bo).getOutgoingFlows();
+       
+       if (flowList != null && flowList.size() > 1) {
          return true;
        }
   	 }

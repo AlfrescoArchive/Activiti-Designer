@@ -64,9 +64,9 @@ Require-Bundle: org.apache.commons.lang
 Bundle-Vendor: Activiti
 Bundle-ClassPath: .,
  activation-1.1.jar,
- activiti-bpmn-converter-5.15-SNAPSHOT.jar,
  activiti-bpmn-layout-5.15-SNAPSHOT.jar,
  activiti-bpmn-model-5.15-SNAPSHOT.jar,
+ activiti-bpmn-converter-5.15-SNAPSHOT.jar,
  activiti-simple-workflow-5.15-SNAPSHOT-sources.jar,
  activiti-simple-workflow-5.15-SNAPSHOT.jar,
  activiti-simple-workflow-alfresco-5.15-SNAPSHOT-sources.jar,
