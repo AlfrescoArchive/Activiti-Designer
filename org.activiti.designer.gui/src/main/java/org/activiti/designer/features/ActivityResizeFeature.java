@@ -19,6 +19,7 @@ import org.activiti.bpmn.model.Activity;
 import org.activiti.bpmn.model.BoundaryEvent;
 import org.activiti.bpmn.model.CallActivity;
 import org.activiti.bpmn.model.Task;
+import org.activiti.designer.PluginImage;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IResizeShapeContext;
 import org.eclipse.graphiti.features.impl.DefaultResizeShapeFeature;
@@ -34,9 +35,9 @@ import org.eclipse.graphiti.mm.pictograms.Shape;
 /**
  * @author Tijs Rademakers
  */
-public class TaskResizeFeature extends DefaultResizeShapeFeature {
+public class ActivityResizeFeature extends DefaultResizeShapeFeature {
   
-  public TaskResizeFeature(IFeatureProvider fp) {
+  public ActivityResizeFeature(IFeatureProvider fp) {
     super(fp);
   }
 
@@ -99,31 +100,46 @@ public class TaskResizeFeature extends DefaultResizeShapeFeature {
     
     List<Shape> shapes = ((ContainerShape) context.getShape()).getChildren();
 		for (Shape shape : shapes) {
-      if(shape.getGraphicsAlgorithm() != null) {
+      if (shape.getGraphicsAlgorithm() != null) {
       	if(shape.getGraphicsAlgorithm() instanceof MultiText) {
 	      	MultiText text = (MultiText) shape.getGraphicsAlgorithm();
 	      	text.setHeight(height - 25);
 	      	text.setWidth(width);
-      	} else if(shape.getGraphicsAlgorithm() instanceof Image) {
+      	} else if (shape.getGraphicsAlgorithm() instanceof Image) {
       		Image image = (Image) shape.getGraphicsAlgorithm();
       		
-      		if(bo instanceof CallActivity) {
-      			
-      			// calculate position for icon
-      			final int iconWidthAndHeight = 10;
-      			final int padding = 5;
-      			final int xPos = (context.getShape().getGraphicsAlgorithm().getWidth() / 2) - (iconWidthAndHeight / 2);
-      			final int yPos = context.getShape().getGraphicsAlgorithm().getHeight() - padding - iconWidthAndHeight;
+      		if (image.getId().endsWith(PluginImage.IMG_MULTIINSTANCE_SEQUENTIAL.getImageKey()) || 
+      		        image.getId().endsWith(PluginImage.IMG_MULTIINSTANCE_PARALLEL.getImageKey())) {
+      		  
+      		  final int iconWidthAndHeight = 16;
+            final int padding = 2;
+            final int xPos = (context.getShape().getGraphicsAlgorithm().getWidth() / 2) - (iconWidthAndHeight / 2);
+            final int yPos = context.getShape().getGraphicsAlgorithm().getHeight() - padding - iconWidthAndHeight;
 
-      			image.setX(xPos);
-      			image.setY(yPos);
-      			
-      		} else {
-	      		int imageX = image.getX();
-	      		if(imageX > 20) {
-	      			image.setX(width - 20);
-	      		}
-      		}
+            image.setX(xPos);
+            image.setY(yPos);
+          
+          } else {
+      		
+        		if (bo instanceof CallActivity) {
+        			
+        			// calculate position for icon
+        			final int iconWidthAndHeight = 10;
+        			final int padding = 5;
+        			final int xPos = (context.getShape().getGraphicsAlgorithm().getWidth() / 2) - (iconWidthAndHeight / 2);
+        			final int yPos = context.getShape().getGraphicsAlgorithm().getHeight() - padding - iconWidthAndHeight;
+  
+        			image.setX(xPos);
+        			image.setY(yPos);
+        			
+        		} else {
+  	      		int imageX = image.getX();
+  	      		if(imageX > 20) {
+  	      			image.setX(width - 20);
+  	      		}
+        		}
+          }
+      		
       	} else if(shape.getGraphicsAlgorithm() instanceof Text) {
       		Text text = (Text) shape.getGraphicsAlgorithm();
 	      	text.setHeight(height - 25);

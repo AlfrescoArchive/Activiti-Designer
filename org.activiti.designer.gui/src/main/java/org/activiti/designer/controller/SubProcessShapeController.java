@@ -1,16 +1,20 @@
 package org.activiti.designer.controller;
 
 import org.activiti.bpmn.model.EventSubProcess;
+import org.activiti.bpmn.model.MultiInstanceLoopCharacteristics;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.bpmn.model.Task;
+import org.activiti.designer.PluginImage;
 import org.activiti.designer.diagram.ActivitiBPMNFeatureProvider;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.platform.OSEnum;
 import org.activiti.designer.util.platform.OSUtil;
 import org.activiti.designer.util.style.StyleUtil;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.mm.algorithms.Ellipse;
+import org.eclipse.graphiti.mm.algorithms.Image;
 import org.eclipse.graphiti.mm.algorithms.Rectangle;
 import org.eclipse.graphiti.mm.algorithms.RoundedRectangle;
 import org.eclipse.graphiti.mm.algorithms.Text;
@@ -31,6 +35,8 @@ import org.eclipse.graphiti.services.IPeCreateService;
  * @author Tijs Rademakers
  */
 public class SubProcessShapeController extends AbstractBusinessObjectShapeController {
+  
+  public static final int IMAGE_SIZE = 16;
   
   public SubProcessShapeController(ActivitiBPMNFeatureProvider featureProvider) {
     super(featureProvider);
@@ -88,6 +94,24 @@ public class SubProcessShapeController extends AbstractBusinessObjectShapeContro
     }
     text.setFont(font);
     gaService.setLocationAndSize(text, 0, 0, width, 20);
+    
+    MultiInstanceLoopCharacteristics multiInstanceObject = addedSubProcess.getLoopCharacteristics();
+    if (multiInstanceObject != null) {
+    
+      if (StringUtils.isNotEmpty(multiInstanceObject.getLoopCardinality()) ||
+          StringUtils.isNotEmpty(multiInstanceObject.getInputDataItem()) ||
+          StringUtils.isNotEmpty(multiInstanceObject.getCompletionCondition())) {
+        
+        final Shape miShape = peCreateService.createShape(containerShape, false);
+        Image miImage = null;
+        if (multiInstanceObject.isSequential()) {
+          miImage = gaService.createImage(miShape, PluginImage.IMG_MULTIINSTANCE_SEQUENTIAL.getImageKey());
+        } else {
+          miImage = gaService.createImage(miShape, PluginImage.IMG_MULTIINSTANCE_PARALLEL.getImageKey());
+        }
+        gaService.setLocationAndSize(miImage, (width - IMAGE_SIZE) / 2, (height - IMAGE_SIZE) - 2, IMAGE_SIZE, IMAGE_SIZE);
+      }
+    }
 
     // provide information to support direct-editing directly
     // after object creation (must be activated additionally)

@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.activiti.bpmn.model.BusinessRuleTask;
 import org.activiti.bpmn.model.ManualTask;
+import org.activiti.bpmn.model.MultiInstanceLoopCharacteristics;
 import org.activiti.bpmn.model.ReceiveTask;
 import org.activiti.bpmn.model.ScriptTask;
 import org.activiti.bpmn.model.ServiceTask;
@@ -21,6 +22,7 @@ import org.activiti.designer.util.extension.ExtensionUtil;
 import org.activiti.designer.util.platform.OSEnum;
 import org.activiti.designer.util.platform.OSUtil;
 import org.activiti.designer.util.style.StyleUtil;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.mm.algorithms.Ellipse;
@@ -47,7 +49,7 @@ import org.eclipse.graphiti.services.IPeCreateService;
  */
 public class TaskShapeController extends AbstractBusinessObjectShapeController {
   
-  private static final int IMAGE_SIZE = 16;
+  public static final int IMAGE_SIZE = 16;
   
   public TaskShapeController(ActivitiBPMNFeatureProvider featureProvider) {
     super(featureProvider);
@@ -174,61 +176,76 @@ public class TaskShapeController extends AbstractBusinessObjectShapeController {
     }
 
     // SHAPE WITH TEXT
-    {
-      // create shape for text
-      final Shape shape = peCreateService.createShape(containerShape, false);
+    // create shape for text
+    final Shape shape = peCreateService.createShape(containerShape, false);
 
-      // create and set text graphics algorithm
-      final MultiText text = gaService.createDefaultMultiText(diagram, shape, addedTask.getName());
-      text.setStyle(StyleUtil.getStyleForTask(diagram));
-      text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
-      text.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);
-      if (OSUtil.getOperatingSystem() == OSEnum.Mac) {
-        text.setFont(gaService.manageFont(diagram, text.getFont().getName(), 11));
-      }
-
-      switch (baseShape) {
-      case ACTIVITY:
-        gaService.setLocationAndSize(text, 0, 20, width, height - 25);
-        break;
-      case GATEWAY:
-        gaService.setLocationAndSize(text, 0, height + 5, width, 40);
-        break;
-      case EVENT:
-        gaService.setLocationAndSize(text, 0, height + 5, width, 40);
-        break;
-      }
-
-      // create link and wire it
-      getFeatureProvider().link(shape, addedTask);
-
-      // provide information to support direct-editing directly
-      // after object creation (must be activated additionally)
-      final IDirectEditingInfo directEditingInfo = getFeatureProvider().getDirectEditingInfo();
-      // set container shape for direct editing after object creation
-      directEditingInfo.setMainPictogramElement(containerShape);
-      // set shape and graphics algorithm where the editor for
-      // direct editing shall be opened after object creation
-      directEditingInfo.setPictogramElement(shape);
-      directEditingInfo.setGraphicsAlgorithm(text);
+    // create and set text graphics algorithm
+    final MultiText text = gaService.createDefaultMultiText(diagram, shape, addedTask.getName());
+    text.setStyle(StyleUtil.getStyleForTask(diagram));
+    text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
+    text.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);
+    if (OSUtil.getOperatingSystem() == OSEnum.Mac) {
+      text.setFont(gaService.manageFont(diagram, text.getFont().getName(), 11));
     }
 
-    {
-      final Shape shape = peCreateService.createShape(containerShape, false);
-      final Image image = gaService.createImage(shape, getIcon(addedTask));
+    switch (baseShape) {
+    case ACTIVITY:
+      gaService.setLocationAndSize(text, 0, 20, width, height - 25);
+      break;
+    case GATEWAY:
+      gaService.setLocationAndSize(text, 0, height + 5, width, 40);
+      break;
+    case EVENT:
+      gaService.setLocationAndSize(text, 0, height + 5, width, 40);
+      break;
+    }
 
-      switch (baseShape) {
-      case ACTIVITY:
-        gaService.setLocationAndSize(image, 5, 5, IMAGE_SIZE, IMAGE_SIZE);
-        break;
-      case GATEWAY:
-        gaService.setLocationAndSize(image, (width - IMAGE_SIZE) / 2, (height - IMAGE_SIZE) / 2, IMAGE_SIZE, IMAGE_SIZE);
-        break;
-      case EVENT:
-        gaService.setLocationAndSize(image, (width - IMAGE_SIZE) / 2, (height - IMAGE_SIZE) / 2, IMAGE_SIZE, IMAGE_SIZE);
-        break;
+    // create link and wire it
+    getFeatureProvider().link(shape, addedTask);
+
+    // provide information to support direct-editing directly
+    // after object creation (must be activated additionally)
+    final IDirectEditingInfo directEditingInfo = getFeatureProvider().getDirectEditingInfo();
+    // set container shape for direct editing after object creation
+    directEditingInfo.setMainPictogramElement(containerShape);
+    // set shape and graphics algorithm where the editor for
+    // direct editing shall be opened after object creation
+    directEditingInfo.setPictogramElement(shape);
+    directEditingInfo.setGraphicsAlgorithm(text);
+
+    final Shape imageShape = peCreateService.createShape(containerShape, false);
+    final Image image = gaService.createImage(imageShape, getIcon(addedTask));
+
+    switch (baseShape) {
+    case ACTIVITY:
+      gaService.setLocationAndSize(image, 5, 5, IMAGE_SIZE, IMAGE_SIZE);
+      break;
+    case GATEWAY:
+      gaService.setLocationAndSize(image, (width - IMAGE_SIZE) / 2, (height - IMAGE_SIZE) / 2, IMAGE_SIZE, IMAGE_SIZE);
+      break;
+    case EVENT:
+      gaService.setLocationAndSize(image, (width - IMAGE_SIZE) / 2, (height - IMAGE_SIZE) / 2, IMAGE_SIZE, IMAGE_SIZE);
+      break;
+    }
+    
+    if (baseShape == DiagramBaseShape.ACTIVITY) {
+      MultiInstanceLoopCharacteristics multiInstanceObject = addedTask.getLoopCharacteristics();
+      if (multiInstanceObject != null) {
+      
+        if (StringUtils.isNotEmpty(multiInstanceObject.getLoopCardinality()) ||
+            StringUtils.isNotEmpty(multiInstanceObject.getInputDataItem()) ||
+            StringUtils.isNotEmpty(multiInstanceObject.getCompletionCondition())) {
+          
+          final Shape miShape = peCreateService.createShape(containerShape, false);
+          Image miImage = null;
+          if (multiInstanceObject.isSequential()) {
+            miImage = gaService.createImage(miShape, PluginImage.IMG_MULTIINSTANCE_SEQUENTIAL.getImageKey());
+          } else {
+            miImage = gaService.createImage(miShape, PluginImage.IMG_MULTIINSTANCE_PARALLEL.getImageKey());
+          }
+          gaService.setLocationAndSize(miImage, (width - IMAGE_SIZE) / 2, (height - IMAGE_SIZE) - 2, IMAGE_SIZE, IMAGE_SIZE);
+        }
       }
-
     }
 
     // add a chopbox anchor to the shape

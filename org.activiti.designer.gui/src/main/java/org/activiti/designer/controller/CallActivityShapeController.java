@@ -1,6 +1,7 @@
 package org.activiti.designer.controller;
 
 import org.activiti.bpmn.model.CallActivity;
+import org.activiti.bpmn.model.MultiInstanceLoopCharacteristics;
 import org.activiti.bpmn.model.Task;
 import org.activiti.designer.PluginImage;
 import org.activiti.designer.diagram.ActivitiBPMNFeatureProvider;
@@ -8,6 +9,7 @@ import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.platform.OSEnum;
 import org.activiti.designer.util.platform.OSUtil;
 import org.activiti.designer.util.style.StyleUtil;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.mm.algorithms.Ellipse;
@@ -32,6 +34,8 @@ import org.eclipse.graphiti.services.IPeCreateService;
  * @author Tijs Rademakers
  */
 public class CallActivityShapeController extends AbstractBusinessObjectShapeController {
+  
+  public static final int IMAGE_SIZE = 16;
   
   public CallActivityShapeController(ActivitiBPMNFeatureProvider featureProvider) {
     super(featureProvider);
@@ -114,6 +118,24 @@ public class CallActivityShapeController extends AbstractBusinessObjectShapeCont
     final int yPos = roundedRectangle.getHeight() - padding - iconWidthAndHeight;
 
     gaService.setLocationAndSize(image, xPos, yPos, iconWidthAndHeight, iconWidthAndHeight);
+    
+    MultiInstanceLoopCharacteristics multiInstanceObject = addedCallActivity.getLoopCharacteristics();
+    if (multiInstanceObject != null) {
+    
+      if (StringUtils.isNotEmpty(multiInstanceObject.getLoopCardinality()) ||
+          StringUtils.isNotEmpty(multiInstanceObject.getInputDataItem()) ||
+          StringUtils.isNotEmpty(multiInstanceObject.getCompletionCondition())) {
+        
+        final Shape miShape = peCreateService.createShape(containerShape, false);
+        Image miImage = null;
+        if (multiInstanceObject.isSequential()) {
+          miImage = gaService.createImage(miShape, PluginImage.IMG_MULTIINSTANCE_SEQUENTIAL.getImageKey());
+        } else {
+          miImage = gaService.createImage(miShape, PluginImage.IMG_MULTIINSTANCE_PARALLEL.getImageKey());
+        }
+        gaService.setLocationAndSize(miImage, (width - IMAGE_SIZE) / 2, (height - IMAGE_SIZE) - 2, IMAGE_SIZE, IMAGE_SIZE);
+      }
+    }
 
     // add a chopbox anchor to the shape
     peCreateService.createChopboxAnchor(containerShape);

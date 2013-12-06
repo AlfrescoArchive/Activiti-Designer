@@ -6,14 +6,12 @@ import java.util.List;
 import org.activiti.bpmn.model.Activity;
 import org.activiti.bpmn.model.Artifact;
 import org.activiti.bpmn.model.BoundaryEvent;
-import org.activiti.bpmn.model.CallActivity;
 import org.activiti.bpmn.model.Event;
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.Gateway;
 import org.activiti.bpmn.model.Lane;
 import org.activiti.bpmn.model.Pool;
 import org.activiti.bpmn.model.SubProcess;
-import org.activiti.bpmn.model.Task;
 import org.activiti.bpmn.model.TextAnnotation;
 import org.activiti.designer.command.AssociationModelUpdater;
 import org.activiti.designer.command.BoundaryEventModelUpdater;
@@ -108,7 +106,7 @@ import org.activiti.designer.features.MoveGatewayFeature;
 import org.activiti.designer.features.MoveLaneFeature;
 import org.activiti.designer.features.PasteFlowElementFeature;
 import org.activiti.designer.features.ReconnectSequenceFlowFeature;
-import org.activiti.designer.features.TaskResizeFeature;
+import org.activiti.designer.features.ActivityResizeFeature;
 import org.activiti.designer.features.UpdateFlowElementFeature;
 import org.activiti.designer.features.UpdatePoolAndLaneFeature;
 import org.activiti.designer.features.UpdateTextAnnotationFeature;
@@ -353,8 +351,8 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
     Object bo = getBusinessObjectForPictogramElement(shape);
     if (bo instanceof SubProcess || bo instanceof Pool || bo instanceof Lane) {
       return new ContainerResizeFeature(this);
-    } else if (bo instanceof Task || bo instanceof CallActivity) {
-      return new TaskResizeFeature(this);
+    } else if (bo instanceof Activity) {
+      return new ActivityResizeFeature(this);
     }
     return super.getResizeShapeFeature(context);
   }
