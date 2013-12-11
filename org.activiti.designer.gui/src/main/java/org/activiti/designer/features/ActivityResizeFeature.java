@@ -111,33 +111,19 @@ public class ActivityResizeFeature extends DefaultResizeShapeFeature {
       		if (image.getId().endsWith(PluginImage.IMG_MULTIINSTANCE_SEQUENTIAL.getImageKey()) || 
       		        image.getId().endsWith(PluginImage.IMG_MULTIINSTANCE_PARALLEL.getImageKey())) {
       		  
-      		  final int iconWidthAndHeight = 16;
-            final int padding = 2;
+      		  final int iconWidthAndHeight = 12;
             final int xPos = (context.getShape().getGraphicsAlgorithm().getWidth() / 2) - (iconWidthAndHeight / 2);
-            final int yPos = context.getShape().getGraphicsAlgorithm().getHeight() - padding - iconWidthAndHeight;
+            final int yPos = context.getShape().getGraphicsAlgorithm().getHeight() - iconWidthAndHeight - 2;
 
             image.setX(xPos);
             image.setY(yPos);
           
           } else {
       		
-        		if (bo instanceof CallActivity) {
-        			
-        			// calculate position for icon
-        			final int iconWidthAndHeight = 10;
-        			final int padding = 5;
-        			final int xPos = (context.getShape().getGraphicsAlgorithm().getWidth() / 2) - (iconWidthAndHeight / 2);
-        			final int yPos = context.getShape().getGraphicsAlgorithm().getHeight() - padding - iconWidthAndHeight;
-  
-        			image.setX(xPos);
-        			image.setY(yPos);
-        			
-        		} else {
-  	      		int imageX = image.getX();
-  	      		if(imageX > 20) {
-  	      			image.setX(width - 20);
-  	      		}
-        		}
+        		int imageX = image.getX();
+	      		if(imageX > 20) {
+	      			image.setX(width - 20);
+	      		}
           }
       		
       	} else if(shape.getGraphicsAlgorithm() instanceof Text) {
@@ -148,5 +134,4 @@ public class ActivityResizeFeature extends DefaultResizeShapeFeature {
       }
     }
   }
-
 }

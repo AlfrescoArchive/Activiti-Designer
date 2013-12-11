@@ -3,6 +3,7 @@ package org.activiti.designer.features;
 import java.util.Iterator;
 
 import org.activiti.bpmn.model.Activity;
+import org.activiti.bpmn.model.CallActivity;
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.MultiInstanceLoopCharacteristics;
 import org.activiti.designer.PluginImage;
@@ -171,17 +172,20 @@ public class UpdateFlowElementFeature extends AbstractUpdateFeature {
 	          
 	          final IPeCreateService peCreateService = Graphiti.getPeCreateService();
 	          final IGaService gaService = Graphiti.getGaService();
+	          
+	          int imageX = (cs.getGraphicsAlgorithm().getWidth() - TaskShapeController.MI_IMAGE_SIZE) / 2;
+	          
 	          if (multiInstanceObject.isSequential()) {
 	            final Shape miShape = peCreateService.createShape(cs, false);
 	            final Image miImage = gaService.createImage(miShape, PluginImage.IMG_MULTIINSTANCE_SEQUENTIAL.getImageKey());
-	            gaService.setLocationAndSize(miImage, (cs.getGraphicsAlgorithm().getWidth() - TaskShapeController.IMAGE_SIZE) / 2, 
-	                    (cs.getGraphicsAlgorithm().getHeight() - TaskShapeController.IMAGE_SIZE) - 2, TaskShapeController.IMAGE_SIZE, TaskShapeController.IMAGE_SIZE);
+	            gaService.setLocationAndSize(miImage, imageX, 
+	                    (cs.getGraphicsAlgorithm().getHeight() - TaskShapeController.MI_IMAGE_SIZE) - 2, TaskShapeController.MI_IMAGE_SIZE, TaskShapeController.MI_IMAGE_SIZE);
 	          
 	          } else {
               final Shape miShape = peCreateService.createShape(cs, false);
               final Image miImage = gaService.createImage(miShape, PluginImage.IMG_MULTIINSTANCE_PARALLEL.getImageKey());
-              gaService.setLocationAndSize(miImage, (cs.getGraphicsAlgorithm().getWidth() - TaskShapeController.IMAGE_SIZE) / 2, 
-                      (cs.getGraphicsAlgorithm().getHeight() - TaskShapeController.IMAGE_SIZE) - 2, TaskShapeController.IMAGE_SIZE, TaskShapeController.IMAGE_SIZE);
+              gaService.setLocationAndSize(miImage, imageX, 
+                      (cs.getGraphicsAlgorithm().getHeight() - TaskShapeController.MI_IMAGE_SIZE) - 2, TaskShapeController.MI_IMAGE_SIZE, TaskShapeController.MI_IMAGE_SIZE);
 	        
 	          }
 	        }

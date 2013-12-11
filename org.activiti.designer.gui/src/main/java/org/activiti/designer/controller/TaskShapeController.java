@@ -50,6 +50,7 @@ import org.eclipse.graphiti.services.IPeCreateService;
 public class TaskShapeController extends AbstractBusinessObjectShapeController {
   
   public static final int IMAGE_SIZE = 16;
+  public static final int MI_IMAGE_SIZE = 12;
   
   public TaskShapeController(ActivitiBPMNFeatureProvider featureProvider) {
     super(featureProvider);
@@ -190,7 +191,7 @@ public class TaskShapeController extends AbstractBusinessObjectShapeController {
 
     switch (baseShape) {
     case ACTIVITY:
-      gaService.setLocationAndSize(text, 0, 20, width, height - 25);
+      gaService.setLocationAndSize(text, 0, 20, width, height - 32);
       break;
     case GATEWAY:
       gaService.setLocationAndSize(text, 0, height + 5, width, 40);
@@ -243,7 +244,7 @@ public class TaskShapeController extends AbstractBusinessObjectShapeController {
           } else {
             miImage = gaService.createImage(miShape, PluginImage.IMG_MULTIINSTANCE_PARALLEL.getImageKey());
           }
-          gaService.setLocationAndSize(miImage, (width - IMAGE_SIZE) / 2, (height - IMAGE_SIZE) - 2, IMAGE_SIZE, IMAGE_SIZE);
+          gaService.setLocationAndSize(miImage, (width - MI_IMAGE_SIZE) / 2, (height - MI_IMAGE_SIZE), MI_IMAGE_SIZE, MI_IMAGE_SIZE);
         }
       }
     }

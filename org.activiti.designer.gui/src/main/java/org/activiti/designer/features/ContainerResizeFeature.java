@@ -18,11 +18,13 @@ import java.util.List;
 
 import org.activiti.bpmn.model.Activity;
 import org.activiti.bpmn.model.BoundaryEvent;
+import org.activiti.bpmn.model.CallActivity;
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.Lane;
 import org.activiti.bpmn.model.Pool;
 import org.activiti.bpmn.model.Process;
 import org.activiti.bpmn.model.SubProcess;
+import org.activiti.designer.PluginImage;
 import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -30,6 +32,8 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IResizeShapeContext;
 import org.eclipse.graphiti.features.impl.DefaultResizeShapeFeature;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
+import org.eclipse.graphiti.mm.algorithms.Image;
+import org.eclipse.graphiti.mm.algorithms.MultiText;
 import org.eclipse.graphiti.mm.algorithms.Text;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
@@ -164,7 +168,27 @@ public class ContainerResizeFeature extends DefaultResizeShapeFeature {
             }
           }
         }
-      } 
+      }
+      
+      List<Shape> childShapes = ((ContainerShape) context.getShape()).getChildren();
+      for (Shape childShape : childShapes) {
+        if (childShape.getGraphicsAlgorithm() != null) {
+          if (childShape.getGraphicsAlgorithm() instanceof Image) {
+            Image image = (Image) childShape.getGraphicsAlgorithm();
+            
+            if (image.getId().endsWith(PluginImage.IMG_MULTIINSTANCE_SEQUENTIAL.getImageKey()) || 
+                    image.getId().endsWith(PluginImage.IMG_MULTIINSTANCE_PARALLEL.getImageKey())) {
+              
+              final int iconWidthAndHeight = 12;
+              final int xPos = (context.getShape().getGraphicsAlgorithm().getWidth() / 2) - (iconWidthAndHeight / 2);
+              final int yPos = context.getShape().getGraphicsAlgorithm().getHeight() - iconWidthAndHeight;
+
+              image.setX(xPos);
+              image.setY(yPos);
+            } 
+          }
+        }
+      }
     }
   }
   

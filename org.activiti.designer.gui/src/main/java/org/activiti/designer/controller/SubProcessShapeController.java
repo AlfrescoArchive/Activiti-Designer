@@ -36,7 +36,7 @@ import org.eclipse.graphiti.services.IPeCreateService;
  */
 public class SubProcessShapeController extends AbstractBusinessObjectShapeController {
   
-  public static final int IMAGE_SIZE = 16;
+  public static final int IMAGE_SIZE = 12;
   
   public SubProcessShapeController(ActivitiBPMNFeatureProvider featureProvider) {
     super(featureProvider);
