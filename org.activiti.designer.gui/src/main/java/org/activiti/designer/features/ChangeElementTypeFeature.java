@@ -1,13 +1,16 @@
 package org.activiti.designer.features;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.activiti.bpmn.model.Activity;
 import org.activiti.bpmn.model.BaseElement;
 import org.activiti.bpmn.model.BoundaryEvent;
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.FlowNode;
+import org.activiti.bpmn.model.Lane;
 import org.activiti.bpmn.model.Process;
 import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.bpmn.model.SubProcess;
@@ -17,20 +20,86 @@ import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.context.impl.CreateContext;
 import org.eclipse.graphiti.features.custom.AbstractCustomFeature;
+import org.eclipse.graphiti.features.impl.AbstractCreateFeature;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 
 public class ChangeElementTypeFeature extends AbstractCustomFeature {
 	
+  public static final String TASK_SERVICE = "servicetask";
+  public static final String TASK_BUSINESSRULE = "businessruletask";
+  public static final String TASK_MAIL = "mailtask";
+  public static final String TASK_MANUAL = "manualtask";
+  public static final String TASK_RECEIVE = "receivetask";
+  public static final String TASK_SCRIPT = "scripttask";
+  public static final String TASK_USER = "usertask";
+  
+  public static final String GATEWAY_EXCLUSIVE = "exclusivegateway";
+  public static final String GATEWAY_INCLUSIVE = "inclusivegateway";
+  public static final String GATEWAY_PARALLEL = "parallelgateway";
+  public static final String GATEWAY_EVENT = "eventgateway";
+  
+  public static final String EVENT_START_NONE = "nonestartevent";
+  public static final String EVENT_START_TIMER = "timerstartevent";
+  public static final String EVENT_START_MESSAGE = "messagestartevent";
+  public static final String EVENT_START_ERROR = "errorstartevent";
+  
+  public static final String EVENT_END_NONE = "noneendevent";
+  public static final String EVENT_END_ERROR = "errorendevent";
+  public static final String EVENT_END_TERMINATE = "terminateendevent";
+  
+  public static final String EVENT_BOUNDARY_TIMER = "timerboundaryevent";
+  public static final String EVENT_BOUNDARY_ERROR = "errorboundaryevent";
+  public static final String EVENT_BOUNDARY_MESSAGE = "messageboundaryevent";
+  public static final String EVENT_BOUNDARY_SIGNAL = "signalboundaryevent";
+  
+  public static final String EVENT_CATCH_TIMER = "timercatchevent";
+  public static final String EVENT_CATCH_MESSAGE = "messagecatchevent";
+  public static final String EVENT_CATCH_SIGNAL = "signalcatchevent";
+  
+  public static final String EVENT_THROW_NONE = "nonethrowevent";
+  public static final String EVENT_THROW_SIGNAL = "signalthrowevent";
+  
+  protected Map<String, AbstractCreateFeature> createFeatureMap = new HashMap<String, AbstractCreateFeature>();
+  
 	private String newType;
 	
 	public ChangeElementTypeFeature(IFeatureProvider fp) {
 		super(fp);
+		createFeatureMap.put(TASK_SERVICE, new CreateServiceTaskFeature(fp));
+		createFeatureMap.put(TASK_BUSINESSRULE, new CreateBusinessRuleTaskFeature(fp));
+		createFeatureMap.put(TASK_MAIL, new CreateMailTaskFeature(fp));
+		createFeatureMap.put(TASK_MANUAL, new CreateManualTaskFeature(fp));
+		createFeatureMap.put(TASK_RECEIVE, new CreateReceiveTaskFeature(fp));
+		createFeatureMap.put(TASK_SCRIPT, new CreateScriptTaskFeature(fp));
+		createFeatureMap.put(TASK_USER, new CreateUserTaskFeature(fp));
+		
+		createFeatureMap.put(GATEWAY_EXCLUSIVE, new CreateExclusiveGatewayFeature(fp));
+		createFeatureMap.put(GATEWAY_INCLUSIVE, new CreateInclusiveGatewayFeature(fp));
+		createFeatureMap.put(GATEWAY_PARALLEL, new CreateParallelGatewayFeature(fp));
+		createFeatureMap.put(GATEWAY_EVENT, new CreateEventGatewayFeature(fp));
+		
+		createFeatureMap.put(EVENT_START_NONE, new CreateStartEventFeature(fp));
+		createFeatureMap.put(EVENT_START_TIMER, new CreateTimerStartEventFeature(fp));
+		createFeatureMap.put(EVENT_START_MESSAGE, new CreateMessageStartEventFeature(fp));
+		createFeatureMap.put(EVENT_START_ERROR, new CreateErrorStartEventFeature(fp));
+		
+		createFeatureMap.put(EVENT_BOUNDARY_TIMER, new CreateBoundaryTimerFeature(fp));
+    createFeatureMap.put(EVENT_BOUNDARY_ERROR, new CreateBoundaryErrorFeature(fp));
+    createFeatureMap.put(EVENT_BOUNDARY_MESSAGE, new CreateBoundaryMessageFeature(fp));
+    createFeatureMap.put(EVENT_BOUNDARY_SIGNAL, new CreateBoundarySignalFeature(fp));
+    
+    createFeatureMap.put(EVENT_CATCH_TIMER, new CreateTimerCatchingEventFeature(fp));
+    createFeatureMap.put(EVENT_CATCH_MESSAGE, new CreateMessageCatchingEventFeature(fp));
+    createFeatureMap.put(EVENT_CATCH_SIGNAL, new CreateSignalCatchingEventFeature(fp));
+    
+    createFeatureMap.put(EVENT_THROW_NONE, new CreateNoneThrowingEventFeature(fp));
+    createFeatureMap.put(EVENT_THROW_SIGNAL, new CreateSignalThrowingEventFeature(fp));
 	}
 
 	public ChangeElementTypeFeature(IFeatureProvider fp, String newType) {
-		super(fp);
+		this(fp);
 		this.newType = newType;
 	}
 	
@@ -72,75 +141,14 @@ public class ChangeElementTypeFeature extends AbstractCustomFeature {
 	  List<Process> processes = ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getBpmnModel().getProcesses();
     for (Process process : processes) {
       process.removeFlowElement(oldObject.getId());
+      for (Lane lane : process.getLanes()) {
+        lane.getFlowReferences().remove(oldObject.getId());
+      }
       removeElement(oldObject, process);
     }
 	  
-	  if("servicetask".equals(newType)) {
-	  	new CreateServiceTaskFeature(getFeatureProvider()).create(taskContext);
-	  
-	  } else if("businessruletask".equals(newType)) {
-	  	new CreateBusinessRuleTaskFeature(getFeatureProvider()).create(taskContext);
-
-	  } else if("mailtask".equals(newType)) {
-	  	new CreateMailTaskFeature(getFeatureProvider()).create(taskContext);
-	  
-	  } else if("manualtask".equals(newType)) {
-	  	new CreateManualTaskFeature(getFeatureProvider()).create(taskContext);
-	  	
-	  } else if("receivetask".equals(newType)) {
-	  	new CreateReceiveTaskFeature(getFeatureProvider()).create(taskContext);
-	  
-	  } else if("scripttask".equals(newType)) {
-	  	new CreateScriptTaskFeature(getFeatureProvider()).create(taskContext);
-	  	
-	  } else if("usertask".equals(newType)) {
-	  	new CreateUserTaskFeature(getFeatureProvider()).create(taskContext);
-	  
-	  } else if("exclusivegateway".equals(newType)) {
-	  	new CreateExclusiveGatewayFeature(getFeatureProvider()).create(taskContext);
-	 
-	  } else if("inclusivegateway".equals(newType)) {
-      new CreateInclusiveGatewayFeature(getFeatureProvider()).create(taskContext);
-     
-    } else if("parallelgateway".equals(newType)) {
-	  	new CreateParallelGatewayFeature(getFeatureProvider()).create(taskContext);
-	  	
-    } else if("eventgateway".equals(newType)) {
-      new CreateEventGatewayFeature(getFeatureProvider()).create(taskContext);
-	  
-    } else if("nonestartevent".equals(newType)) {
-      new CreateStartEventFeature(getFeatureProvider()).create(taskContext);
-    
-    } else if("timerstartevent".equals(newType)) {
-      new CreateTimerStartEventFeature(getFeatureProvider()).create(taskContext);
-    
-    } else if("messagestartevent".equals(newType)) {
-      new CreateMessageStartEventFeature(getFeatureProvider()).create(taskContext);
-    
-    } else if("errorstartevent".equals(newType)) {
-      new CreateErrorStartEventFeature(getFeatureProvider()).create(taskContext);
-    
-    } else if("noneendevent".equals(newType)) {
-      new CreateEndEventFeature(getFeatureProvider()).create(taskContext);
-    
-    } else if("errorendevent".equals(newType)) {
-      new CreateErrorEndEventFeature(getFeatureProvider()).create(taskContext);
-    
-    } else if("terminateendevent".equals(newType)) {
-      new CreateTerminateEndEventFeature(getFeatureProvider()).create(taskContext);
-    
-    } else if ("timerboundaryevent".equals(newType)) {
-      new CreateBoundaryTimerFeature(getFeatureProvider()).create(taskContext);
-    
-    } else if ("errorboundaryevent".equals(newType)) {
-      new CreateBoundaryErrorFeature(getFeatureProvider()).create(taskContext);
-    
-    } else if ("messageboundaryevent".equals(newType)) {
-      new CreateBoundaryMessageFeature(getFeatureProvider()).create(taskContext);
-    
-    } else if ("signalboundaryevent".equals(newType)) {
-      new CreateBoundarySignalFeature(getFeatureProvider()).create(taskContext);
-    
+    if (createFeatureMap.containsKey(newType)) {
+      createFeatureMap.get(newType).create(taskContext);
     }
   }
 	

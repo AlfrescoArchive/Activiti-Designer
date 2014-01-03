@@ -79,7 +79,7 @@ public class TestRunnerClassGenerator {
   private String createTestClass(IResource bpmnResource, String name, String className, IPackageFragment pack) {
     StringBuffer buffer = new StringBuffer();
     String absoluteResourceLocation = bpmnResource.getLocation().toOSString();
-    absoluteResourceLocation = absoluteResourceLocation.replaceAll("\\", "\\\\");
+    absoluteResourceLocation = absoluteResourceLocation.replace("\\", "\\\\");
     buffer.append("package " + pack.getElementName() + ";\n\n").append("import static org.junit.Assert.*;\n\n").append("import java.util.HashMap;\n")
             .append("import java.util.Map;\n")
             .append("import java.io.FileInputStream;\n\n")

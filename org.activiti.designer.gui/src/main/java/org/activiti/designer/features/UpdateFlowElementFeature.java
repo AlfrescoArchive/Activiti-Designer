@@ -3,7 +3,7 @@ package org.activiti.designer.features;
 import java.util.Iterator;
 
 import org.activiti.bpmn.model.Activity;
-import org.activiti.bpmn.model.CallActivity;
+import org.activiti.bpmn.model.BoundaryEvent;
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.MultiInstanceLoopCharacteristics;
 import org.activiti.designer.PluginImage;
@@ -16,9 +16,12 @@ import org.eclipse.graphiti.features.IReason;
 import org.eclipse.graphiti.features.context.IUpdateContext;
 import org.eclipse.graphiti.features.impl.AbstractUpdateFeature;
 import org.eclipse.graphiti.features.impl.Reason;
+import org.eclipse.graphiti.mm.algorithms.Ellipse;
+import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.algorithms.Image;
 import org.eclipse.graphiti.mm.algorithms.MultiText;
 import org.eclipse.graphiti.mm.algorithms.Text;
+import org.eclipse.graphiti.mm.algorithms.styles.LineStyle;
 import org.eclipse.graphiti.mm.pictograms.ConnectionDecorator;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.FreeFormConnection;
@@ -49,6 +52,24 @@ public class UpdateFlowElementFeature extends AbstractUpdateFeature {
     
 		if (pictogramElement instanceof ContainerShape) {
 			ContainerShape cs = (ContainerShape) pictogramElement;
+			
+			if (bo instanceof BoundaryEvent && cs.getGraphicsAlgorithm() instanceof Ellipse) {
+			  BoundaryEvent event = (BoundaryEvent) bo;
+			  Iterator<GraphicsAlgorithm> itGraph = cs.getGraphicsAlgorithm().getGraphicsAlgorithmChildren().iterator();
+			  while (itGraph.hasNext()) {
+			    GraphicsAlgorithm childGraph = itGraph.next();
+			    if (childGraph instanceof Ellipse) {
+			      Ellipse ellipse = (Ellipse) childGraph;
+			      if (ellipse.getLineStyle() == LineStyle.SOLID && event.isCancelActivity() == false) {
+			        return Reason.createTrueReason();
+			      
+			      } else if (ellipse.getLineStyle() == LineStyle.DOT && event.isCancelActivity()) {
+			        return Reason.createTrueReason();
+			      }
+			    }
+			  }
+			}
+			
 			for (Shape shape : cs.getChildren()) {
 				if (shape.getGraphicsAlgorithm() instanceof Text) {
 					Text text = (Text) shape.getGraphicsAlgorithm();
@@ -135,6 +156,38 @@ public class UpdateFlowElementFeature extends AbstractUpdateFeature {
 		// Set name in pictogram model
 		if (pictogramElement instanceof ContainerShape) {
 			ContainerShape cs = (ContainerShape) pictogramElement;
+			
+			if (bo instanceof BoundaryEvent && cs.getGraphicsAlgorithm() instanceof Ellipse) {
+			  BoundaryEvent event = (BoundaryEvent) bo;
+        Iterator<GraphicsAlgorithm> itGraph = cs.getGraphicsAlgorithm().getGraphicsAlgorithmChildren().iterator();
+        while (itGraph.hasNext()) {
+          GraphicsAlgorithm childGraph = itGraph.next();
+          if (childGraph instanceof Ellipse) {
+            Ellipse ellipse = (Ellipse) childGraph;
+            if (event.isCancelActivity()) {
+              ellipse.setLineStyle(LineStyle.SOLID);
+            } else {
+              ellipse.setLineStyle(LineStyle.DOT);
+            }
+            
+            Iterator<GraphicsAlgorithm> itChildGraph = childGraph.getGraphicsAlgorithmChildren().iterator();
+            while (itChildGraph.hasNext()) {
+              GraphicsAlgorithm innerChildGraph = itChildGraph.next();
+              if (innerChildGraph instanceof Ellipse) {
+                Ellipse innerEllipse = (Ellipse) innerChildGraph;
+                if (event.isCancelActivity()) {
+                  innerEllipse.setLineStyle(LineStyle.SOLID);
+                } else {
+                  innerEllipse.setLineStyle(LineStyle.DOT);
+                }
+              }
+            }
+            
+            updated = true;
+          }
+        }
+      }
+			
 			Iterator<Shape> itShape = cs.getChildren().iterator();
 			while (itShape.hasNext()) {
 			  Shape shape = itShape.next();
@@ -158,7 +211,7 @@ public class UpdateFlowElementFeature extends AbstractUpdateFeature {
             itShape.remove();
             updated = true;
           }
-        }
+				}
 			}
 			
 			if (bo instanceof Activity) {
@@ -190,6 +243,12 @@ public class UpdateFlowElementFeature extends AbstractUpdateFeature {
 	          }
 	        }
 	      }
+			
+			} else if (bo instanceof BoundaryEvent) {
+			  BoundaryEvent event = (BoundaryEvent) bo;
+			  if (event.isCancelActivity() == false) {
+			    
+			  }
 			}
 		
 		} else if (pictogramElement instanceof FreeFormConnection) {

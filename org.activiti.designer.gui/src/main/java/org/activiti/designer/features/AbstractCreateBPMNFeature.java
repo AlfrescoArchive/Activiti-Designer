@@ -9,7 +9,6 @@ import org.activiti.bpmn.model.Activity;
 import org.activiti.bpmn.model.Artifact;
 import org.activiti.bpmn.model.BaseElement;
 import org.activiti.bpmn.model.BoundaryEvent;
-import org.activiti.bpmn.model.CallActivity;
 import org.activiti.bpmn.model.Event;
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.FlowNode;
@@ -18,7 +17,6 @@ import org.activiti.bpmn.model.Lane;
 import org.activiti.bpmn.model.Process;
 import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.bpmn.model.SubProcess;
-import org.activiti.bpmn.model.Task;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
@@ -117,8 +115,8 @@ public abstract class AbstractCreateBPMNFeature extends AbstractCreateFeature {
         model.addMainProcess();
       }
       addFlowNodeOrArtifact(baseElement, model.getBpmnModel().getMainProcess());
-    }
-    else {
+      
+    } else {
       // find the parent object
       final Object parent = getBusinessObjectForPictogramElement(targetContainer);
       
@@ -209,39 +207,24 @@ public abstract class AbstractCreateBPMNFeature extends AbstractCreateFeature {
   }
   
   private void setLocation(BaseElement targetElement, CreateContext context) {
-  	if(context.getProperty(CONNECTION_ATTRIBUTE) != null) {
+  	if (context.getProperty(CONNECTION_ATTRIBUTE) != null) {
   		
   		CreateConnectionContext connectionContext = (CreateConnectionContext) 
 					context.getProperty(CONNECTION_ATTRIBUTE);
   		PictogramElement sourceElement = connectionContext.getSourcePictogramElement();
-  		Object sourceObject = getBusinessObjectForPictogramElement(sourceElement);
-  		if(sourceObject instanceof Event && (targetElement instanceof Task || targetElement instanceof CallActivity)) {
-  			context.setLocation(sourceElement.getGraphicsAlgorithm().getX() + 80, 
-  					sourceElement.getGraphicsAlgorithm().getY() - 10);
   		
-  		} else if(sourceObject instanceof Event && targetElement instanceof Gateway) {
-  			context.setLocation(sourceElement.getGraphicsAlgorithm().getX() + 80, 
-  					sourceElement.getGraphicsAlgorithm().getY() - 3);
+  		int outerRightX = sourceElement.getGraphicsAlgorithm().getX() + sourceElement.getGraphicsAlgorithm().getWidth();
+  		int newXPosition = outerRightX + 45;
+  		int middleY = sourceElement.getGraphicsAlgorithm().getY() + (sourceElement.getGraphicsAlgorithm().getHeight() / 2);
+  		
+  		if (targetElement instanceof Event) {
+        context.setLocation(newXPosition, middleY - 17);
   			
-  		} else if(sourceObject instanceof Gateway && targetElement instanceof Event) {
-  			context.setLocation(sourceElement.getGraphicsAlgorithm().getX() + 85, 
-  					sourceElement.getGraphicsAlgorithm().getY() + 3);
+  		} else if (targetElement instanceof Gateway) {
+  			context.setLocation(newXPosition, middleY - 19);
   		
-  		} else if(sourceObject instanceof Gateway && (targetElement instanceof Task || targetElement instanceof CallActivity)) {
-  			context.setLocation(sourceElement.getGraphicsAlgorithm().getX() + 85, 
-  					sourceElement.getGraphicsAlgorithm().getY() - 7);
-  		
-  		} else if((sourceObject instanceof Task || sourceObject instanceof CallActivity) && targetElement instanceof Gateway) {
-  			context.setLocation(sourceElement.getGraphicsAlgorithm().getX() + 160, 
-  					sourceElement.getGraphicsAlgorithm().getY() + 7);
-  		
-  		} else if((sourceObject instanceof Task || sourceObject instanceof CallActivity) && targetElement instanceof Event) {
-  			context.setLocation(sourceElement.getGraphicsAlgorithm().getX() + 160, 
-  					sourceElement.getGraphicsAlgorithm().getY() + 10);
-  		
-  		} else if((sourceObject instanceof Task || sourceObject instanceof CallActivity) && (targetElement instanceof Task || targetElement instanceof CallActivity)) {
-  			context.setLocation(sourceElement.getGraphicsAlgorithm().getX() + 160, 
-  					sourceElement.getGraphicsAlgorithm().getY());
+  		} else if (targetElement instanceof Activity) {
+  			context.setLocation(newXPosition, middleY - 27);
   		}
   	}
   }

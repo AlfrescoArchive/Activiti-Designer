@@ -23,7 +23,7 @@ public class CreateMessageStartEventFeature extends AbstractCreateBPMNFeature {
   public boolean canCreate(ICreateContext context) {
     Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
     if (parentObject instanceof EventSubProcess)
-      return false;
+      return true;
     return super.canCreate(context);
   }
 

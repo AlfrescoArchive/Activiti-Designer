@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
+import org.activiti.bpmn.model.Activity;
 import org.activiti.bpmn.model.BoundaryEvent;
 import org.activiti.bpmn.model.BusinessRuleTask;
 import org.activiti.bpmn.model.CallActivity;
@@ -19,6 +20,7 @@ import org.activiti.bpmn.model.EventGateway;
 import org.activiti.bpmn.model.ExclusiveGateway;
 import org.activiti.bpmn.model.Gateway;
 import org.activiti.bpmn.model.InclusiveGateway;
+import org.activiti.bpmn.model.IntermediateCatchEvent;
 import org.activiti.bpmn.model.ManualTask;
 import org.activiti.bpmn.model.MessageEventDefinition;
 import org.activiti.bpmn.model.ParallelGateway;
@@ -31,6 +33,7 @@ import org.activiti.bpmn.model.StartEvent;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.bpmn.model.Task;
 import org.activiti.bpmn.model.TerminateEventDefinition;
+import org.activiti.bpmn.model.ThrowEvent;
 import org.activiti.bpmn.model.TimerEventDefinition;
 import org.activiti.bpmn.model.UserTask;
 import org.activiti.bpmn.model.alfresco.AlfrescoStartEvent;
@@ -209,7 +212,9 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     taskContext.setTargetContainer((ContainerShape) pe.eContainer());
     taskContext.putProperty("org.activiti.designer.connectionContext", connectionContext);
 
-    if (bo instanceof StartEvent || bo instanceof Task || bo instanceof CallActivity || bo instanceof Gateway || bo instanceof BoundaryEvent) {
+    if (bo instanceof StartEvent || bo instanceof Activity ||
+        bo instanceof IntermediateCatchEvent || bo instanceof ThrowEvent ||
+        bo instanceof Gateway || bo instanceof BoundaryEvent) {
 
       CreateUserTaskFeature userTaskfeature = new CreateUserTaskFeature(getFeatureProvider());
       ContextButtonEntry newUserTaskButton = new ContextButtonEntry(userTaskfeature, taskContext);
@@ -257,8 +262,9 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
       data.getDomainSpecificContextButtons().add(button);
     }
 
-    if (bo instanceof StartEvent || bo instanceof Task || bo instanceof CallActivity || 
-        bo instanceof SubProcess || bo instanceof Gateway || bo instanceof BoundaryEvent) {
+    if (bo instanceof StartEvent || bo instanceof Activity ||
+        bo instanceof IntermediateCatchEvent || bo instanceof ThrowEvent ||
+        bo instanceof Gateway || bo instanceof BoundaryEvent) {
 
       ContextButtonEntry otherElementButton = new ContextButtonEntry(null, null);
       otherElementButton.setText("new element"); //$NON-NLS-1$
@@ -294,6 +300,16 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
               "Create a new error end event", PluginImage.IMG_EVENT_ERROR);
       addContextButton(otherElementButton, new CreateTerminateEndEventFeature(getFeatureProvider()), taskContext, "Create terminate end event",
               "Create a new terminate end event", PluginImage.IMG_EVENT_TERMINATE);
+      addContextButton(otherElementButton, new CreateTimerCatchingEventFeature(getFeatureProvider()), taskContext, "Create intermediate catch timer event",
+          "Create a new intermediate catch timer event", PluginImage.IMG_EVENT_TIMER);
+      addContextButton(otherElementButton, new CreateMessageCatchingEventFeature(getFeatureProvider()), taskContext, "Create intermediate catch message event",
+          "Create a new intermediate catch message event", PluginImage.IMG_EVENT_MESSAGE);
+      addContextButton(otherElementButton, new CreateSignalCatchingEventFeature(getFeatureProvider()), taskContext, "Create intermediate catch signal event",
+          "Create a new intermediate catch signal event", PluginImage.IMG_EVENT_SIGNAL);
+      addContextButton(otherElementButton, new CreateNoneThrowingEventFeature(getFeatureProvider()), taskContext, "Create intermediate throw none event",
+          "Create a new intermediate throw none event", PluginImage.IMG_THROW_NONE);
+      addContextButton(otherElementButton, new CreateSignalThrowingEventFeature(getFeatureProvider()), taskContext, "Create intermediate throw signal event",
+          "Create a new intermediate throw signal event", PluginImage.IMG_THROW_SIGNAL);
       addContextButton(otherElementButton, new CreateAlfrescoScriptTaskFeature(getFeatureProvider()), taskContext, "Create alfresco script task",
               "Create a new alfresco script task", PluginImage.IMG_SERVICETASK);
       addContextButton(otherElementButton, new CreateAlfrescoUserTaskFeature(getFeatureProvider()), taskContext, "Create alfresco user task",
@@ -321,6 +337,10 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
       addEndEventButtons(editElementButton, (EndEvent) bo, customContext);
     } else if (bo instanceof BoundaryEvent) {
       addBoundaryEventButtons(editElementButton, (BoundaryEvent) bo, customContext);
+    } else if (bo instanceof ThrowEvent) {
+      addThrowEventButtons(editElementButton, (ThrowEvent) bo, customContext);
+    } else if (bo instanceof IntermediateCatchEvent) {
+      addIntermediateCatchEventButtons(editElementButton, (IntermediateCatchEvent) bo, customContext);
     }
 
     return data;
@@ -328,20 +348,20 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
 
   private void addGatewayButtons(ContextButtonEntry otherElementButton, Gateway notGateway, CustomContext customContext) {
     if (notGateway == null || !(notGateway instanceof ExclusiveGateway)) {
-      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "exclusivegateway"), customContext,
-              "Change to exclusive gateway", "Change to an exclusive gateway", PluginImage.IMG_GATEWAY_EXCLUSIVE);
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), ChangeElementTypeFeature.GATEWAY_EXCLUSIVE), customContext,
+          "Change to exclusive gateway", "Change to an exclusive gateway", PluginImage.IMG_GATEWAY_EXCLUSIVE);
     }
     if (notGateway == null || !(notGateway instanceof InclusiveGateway)) {
-      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "inclusivegateway"), customContext,
-              "Change to inclusive gateway", "Change to an inclusive gateway", PluginImage.IMG_GATEWAY_INCLUSIVE);
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), ChangeElementTypeFeature.GATEWAY_INCLUSIVE), customContext,
+          "Change to inclusive gateway", "Change to an inclusive gateway", PluginImage.IMG_GATEWAY_INCLUSIVE);
     }
     if (notGateway == null || !(notGateway instanceof ParallelGateway)) {
-      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "parallelgateway"), customContext, "Change to parallel gateway",
-              "Change to a parallel gateway", PluginImage.IMG_GATEWAY_PARALLEL);
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), ChangeElementTypeFeature.GATEWAY_PARALLEL), customContext, 
+          "Change to parallel gateway", "Change to a parallel gateway", PluginImage.IMG_GATEWAY_PARALLEL);
     }
     if (notGateway == null || !(notGateway instanceof EventGateway)) {
-      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "eventgateway"), customContext, "Change to event gateway",
-              "Change to a event gateway", PluginImage.IMG_GATEWAY_EVENT);
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), ChangeElementTypeFeature.GATEWAY_EVENT), customContext, 
+          "Change to event gateway", "Change to a event gateway", PluginImage.IMG_GATEWAY_EVENT);
     }
   }
 
@@ -364,19 +384,19 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     }
 
     if ("none".equals(startEventType) == false) {
-      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "nonestartevent"), customContext,
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), ChangeElementTypeFeature.EVENT_START_NONE), customContext,
               "Change to none start event", "Change to a none start event", PluginImage.IMG_STARTEVENT_NONE);
     }
     if ("timer".equals(startEventType) == false) {
-      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "timerstartevent"), customContext,
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), ChangeElementTypeFeature.EVENT_START_TIMER), customContext,
               "Change to timer start event", "Change to a timer start event", PluginImage.IMG_EVENT_TIMER);
     }
     if ("message".equals(startEventType) == false) {
-      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "messagestartevent"), customContext,
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), ChangeElementTypeFeature.EVENT_START_MESSAGE), customContext,
               "Change to message start event", "Change to a message start event", PluginImage.IMG_EVENT_MESSAGE);
     }
     if ("error".equals(startEventType) == false) {
-      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "errorstartevent"), customContext,
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), ChangeElementTypeFeature.EVENT_START_ERROR), customContext,
               "Change to error start event", "Change to an error start event", PluginImage.IMG_EVENT_ERROR);
     }
   }
@@ -395,15 +415,15 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     }
 
     if ("none".equals(endEventType) == false) {
-      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "noneendevent"), customContext,
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), ChangeElementTypeFeature.EVENT_END_NONE), customContext,
               "Change to none end event", "Change to a none end event", PluginImage.IMG_ENDEVENT_NONE);
     }
     if ("error".equals(endEventType) == false) {
-      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "errorendevent"), customContext,
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), ChangeElementTypeFeature.EVENT_END_ERROR), customContext,
               "Change to error end event", "Change to an error end event", PluginImage.IMG_EVENT_ERROR);
     }
     if ("terminate".equals(endEventType) == false) {
-      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "terminateendevent"), customContext,
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), ChangeElementTypeFeature.EVENT_END_TERMINATE), customContext,
               "Change to terminate end event", "Change to a terminate end event", PluginImage.IMG_EVENT_TERMINATE);
     }
   }
@@ -426,54 +446,105 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     }
 
     if ("timer".equals(eventType) == false) {
-      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "timerboundaryevent"), customContext,
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), ChangeElementTypeFeature.EVENT_BOUNDARY_TIMER), customContext,
               "Change to timer boundary event", "Change to a timer boundary event", PluginImage.IMG_EVENT_TIMER);
     }
     if ("message".equals(eventType) == false) {
-      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "messageboundaryevent"), customContext,
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), ChangeElementTypeFeature.EVENT_BOUNDARY_MESSAGE), customContext,
               "Change to message boundary event", "Change to a message boundary event", PluginImage.IMG_EVENT_MESSAGE);
     }
     if ("error".equals(eventType) == false) {
       Object parentObject = notBoundaryEvent.getAttachedToRef();
       if (parentObject instanceof SubProcess || parentObject instanceof CallActivity || parentObject instanceof ServiceTask) {
-        addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "errorboundaryevent"), customContext,
+        addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), ChangeElementTypeFeature.EVENT_BOUNDARY_ERROR), customContext,
                 "Change to error boundary event", "Change to an error boundary event", PluginImage.IMG_EVENT_ERROR);
       }
     }
     if ("signal".equals(eventType) == false) {
-      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "signalboundaryevent"), customContext,
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), ChangeElementTypeFeature.EVENT_BOUNDARY_SIGNAL), customContext,
               "Change to signal boundary event", "Change to a signal boundary event", PluginImage.IMG_EVENT_SIGNAL);
+    }
+  }
+  
+  private void addIntermediateCatchEventButtons(ContextButtonEntry otherElementButton, IntermediateCatchEvent catchEvent, CustomContext customContext) {
+    String eventType = null;
+    for (EventDefinition eventDefinition : catchEvent.getEventDefinitions()) {
+      if (eventDefinition instanceof TimerEventDefinition) {
+        eventType = "timer";
+      } else if (eventDefinition instanceof MessageEventDefinition) {
+        eventType = "message";
+      } else if (eventDefinition instanceof SignalEventDefinition) {
+        eventType = "signal";
+      }
+    }
+    if (eventType == null) {
+      return;
+    }
+
+    if ("timer".equals(eventType) == false) {
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), ChangeElementTypeFeature.EVENT_CATCH_TIMER), customContext,
+              "Change to intermediate catch timer event", "Change to an intermediate catch timer event", PluginImage.IMG_EVENT_TIMER);
+    }
+    if ("message".equals(eventType) == false) {
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), ChangeElementTypeFeature.EVENT_CATCH_MESSAGE), customContext,
+              "Change to intermediate catch message event", "Change to an intermediate catch message event", PluginImage.IMG_EVENT_MESSAGE);
+    }
+    if ("signal".equals(eventType) == false) {
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), ChangeElementTypeFeature.EVENT_CATCH_SIGNAL), customContext,
+              "Change to intermediate catch signal event", "Change to an intermediate catch signal event", PluginImage.IMG_EVENT_SIGNAL);
+    }
+  }
+  
+  private void addThrowEventButtons(ContextButtonEntry otherElementButton, ThrowEvent throwEvent, CustomContext customContext) {
+    String eventType = null;
+    for (EventDefinition eventDefinition : throwEvent.getEventDefinitions()) {
+      if (eventDefinition instanceof SignalEventDefinition) {
+        eventType = "signal";
+      }
+    }
+    
+    if (eventType == null) {
+      eventType = "none";
+    }
+
+    if ("none".equals(eventType) == false) {
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), ChangeElementTypeFeature.EVENT_THROW_NONE), customContext,
+              "Change to intermediate throw none event", "Change to an intermediate throw none event", PluginImage.IMG_THROW_NONE);
+    }
+    if ("signal".equals(eventType) == false) {
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), ChangeElementTypeFeature.EVENT_THROW_SIGNAL), customContext,
+              "Change to intermediate throw signal event", "Change to an intermediate throw signal event", PluginImage.IMG_THROW_SIGNAL);
     }
   }
 
   private void addTaskButtons(ContextButtonEntry otherElementButton, Task notTask, CustomContext customContext) {
     if (notTask == null || notTask instanceof ServiceTask == false || ServiceTask.MAIL_TASK.equalsIgnoreCase(((ServiceTask) notTask).getType())) {
-      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "servicetask"), customContext, "Change to service task",
-              "Change to a service task", PluginImage.IMG_SERVICETASK);
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), ChangeElementTypeFeature.TASK_SERVICE), customContext, 
+          "Change to service task", "Change to a service task", PluginImage.IMG_SERVICETASK);
     }
     if (notTask == null || notTask instanceof ScriptTask == false) {
-      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "scripttask"), customContext, "Change to script task",
-              "Change to a script task", PluginImage.IMG_SCRIPTTASK);
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), ChangeElementTypeFeature.TASK_SCRIPT), customContext, 
+          "Change to script task", "Change to a script task", PluginImage.IMG_SCRIPTTASK);
     }
     if (notTask == null || notTask instanceof UserTask == false) {
-      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "usertask"), customContext, "Change to user task",
-              "Change to a user task", PluginImage.IMG_USERTASK);
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), ChangeElementTypeFeature.TASK_USER), customContext, 
+          "Change to user task", "Change to a user task", PluginImage.IMG_USERTASK);
     }
     if (notTask == null || notTask instanceof ServiceTask == false || ServiceTask.MAIL_TASK.equalsIgnoreCase(((ServiceTask) notTask).getType()) == false) {
-      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "mailtask"), customContext, "Change to mail task",
-              "Change to a mail task", PluginImage.IMG_MAILTASK);
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), ChangeElementTypeFeature.TASK_MAIL), customContext, 
+          "Change to mail task", "Change to a mail task", PluginImage.IMG_MAILTASK);
     }
     if (notTask == null || notTask instanceof BusinessRuleTask == false) {
-      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "businessruletask"), customContext,
-              "Change to business rule task", "Change to a business rule task", PluginImage.IMG_BUSINESSRULETASK);
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), ChangeElementTypeFeature.TASK_BUSINESSRULE), customContext,
+          "Change to business rule task", "Change to a business rule task", PluginImage.IMG_BUSINESSRULETASK);
     }
     if (notTask == null || notTask instanceof ManualTask == false) {
-      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "manualtask"), customContext, "Change to manual task",
-              "Change to a manual task", PluginImage.IMG_MANUALTASK);
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), ChangeElementTypeFeature.TASK_MANUAL), customContext, 
+          "Change to manual task", "Change to a manual task", PluginImage.IMG_MANUALTASK);
     }
     if (notTask == null || notTask instanceof ReceiveTask == false) {
-      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), "receivetask"), customContext, "Change to receive task",
-              "Change to a receive task", PluginImage.IMG_RECEIVETASK);
+      addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), ChangeElementTypeFeature.TASK_RECEIVE), customContext, 
+          "Change to receive task", "Change to a receive task", PluginImage.IMG_RECEIVETASK);
     }
   }
 

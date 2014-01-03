@@ -31,7 +31,7 @@ public class PropertyBoundaryMessageSection extends ActivitiPropertySection impl
     } else if (control == messageText) {
       if (event.getEventDefinitions().get(0) != null) {
         MessageEventDefinition messageDefinition = (MessageEventDefinition) event.getEventDefinitions().get(0);
-        return messageDefinition.getMessageRef();
+        return convertMessageRef(messageDefinition.getMessageRef());
       }
     }
     return null;

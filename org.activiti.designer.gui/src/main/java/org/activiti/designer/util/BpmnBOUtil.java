@@ -45,9 +45,9 @@ public class BpmnBOUtil {
 
   public static List<ActivitiListener> getExecutionListeners(Object bo, Diagram diagram) {
     List<ActivitiListener> listenerList = null;
-    if(bo instanceof HasExecutionListeners) {
+    if (bo instanceof HasExecutionListeners) {
       listenerList = ((HasExecutionListeners) bo).getExecutionListeners();
-    } else if(bo instanceof Pool) {
+    } else if (bo instanceof Pool) {
       Pool pool = ((Pool) bo);
       BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(diagram));
       listenerList = model.getBpmnModel().getProcess(pool.getId()).getExecutionListeners();
@@ -56,9 +56,9 @@ public class BpmnBOUtil {
   }
   
   public static void addExecutionListener(Object bo, ActivitiListener listener, Diagram diagram) {
-  	if(bo instanceof HasExecutionListeners) {
+  	if (bo instanceof HasExecutionListeners) {
     	((HasExecutionListeners) bo).getExecutionListeners().add(listener);
-    } else if(bo instanceof Pool) {
+    } else if (bo instanceof Pool) {
       Pool pool = ((Pool) bo);
       BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(diagram));
       model.getBpmnModel().getProcess(pool.getId()).getExecutionListeners().add(listener);
@@ -66,9 +66,9 @@ public class BpmnBOUtil {
   }
   
   public static void setExecutionListener(Object bo, ActivitiListener listener, int index, Diagram diagram) {
-  	if(bo instanceof HasExecutionListeners) {
+  	if (bo instanceof HasExecutionListeners) {
     	((HasExecutionListeners) bo).getExecutionListeners().set(index, listener);
-    } else if(bo instanceof Pool) {
+    } else if (bo instanceof Pool) {
       Pool pool = ((Pool) bo);
       BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(diagram));
       model.getBpmnModel().getProcess(pool.getId()).getExecutionListeners().set(index, listener);
@@ -76,9 +76,9 @@ public class BpmnBOUtil {
   }
   
   public static void setExecutionListeners(Object bo, List<ActivitiListener> listeners, Diagram diagram) {
-    if(bo instanceof HasExecutionListeners) {
+    if (bo instanceof HasExecutionListeners) {
       ((HasExecutionListeners) bo).setExecutionListeners(listeners);
-    } else if(bo instanceof Pool) {
+    } else if (bo instanceof Pool) {
       Pool pool = ((Pool) bo);
       BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(diagram));
       model.getBpmnModel().getProcess(pool.getId()).setExecutionListeners(listeners);
@@ -86,9 +86,9 @@ public class BpmnBOUtil {
   }
   
   public static void removeExecutionListener(Object bo, int index, Diagram diagram) {
-  	if(bo instanceof HasExecutionListeners) {
+  	if (bo instanceof HasExecutionListeners) {
     	((HasExecutionListeners) bo).getExecutionListeners().remove(index);
-    } else if(bo instanceof Pool) {
+    } else if (bo instanceof Pool) {
       Pool pool = ((Pool) bo);
       BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(diagram));
       model.getBpmnModel().getProcess(pool.getId()).getExecutionListeners().remove(index);

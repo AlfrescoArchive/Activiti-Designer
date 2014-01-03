@@ -3,6 +3,7 @@ package org.activiti.designer.property;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.bpmn.model.FieldExtension;
 import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.designer.command.BpmnProcessModelUpdater;
@@ -386,7 +387,7 @@ public abstract class ActivitiPropertySection extends BaseActivitiPropertySectio
     if (element == null)
       return null;
     Diagram diagram = getContainer(element);
-    BpmnMemoryModel model = (ModelHandler.getModel(EcoreUtil.getURI(diagram)));
+    BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(diagram));
     if (model != null) {
       return (ActivitiBPMNFeatureProvider) model.getFeatureProvider();
     }
@@ -478,7 +479,7 @@ public abstract class ActivitiPropertySection extends BaseActivitiPropertySectio
     FormData data = new FormData();
     data.left = new FormAttachment(0, 0);
     data.right = new FormAttachment(control, -HSPACE);
-    data.top = new FormAttachment(control, 0, SWT.CENTER);
+    data.top = new FormAttachment(control, 0, SWT.TOP);
     labelControl.setLayoutData(data);
     return labelControl;
   }
@@ -664,5 +665,17 @@ public abstract class ActivitiPropertySection extends BaseActivitiPropertySectio
       fieldExtension.setExpression(null);
     }
   }
-
+  
+  protected String convertMessageRef(String messageRef) {
+    String convertedMessageRef = messageRef;
+    if (StringUtils.isNotEmpty(convertedMessageRef)) {
+      BpmnMemoryModel memoryModel = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+      BpmnModel model = memoryModel.getBpmnModel();
+      if (model.getTargetNamespace() != null && convertedMessageRef.startsWith(model.getTargetNamespace())) {
+        convertedMessageRef = convertedMessageRef.replace(model.getTargetNamespace(), "");
+        convertedMessageRef = convertedMessageRef.replaceFirst(":", "");
+      }
+    }
+    return convertedMessageRef;
+  }
 }
