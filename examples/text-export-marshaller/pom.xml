@@ -12,7 +12,7 @@
 	<parent>
 		<artifactId>org.activiti.designer.parent</artifactId>
 		<groupId>org.activiti.designer</groupId>
-		<version>5.12.1-SNAPSHOT</version>
+		<version>5.14.0-SNAPSHOT</version>
 		<relativePath>../../org.activiti.designer.parent/pom.xml</relativePath>
 	</parent>
 </project>

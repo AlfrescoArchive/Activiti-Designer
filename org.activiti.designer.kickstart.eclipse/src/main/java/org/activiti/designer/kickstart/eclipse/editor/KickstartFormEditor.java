@@ -5,7 +5,6 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 
 import org.activiti.designer.kickstart.eclipse.Logger;
-import org.activiti.designer.kickstart.eclipse.ui.ActivitiEditorContextMenuProvider;
 import org.activiti.designer.kickstart.eclipse.util.FileService;
 import org.activiti.designer.util.editor.KickstartFormMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
@@ -23,7 +22,6 @@ import org.eclipse.emf.common.command.BasicCommandStack;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.transaction.RecordingCommand;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
-import org.eclipse.gef.ContextMenuProvider;
 import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.impl.AddContext;
@@ -44,11 +42,6 @@ public class KickstartFormEditor extends DiagramEditor {
 
   public KickstartFormEditor() {
     jsonConverter = new AlfrescoSimpleWorkflowJsonConverter();
-  }
-
-  @Override
-  protected ContextMenuProvider createContextMenuProvider() {
-    return new ActivitiEditorContextMenuProvider(getGraphicalViewer(), getActionRegistry(), getDiagramTypeProvider());
   }
 
   public static GraphicalViewer getActiveGraphicalViewer() {

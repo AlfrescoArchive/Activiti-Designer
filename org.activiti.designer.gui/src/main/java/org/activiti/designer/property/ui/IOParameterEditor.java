@@ -9,7 +9,6 @@ import org.activiti.designer.property.ModelUpdater;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.platform.IDiagramEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TableItem;
@@ -21,7 +20,6 @@ public class IOParameterEditor extends TableFieldEditor {
   protected ModelUpdater modelUpdater;
   
   public PictogramElement pictogramElement;
-  public IDiagramEditor diagramEditor;
   public Diagram diagram;
   public boolean isInputParameters = false;
 	

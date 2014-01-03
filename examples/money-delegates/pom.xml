@@ -9,15 +9,8 @@
 	<name>Acme Corporation Money Delegates</name>
 
 	<properties>
-		<activiti.version>5.12</activiti.version>
+		<activiti.version>5.14</activiti.version>
 	</properties>
-
-	<repositories>
-		<repository>
-			<id>Activiti</id>
-			<url>https://maven.alfresco.com/nexus/content/groups/public/</url>
-		</repository>
-	</repositories>
 
 	<dependencies>
 		<dependency>

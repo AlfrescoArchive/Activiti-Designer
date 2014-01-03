@@ -34,7 +34,6 @@ import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.designer.eclipse.extension.export.ExportMarshaller;
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
-import org.activiti.designer.eclipse.ui.ActivitiEditorContextMenuProvider;
 import org.activiti.designer.eclipse.ui.ExportMarshallerRunnable;
 import org.activiti.designer.eclipse.util.ExtensionPointUtil;
 import org.activiti.designer.eclipse.util.FileService;
@@ -59,7 +58,6 @@ import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.transaction.RecordingCommand;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
-import org.eclipse.gef.ContextMenuProvider;
 import org.eclipse.gef.GraphicalViewer;
 import org.eclipse.gef.LayerConstants;
 import org.eclipse.gef.editparts.LayerManager;
@@ -93,20 +91,10 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 
   private static GraphicalViewer activeGraphicalViewer;
 
-  private ActivitiBpmnModelChangeListener activitiBpmnModelChangeListener;
-
   private TransactionalEditingDomain transactionalEditingDomain;
 
   public ActivitiDiagramEditor() {
     super();
-  }
-
-  @Override
-  protected void registerBusinessObjectsListener() {
-    activitiBpmnModelChangeListener = new ActivitiBpmnModelChangeListener(this);
-
-    final TransactionalEditingDomain ted = getEditingDomain();
-    ted.addResourceSetListener(activitiBpmnModelChangeListener);
   }
 
   @Override
@@ -835,12 +823,6 @@ public class ActivitiDiagramEditor extends DiagramEditor {
       IFigure gridFigure = ((LayerManager) rootEditPart).getLayer(LayerConstants.GRID_LAYER);
       gridFigure.setVisible(false);
     }
-    // setPartName("MyDiagram2");
-  }
-
-  @Override
-  protected ContextMenuProvider createContextMenuProvider() {
-    return new ActivitiEditorContextMenuProvider(getGraphicalViewer(), getActionRegistry(), getDiagramTypeProvider());
   }
 
   public static GraphicalViewer getActiveGraphicalViewer() {

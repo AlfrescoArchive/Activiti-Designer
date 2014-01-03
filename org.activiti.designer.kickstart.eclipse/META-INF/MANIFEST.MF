@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Activiti Designer - Kickstart - Eclipse
 Bundle-SymbolicName: org.activiti.designer.kickstart.eclipse;singleton:=true
-Bundle-Version: 5.12.1.qualifier
+Bundle-Version: 5.14.0.qualifier
 Require-Bundle: org.eclipse.graphiti,
  org.eclipse.graphiti.pattern,
  org.eclipse.graphiti.ui,

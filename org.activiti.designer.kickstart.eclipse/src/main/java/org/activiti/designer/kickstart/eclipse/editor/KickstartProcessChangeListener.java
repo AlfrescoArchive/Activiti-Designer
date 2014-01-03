@@ -15,18 +15,19 @@ import org.eclipse.graphiti.dt.IDiagramTypeProvider;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.notification.INotificationService;
-import org.eclipse.graphiti.platform.IDiagramEditor;
+import org.eclipse.graphiti.platform.IDiagramBehavior;
+import org.eclipse.graphiti.platform.IDiagramContainer;
 import org.eclipse.swt.widgets.Display;
 
 
 public class KickstartProcessChangeListener implements ResourceSetListener {
 
-  private final IDiagramEditor diagramEditor;
+  private final IDiagramBehavior diagramBehavior;
 
-  public KickstartProcessChangeListener(final IDiagramEditor diagramEditor) {
+  public KickstartProcessChangeListener(final IDiagramBehavior diagramBehavior) {
     super();
 
-    this.diagramEditor = diagramEditor;
+    this.diagramBehavior = diagramBehavior;
   }
 
   @Override
@@ -51,7 +52,7 @@ public class KickstartProcessChangeListener implements ResourceSetListener {
 
   @Override
   public void resourceSetChanged(ResourceSetChangeEvent event) {
-    final IDiagramTypeProvider provider = diagramEditor.getDiagramTypeProvider();
+    final IDiagramTypeProvider provider = diagramBehavior.getDiagramContainer().getDiagramTypeProvider();
     final Diagram diagram = provider.getDiagram();
 
     if (diagram != null && diagram.getPictogramLinks().isEmpty()) {
@@ -81,11 +82,11 @@ public class KickstartProcessChangeListener implements ResourceSetListener {
 
         @Override
         public void run() {
-          IDiagramEditor diagramEditor = provider.getDiagramEditor();
-          if (provider.isAutoUpdateAtRuntime() && diagramEditor.isDirty()) {
+          IDiagramContainer diagramContainer = provider.getDiagramBehavior().getDiagramContainer();
+          if (provider.isAutoUpdateAtRuntime() && diagramContainer.isDirty()) {
             notificationService.updatePictogramElements(dirtyPEs);
           } else {
-            diagramEditor.refresh();
+            diagramContainer.getDiagramBehavior().refresh();
           }
         }
 

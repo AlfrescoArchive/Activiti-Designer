@@ -25,7 +25,6 @@ import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
@@ -65,40 +64,7 @@ public class PropertyGeneralSection extends ActivitiPropertySection implements I
       element.setId(idText.getText());
       
     } else if (control == nameText) {
-      final PictogramElement pe = getSelectedPictogramElement();
       setName(businessObject, nameText.getText());
-          
-      /*UpdateContext updateContext = new UpdateContext(pe);
-      IUpdateFeature updateFeature = getDiagramTypeProvider().getFeatureProvider().getUpdateFeature(updateContext);
-      if(updateFeature != null) {
-        updateFeature.update(updateContext);
-      }
-
-      if (pe instanceof ContainerShape) {
-        ContainerShape cs = (ContainerShape) pe;
-        for (Shape shape : cs.getChildren()) {
-          if (shape.getGraphicsAlgorithm() instanceof Text) {
-            org.eclipse.graphiti.mm.algorithms.Text text = (org.eclipse.graphiti.mm.algorithms.Text) shape.getGraphicsAlgorithm();
-            text.setValue(nameText.getText());
-          }
-          if (shape.getGraphicsAlgorithm() instanceof MultiText) {
-            MultiText text = (MultiText) shape.getGraphicsAlgorithm();
-            text.setValue(nameText.getText());
-          }
-        }
-      }
-
-      if (!(getSelectedPictogramElement() instanceof FreeFormConnection)) {
-        return;
-      }
-      EList<ConnectionDecorator> decoratorList = ((FreeFormConnection) getSelectedPictogramElement()).getConnectionDecorators();
-      for (ConnectionDecorator decorator : decoratorList) {
-        if (decorator.getGraphicsAlgorithm() instanceof org.eclipse.graphiti.mm.algorithms.MultiText) {
-          org.eclipse.graphiti.mm.algorithms.MultiText text = (org.eclipse.graphiti.mm.algorithms.MultiText) decorator.getGraphicsAlgorithm();
-          text.setValue(nameText.getText());
-          TextUtil.setTextSize(text);
-        }
-      }*/
     }
   }
 

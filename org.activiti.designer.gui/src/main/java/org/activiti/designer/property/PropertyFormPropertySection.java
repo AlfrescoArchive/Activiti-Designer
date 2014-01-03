@@ -63,8 +63,6 @@ public class PropertyFormPropertySection extends ActivitiPropertySection impleme
       }
       
       formPropertyEditor.pictogramElement = pe;
-      formPropertyEditor.diagramEditor = getDiagramEditor();
-      formPropertyEditor.diagram = getDiagram();
       formPropertyEditor.initialize(formPropertyList);
     }
   }

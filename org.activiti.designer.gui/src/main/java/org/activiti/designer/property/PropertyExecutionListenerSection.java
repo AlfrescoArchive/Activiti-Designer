@@ -57,7 +57,6 @@ public class PropertyExecutionListenerSection extends ActivitiPropertySection im
       List<ActivitiListener> executionListenerList = BpmnBOUtil.getExecutionListeners(bo, getDiagram());
 
       listenerEditor.pictogramElement = pe;
-      listenerEditor.diagramEditor = getDiagramEditor();
       listenerEditor.diagram = getDiagram();
       boolean isSequenceFlow = false;
       if (bo instanceof SequenceFlow) {

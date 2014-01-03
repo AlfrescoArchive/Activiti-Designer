@@ -18,8 +18,6 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.platform.IDiagramEditor;
-import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.events.FocusEvent;
@@ -39,8 +37,6 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.part.IContributedContentsView;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
@@ -229,8 +225,7 @@ public abstract class ActivitiPropertySection extends BaseActivitiPropertySectio
   public void executeModelUpdater() {
     // Make sure the update of the model is done in the transactional editing domain
     // to allow for "undoing" changes
-    DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
-    TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
+    TransactionalEditingDomain editingDomain = getTransactionalEditingDomain();
     
     if (currentUpdater != null) {
       // Do the actual changes to the business-object in a command
@@ -544,40 +539,6 @@ public abstract class ActivitiPropertySection extends BaseActivitiPropertySectio
     BpmnMemoryModel model = (ModelHandler.getModel(EcoreUtil.getURI(diagram)));
     return model;
   }
-  
-	/**
-	 * @return the {@link IDiagramEditor} diagram editor.
-	 */
-	@Override
-  protected IDiagramEditor getDiagramEditor() {
-		IWorkbenchPart part = getPart();
-		if (part instanceof IContributedContentsView) {
-		  IContributedContentsView contributedView = (IContributedContentsView) part
-          .getAdapter(IContributedContentsView.class);
-      if (contributedView != null) {
-        part = contributedView.getContributingPart();
-      }
-		}
-
-		if (part instanceof IDiagramEditor) {
-			return (IDiagramEditor) part;
-		}
-		return null;
-	}
-
-	/**
-	 * Returns the transactional editing domain of the current diagram editor.
-	 *
-	 * @return the transactional editing domain of the diagram editor.
-	 */
-	protected TransactionalEditingDomain getTransactionalEditingDomain() {
-	  final IDiagramEditor de = getDiagramEditor();
-	  if (de != null) {
-	    return de.getEditingDomain();
-	  }
-
-	  return null;
-	}
 
 	/**
 	 * Returns the default business object for the currently selected pictogram element in the

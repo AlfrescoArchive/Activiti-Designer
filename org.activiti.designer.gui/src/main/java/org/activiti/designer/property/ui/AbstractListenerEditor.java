@@ -12,7 +12,6 @@ import org.activiti.designer.util.BpmnBOUtil;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.platform.IDiagramEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
@@ -29,7 +28,6 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
 	protected ModelUpdater modelUpdater;
 	
 	public PictogramElement pictogramElement;
-	public IDiagramEditor diagramEditor;
 	public Diagram diagram;
 	public boolean isSequenceFlow;
 	private List<ActivitiListener> listenerList;

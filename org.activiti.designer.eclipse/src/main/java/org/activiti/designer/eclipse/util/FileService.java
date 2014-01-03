@@ -239,7 +239,9 @@ public class FileService {
 		TransactionalEditingDomain editingDomain = null;
 		ResourceSet resourceSet = null;
 
-		if (diagramEditor == null || diagramEditor.getResourceSet() == null || diagramEditor.getEditingDomain() == null) {
+		if (diagramEditor == null || diagramEditor.getDiagramBehavior() == null || 
+		    diagramEditor.getDiagramBehavior().getResourceSet() == null || diagramEditor.getEditingDomain() == null) {
+		  
 		  // nothing found, create a new one
 		  resourceSet = new ResourceSetImpl();
 
@@ -252,7 +254,7 @@ public class FileService {
 		  }
 		} else {
 		  editingDomain = diagramEditor.getEditingDomain();
-		  resourceSet = diagramEditor.getResourceSet();
+		  resourceSet = diagramEditor.getDiagramBehavior().getResourceSet();
 		}
 
 		// Create a resource for this file.

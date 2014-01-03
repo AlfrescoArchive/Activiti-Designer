@@ -2,7 +2,7 @@ package org.activiti.designer.eclipse.editor;
 
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.ui.editor.DefaultUpdateBehavior;
-import org.eclipse.graphiti.ui.editor.DiagramEditor;
+import org.eclipse.graphiti.ui.editor.DiagramBehavior;
 
 /**
  * Subclasses the default update behavior of Graphiti to all external creation of the transactional
@@ -13,8 +13,8 @@ import org.eclipse.graphiti.ui.editor.DiagramEditor;
  */
 public class ActivitiEditorUpdateBehavior extends DefaultUpdateBehavior {
 
-  public ActivitiEditorUpdateBehavior(final DiagramEditor diagramEditor) {
-    super(diagramEditor);
+  public ActivitiEditorUpdateBehavior(final DiagramBehavior diagramBehavior) {
+    super(diagramBehavior);
   }
 
   @Override

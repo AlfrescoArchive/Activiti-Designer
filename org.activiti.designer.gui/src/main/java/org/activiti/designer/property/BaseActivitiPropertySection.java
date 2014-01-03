@@ -8,10 +8,8 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.platform.IDiagramEditor;
+import org.eclipse.graphiti.platform.IDiagramContainer;
 import org.eclipse.graphiti.ui.platform.GFPropertySection;
-import org.eclipse.ui.IWorkbenchPart;
-import org.eclipse.ui.part.IContributedContentsView;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 
 public abstract class BaseActivitiPropertySection extends GFPropertySection implements ITabbedPropertyConstants {
@@ -58,26 +56,6 @@ public abstract class BaseActivitiPropertySection extends GFPropertySection impl
     BpmnMemoryModel model = (ModelHandler.getModel(EcoreUtil.getURI(diagram)));
     return model;
   }
-  
-	/**
-	 * @return the {@link IDiagramEditor} diagram editor.
-	 */
-	@Override
-  protected IDiagramEditor getDiagramEditor() {
-		IWorkbenchPart part = getPart();
-		if (part instanceof IContributedContentsView) {
-		  IContributedContentsView contributedView = (IContributedContentsView) part
-          .getAdapter(IContributedContentsView.class);
-      if (contributedView != null) {
-        part = contributedView.getContributingPart();
-      }
-		}
-
-		if (part instanceof IDiagramEditor) {
-			return (IDiagramEditor) part;
-		}
-		return null;
-	}
 
 	/**
 	 * Returns the transactional editing domain of the current diagram editor.
@@ -85,9 +63,9 @@ public abstract class BaseActivitiPropertySection extends GFPropertySection impl
 	 * @return the transactional editing domain of the diagram editor.
 	 */
 	protected TransactionalEditingDomain getTransactionalEditingDomain() {
-	  final IDiagramEditor de = getDiagramEditor();
-	  if (de != null) {
-	    return de.getEditingDomain();
+	  final IDiagramContainer diagramContainer = getDiagramContainer();
+	  if (diagramContainer != null) {
+	    return diagramContainer.getDiagramBehavior().getEditingDomain();
 	  }
 
 	  return null;

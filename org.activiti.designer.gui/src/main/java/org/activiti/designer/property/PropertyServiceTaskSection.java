@@ -6,7 +6,6 @@ import org.activiti.designer.property.ui.FieldExtensionEditor;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
-import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.jdt.core.IJavaProject;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.search.SearchEngine;
@@ -74,8 +73,7 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
               classNameText.setText(className);
             }
 
-            DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
-            TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
+            TransactionalEditingDomain editingDomain = getTransactionalEditingDomain();
 
             ActivitiUiUtil.runModelChange(new Runnable() {
               @Override
@@ -141,7 +139,7 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
     if (control == taskTypeButton) {
       
       fieldEditor.pictogramElement = getSelectedPictogramElement();
-      fieldEditor.diagramEditor = getDiagramEditor();
+      fieldEditor.diagramBehavior = getDiagramContainer().getDiagramBehavior();
       fieldEditor.diagram = getDiagram();
       fieldEditor.initialize(task.getFieldExtensions());
       

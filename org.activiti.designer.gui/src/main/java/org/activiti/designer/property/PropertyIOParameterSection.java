@@ -76,7 +76,6 @@ public class PropertyIOParameterSection extends ActivitiPropertySection implemen
       List<IOParameter> inParameterList = bo.getInParameters();
       
       inParameterEditor.pictogramElement = getSelectedPictogramElement();
-      inParameterEditor.diagramEditor = getDiagramEditor();
       inParameterEditor.diagram = getDiagram();
       inParameterEditor.isInputParameters = true;
       inParameterEditor.initialize(inParameterList);
@@ -84,7 +83,6 @@ public class PropertyIOParameterSection extends ActivitiPropertySection implemen
       List<IOParameter> outParameterList = bo.getOutParameters();
       
       outParameterEditor.pictogramElement = getSelectedPictogramElement();
-      outParameterEditor.diagramEditor = getDiagramEditor();
       outParameterEditor.diagram = getDiagram();
       outParameterEditor.isInputParameters = false;
       outParameterEditor.initialize(outParameterList);

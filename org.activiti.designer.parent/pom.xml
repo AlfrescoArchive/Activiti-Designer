@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.activiti.designer</groupId>
 	<artifactId>org.activiti.designer.parent</artifactId>
-	<version>5.12.1.qualifier</version>
+	<version>5.14.0.qualifier</version>
 	<packaging>pom</packaging>
 	<name>Activiti Designer - Parent project</name>
 
@@ -29,21 +29,15 @@
 
 	<repositories>
 		<repository>
-			<id>eclipse-indigo</id>
+			<id>eclipse-juno</id>
 			<layout>p2</layout>
-			<url>http://download.eclipse.org/releases/indigo</url>
+			<url>http://download.eclipse.org/releases/juno</url>
 		</repository>
 		<repository>
 			<id>Graphiti</id>
 			<layout>p2</layout>
 			<!-- <url>http://download.eclipse.org/graphiti/updates/milestones/</url> -->
-			<url>http://download.eclipse.org/graphiti/updates/0.9.2</url>
-		</repository>
-		<repository>
-			<id>Oribit</id>
-			<layout>p2</layout>
-			<url>http://download.eclipse.org/tools/orbit/downloads/drops/R20120119162704/repository</url>
-			<!-- <url>http://download.eclipse.org/tools/orbit/downloads/drops/R20100519200754/updateSite/</url> -->
+			<url>http://download.eclipse.org/graphiti/updates/0.10.1</url>
 		</repository>
 	</repositories>
 
