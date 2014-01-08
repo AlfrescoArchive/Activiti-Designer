@@ -17,6 +17,7 @@ import org.activiti.bpmn.model.EndEvent;
 import org.activiti.bpmn.model.ErrorEventDefinition;
 import org.activiti.bpmn.model.EventDefinition;
 import org.activiti.bpmn.model.EventGateway;
+import org.activiti.bpmn.model.EventSubProcess;
 import org.activiti.bpmn.model.ExclusiveGateway;
 import org.activiti.bpmn.model.Gateway;
 import org.activiti.bpmn.model.InclusiveGateway;
@@ -212,7 +213,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     taskContext.setTargetContainer((ContainerShape) pe.eContainer());
     taskContext.putProperty("org.activiti.designer.connectionContext", connectionContext);
 
-    if (bo instanceof StartEvent || bo instanceof Activity ||
+    if (bo instanceof StartEvent || (bo instanceof Activity && bo instanceof EventSubProcess == false) ||
         bo instanceof IntermediateCatchEvent || bo instanceof ThrowEvent ||
         bo instanceof Gateway || bo instanceof BoundaryEvent) {
 
@@ -262,7 +263,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
       data.getDomainSpecificContextButtons().add(button);
     }
 
-    if (bo instanceof StartEvent || bo instanceof Activity ||
+    if (bo instanceof StartEvent || (bo instanceof Activity && bo instanceof EventSubProcess == false) ||
         bo instanceof IntermediateCatchEvent || bo instanceof ThrowEvent ||
         bo instanceof Gateway || bo instanceof BoundaryEvent) {
 
