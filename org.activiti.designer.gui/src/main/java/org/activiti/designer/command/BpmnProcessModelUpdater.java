@@ -115,7 +115,7 @@ public abstract class BpmnProcessModelUpdater {
   protected void triggerBusinessObjectModelUpdated() {
     Diagram diagram = featureProvider.getDiagramTypeProvider().getDiagram();
     if (diagram != null) {
-      KickstartProcessMemoryModel model = (ModelHandler.getKickstartProcessModel(EcoreUtil.getURI(diagram)));
+      BpmnMemoryModel model = (ModelHandler.getModel(EcoreUtil.getURI(diagram)));
       if (model != null) {
         model.modelObjectUpdated(businessObject);
       }
