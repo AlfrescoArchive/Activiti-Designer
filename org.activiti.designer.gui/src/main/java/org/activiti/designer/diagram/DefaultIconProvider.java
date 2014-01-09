@@ -12,6 +12,8 @@
  */
 package org.activiti.designer.diagram;
 
+import java.util.List;
+
 import org.activiti.bpmn.model.BoundaryEvent;
 import org.activiti.bpmn.model.BusinessRuleTask;
 import org.activiti.bpmn.model.CallActivity;
@@ -42,7 +44,14 @@ import org.activiti.bpmn.model.alfresco.AlfrescoStartEvent;
 import org.activiti.designer.Activator;
 import org.activiti.designer.PluginImage;
 import org.activiti.designer.eclipse.extension.icon.IconProvider;
+import org.activiti.designer.util.eclipse.ActivitiUiUtil;
+import org.activiti.designer.util.extension.CustomServiceTaskContext;
+import org.activiti.designer.util.extension.ExtensionUtil;
+import org.eclipse.graphiti.ui.editor.DiagramEditor;
+import org.eclipse.graphiti.ui.internal.GraphitiUIPlugin;
+import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
+import org.eclipse.ui.PlatformUI;
 
 /**
  * @author Tiese Barrell
@@ -108,6 +117,20 @@ public class DefaultIconProvider implements IconProvider {
       if (ServiceTask.MAIL_TASK.equalsIgnoreCase(serviceTask.getType())) {
         result = Activator.getImage(PluginImage.IMG_MAILTASK);
       } else {
+        
+        if (ExtensionUtil.isCustomServiceTask(context)) {
+          DiagramEditor editor = (DiagramEditor) PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().getActiveEditor();
+          final List<CustomServiceTaskContext> customServiceTaskContexts = ExtensionUtil.getCustomServiceTaskContexts(
+                  ActivitiUiUtil.getProjectFromDiagram(editor.getDiagramTypeProvider().getDiagram()));
+          for (CustomServiceTaskContext customServiceTaskContext : customServiceTaskContexts) {
+            if (customServiceTaskContext.getServiceTask().getId().equals(serviceTask.getExtensionId())) {
+              @SuppressWarnings("restriction")
+              final ImageRegistry reg = GraphitiUIPlugin.getDefault().getImageRegistry();
+              return reg.get(editor.getDiagramTypeProvider().getProviderId() + "||" + customServiceTaskContext.getSmallImageKey());
+            }
+          }
+        }
+        
         result = Activator.getImage(PluginImage.IMG_SERVICETASK);
       }
     } else if (context instanceof ScriptTask) {

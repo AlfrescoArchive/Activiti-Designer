@@ -81,6 +81,14 @@ public class Activator extends AbstractUIPlugin {
   public static final Image getImage(final PluginImage pluginImage) {
     return plugin.getImageRegistry().get(pluginImage.getImageKey());
   }
+  
+  public static final Image getImage(final String key) {
+    return plugin.getImageRegistry().get(key);
+  }
+  
+  public static final void putImage(final String key, Image image) {
+    plugin.getImageRegistry().put(key, image);
+  }
 
   /**
    * Utility method to get an image descriptor from the plugin.

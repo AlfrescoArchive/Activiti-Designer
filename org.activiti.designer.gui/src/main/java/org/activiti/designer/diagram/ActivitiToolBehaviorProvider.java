@@ -748,18 +748,21 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
 
     final List<CustomServiceTaskContext> customServiceTaskContexts = ExtensionUtil.getCustomServiceTaskContexts(project);
 
+    // Graphiti sets the diagram type prover id with || in front of the image key
+    String prefixId = getDiagramTypeProvider().getProviderId() + "||";
+    @SuppressWarnings("restriction")
     final ImageRegistry reg = GraphitiUIPlugin.getDefault().getImageRegistry();
     for (final CustomServiceTaskContext taskContext : customServiceTaskContexts) {
-      if (reg.get(taskContext.getSmallImageKey()) == null) {
-        reg.put(taskContext.getSmallImageKey(),
-                new Image(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().getDisplay(), taskContext.getSmallIconStream()));
+      if (reg.get(prefixId + taskContext.getSmallImageKey()) == null) {
+        reg.put(prefixId + taskContext.getSmallImageKey(), 
+            new Image(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().getDisplay(), taskContext.getSmallIconStream()));
       }
-      if (reg.get(taskContext.getLargeImageKey()) == null) {
-        reg.put(taskContext.getLargeImageKey(),
+      if (reg.get(prefixId + taskContext.getLargeImageKey()) == null) {
+        reg.put(prefixId + taskContext.getLargeImageKey(),
                 new Image(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().getDisplay(), taskContext.getLargeIconStream()));
       }
-      if (reg.get(taskContext.getShapeImageKey()) == null) {
-        reg.put(taskContext.getShapeImageKey(),
+      if (reg.get(prefixId + taskContext.getShapeImageKey()) == null) {
+        reg.put(prefixId + taskContext.getShapeImageKey(),
                 new Image(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().getDisplay(), taskContext.getShapeIconStream()));
       }
     }
@@ -782,7 +785,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
         final CreateCustomServiceTaskFeature feature = new CreateCustomServiceTaskFeature(getFeatureProvider(), currentDrawerItem.getServiceTask().getName(),
                 currentDrawerItem.getServiceTask().getDescription(), currentDrawerItem.getServiceTask().getClass().getCanonicalName());
         final IToolEntry entry = new ObjectCreationToolEntry(currentDrawerItem.getServiceTask().getName(), currentDrawerItem.getServiceTask().getDescription(),
-                currentDrawerItem.getSmallImageKey(), null, feature);
+              currentDrawerItem.getSmallImageKey(), currentDrawerItem.getSmallImageKey(), feature);
         paletteCompartmentEntry.getToolEntries().add(entry);
       }
       ret.add(paletteCompartmentEntry);

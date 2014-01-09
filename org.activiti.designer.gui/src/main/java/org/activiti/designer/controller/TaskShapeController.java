@@ -18,6 +18,7 @@ import org.activiti.designer.diagram.ActivitiBPMNFeatureProvider;
 import org.activiti.designer.integration.servicetask.CustomServiceTask;
 import org.activiti.designer.integration.servicetask.DiagramBaseShape;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
+import org.activiti.designer.util.extension.CustomServiceTaskContext;
 import org.activiti.designer.util.extension.ExtensionUtil;
 import org.activiti.designer.util.platform.OSEnum;
 import org.activiti.designer.util.platform.OSUtil;
@@ -269,6 +270,17 @@ public class TaskShapeController extends AbstractBusinessObjectShapeController {
       if (ServiceTask.MAIL_TASK.equalsIgnoreCase(serviceTask.getType())) {
         return PluginImage.IMG_MAILTASK.getImageKey();
       } else {
+        
+        if (ExtensionUtil.isCustomServiceTask(bo)) {
+          final List<CustomServiceTaskContext> customServiceTaskContexts = ExtensionUtil.getCustomServiceTaskContexts(
+                  ActivitiUiUtil.getProjectFromDiagram(getFeatureProvider().getDiagramTypeProvider().getDiagram()));
+          for (CustomServiceTaskContext customServiceTaskContext : customServiceTaskContexts) {
+            if (customServiceTaskContext.getServiceTask().getId().equals(serviceTask.getExtensionId())) {
+              return customServiceTaskContext.getShapeImageKey();
+            }
+          }
+        }
+        
         return PluginImage.IMG_SERVICETASK.getImageKey();
       }
     

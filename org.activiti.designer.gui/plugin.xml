@@ -96,12 +96,12 @@
                id="org.activiti.designer.messageTab" 
                label="Messages">
          </propertyTab>
-         <propertyTab
+         <!-- <propertyTab
                afterTab="org.activiti.designer.listenerTab"
                category="Activiti"
                id="org.activiti.designer.eventListenerTab"
                label="Event Listeners">
-         </propertyTab>
+         </propertyTab> -->
          
       </propertyTabs>
    </extension>
@@ -327,12 +327,12 @@
                id="org.activiti.designer.documentationTab.documentation"
                tab="org.activiti.designer.documentationTab">
          </propertySection>
-         <propertySection
+         <!-- <propertySection
                class="org.activiti.designer.property.PropertyEventListenersSection"
                filter="org.activiti.designer.property.PropertyEventListenersFilter"
                id="org.activiti.designer.eventListenerTab.eventListenersSection"
                tab="org.activiti.designer.eventListenerTab">
-         </propertySection>
+         </propertySection> -->
          
       </propertySections>
    </extension>
