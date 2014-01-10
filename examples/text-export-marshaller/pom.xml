@@ -8,11 +8,11 @@
 	
 	<groupId>org.activiti.designer.examples</groupId>
 	<description>This project contains an example of a plugin extension that uses the ExportMarshaller extension point to Activiti Designer. The ExportMarshaller creates a simple text file with some of the information contained in the diagram's BPMN.</description>
-	<version>1.0.0-SNAPSHOT</version>
+	<version>1.1.0</version>
 	<parent>
 		<artifactId>org.activiti.designer.parent</artifactId>
 		<groupId>org.activiti.designer</groupId>
-		<version>5.14.0-SNAPSHOT</version>
+		<version>5.14.0</version>
 		<relativePath>../../org.activiti.designer.parent/pom.xml</relativePath>
 	</parent>
 </project>
