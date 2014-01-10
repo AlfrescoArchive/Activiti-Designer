@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Activiti Designer - Kickstart - Process
 Bundle-SymbolicName: org.activiti.designer.kickstart.gui.process;singleton:=true
-Bundle-Version: 5.14.0
+Bundle-Version: 5.14.1.qualifier
 Require-Bundle: org.eclipse.ui,
  org.eclipse.core.runtime,
  org.eclipse.graphiti,
