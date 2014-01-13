@@ -38,6 +38,7 @@ public enum PluginImage {
   IMG_EVENT_MESSAGE("event.message", "letter.png"),
   IMG_EVENT_TIMER("event.timer", "timer.png"), //$NON-NLS-1$
   IMG_EVENT_SIGNAL("event.signal", "signal.png"), //$NON-NLS-1$
+  IMG_EVENT_COMPENSATE("event.compensate", "compensate.png"), //$NON-NLS-1$
 
   // Gateway image icons
   IMG_GATEWAY_PARALLEL("gateway.parallel", "type.gateway.parallel.png"), //$NON-NLS-1$

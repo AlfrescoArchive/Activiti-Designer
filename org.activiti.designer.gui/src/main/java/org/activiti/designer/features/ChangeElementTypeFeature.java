@@ -53,6 +53,7 @@ public class ChangeElementTypeFeature extends AbstractCustomFeature {
   public static final String EVENT_BOUNDARY_ERROR = "errorboundaryevent";
   public static final String EVENT_BOUNDARY_MESSAGE = "messageboundaryevent";
   public static final String EVENT_BOUNDARY_SIGNAL = "signalboundaryevent";
+  public static final String EVENT_BOUNDARY_COMPENSATE = "compensateboundaryevent";
   
   public static final String EVENT_CATCH_TIMER = "timercatchevent";
   public static final String EVENT_CATCH_MESSAGE = "messagecatchevent";
@@ -89,6 +90,7 @@ public class ChangeElementTypeFeature extends AbstractCustomFeature {
     createFeatureMap.put(EVENT_BOUNDARY_ERROR, new CreateBoundaryErrorFeature(fp));
     createFeatureMap.put(EVENT_BOUNDARY_MESSAGE, new CreateBoundaryMessageFeature(fp));
     createFeatureMap.put(EVENT_BOUNDARY_SIGNAL, new CreateBoundarySignalFeature(fp));
+    createFeatureMap.put(EVENT_BOUNDARY_COMPENSATE, new CreateBoundarySignalFeature(fp));
     
     createFeatureMap.put(EVENT_CATCH_TIMER, new CreateTimerCatchingEventFeature(fp));
     createFeatureMap.put(EVENT_CATCH_MESSAGE, new CreateMessageCatchingEventFeature(fp));

@@ -17,6 +17,7 @@ import java.util.List;
 import org.activiti.bpmn.model.BoundaryEvent;
 import org.activiti.bpmn.model.BusinessRuleTask;
 import org.activiti.bpmn.model.CallActivity;
+import org.activiti.bpmn.model.CompensateEventDefinition;
 import org.activiti.bpmn.model.EndEvent;
 import org.activiti.bpmn.model.ErrorEventDefinition;
 import org.activiti.bpmn.model.EventDefinition;
@@ -178,6 +179,8 @@ public class DefaultIconProvider implements IconProvider {
           result = Activator.getImage(PluginImage.IMG_EVENT_SIGNAL);
         } else if (definition instanceof MessageEventDefinition) {
           result = Activator.getImage(PluginImage.IMG_EVENT_MESSAGE);
+        } else if (definition instanceof CompensateEventDefinition) {
+          result = Activator.getImage(PluginImage.IMG_EVENT_COMPENSATE);
         } else {
           result = Activator.getImage(PluginImage.IMG_EVENT_TIMER);
         }

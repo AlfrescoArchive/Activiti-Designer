@@ -13,6 +13,7 @@ import org.activiti.bpmn.model.Activity;
 import org.activiti.bpmn.model.BoundaryEvent;
 import org.activiti.bpmn.model.BusinessRuleTask;
 import org.activiti.bpmn.model.CallActivity;
+import org.activiti.bpmn.model.CompensateEventDefinition;
 import org.activiti.bpmn.model.EndEvent;
 import org.activiti.bpmn.model.ErrorEventDefinition;
 import org.activiti.bpmn.model.EventDefinition;
@@ -42,6 +43,7 @@ import org.activiti.designer.PluginImage;
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.features.AbstractCreateBPMNFeature;
 import org.activiti.designer.features.ChangeElementTypeFeature;
+import org.activiti.designer.features.CreateBoundaryCompensateFeature;
 import org.activiti.designer.features.CreateBoundaryErrorFeature;
 import org.activiti.designer.features.CreateBoundaryMessageFeature;
 import org.activiti.designer.features.CreateBoundarySignalFeature;
@@ -161,6 +163,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     toolMapping.put(CreateEventSubProcessFeature.class, PaletteEntry.EVENT_SUBPROCESS);
     toolMapping.put(CreateUserTaskFeature.class, PaletteEntry.USER_TASK);
     toolMapping.put(CreateAlfrescoUserTaskFeature.class, PaletteEntry.ALFRESCO_USER_TASK);
+    toolMapping.put(CreateBoundaryCompensateFeature.class, PaletteEntry.BOUNDARY_COMPENSATE);
     toolMapping.put(CreateBoundaryTimerFeature.class, PaletteEntry.BOUNDARY_TIMER);
     toolMapping.put(CreateBoundaryErrorFeature.class, PaletteEntry.BOUNDARY_ERROR);
     toolMapping.put(CreateBoundaryMessageFeature.class, PaletteEntry.BOUNDARY_MESSAGE);
@@ -440,6 +443,8 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
         eventType = "error";
       } else if (eventDefinition instanceof SignalEventDefinition) {
         eventType = "signal";
+      } else if (eventDefinition instanceof CompensateEventDefinition) {
+    	eventType = "compensate";
       }
     }
     if (eventType == null) {
@@ -465,6 +470,10 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
       addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), ChangeElementTypeFeature.EVENT_BOUNDARY_SIGNAL), customContext,
               "Change to signal boundary event", "Change to a signal boundary event", PluginImage.IMG_EVENT_SIGNAL);
     }
+    if ("compensate".equals(eventType) == false) {
+        addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), ChangeElementTypeFeature.EVENT_BOUNDARY_COMPENSATE), customContext,
+                "Change to signal boundary event", "Change to a signal boundary event", PluginImage.IMG_EVENT_SIGNAL);
+      }
   }
   
   private void addIntermediateCatchEventButtons(ContextButtonEntry otherElementButton, IntermediateCatchEvent catchEvent, CustomContext customContext) {
@@ -476,6 +485,8 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
         eventType = "message";
       } else if (eventDefinition instanceof SignalEventDefinition) {
         eventType = "signal";
+      } else if (eventDefinition instanceof CompensateEventDefinition) {
+    	eventType = "compensate";
       }
     }
     if (eventType == null) {
