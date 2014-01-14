@@ -34,7 +34,7 @@ public class CreateAssociationFeature extends AbstractCreateBPMNConnectionFeatur
     boolean canCreate = false;
     
     //if (sourceBo != targetBo && (sourceBo instanceof TextAnnotation || targetBo instanceof TextAnnotation)) {
-   if (sourceBo != targetBo && targetBo != null && sourceBo != targetBo && targetBo instanceof Task) {
+   if (sourceBo != targetBo && targetBo != null && sourceBo != targetBo && (targetBo instanceof Task ||sourceBo instanceof Task || sourceBo instanceof TextAnnotation || targetBo instanceof TextAnnotation)) {
       canCreate = true;
     }
     
