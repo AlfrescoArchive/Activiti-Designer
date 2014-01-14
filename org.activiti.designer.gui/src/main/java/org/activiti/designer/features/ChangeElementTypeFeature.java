@@ -60,6 +60,7 @@ public class ChangeElementTypeFeature extends AbstractCustomFeature {
   public static final String EVENT_CATCH_SIGNAL = "signalcatchevent";
   
   public static final String EVENT_THROW_NONE = "nonethrowevent";
+  public static final String EVENT_THROW_COMPENSATE = "compensatethrowevent";
   public static final String EVENT_THROW_SIGNAL = "signalthrowevent";
   
   protected Map<String, AbstractCreateFeature> createFeatureMap = new HashMap<String, AbstractCreateFeature>();
@@ -98,6 +99,7 @@ public class ChangeElementTypeFeature extends AbstractCustomFeature {
     
     createFeatureMap.put(EVENT_THROW_NONE, new CreateNoneThrowingEventFeature(fp));
     createFeatureMap.put(EVENT_THROW_SIGNAL, new CreateSignalThrowingEventFeature(fp));
+    createFeatureMap.put(EVENT_THROW_COMPENSATE, new CreateCompensateThrowingEventFeature(fp));
 	}
 
 	public ChangeElementTypeFeature(IFeatureProvider fp, String newType) {

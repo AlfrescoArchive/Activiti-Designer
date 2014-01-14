@@ -69,6 +69,7 @@ public enum PluginImage {
   IMG_ACTION_ZOOM("action.magnifier", "action.magnifier.png"), //$NON-NLS-1$
 
   IMG_THROW_SIGNAL("throw.signal", "throw.signal.png"), //$NON-NLS-1$
+  IMG_THROW_COMPENSATE("throw.compensate", "throw.compensate.png"), //$NON-NLS-1$
   IMG_THROW_NONE("throw.none", "throw.none.png"), //$NON-NLS-1$
   
   IMG_TEXT_ANNOTATION("textannotation", "textannotation.png"),
