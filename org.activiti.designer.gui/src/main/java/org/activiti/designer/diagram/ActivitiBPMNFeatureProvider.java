@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.activiti.bpmn.model.Activity;
 import org.activiti.bpmn.model.Artifact;
+import org.activiti.bpmn.model.Association;
 import org.activiti.bpmn.model.BoundaryEvent;
 import org.activiti.bpmn.model.Event;
 import org.activiti.bpmn.model.FlowElement;
@@ -107,6 +108,7 @@ import org.activiti.designer.features.MoveEventFeature;
 import org.activiti.designer.features.MoveGatewayFeature;
 import org.activiti.designer.features.MoveLaneFeature;
 import org.activiti.designer.features.PasteFlowElementFeature;
+import org.activiti.designer.features.ReconnectAssociationFeature;
 import org.activiti.designer.features.ReconnectSequenceFlowFeature;
 import org.activiti.designer.features.ActivityResizeFeature;
 import org.activiti.designer.features.UpdateFlowElementFeature;
@@ -305,7 +307,12 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 
   @Override
   public IReconnectionFeature getReconnectionFeature(IReconnectionContext context) {
-    return new ReconnectSequenceFlowFeature(this);
+	  Object connectObject = this.getBusinessObjectForPictogramElement(context.getConnection());
+	  if(connectObject instanceof Association) {
+		  return new ReconnectAssociationFeature(this);
+	  } else {
+		  return new ReconnectSequenceFlowFeature(this);
+	  }
   }
 
   @Override
