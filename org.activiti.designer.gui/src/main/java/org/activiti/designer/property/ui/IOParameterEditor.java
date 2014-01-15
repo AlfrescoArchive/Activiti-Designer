@@ -95,9 +95,11 @@ public class IOParameterEditor extends TableFieldEditor {
   }
   
   @Override
-  protected void selectionChanged() {
-    super.selectionChanged();
-    saveIOParameters();
+  protected void selectionChanged(boolean updated) {
+    super.selectionChanged(updated);
+    if(updated) {
+      saveIOParameters();
+    }
   }
   
   private void saveIOParameters() {

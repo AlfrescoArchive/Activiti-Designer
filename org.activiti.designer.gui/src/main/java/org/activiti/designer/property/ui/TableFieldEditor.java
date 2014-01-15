@@ -270,7 +270,7 @@ public abstract class TableFieldEditor extends FieldEditor {
 			  } else if (widget == downButton) {
 			  	downPressed();
 				} else if (widget == table) {
-					selectionChanged();
+					selectionChanged(false);
 				}
 			}
 		};
@@ -381,7 +381,7 @@ public abstract class TableFieldEditor extends FieldEditor {
 			checkParent(buttonBox, parent);
 		}
 
-		selectionChanged();
+		selectionChanged(false);
 		return buttonBox;
 	}
 
@@ -478,7 +478,7 @@ public abstract class TableFieldEditor extends FieldEditor {
 		if(newInputObject != null) {
 			TableItem tableItem = new TableItem(table, SWT.NONE);
 			tableItem.setText(newInputObject);
-			selectionChanged();
+			selectionChanged(true);
 		}
 	}
 	
@@ -489,7 +489,7 @@ public abstract class TableFieldEditor extends FieldEditor {
     String[] changedInputObject = getChangedInputObject(tableItem);
     if(changedInputObject != null) {
       tableItem.setText(changedInputObject);
-      selectionChanged();
+      selectionChanged(true);
     }
 	}
 
@@ -502,7 +502,7 @@ public abstract class TableFieldEditor extends FieldEditor {
 		if (index >= 0) {
 			table.remove(index);
 			removedItem(index);
-			selectionChanged();
+			selectionChanged(true);
 		}
 	}
 	
@@ -536,14 +536,14 @@ public abstract class TableFieldEditor extends FieldEditor {
 	 * </p>
 	 * 
 	 */
-	protected void selectionChanged() {
+	protected void selectionChanged(boolean updated) {
 		int index = table.getSelectionIndex();
 		int size = table.getItemCount();
 
 		editButton.setEnabled(index >= 0);
 		removeButton.setEnabled(index >= 0);
 		upButton.setEnabled(size > 1 && index > 0);
-    downButton.setEnabled(size > 1 && index >= 0 && index < size - 1);
+      downButton.setEnabled(size > 1 && index >= 0 && index < size - 1);
 	}
 
 	/*
@@ -580,7 +580,7 @@ public abstract class TableFieldEditor extends FieldEditor {
 	      table.setSelection(target);
       }
     }
-    selectionChanged();
+    selectionChanged(true);
   }
 
 

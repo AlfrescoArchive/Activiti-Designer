@@ -110,9 +110,11 @@ public class FormPropertyEditor extends TableFieldEditor {
   }
   
   @Override
-  protected void selectionChanged() {
-    super.selectionChanged();
-    saveFormProperties();
+  protected void selectionChanged(boolean updated) {
+    super.selectionChanged(updated);
+    if(updated) {
+      saveFormProperties();
+    }
   }
   
   private List<FormProperty> getFormProperties(Object bo) {
