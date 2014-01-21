@@ -14,6 +14,11 @@ public class ExecutionListenerEditor extends AbstractListenerEditor {
   }
 
   @Override
+  protected boolean isTableChangeEnabled() {
+    return false;
+  }
+
+  @Override
   protected AbstractListenerDialog getDialog(Shell shell, TableItem[] items) {
     return new ExecutionListenerDialog(shell, items, isSequenceFlow);
   }

@@ -8,9 +8,9 @@ import org.eclipse.swt.widgets.TableItem;
 public class FormValueEditor extends TableFieldEditor {
   
   protected Composite parent;
+  protected boolean enableTableChanges = true;
 	
   public FormValueEditor(String key, Composite parent) {
-    
     super(key, "", new String[] {"Id", "Name"},
         new int[] {200, 200}, parent);
     this.parent = parent;
@@ -23,6 +23,11 @@ public class FormValueEditor extends TableFieldEditor {
     for (String formValue : formValueList) {
       addTableItem(formValue);
     }
+  }
+  
+  @Override
+  protected boolean isTableChangeEnabled() {
+    return true;
   }
 
   @Override
