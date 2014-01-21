@@ -122,9 +122,9 @@ public class FieldExtensionEditor extends TableFieldEditor {
 	
 	@Override
 	protected void selectionChanged() {
-		super.selectionChanged();
-		saveFieldExtensions();
-	}
+    super.selectionChanged();
+    saveFieldExtensions();
+  }
 	
 	private void saveFieldExtensions() {
 		if (pictogramElement != null) {

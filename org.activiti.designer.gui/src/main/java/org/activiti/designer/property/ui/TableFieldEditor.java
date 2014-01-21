@@ -551,7 +551,7 @@ public abstract class TableFieldEditor extends FieldEditor {
 		editButton.setEnabled(index >= 0);
 		removeButton.setEnabled(index >= 0);
 		upButton.setEnabled(size > 1 && index > 0);
-    downButton.setEnabled(size > 1 && index >= 0 && index < size - 1);
+		downButton.setEnabled(size > 1 && index >= 0 && index < size - 1);
 	}
 
 	/*

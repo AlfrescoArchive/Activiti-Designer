@@ -206,11 +206,9 @@ public class FormPropertyEditor extends TableFieldEditor {
     List<FormValue> formValueList = new ArrayList<FormValue>();
     if (dialog.formValues != null && dialog.formValues.length() > 0) {
       String[] formValueArray = dialog.formValues.split(";");
-      System.out.println("dialog.formValues " + dialog.formValues);
       if(formValueArray != null) {
         for(String formValue : formValueArray) {
           FormValue formValueObj = new FormValue();
-          System.out.println("formValue " + formValue);
           formValueObj.setId(formValue.substring(0, formValue.lastIndexOf(":")));
           formValueObj.setName(formValue.substring(formValue.lastIndexOf(":") + 1));
           formValueList.add(formValueObj);
