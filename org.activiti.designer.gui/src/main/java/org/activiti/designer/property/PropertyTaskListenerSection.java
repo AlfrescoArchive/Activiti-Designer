@@ -49,9 +49,8 @@ public class PropertyTaskListenerSection extends ActivitiPropertySection impleme
   public void refresh() {
     PictogramElement pe = getSelectedPictogramElement();
     if (pe != null) {
-      
-      PictogramElement element = getSelectedPictogramElement();
-      Object bo = getBusinessObject(element);
+      Object bo = getBusinessObject(pe);
+      resetModelUpdater();
 
       UserTask userTask = (UserTask) bo;
       List<ActivitiListener> taskListenerList = userTask.getTaskListeners();

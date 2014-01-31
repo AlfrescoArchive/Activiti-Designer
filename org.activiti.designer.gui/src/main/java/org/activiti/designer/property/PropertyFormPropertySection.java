@@ -50,6 +50,7 @@ public class PropertyFormPropertySection extends ActivitiPropertySection impleme
     PictogramElement pe = getSelectedPictogramElement();
     if (pe != null) {
       Object bo = getBusinessObject(pe);
+      resetModelUpdater();
 
       List<FormProperty> formPropertyList = null;
       if (bo instanceof UserTask) {
