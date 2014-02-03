@@ -55,5 +55,14 @@ public interface ProcessValidator {
    * @return true if validation was successful, false otherwise
    */
   boolean validateDiagram(Diagram diagram, IProgressMonitor monitor);
+  
+  /**
+   * IN DEVELOPMENT! (jurosh@jurosh.com)
+   * 
+   * Perform validation of diagram. Should be used in realtime.
+   * 
+   * @return validation results
+   */
+  ValidationResult validateDiagram(Diagram diagram);
 
 }
