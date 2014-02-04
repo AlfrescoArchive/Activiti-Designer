@@ -3,11 +3,12 @@ package org.activiti.designer.eclipse.views.validator;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import org.activiti.designer.eclipse.editor.ActivitiDiagramEditor;
 import org.activiti.designer.eclipse.extension.validation.ProcessValidator;
+import org.activiti.designer.eclipse.extension.validation.ValidationResults;
+import org.activiti.designer.eclipse.extension.validation.ValidationResults.ValidationResult;
 import org.activiti.designer.eclipse.util.ExtensionPointUtil;
 import org.activiti.designer.util.ActivitiConstants;
 import org.activiti.designer.util.editor.BpmnMemoryModel;
@@ -34,6 +35,10 @@ import org.eclipse.ui.part.ViewPart;
  * Activiti view providing results and actions for validation and verification
  * of BPMN 2.0 diagrams.
  * 
+ * TODO add loader icon while validating
+ * TODO add icons for types
+ * TODO finalize
+ * 
  * @author Juraj Husar (jurosh@jurosh.com)
  * 
  */
@@ -44,6 +49,8 @@ public class ActivitiValidationView extends ViewPart {
 	private Button configButton;
 	private Table table;
 
+	private List<ValidationResult> data = new ArrayList<ValidationResults.ValidationResult>();
+	
 	@Override
 	public void createPartControl(Composite parent) {
 
@@ -80,7 +87,7 @@ public class ActivitiValidationView extends ViewPart {
 		table.setLinesVisible(true);
 
 		viewer.setContentProvider(new ArrayContentProvider());
-		viewer.setInput(ModelProvider.INSTANCE.getData());
+		viewer.setInput(data); // TODO use serios provider for imput changes
 
 		GridData gridData = new GridData(GridData.VERTICAL_ALIGN_END);
 		gridData.horizontalSpan = 3;
@@ -121,9 +128,9 @@ public class ActivitiValidationView extends ViewPart {
 		viewerColumn.setLabelProvider(new ColumnLabelProvider() {
 			@Override
 			public String getText(Object element) {
-				if (element != null && element instanceof ValidationObject) {
+				if (element != null && element instanceof ValidationResult) {
 					try {
-						Method method = ValidationObject.class.getDeclaredMethod("get" + propertyName);
+						Method method = ValidationResult.class.getDeclaredMethod("get" + propertyName);
 						Object returns = method.invoke(element);
 						return returns == null ? "-" : returns.toString();
 
@@ -158,9 +165,15 @@ public class ActivitiValidationView extends ViewPart {
 			tc.pack();
 		}
 	}
+	
+	// TODO refresh correctly...
+	private void refreshTable() {
+		table.redraw();
+	}
 
 	protected void validate() {
 		System.out.println("RUN VALIDATE!");
+		data.clear();
 
 		// inspired by AbstractExportMarshaller.invokeValidators
 		// final int totalWork = WORK_INVOKE_VALIDATORS_VALIDATOR *
@@ -170,16 +183,20 @@ public class ActivitiValidationView extends ViewPart {
 		// activeMonitor.beginTask("Invoking validators", totalWork);
 		// boolean overallResult = true;
 
-		Iterator<ProcessValidator> iterator = ExtensionPointUtil.getProcessValidators().iterator();
-		while (iterator.hasNext()) {
-			System.out.print(iterator.next().getValidatorId());
-		}
-
 		// get validator, else skip
 		final ProcessValidator processValidator = ExtensionPointUtil.getProcessValidator(ActivitiConstants.BPMN_VALIDATOR_ID);
-
 		if (processValidator != null) {
 			System.out.println("OK, have validator...");
+			// TODO correct way of getting ACTIVE diagram
+			ValidationResults validateDiagram = processValidator.validateDiagram(ActivitiDiagramEditor.EDITOR.getDiagramTypeProvider().getDiagram());
+			data.addAll(validateDiagram.getResults());
+			
+			System.out.println("Validation DONE!");
+			for (ValidationResult result : data) {
+				System.out.println("result: " + result.getReason());
+			}
+			
+			refreshTable();
 		}
 	}
 
@@ -188,6 +205,7 @@ public class ActivitiValidationView extends ViewPart {
 		// TODO Auto-generated method stub
 	}
 
+	@Deprecated
 	private BpmnMemoryModel getActiveModel() {
 		// URI uri = EcoreUtil.getURI(getDiagramTypeProvider().getDiagram());
 		// TODO allways get last diagram
@@ -195,76 +213,26 @@ public class ActivitiValidationView extends ViewPart {
 		return ModelHandler.getModel(uri);
 	}
 
-	/**
-	 * Model provider
-	 * 
-	 * @author Jurosh
-	 * 
-	 */
-	public enum ModelProvider {
-		INSTANCE;
-
-		private List<ValidationObject> sampleValidationObjects;
-
-		private ModelProvider() {
-			sampleValidationObjects = new ArrayList<ValidationObject>();
-			// Image here some fancy database access to read the persons and to
-			// put them into the model
-			sampleValidationObjects.add(new ValidationObject("error", "Start Element", "End element (end1)", "Not connected"));
-			sampleValidationObjects.add(new ValidationObject("warning", "Pool", "", "Pool is missing"));
-			sampleValidationObjects.add(new ValidationObject("info", "Text", "", "Use text"));
-			sampleValidationObjects.add(new ValidationObject("warning", "Las elem (elem1)", "", "This is not good"));
-			sampleValidationObjects.add(new ValidationObject("error", "Element5", "", "Erorr"));
-		}
-
-		public List<ValidationObject> getData() {
-			return sampleValidationObjects;
-		}
-
-	}
-
-	/**
-	 * Validation result object
-	 * 
-	 * @author Jurosh
-	 * 
-	 */
-	static class ValidationObject {
-
-		private String type;
-		private String element1Id;
-		private String element2Id;
-		private String reason;
-
-		public ValidationObject(String type, String element1Id, String element2Id, String reason) {
-			super();
-			this.type = type;
-			this.element1Id = element1Id;
-			this.element2Id = element2Id;
-			this.reason = reason;
-		}
-
-		@Override
-		public String toString() {
-			return type + " " + reason;
-		}
-
-		public String getType() {
-			return type;
-		}
-
-		public String getElement1Id() {
-			return element1Id;
-		}
-
-		public String getElement2Id() {
-			return element2Id;
-		}
-
-		public String getReason() {
-			return reason;
-		}
-
-	}
+//	public enum ModelProvider {
+//		INSTANCE;
+//
+//		private List<ValidationObject> sampleValidationObjects;
+//
+//		private ModelProvider() {
+//			sampleValidationObjects = new ArrayList<ValidationObject>();
+//			// Image here some fancy database access to read the persons and to
+//			// put them into the model
+//			sampleValidationObjects.add(new ValidationObject("error", "Start Element", "End element (end1)", "Not connected"));
+//			sampleValidationObjects.add(new ValidationObject("warning", "Pool", "", "Pool is missing"));
+//			sampleValidationObjects.add(new ValidationObject("info", "Text", "", "Use text"));
+//			sampleValidationObjects.add(new ValidationObject("warning", "Las elem (elem1)", "", "This is not good"));
+//			sampleValidationObjects.add(new ValidationObject("error", "Element5", "", "Erorr"));
+//		}
+//
+//		public List<ValidationObject> getData() {
+//			return sampleValidationObjects;
+//		}
+//
+//	}
 
 }

@@ -11,9 +11,10 @@ import java.util.Map;
 
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.designer.eclipse.extension.validation.AbstractProcessValidator;
-import org.activiti.designer.eclipse.extension.validation.ValidationResult;
+import org.activiti.designer.eclipse.extension.validation.ValidationResults;
 import org.activiti.designer.util.ActivitiConstants;
 import org.activiti.designer.validation.bpmn20.bundle.PluginConstants;
+import org.activiti.designer.validation.bpmn20.validation.indev.BPVerificator;
 import org.activiti.designer.validation.bpmn20.validation.worker.ProcessValidationWorkerInfo;
 import org.activiti.designer.validation.bpmn20.validation.worker.ProcessValidationWorkerMarker;
 import org.activiti.designer.validation.bpmn20.validation.worker.impl.ScriptTaskValidationWorker;
@@ -147,8 +148,8 @@ public class BPMN20ProcessValidator extends AbstractProcessValidator {
   }
   
   @Override
-  public ValidationResult validateDiagram(Diagram diagram) {
-	return new ValidationResult();
+  public ValidationResults validateDiagram(Diagram diagram) {
+	return (new BPVerificator()).validate(diagram);
   }
 
 }

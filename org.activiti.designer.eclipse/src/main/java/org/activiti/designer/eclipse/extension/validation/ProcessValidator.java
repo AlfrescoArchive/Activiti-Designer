@@ -63,6 +63,6 @@ public interface ProcessValidator {
    * 
    * @return validation results
    */
-  ValidationResult validateDiagram(Diagram diagram);
+  ValidationResults validateDiagram(Diagram diagram);
 
 }
