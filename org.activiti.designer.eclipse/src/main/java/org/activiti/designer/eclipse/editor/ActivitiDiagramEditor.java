@@ -93,8 +93,12 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 
   private TransactionalEditingDomain transactionalEditingDomain;
 
+  // TODO just for testing verification
+  public static ActivitiDiagramEditor EDITOR;
+  
   public ActivitiDiagramEditor() {
     super();
+    EDITOR = this;
   }
 
   @Override
