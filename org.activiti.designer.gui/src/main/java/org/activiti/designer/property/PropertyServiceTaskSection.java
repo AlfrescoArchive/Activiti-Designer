@@ -33,6 +33,7 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 public class PropertyServiceTaskSection extends ActivitiPropertySection implements ITabbedPropertyConstants {
 
 	protected Combo taskTypeButton;
+	protected CLabel classNameLabel;
 	protected Text classNameText;
 	protected Button classSelectButton;
 	protected Text expressionText;
@@ -48,10 +49,18 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
   public void createFormControls(TabbedPropertySheetPage aTabbedPropertySheetPage) {
 	  taskTypeButton = createCombobox(typeValues, 0);
     createLabel("Task type", taskTypeButton);
-    classNameText = createTextControl(false);
-    createLabel("Class name", classNameText);
-    classSelectButton = getWidgetFactory().createButton(formComposite, "Select class", SWT.PUSH);
+    
+    classNameText = getWidgetFactory().createText(formComposite, "", SWT.NONE);
     FormData data = new FormData();
+    data.left = new FormAttachment(0, 200);
+    data.right = new FormAttachment(70, 0);
+    data.top = createTopFormAttachment();
+    classNameText.setLayoutData(data);
+    registerControl(classNameText);
+    
+    classNameLabel = createLabel("Class name", classNameText);
+    classSelectButton = getWidgetFactory().createButton(formComposite, "Select class", SWT.PUSH);
+    data = new FormData();
     data.left = new FormAttachment(classNameText, 0);
     data.right = new FormAttachment(78, 0);
     data.top = new FormAttachment(classNameText, -2, SWT.TOP);
@@ -102,10 +111,29 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
         }
       }
     });
-    expressionText = createTextControl(false);
+    
+    expressionText = getWidgetFactory().createText(formComposite, ""); //$NON-NLS-1$
+    data = new FormData();
+    data.left = new FormAttachment(0, 200);
+    data.right = new FormAttachment(100, 0);
+    data.top = new FormAttachment(taskTypeButton, VSPACE);
+    expressionText.setVisible(false);
+    expressionText.setLayoutData(data);
+    registerControl(expressionText);
+
     expressionLabel = createLabel("Expression", expressionText);
-    delegateExpressionText = createTextControl(false);
+
+    delegateExpressionText = getWidgetFactory().createText(formComposite, ""); //$NON-NLS-1$
+    data = new FormData();
+    data.left = new FormAttachment(0, 200);
+    data.right = new FormAttachment(100, 0);
+    data.top = new FormAttachment(taskTypeButton, VSPACE);
+    delegateExpressionText.setVisible(false);
+    delegateExpressionText.setLayoutData(data);
+    registerControl(delegateExpressionText);
+    
     delegateExpressionLabel = createLabel("Delegate Expression", delegateExpressionText);
+    
     resultVariableText = createTextControl(false);
     createLabel("Result variable", resultVariableText);
     
@@ -142,6 +170,8 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
       fieldEditor.diagramBehavior = getDiagramContainer().getDiagramBehavior();
       fieldEditor.diagram = getDiagram();
       fieldEditor.initialize(task.getFieldExtensions());
+      
+      System.out.println("getModelValueForControl " + task.getImplementationType());
       
       if (ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equals(task.getImplementationType())) {
         setVisibleClassType(false);
@@ -186,12 +216,14 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
     ServiceTask task = (ServiceTask) businessObject;
     if (control == taskTypeButton) {
       if (taskTypeButton.getSelectionIndex() == 0) {
+        System.out.println("0 " + taskTypeButton.getSelectionIndex() + " " + businessObject);
         setVisibleClassType(true);
         setVisibleExpressionType(false);
         setVisibleDelegateExpressionType(false);
         task.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
       
       } else if (taskTypeButton.getSelectionIndex() == 1) {
+        System.out.println("1 " + taskTypeButton.getSelectionIndex() + " " + businessObject);
         setVisibleClassType(false);
         setVisibleExpressionType(true);
         setVisibleDelegateExpressionType(false);
@@ -218,6 +250,7 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 
 	private void setVisibleClassType(boolean visible) {
 		classNameText.setVisible(visible);
+		classNameLabel.setVisible(visible);
 		classSelectButton.setVisible(visible);
 	}
 
