@@ -171,8 +171,6 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
       fieldEditor.diagram = getDiagram();
       fieldEditor.initialize(task.getFieldExtensions());
       
-      System.out.println("getModelValueForControl " + task.getImplementationType());
-      
       if (ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION.equals(task.getImplementationType())) {
         setVisibleClassType(false);
         setVisibleExpressionType(true);
@@ -216,24 +214,22 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
     ServiceTask task = (ServiceTask) businessObject;
     if (control == taskTypeButton) {
       if (taskTypeButton.getSelectionIndex() == 0) {
-        System.out.println("0 " + taskTypeButton.getSelectionIndex() + " " + businessObject);
+        task.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
         setVisibleClassType(true);
         setVisibleExpressionType(false);
         setVisibleDelegateExpressionType(false);
-        task.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
       
       } else if (taskTypeButton.getSelectionIndex() == 1) {
-        System.out.println("1 " + taskTypeButton.getSelectionIndex() + " " + businessObject);
+        task.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
         setVisibleClassType(false);
         setVisibleExpressionType(true);
         setVisibleDelegateExpressionType(false);
-        task.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
       
       } else if (taskTypeButton.getSelectionIndex() == 2) {
+        task.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
         setVisibleClassType(false);
         setVisibleExpressionType(false);
         setVisibleDelegateExpressionType(true);
-        task.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
       } 
     } else if (control == classNameText) {
       task.setImplementation(classNameText.getText());
