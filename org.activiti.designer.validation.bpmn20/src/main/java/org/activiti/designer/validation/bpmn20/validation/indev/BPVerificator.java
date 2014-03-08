@@ -24,7 +24,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 
 /**
- * Business process validator
+ * Business process verificator
  * 
  * @author Juraj Husar (jurosh@jurosh.com)
  *
@@ -118,6 +118,7 @@ public class BPVerificator {
 	}
 	
 	private static ValidationResult createErr(String type, BaseElement elem , String msg) {
+		System.out.println("[ValidationError]" + msg);
 		return new ValidationResult(type, msg, elem);
 	}
 	
@@ -143,8 +144,7 @@ public class BPVerificator {
 					if (((StartEvent) element).getOutgoingFlows().size() == 0) {
 						// Something wrong there, start element
 						// (id=" + element.getId() + ") is not conected..");
-						System.out
-								.println("validation ERROR, start not conected");
+						System.out								.println("validation ERROR, start not conected");
 						hasErrors = true;
 					}
 				}

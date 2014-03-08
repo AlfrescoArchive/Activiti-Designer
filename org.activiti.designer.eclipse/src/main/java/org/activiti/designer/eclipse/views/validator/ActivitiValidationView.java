@@ -98,6 +98,11 @@ public class ActivitiValidationView extends ViewPart {
 		
 		bindActions();
 	}
+	
+	private void initUI() {
+		// TODO Auto-generated method stub
+
+	}
 
 	// inspired by
 	// http://www.vogella.com/tutorials/EclipseJFaceTable/article.html

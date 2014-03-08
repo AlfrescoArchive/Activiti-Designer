@@ -154,7 +154,7 @@
           class="org.activiti.designer.eclipse.views.validator.ActivitiValidationView"
           icon="icons/logo/activiti.logo.gradients.16x16.png"
           id="org.activiti.designer.eclipse.jurosh.validator"
-          name="BPMN 2.0 Validator"
+          name="BPMN 2.0 Verificator"
           restorable="true">
     </view>
     
