@@ -15,6 +15,8 @@ import org.activiti.designer.eclipse.extension.validation.ValidationResults;
 import org.activiti.designer.util.ActivitiConstants;
 import org.activiti.designer.validation.bpmn20.bundle.PluginConstants;
 import org.activiti.designer.validation.bpmn20.validation.indev.BPVerificator;
+import org.activiti.designer.validation.bpmn20.validation.indev.OfficialRulesValidationWorker;
+import org.activiti.designer.validation.bpmn20.validation.indev.StyleRulesValidationWoker;
 import org.activiti.designer.validation.bpmn20.validation.worker.ProcessValidationWorkerInfo;
 import org.activiti.designer.validation.bpmn20.validation.worker.ProcessValidationWorkerMarker;
 import org.activiti.designer.validation.bpmn20.validation.worker.impl.ScriptTaskValidationWorker;
@@ -127,6 +129,7 @@ public class BPMN20ProcessValidator extends AbstractProcessValidator {
 
     return result;
   }
+  
   private List<ProcessValidationWorkerInfo> getWorkers() {
 
     List<ProcessValidationWorkerInfo> result = new ArrayList<ProcessValidationWorkerInfo>();
@@ -136,6 +139,9 @@ public class BPMN20ProcessValidator extends AbstractProcessValidator {
     result.add(new ProcessValidationWorkerInfo(new ServiceTaskValidationWorker(), PluginConstants.WORK_SERVICE_TASK));
     result.add(new ProcessValidationWorkerInfo(new SequenceFlowValidationWorker(), PluginConstants.WORK_SEQUENCE_FLOW));
     result.add(new ProcessValidationWorkerInfo(new SubProcessValidationWorker(), PluginConstants.WORK_SUB_PROCESS));
+    
+    result.add(new ProcessValidationWorkerInfo(new OfficialRulesValidationWorker(), PluginConstants.WORK_SUB_PROCESS));
+    result.add(new ProcessValidationWorkerInfo(new StyleRulesValidationWoker(), PluginConstants.WORK_SUB_PROCESS));
 
     return result;
 
@@ -147,7 +153,9 @@ public class BPMN20ProcessValidator extends AbstractProcessValidator {
     overallResult = false;
   }
   
+  // TODO remove after landing verification via workers
   @Override
+  @Deprecated
   public ValidationResults validateDiagram(Diagram diagram) {
 	return (new BPVerificator()).validate(diagram);
   }

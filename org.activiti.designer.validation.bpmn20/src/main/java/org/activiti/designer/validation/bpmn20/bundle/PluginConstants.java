@@ -27,6 +27,10 @@ public final class PluginConstants {
   public static final int WORK_SERVICE_TASK = 10;
   public static final int WORK_SEQUENCE_FLOW = 10;
   public static final int WORK_SUB_PROCESS = 10;
+  
+  // these 2 should contain more validation rules
+  public static final int WORK_OFFICIAL_BPMN = 50;
+  public static final int WORK_STYLE_BPMN 	 = 45;
 
   public static final int WORK_TOTAL = WORK_CLEAR_MARKERS + WORK_EXTRACT_CONSTRUCTS + WORK_USER_TASK + WORK_SCRIPT_TASK + WORK_SERVICE_TASK
           + WORK_SEQUENCE_FLOW + WORK_SUB_PROCESS;
