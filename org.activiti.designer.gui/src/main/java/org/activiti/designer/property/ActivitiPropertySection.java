@@ -420,7 +420,7 @@ public abstract class ActivitiPropertySection extends BaseActivitiPropertySectio
       textControl = getWidgetFactory().createText(formComposite, "", SWT.NONE);
       data = new FormData();
     }
-    data.left = new FormAttachment(0, 280);
+    data.left = new FormAttachment(0, 200);
     data.right = new FormAttachment(100, 0);
     data.top = createTopFormAttachment();
     textControl.setLayoutData(data);
@@ -449,7 +449,7 @@ public abstract class ActivitiPropertySection extends BaseActivitiPropertySectio
   protected Combo createCombobox(String[] values, int defaultSelectionIndex) {
     Combo comboControl = new Combo(formComposite, SWT.READ_ONLY);
     FormData data = new FormData();
-    data.left = new FormAttachment(0, 250);
+    data.left = new FormAttachment(0, 200);
     data.right = new FormAttachment(100, 0);
     data.top = createTopFormAttachment();
     comboControl.setLayoutData(data);
