@@ -1,7 +1,5 @@
 package org.activiti.designer.validation.bpmn20.validation.indev.rules;
 
-import static org.activiti.designer.eclipse.extension.validation.ValidationResults.TYPE_ERROR;
-
 import java.util.List;
 
 import org.activiti.bpmn.model.BoundaryEvent;
@@ -12,6 +10,7 @@ import org.activiti.bpmn.model.Process;
 import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.bpmn.model.StartEvent;
 import org.activiti.designer.validation.bpmn20.validation.indev.AbstractAdvancedValidatorWorker;
+import org.eclipse.core.resources.IMarker;
 
 /**
  * BPMN 2.0 Level 1 Palete Verification Rules
@@ -37,14 +36,13 @@ public class Level1ValidationWorker extends AbstractAdvancedValidatorWorker {
 		/**
 		 * [O1-3] A Message flow may not connect nodes in the same pool
 		 * 
-		 * priority: MEDIUM
+		 * priority: MEDIUM [ not allowed by editor]
 		 */
 		for (Process process : getModel().getProcesses()) {
 			for (FlowElement elem : process.getFlowElements()) {
 				if (elem instanceof BoundaryEvent) {
 					// System.out.println(elem.getId());
-					// TODO detect message boundary and check ref element, if is
-					// on same pool or not
+					// TODO detect message boundary and check ref element, if is on same pool or not
 				}
 			}
 		}
@@ -63,7 +61,7 @@ public class Level1ValidationWorker extends AbstractAdvancedValidatorWorker {
 
 					// not allow cycle connections
 					if (outgoingFlows.contains(elem) || incomingFlows.contains(elem)) {
-						createErr(TYPE_ERROR, elem, formatName(elem) + " is connected to itself.");
+						createErr(IMarker.SEVERITY_ERROR, formatName(elem) + " is connected to itself.", elem);
 						break;
 					}
 
@@ -74,13 +72,13 @@ public class Level1ValidationWorker extends AbstractAdvancedValidatorWorker {
 					boolean flowInError = incomingFlows.size() == 0 && !(elem instanceof StartEvent);
 
 					if (flowInError && flowOutError) {
-						createErr(TYPE_ERROR, elem, formatName(elem) + " have no incomming and outgoing sequence flow.");
+						createErr(IMarker.SEVERITY_ERROR, formatName(elem) + " have no incomming and outgoing sequence flow.", elem);
 
 					} else if (flowInError) {
-						createErr(TYPE_ERROR, elem, formatName(elem) + " have no incomming sequence flow.");
+						createErr(IMarker.SEVERITY_ERROR, formatName(elem) + " have no incomming sequence flow.", elem);
 
 					} else if (flowOutError) {
-						createErr(TYPE_ERROR, elem, formatName(elem) + " don't have next element connection.");
+						createErr(IMarker.SEVERITY_ERROR, formatName(elem) + " don't have next element connection.", elem);
 					}
 
 				}

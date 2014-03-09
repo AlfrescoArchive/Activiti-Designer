@@ -6,25 +6,28 @@ import org.activiti.designer.eclipse.extension.validation.ValidationResults.Vali
 import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.designer.validation.bpmn20.validation.worker.AbstractValidationWorker;
+import org.activiti.designer.validation.bpmn20.validation.worker.ProcessValidationWorkerMarker;
+import org.activiti.designer.validation.bpmn20.validation.worker.impl.ValidationCode;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 
 /**
  * 
  * @author Jurosh
- *
+ * 
  */
 public abstract class AbstractAdvancedValidatorWorker extends AbstractValidationWorker {
 
 	/**
 	 * Format name for output
+	 * 
 	 * @param element
 	 * @return
 	 */
 	protected static String formatName(BaseElement element) {
 		return element.getClass().getSimpleName() + " [" + element.getId() + "]";
 	}
-	
+
 	/**
 	 * 
 	 * @param type
@@ -32,14 +35,22 @@ public abstract class AbstractAdvancedValidatorWorker extends AbstractValidation
 	 * @param msg
 	 * @return
 	 */
-	protected static ValidationResult createErr(String type, BaseElement elem , String msg) {
+	protected void createErr(int severity, String msg, BaseElement elem) {
 		System.out.println("[ValidationError]" + msg);
-		return new ValidationResult(type, msg, elem);
+
+		// new (but temporary) result object
+		ValidationResult validationResult = new ValidationResult(severity, msg, elem);
+
+		// original result object
+		ProcessValidationWorkerMarker processValidationWorkerMarker = new ProcessValidationWorkerMarker(validationResult, ValidationCode.VAL_100);
+		
+		results.add(processValidationWorkerMarker);
 	}
 	
 	/**
-	 * Try to do stuff without this method, but probably will be needed
-	 * TODO: correct way of getting model, not it should probably take not always selected 
+	 * Try to do stuff without this method, but probably will be needed TODO:
+	 * correct way of getting model, not it should probably take not always
+	 * selected
 	 * 
 	 * @return
 	 */
@@ -47,7 +58,6 @@ public abstract class AbstractAdvancedValidatorWorker extends AbstractValidation
 		URI uri = EcoreUtil.getURI(diagram);
 		BpmnMemoryModel model = ModelHandler.getModel(uri);
 		return model.getBpmnModel();
-
 	}
-	
+
 }

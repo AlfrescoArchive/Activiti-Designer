@@ -32,19 +32,11 @@ import org.eclipse.swt.widgets.TableColumn;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.part.ViewPart;
 
-/**
- * Activiti view providing results and actions for validation and verification
- * of BPMN 2.0 diagrams.
- * 
- * TODO add loader icon while validating
- * TODO add icons for types
- * TODO finalize
- * 
- * @author Juraj Husar (jurosh@jurosh.com)
- * 
- */
-public class ActivitiValidationView extends ViewPart {
-	public ActivitiValidationView() {
+
+// just for window builder testing
+@Deprecated
+public class CopyOfActivitiValidationView extends ViewPart {
+	public CopyOfActivitiValidationView() {
 	}
 
 	private Button validateButton;
@@ -58,17 +50,12 @@ public class ActivitiValidationView extends ViewPart {
 	
 	@Override
 	public void createPartControl(Composite parent) {
-
-		// Config layout, tutorial: http://zetcode.com/gui/javaswt/layout/
-		GridLayout gridLayout = new GridLayout(3, true);
-		parent.setLayout(gridLayout);
+		parent.setLayout(new GridLayout(3, false));
 
 		// create UI
 		Label indevLabel = new Label(parent, SWT.PUSH);
+		indevLabel.setLayoutData(new GridData(SWT.LEFT, SWT.BOTTOM, false, false, 3, 1));
 		indevLabel.setText("Validation is currently in BETA. After some develpoment work this sign will be removed.");
-		GridData gridData2 = new GridData(GridData.VERTICAL_ALIGN_END);
-		gridData2.horizontalSpan = 3;
-		indevLabel.setLayoutData(gridData2);
 
 		validateButton = new Button(parent, SWT.PUSH);
 		validateButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
@@ -79,18 +66,8 @@ public class ActivitiValidationView extends ViewPart {
 		clearButton.setText("Clear");
 
 		configButton = new Button(parent, SWT.PUSH);
-		configButton.setLayoutData(new GridData(SWT.FILL, SWT.CENTER, false, false, 1, 1));
 		configButton.setText("Configuration");
 
-		GridData gridData3 = new GridData(GridData.VERTICAL_ALIGN_END);
-	    gridData3.heightHint = 199;
-	    gridData3.horizontalAlignment = SWT.FILL;
-	    gridData3.horizontalSpan = 3;
-	    gridData3.widthHint = 176;
-	    gridData3.minimumHeight = 50;
-	    text = new Text(parent, SWT.BORDER | SWT.V_SCROLL);
-	    text.setLayoutData(gridData3);
-		
 		// define the TableViewer
 		TableViewer viewer = new TableViewer(parent, SWT.MULTI | SWT.H_SCROLL | SWT.V_SCROLL | SWT.FULL_SELECTION | SWT.BORDER);
 
@@ -100,27 +77,25 @@ public class ActivitiValidationView extends ViewPart {
 
 		// make lines and header visible
 		table = viewer.getTable();
+		GridData gd_table = new GridData(SWT.FILL, SWT.BOTTOM, false, false, 3, 1);
+		gd_table.heightHint = 67;
+		table.setLayoutData(gd_table);
 		table.setHeaderVisible(true);
 		table.setLinesVisible(true);
 
 		viewer.setContentProvider(new ArrayContentProvider());
-		viewer.setInput(data); // TODO use serios provider for imput changes
-
-		GridData gridData = new GridData(GridData.VERTICAL_ALIGN_END);
-		gridData.horizontalSpan = 3;
-		gridData.horizontalAlignment = GridData.FILL;
-		table.setLayoutData(gridData);
+		viewer.setInput(data);
 
 		resizeTable();
-	    
+	    text = new Text(parent, SWT.BORDER | SWT.V_SCROLL);
+	    GridData gd_text = new GridData(SWT.FILL, SWT.BOTTOM, false, false, 3, 1);
+	    gd_text.heightHint = 126;
+	    gd_text.widthHint = 172;
+	    text.setLayoutData(gd_text);
+		
 		bindActions();
 	}
 	
-	private void initUI() {
-		// TODO Auto-generated method stub
-
-	}
-
 	// inspired by
 	// http://www.vogella.com/tutorials/EclipseJFaceTable/article.html
 	private void createColumns(TableViewer viewer) {
@@ -176,14 +151,8 @@ public class ActivitiValidationView extends ViewPart {
 		validateButton.addMouseListener(new MouseAdapter() {
 			@Override
 			public void mouseDown(MouseEvent e) {
+				super.mouseDown(e);
 				validate();
-			}
-		});
-		clearButton.addMouseListener(new MouseAdapter() {
-			@Override
-			public void mouseDown(MouseEvent e) {
-				textClear();
-				data.clear();
 			}
 		});
 	}
@@ -239,7 +208,7 @@ public class ActivitiValidationView extends ViewPart {
 	}
 
 	private void textAppend(String line) {
-		text.append(line + "\n");
+		text.append("Line " + line + "\n");
 		/*
 		 * shell.open(); while (!shell.isDisposed()) { if
 		 * (!display.readAndDispatch()) display.sleep(); } display.dispose();
