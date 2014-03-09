@@ -149,6 +149,14 @@
       id="org.activiti.designer.eclipse.view"
       name="Activiti">
     </category>
+    <view
+          category="org.activiti.designer.eclipse.view"
+          class="org.activiti.designer.eclipse.views.validator.ActivitiValidationView"
+          icon="icons/logo/activiti.logo.gradients.16x16.png"
+          id="org.activiti.designer.eclipse.jurosh.validator"
+          name="BPMN 2.0 Verificator"
+          restorable="true">
+    </view>
     
   </extension>
   
