@@ -22,7 +22,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 
 /**
- * Business process verificator
+ * Business process verificator - DO NOT USE THIS, will be removed
  * 
  * @author Juraj Husar (jurosh@jurosh.com)
  *
@@ -60,6 +60,18 @@ public class BPVerificator {
 		
 		return results;
 	}
+	
+//	// TODO Auto-generated method stub
+//	// [1] RULE: have all pools NAMES ?
+//	// INFO LOW
+//
+//	for (Pool pool : getNodes(Pool.class)) {
+//		if (pool.getName() == null || pool.getName().trim().isEmpty()) {
+//			// createErr(TYPE_INFO, pool, formatName(pool) +
+//			// " should have name.");
+//			System.out.println(formatName(pool) + " should have name.");
+//		}
+//	}
 	
 	private static ValidationResult createErr(String type, BaseElement elem , String msg) {
 		System.out.println("[ValidationError]" + msg);
