@@ -51,7 +51,7 @@ public class PropertyExecutionListenerSection extends ActivitiPropertySection im
     PictogramElement pe = getSelectedPictogramElement();
     if (pe != null) {
       Object bo = getBusinessObject(pe);
-
+      resetModelUpdater();
       List<ActivitiListener> executionListenerList = BpmnBOUtil.getExecutionListeners(bo, getDiagram());
 
       listenerEditor.pictogramElement = pe;
