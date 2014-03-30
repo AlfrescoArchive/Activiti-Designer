@@ -353,7 +353,7 @@
             category="org.activiti.designer.preferences"
             class="org.activiti.designer.preferences.ActivitiSavePreferencesPage"
             id="org.activiti.designer.gui.savepage"
-            name="Save">
+            name="Save Actions">
       </page>
       <page
             category="org.activiti.designer.preferences"

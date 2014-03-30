@@ -219,6 +219,10 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 
       final Image img = new Image(display, rootFigureBounds.width, rootFigureBounds.height);
       final GC imageGC = new GC(img);
+
+      // Add overlay
+      addOverlay(imageGC, modelFileName, model);
+
       final SWTGraphics grap = new SWTGraphics(imageGC);
 
       // Access UI thread from runnable to print the canvas to the image
@@ -270,6 +274,13 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 
     } catch (Exception e) {
       e.printStackTrace();
+    }
+  }
+
+  public void addOverlay(final GC imageGC, String modelFileName, BpmnMemoryModel model) {
+    if (PreferencesUtil.getBooleanPreference(Preferences.SAVE_IMAGE_ADD_OVERLAY)) {
+      final ImageOverlayCreator creator = new ImageOverlayCreator(imageGC);
+      creator.addOverlay(modelFileName, model);
     }
   }
 
@@ -361,11 +372,12 @@ public class ActivitiDiagramEditor extends DiagramEditor {
         if (model.getBpmnModel().getPools().size() > 0) {
           for (Pool pool : model.getBpmnModel().getPools()) {
             GraphicInfo graphicInfo = model.getBpmnModel().getGraphicInfo(pool.getId());
-            
-            // if no graphic info is present we can try to calculate it from the lane DI info
+
+            // if no graphic info is present we can try to calculate it from the
+            // lane DI info
             if (graphicInfo == null && StringUtils.isNotEmpty(pool.getProcessRef())) {
               Process process = model.getBpmnModel().getProcess(pool.getId());
-              
+
               if (process != null && process.getLanes().size() > 0) {
                 Double minX = null, minY = null, width = null, height = null;
                 for (Lane lane : process.getLanes()) {
@@ -377,7 +389,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
                     if (minY == null || laneInfo.getY() < minY) {
                       minY = laneInfo.getY();
                     }
-                    
+
                     if (width == null || laneInfo.getWidth() > width) {
                       width = laneInfo.getWidth();
                     }
@@ -388,7 +400,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
                     }
                   }
                 }
-                
+
                 if (width != null && width > 0) {
                   graphicInfo = new GraphicInfo();
                   graphicInfo.setX(minX);
@@ -399,13 +411,13 @@ public class ActivitiDiagramEditor extends DiagramEditor {
                 }
               }
             }
-            
+
             if (graphicInfo != null) {
               PictogramElement poolElement = addContainerElement(pool, model, diagram);
               if (poolElement == null) {
                 continue;
               }
-  
+
               Process process = model.getBpmnModel().getProcess(pool.getId());
               for (Lane lane : process.getLanes()) {
                 addContainerElement(lane, model, (ContainerShape) poolElement);
@@ -491,7 +503,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
         } else {
           parentContainer = parentShape;
         }
-        
+
         context.setTargetContainer(parentContainer);
         if (parentContainer instanceof Diagram == false) {
           Point location = getLocation(parentContainer);
@@ -540,7 +552,8 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 
               if (addFeature.canAdd(boundaryContext)) {
                 PictogramElement newBoundaryContainer = addFeature.add(boundaryContext);
-                //featureProvider.link(newBoundaryContainer, new Object[] { boundaryEvent });
+                // featureProvider.link(newBoundaryContainer, new Object[] {
+                // boundaryEvent });
               }
             }
           }
