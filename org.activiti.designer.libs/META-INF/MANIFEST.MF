@@ -3,7 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Activiti Designer - Libs
 Bundle-SymbolicName: org.activiti.designer.libs;singleton:=true
 Bundle-Version: 5.14.1
-Export-Package: org.activiti.bpmn,
+Export-Package: com.tuniu.nfbird.bpm.model,
+ org.activiti.bpmn,
  org.activiti.bpmn.constants,
  org.activiti.bpmn.converter;
   uses:="javax.xml.stream,
@@ -94,4 +95,6 @@ Bundle-ClassPath: .,
  slf4j-api-1.7.2.jar,
  slf4j-api-1.7.5.jar,
  slf4j-log4j12-1.7.2.jar,
- streambuffer-0.9.jar
+ streambuffer-0.9.jar,
+ nfbird-bpm-converter-0.0.1-SNAPSHOT.jar,
+ nfbird-bpm-engine-0.0.1-SNAPSHOT.jar

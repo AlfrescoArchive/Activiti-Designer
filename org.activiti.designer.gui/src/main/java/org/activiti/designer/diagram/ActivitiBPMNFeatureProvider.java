@@ -152,6 +152,7 @@ import com.alfresco.designer.gui.features.CreateAlfrescoMailTaskFeature;
 import com.alfresco.designer.gui.features.CreateAlfrescoScriptTaskFeature;
 import com.alfresco.designer.gui.features.CreateAlfrescoStartEventFeature;
 import com.alfresco.designer.gui.features.CreateAlfrescoUserTaskFeature;
+import com.tuniu.designer.gui.features.CreateTuniuUserTaskFeature;
 
 public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 
@@ -269,7 +270,7 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
         new CreateMessageCatchingEventFeature(this), new CreateSignalThrowingEventFeature(this), new CreateNoneThrowingEventFeature(this),
         new CreateEventSubProcessFeature(this), new CreateEmbeddedSubProcessFeature(this), new CreatePoolFeature(this), new CreateLaneFeature(this),
         new CreateCallActivityFeature(this), new CreateAlfrescoScriptTaskFeature(this), new CreateAlfrescoMailTaskFeature(this),
-        new CreateTextAnnotationFeature(this) };
+        new CreateTextAnnotationFeature(this),new CreateTuniuUserTaskFeature(this) };
   }
 
   @Override

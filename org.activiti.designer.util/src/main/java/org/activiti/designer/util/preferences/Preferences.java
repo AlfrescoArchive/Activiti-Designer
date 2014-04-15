@@ -18,6 +18,7 @@ public enum Preferences {
   ALFRESCO_ENABLE("com.alfresco.designer.preferences.enable"),
   ALFRESCO_FORMTYPES_STARTEVENT("com.alfresco.designer.preferences.formtypes.startevent"),
   ALFRESCO_FORMTYPES_USERTASK("com.alfresco.designer.preferences.formtypes.usertask"),
+  TUNIU_FORMTYPES_USERTASK("com.tuniu.nfbird.bpm.model.WorkformTask"),
   EDITOR_ADD_LABELS_TO_NEW_SEQUENCEFLOWS("org.activiti.designer.preferences.editor.addLabelsToNewSequenceFlows"), 
   EDITOR_ADD_DEFAULT_CONTENT_TO_DIAGRAMS("org.activiti.designer.preferences.editor.addDefaultContentToDiagrams"), 
   SAVE_TO_FORMAT("org.activiti.designer.preferences.save.saveToFormat"), 

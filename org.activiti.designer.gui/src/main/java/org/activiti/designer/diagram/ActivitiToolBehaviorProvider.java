@@ -128,6 +128,7 @@ import com.alfresco.designer.gui.features.CreateAlfrescoMailTaskFeature;
 import com.alfresco.designer.gui.features.CreateAlfrescoScriptTaskFeature;
 import com.alfresco.designer.gui.features.CreateAlfrescoStartEventFeature;
 import com.alfresco.designer.gui.features.CreateAlfrescoUserTaskFeature;
+import com.tuniu.designer.gui.features.CreateTuniuUserTaskFeature;
 
 public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
 
@@ -174,6 +175,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     toolMapping.put(CreateAlfrescoScriptTaskFeature.class, PaletteEntry.ALFRESCO_SCRIPT_TASK);
     toolMapping.put(CreateAlfrescoMailTaskFeature.class, PaletteEntry.ALFRESCO_MAIL_TASK);
     toolMapping.put(CreateTextAnnotationFeature.class, PaletteEntry.TEXT_ANNOTATION);
+    toolMapping.put(CreateTuniuUserTaskFeature.class, PaletteEntry.TUNIU_USER_TASK);
   }
 
   @Override
@@ -317,6 +319,8 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
               "Create a new alfresco user task", PluginImage.IMG_USERTASK);
       addContextButton(otherElementButton, new CreateAlfrescoMailTaskFeature(getFeatureProvider()), taskContext, "Create alfresco mail task",
               "Create a new alfresco mail task", PluginImage.IMG_MAILTASK);
+      addContextButton(otherElementButton, new CreateTuniuUserTaskFeature(getFeatureProvider()), taskContext, "Create tuniu user task",
+    		  "Create a new tuniu user task", PluginImage.IMG_USERTASK);
     }
 
     ContextButtonEntry editElementButton = new ContextButtonEntry(null, null);
@@ -622,6 +626,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     IPaletteCompartmentEntry intermediateEventCompartmentEntry = new PaletteCompartmentEntry("Intermediate event", null);
     IPaletteCompartmentEntry artifactsCompartmentEntry = new PaletteCompartmentEntry("Artifacts", null);
     IPaletteCompartmentEntry alfrescoCompartmentEntry = new PaletteCompartmentEntry("Alfresco", PluginImage.IMG_ALFRESCO_LOGO.getImageKey());
+    IPaletteCompartmentEntry tuniuCompartmentEntry = new PaletteCompartmentEntry("Tuniu", PluginImage.IMG_TUNIU_LOGO.getImageKey());
 
     for (final IPaletteCompartmentEntry entry : superCompartments) {
 
@@ -713,6 +718,8 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
           alfrescoCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("annotation".equalsIgnoreCase(toolEntry.getLabel())) {
           artifactsCompartmentEntry.getToolEntries().add(toolEntry);
+        }else if ("tuniuUserTask".equalsIgnoreCase(toolEntry.getLabel())) {
+          tuniuCompartmentEntry.getToolEntries().add(toolEntry);
         }
       }
     }
@@ -743,7 +750,9 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     if (PreferencesUtil.getBooleanPreference(Preferences.ALFRESCO_ENABLE) && alfrescoCompartmentEntry.getToolEntries().size() > 0) {
       ret.add(alfrescoCompartmentEntry);
     }
-
+ 	// Always add the tuniu compartment
+    ret.add(tuniuCompartmentEntry);
+    
     final Map<String, List<CustomServiceTaskContext>> tasksInDrawers = new HashMap<String, List<CustomServiceTaskContext>>();
 
     final List<CustomServiceTaskContext> customServiceTaskContexts = ExtensionUtil.getCustomServiceTaskContexts(project);

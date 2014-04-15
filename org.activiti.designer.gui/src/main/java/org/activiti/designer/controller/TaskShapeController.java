@@ -43,6 +43,8 @@ import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.graphiti.services.IGaService;
 import org.eclipse.graphiti.services.IPeCreateService;
 
+import com.tuniu.nfbird.bpm.model.WorkformTask;
+
 /**
  * A {@link BusinessObjectShapeController} capable of creating and updating shapes for {@link Task} objects.
  *  
@@ -59,7 +61,7 @@ public class TaskShapeController extends AbstractBusinessObjectShapeController {
 
   @Override
   public boolean canControlShapeFor(Object businessObject) {
-    if (businessObject instanceof AlfrescoUserTask || businessObject instanceof AlfrescoMailTask || businessObject instanceof AlfrescoScriptTask) {
+    if (businessObject instanceof WorkformTask || businessObject instanceof AlfrescoUserTask || businessObject instanceof AlfrescoMailTask || businessObject instanceof AlfrescoScriptTask) {
       return false;
     } else if (businessObject instanceof ServiceTask) {
       ServiceTask serviceTask = (ServiceTask) businessObject;

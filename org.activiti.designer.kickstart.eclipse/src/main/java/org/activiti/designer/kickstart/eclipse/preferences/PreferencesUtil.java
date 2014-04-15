@@ -80,7 +80,7 @@ public final class PreferencesUtil {
     List<String> resultList = new ArrayList<String>();
     String defaultFormTypes = PreferencesUtil.getStringPreference(preferenceName);
     if(defaultFormTypes != null && defaultFormTypes.length() > 0) {
-      String[] formList = defaultFormTypes.split("±");
+      String[] formList = defaultFormTypes.split("Â±");
       if (formList != null) {
         for (String formKey : formList) {
           resultList.add(formKey);
