@@ -1,15 +1,12 @@
 package com.tuniu.designer.gui.features;
 
-import java.util.List;
 
 import org.activiti.bpmn.model.Lane;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.designer.PluginImage;
-import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.features.AbstractCreateFastBPMNFeature;
 import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
-import org.activiti.designer.util.preferences.Preferences;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
@@ -39,10 +36,10 @@ public class CreateTuniuUserTaskFeature extends AbstractCreateFastBPMNFeature {
     newUserTask.setId(getNextId(newUserTask));
     newUserTask.setName("Tuniu User Task");
     
-    List<String> formTypes = PreferencesUtil.getStringArray(Preferences.TUNIU_FORMTYPES_USERTASK);
-    if (formTypes.size() > 0) {
-      newUserTask.setFormKey(formTypes.get(0));
-    }
+    newUserTask.setFormKey("workformTask");
+    
+    newUserTask.setAsynchronous(true);
+
 
     Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
     if (parentObject instanceof SubProcess) {
@@ -71,7 +68,7 @@ public class CreateTuniuUserTaskFeature extends AbstractCreateFastBPMNFeature {
 
   @Override
   public String getCreateImageId() {
-    return PluginImage.IMG_TUNIU_LOGO.getImageKey();
+    return PluginImage.IMG_USERTASK.getImageKey();
   }
 
   @Override

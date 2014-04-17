@@ -13,6 +13,8 @@ public class PropertyTuniuUserTaskSection extends ActivitiPropertySection
 
 	private Text formKeyText;
 	private Text urlText;
+	private Text paramText;
+	private Text assigneeText;
 
 	@Override
 	public void createFormControls(
@@ -21,8 +23,14 @@ public class PropertyTuniuUserTaskSection extends ActivitiPropertySection
 		formKeyText = createTextControl(false);
 		createLabel("Form key", formKeyText);
 
-		urlText = createTextControl(true);
-		createLabel("Url", urlText);
+		urlText = createTextControl(false);
+		createLabel("url", urlText);
+		
+		paramText = createTextControl(false);
+		createLabel("param", paramText);
+		
+		assigneeText = createTextControl(false);
+		createLabel("assignee", assigneeText);
 	}
 
 	@Override
@@ -40,6 +48,14 @@ public class PropertyTuniuUserTaskSection extends ActivitiPropertySection
 
 			return userTask.getWorkformAttributes().get("url");
 
+		}else if (control == paramText) {
+
+			return userTask.getWorkformAttributes().get("param");
+
+		}else if (control == assigneeText) {
+
+			return userTask.getWorkformAttributes().get("assignee");
+
 		}
 		return null;
 	}
@@ -50,10 +66,12 @@ public class PropertyTuniuUserTaskSection extends ActivitiPropertySection
 		if (control == formKeyText) {
 			userTask.setFormKey(formKeyText.getText());
 
-		} else if (control == urlText) {
+		}else if (control == urlText) {
 			userTask.addWorkformAttribute("url", urlText.getText());
-			;
-
+		}else if (control == paramText) {
+			userTask.addWorkformAttribute("param", paramText.getText());
+		}else if (control == assigneeText) {
+			userTask.addWorkformAttribute("assignee", assigneeText.getText());
 		}
 	}
 	

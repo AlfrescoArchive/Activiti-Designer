@@ -34,6 +34,7 @@ import org.activiti.designer.command.StartEventModelUpdater;
 import org.activiti.designer.command.SubProcessModelUpdater;
 import org.activiti.designer.command.TextAnnotationModelUpdater;
 import org.activiti.designer.command.ThrowEventModelUpdater;
+import org.activiti.designer.command.TuniuUserTaskModelUpdater;
 import org.activiti.designer.command.UserTaskModelUpdater;
 import org.activiti.designer.controller.AssociationShapeController;
 import org.activiti.designer.controller.BoundaryEventShapeController;
@@ -152,6 +153,7 @@ import com.alfresco.designer.gui.features.CreateAlfrescoMailTaskFeature;
 import com.alfresco.designer.gui.features.CreateAlfrescoScriptTaskFeature;
 import com.alfresco.designer.gui.features.CreateAlfrescoStartEventFeature;
 import com.alfresco.designer.gui.features.CreateAlfrescoUserTaskFeature;
+import com.tuniu.designer.gui.controller.TuniuTaskShapeController;
 import com.tuniu.designer.gui.features.CreateTuniuUserTaskFeature;
 
 public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
@@ -183,11 +185,13 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
     shapeControllers.add(new AssociationShapeController(this));
     shapeControllers.add(new AlfrescoStartEventShapeController(this));
     shapeControllers.add(new AlfrescoTaskShapeController(this));
+    shapeControllers.add(new TuniuTaskShapeController(this));
     
     this.modelUpdaters = new ArrayList<BpmnProcessModelUpdater>();
     modelUpdaters.add(new StartEventModelUpdater(this));
     modelUpdaters.add(new EndEventModelUpdater(this));
     modelUpdaters.add(new UserTaskModelUpdater(this));
+    modelUpdaters.add(new TuniuUserTaskModelUpdater(this));
     modelUpdaters.add(new ServiceTaskModelUpdater(this));
     modelUpdaters.add(new ScriptTaskModelUpdater(this));
     modelUpdaters.add(new ReceiveTaskModelUpdater(this));

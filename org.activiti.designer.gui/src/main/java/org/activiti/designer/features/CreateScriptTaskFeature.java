@@ -16,6 +16,7 @@ public class CreateScriptTaskFeature extends AbstractCreateFastBPMNFeature {
   @Override
   public Object[] create(ICreateContext context) {
     ScriptTask newScriptTask = new ScriptTask();
+    newScriptTask.setAsynchronous(true);
     addObjectToContainer(context, newScriptTask, "Script Task");
 
     return new Object[] { newScriptTask };

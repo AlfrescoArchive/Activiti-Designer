@@ -16,6 +16,7 @@ public class CreateBusinessRuleTaskFeature extends AbstractCreateFastBPMNFeature
   @Override
   public Object[] create(ICreateContext context) {
     BusinessRuleTask newBusinessRuleTask = new BusinessRuleTask();
+    newBusinessRuleTask.setAsynchronous(true);
     addObjectToContainer(context, newBusinessRuleTask, "Business rule task");
 
     return new Object[] { newBusinessRuleTask };

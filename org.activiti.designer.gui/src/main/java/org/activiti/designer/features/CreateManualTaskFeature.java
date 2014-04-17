@@ -16,6 +16,7 @@ public class CreateManualTaskFeature extends AbstractCreateFastBPMNFeature {
   @Override
   public Object[] create(ICreateContext context) {
     ManualTask newManualTask = new ManualTask();
+    newManualTask.setAsynchronous(true);
     addObjectToContainer(context, newManualTask, "Manual Task");
 
     return new Object[] { newManualTask };

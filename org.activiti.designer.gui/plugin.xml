@@ -285,6 +285,12 @@
                tab="org.activiti.designer.mainConfigTab">
          </propertySection>
          <propertySection
+               class="com.tuniu.designer.gui.property.PropertyTuniuUserTaskSection"
+               filter="com.tuniu.designer.gui.property.PropertyTuniuUserTaskFilter"
+               id="org.activiti.designer.mainConfigTab.tuniuUsertask"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <propertySection
                class="com.alfresco.designer.gui.property.PropertyAlfrescoStartEventSection"
                filter="com.alfresco.designer.gui.property.PropertyAlfrescoStartEventFilter"
                id="org.activiti.designer.mainConfigTab.alfrescoStartevent"

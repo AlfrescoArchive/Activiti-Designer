@@ -3,7 +3,8 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Activiti Designer - Libs
 Bundle-SymbolicName: org.activiti.designer.libs;singleton:=true
 Bundle-Version: 5.14.1
-Export-Package: com.tuniu.nfbird.bpm.model,
+Export-Package: com.tuniu.nfbird.bpm.converter,
+ com.tuniu.nfbird.bpm.model,
  org.activiti.bpmn,
  org.activiti.bpmn.constants,
  org.activiti.bpmn.converter;

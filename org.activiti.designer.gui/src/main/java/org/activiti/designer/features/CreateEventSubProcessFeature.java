@@ -26,6 +26,7 @@ public class CreateEventSubProcessFeature extends AbstractCreateBPMNFeature {
   @Override
   public Object[] create(ICreateContext context) {
     EventSubProcess newSubProcess = new EventSubProcess();
+    newSubProcess.setAsynchronous(true);
     addObjectToContainer(context, newSubProcess, "Event sub Process");
 
     // return newly created business object(s)

@@ -39,8 +39,7 @@ public class PropertyAsyncSection extends ActivitiPropertySection implements ITa
   public void createFormControls(TabbedPropertySheetPage aTabbedPropertySheetPage) {
     asyncButton = createCheckboxControl("Asynchronous");
     exclusiveButton = createCheckboxControl("Exclusive");
-    //默认设置为异步
-    //asyncButton.setSelection(true);
+
   }
 
   @Override

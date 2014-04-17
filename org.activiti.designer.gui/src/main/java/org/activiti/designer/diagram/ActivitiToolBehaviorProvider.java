@@ -313,12 +313,12 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
           "Create a new intermediate throw none event", PluginImage.IMG_THROW_NONE);
       addContextButton(otherElementButton, new CreateSignalThrowingEventFeature(getFeatureProvider()), taskContext, "Create intermediate throw signal event",
           "Create a new intermediate throw signal event", PluginImage.IMG_THROW_SIGNAL);
-      addContextButton(otherElementButton, new CreateAlfrescoScriptTaskFeature(getFeatureProvider()), taskContext, "Create alfresco script task",
-              "Create a new alfresco script task", PluginImage.IMG_SERVICETASK);
-      addContextButton(otherElementButton, new CreateAlfrescoUserTaskFeature(getFeatureProvider()), taskContext, "Create alfresco user task",
-              "Create a new alfresco user task", PluginImage.IMG_USERTASK);
-      addContextButton(otherElementButton, new CreateAlfrescoMailTaskFeature(getFeatureProvider()), taskContext, "Create alfresco mail task",
-              "Create a new alfresco mail task", PluginImage.IMG_MAILTASK);
+//      addContextButton(otherElementButton, new CreateAlfrescoScriptTaskFeature(getFeatureProvider()), taskContext, "Create alfresco script task",
+//              "Create a new alfresco script task", PluginImage.IMG_SERVICETASK);
+//      addContextButton(otherElementButton, new CreateAlfrescoUserTaskFeature(getFeatureProvider()), taskContext, "Create alfresco user task",
+//              "Create a new alfresco user task", PluginImage.IMG_USERTASK);
+//      addContextButton(otherElementButton, new CreateAlfrescoMailTaskFeature(getFeatureProvider()), taskContext, "Create alfresco mail task",
+//              "Create a new alfresco mail task", PluginImage.IMG_MAILTASK);
       addContextButton(otherElementButton, new CreateTuniuUserTaskFeature(getFeatureProvider()), taskContext, "Create tuniu user task",
     		  "Create a new tuniu user task", PluginImage.IMG_USERTASK);
     }
@@ -625,7 +625,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     IPaletteCompartmentEntry boundaryEventCompartmentEntry = new PaletteCompartmentEntry("Boundary event", null);
     IPaletteCompartmentEntry intermediateEventCompartmentEntry = new PaletteCompartmentEntry("Intermediate event", null);
     IPaletteCompartmentEntry artifactsCompartmentEntry = new PaletteCompartmentEntry("Artifacts", null);
-    IPaletteCompartmentEntry alfrescoCompartmentEntry = new PaletteCompartmentEntry("Alfresco", PluginImage.IMG_ALFRESCO_LOGO.getImageKey());
+    //IPaletteCompartmentEntry alfrescoCompartmentEntry = new PaletteCompartmentEntry("Alfresco", PluginImage.IMG_ALFRESCO_LOGO.getImageKey());
     IPaletteCompartmentEntry tuniuCompartmentEntry = new PaletteCompartmentEntry("Tuniu", PluginImage.IMG_TUNIU_LOGO.getImageKey());
 
     for (final IPaletteCompartmentEntry entry : superCompartments) {
@@ -708,7 +708,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
           containerCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("callactivity".equalsIgnoreCase(toolEntry.getLabel())) {
           taskCompartmentEntry.getToolEntries().add(toolEntry);
-        } else if ("alfrescousertask".equalsIgnoreCase(toolEntry.getLabel())) {
+        } /*else if ("alfrescousertask".equalsIgnoreCase(toolEntry.getLabel())) {
           alfrescoCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("alfrescostartevent".equalsIgnoreCase(toolEntry.getLabel())) {
           alfrescoCompartmentEntry.getToolEntries().add(toolEntry);
@@ -716,7 +716,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
           alfrescoCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("alfrescomailtask".equalsIgnoreCase(toolEntry.getLabel())) {
           alfrescoCompartmentEntry.getToolEntries().add(toolEntry);
-        } else if ("annotation".equalsIgnoreCase(toolEntry.getLabel())) {
+        } */else if ("annotation".equalsIgnoreCase(toolEntry.getLabel())) {
           artifactsCompartmentEntry.getToolEntries().add(toolEntry);
         }else if ("tuniuUserTask".equalsIgnoreCase(toolEntry.getLabel())) {
           tuniuCompartmentEntry.getToolEntries().add(toolEntry);
@@ -747,9 +747,9 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     if (!artifactsCompartmentEntry.getToolEntries().isEmpty()) {
       ret.add(artifactsCompartmentEntry);
     }
-    if (PreferencesUtil.getBooleanPreference(Preferences.ALFRESCO_ENABLE) && alfrescoCompartmentEntry.getToolEntries().size() > 0) {
-      ret.add(alfrescoCompartmentEntry);
-    }
+//    if (PreferencesUtil.getBooleanPreference(Preferences.ALFRESCO_ENABLE) && alfrescoCompartmentEntry.getToolEntries().size() > 0) {
+//      ret.add(alfrescoCompartmentEntry);
+//    }
  	// Always add the tuniu compartment
     ret.add(tuniuCompartmentEntry);
     

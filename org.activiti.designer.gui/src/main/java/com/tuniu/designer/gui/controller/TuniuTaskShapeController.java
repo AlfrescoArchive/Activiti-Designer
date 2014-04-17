@@ -114,7 +114,7 @@ public class TuniuTaskShapeController extends AbstractBusinessObjectShapeControl
     gaService.setLocationAndSize(image, 5, 5, IMAGE_SIZE, IMAGE_SIZE);
     
     shape = peCreateService.createShape(containerShape, false);
-    image = gaService.createImage(shape, PluginImage.IMG_ALFRESCO_LOGO.getImageKey());
+    image = gaService.createImage(shape, PluginImage.IMG_TUNIU_LOGO.getImageKey());
 
     gaService.setLocationAndSize(image, 85, 3, IMAGE_SIZE, IMAGE_SIZE);
 
@@ -134,7 +134,7 @@ public class TuniuTaskShapeController extends AbstractBusinessObjectShapeControl
   
   protected String getIcon(Object bo) {
     if (bo instanceof WorkformTask) {
-      return PluginImage.IMG_TUNIU_LOGO.getImageKey();
+      return PluginImage.IMG_USERTASK.getImageKey();
       
     } else {
       // fallback
