@@ -15,7 +15,9 @@ public class PropertyFormPropertyFilter extends ActivitiPropertyFilter {
 	@Override
 	protected boolean accept(PictogramElement pe) {
 		Object bo = getBusinessObject(pe);
-		if (bo instanceof UserTask && bo instanceof AlfrescoUserTask == false  && bo instanceof WorkformTask == false) {
+		if (bo instanceof WorkformTask) {
+			  return true;
+			} else if (bo instanceof UserTask && bo instanceof AlfrescoUserTask == false ) {
 		  return true;
 		} else if (bo instanceof StartEvent && bo instanceof AlfrescoStartEvent == false) {
 		  StartEvent startEvent = (StartEvent) bo;

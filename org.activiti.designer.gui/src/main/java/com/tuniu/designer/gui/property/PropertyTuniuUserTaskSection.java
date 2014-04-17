@@ -11,7 +11,7 @@ import com.tuniu.nfbird.bpm.model.WorkformTask;
 public class PropertyTuniuUserTaskSection extends ActivitiPropertySection
 		implements ITabbedPropertyConstants {
 
-	private Text formKeyText;
+	//private Text formKeyText;
 	private Text urlText;
 	private Text paramText;
 	private Text assigneeText;
@@ -20,8 +20,8 @@ public class PropertyTuniuUserTaskSection extends ActivitiPropertySection
 	public void createFormControls(
 			TabbedPropertySheetPage aTabbedPropertySheetPage) {
 
-		formKeyText = createTextControl(false);
-		createLabel("Form key", formKeyText);
+		//formKeyText = createTextControl(false);
+		//createLabel("Form key", formKeyText);
 
 		urlText = createTextControl(false);
 		createLabel("url", urlText);
@@ -40,11 +40,7 @@ public class PropertyTuniuUserTaskSection extends ActivitiPropertySection
 
 		userTask.getWorkformAttributes();
 
-		if (control == formKeyText) {
-
-			return userTask.getFormKey();
-
-		} else if (control == urlText) {
+		if (control == urlText) {
 
 			return userTask.getWorkformAttributes().get("url");
 
@@ -63,10 +59,7 @@ public class PropertyTuniuUserTaskSection extends ActivitiPropertySection
 	@Override
 	protected void storeValueInModel(Control control, Object businessObject) {
 		WorkformTask userTask = (WorkformTask) businessObject;
-		if (control == formKeyText) {
-			userTask.setFormKey(formKeyText.getText());
-
-		}else if (control == urlText) {
+		if (control == urlText) {
 			userTask.addWorkformAttribute("url", urlText.getText());
 		}else if (control == paramText) {
 			userTask.addWorkformAttribute("param", paramText.getText());
