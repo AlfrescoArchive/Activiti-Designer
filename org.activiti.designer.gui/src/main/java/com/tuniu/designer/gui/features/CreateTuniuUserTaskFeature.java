@@ -35,8 +35,7 @@ public class CreateTuniuUserTaskFeature extends AbstractCreateFastBPMNFeature {
     
     newUserTask.setId(getNextId(newUserTask));
     newUserTask.setName("Tuniu User Task");
-    
-    newUserTask.setFormKey("workformTask");
+   
     
     newUserTask.setAsynchronous(true);
 
