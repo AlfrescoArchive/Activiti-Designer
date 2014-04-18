@@ -16,6 +16,7 @@ public class CreateReceiveTaskFeature extends AbstractCreateFastBPMNFeature {
   @Override
   public Object[] create(ICreateContext context) {
     ReceiveTask newReceiveTask = new ReceiveTask();
+    newReceiveTask.setAsynchronous(true);
     addObjectToContainer(context, newReceiveTask, "Receive Task");
 
     return new Object[] { newReceiveTask };

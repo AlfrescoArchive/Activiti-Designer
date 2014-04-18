@@ -16,6 +16,7 @@ public class CreateUserTaskFeature extends AbstractCreateFastBPMNFeature {
   @Override
   public Object[] create(ICreateContext context) {
     UserTask newUserTask = new UserTask();
+    newUserTask.setAsynchronous(true);
     addObjectToContainer(context, newUserTask, "User Task");
 
     // activate direct editing after object creation

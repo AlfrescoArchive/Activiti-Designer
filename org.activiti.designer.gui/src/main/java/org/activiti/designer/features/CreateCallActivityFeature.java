@@ -16,6 +16,7 @@ public class CreateCallActivityFeature extends AbstractCreateFastBPMNFeature {
   @Override
   public Object[] create(ICreateContext context) {
     CallActivity callActivity = new CallActivity();
+    callActivity.setAsynchronous(true);
     addObjectToContainer(context, callActivity, "Call activity");
 
     // return newly created business object(s)

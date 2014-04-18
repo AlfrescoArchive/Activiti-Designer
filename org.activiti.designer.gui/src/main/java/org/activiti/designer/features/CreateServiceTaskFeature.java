@@ -31,6 +31,7 @@ public class CreateServiceTaskFeature extends AbstractCreateFastBPMNFeature {
     ServiceTask newServiceTask = new ServiceTask();
     newServiceTask.setName("Service Task");
     newServiceTask.setExtensionId(customServiceTaskId);
+    newServiceTask.setAsynchronous(true);
 
     // Process custom service tasks
     if (newServiceTask.isExtended()) {

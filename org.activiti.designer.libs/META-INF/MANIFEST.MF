@@ -3,7 +3,9 @@ Bundle-ManifestVersion: 2
 Bundle-Name: Activiti Designer - Libs
 Bundle-SymbolicName: org.activiti.designer.libs;singleton:=true
 Bundle-Version: 5.14.1
-Export-Package: org.activiti.bpmn,
+Export-Package: com.tuniu.nfbird.bpm.converter,
+ com.tuniu.nfbird.bpm.model,
+ org.activiti.bpmn,
  org.activiti.bpmn.constants,
  org.activiti.bpmn.converter;
   uses:="javax.xml.stream,
@@ -64,13 +66,6 @@ Require-Bundle: org.apache.commons.lang
 Bundle-Vendor: Activiti
 Bundle-ClassPath: .,
  activation-1.1.jar,
- activiti-bpmn-converter-5.15-SNAPSHOT-sources.jar,
- activiti-bpmn-converter-5.15-SNAPSHOT.jar,
- activiti-bpmn-layout-5.15-SNAPSHOT.jar,
- activiti-bpmn-model-5.15-SNAPSHOT-sources.jar,
- activiti-bpmn-model-5.15-SNAPSHOT.jar,
- activiti-simple-workflow-5.15-SNAPSHOT-sources.jar,
- activiti-simple-workflow-5.15-SNAPSHOT.jar,
  activiti-simple-workflow-alfresco-5.15-SNAPSHOT-sources.jar,
  activiti-simple-workflow-alfresco-5.15-SNAPSHOT.jar,
  chemistry-opencmis-client-api-0.10.0.jar,
@@ -94,4 +89,15 @@ Bundle-ClassPath: .,
  slf4j-api-1.7.2.jar,
  slf4j-api-1.7.5.jar,
  slf4j-log4j12-1.7.2.jar,
- streambuffer-0.9.jar
+ streambuffer-0.9.jar,
+ nfbird-bpm-converter-1.3.0-SNAPSHOT.jar,
+ nfbird-bpm-engine-1.3.0-SNAPSHOT.jar,
+ activiti-bpmn-converter-5.15.1-sources.jar,
+ activiti-bpmn-converter-5.15.1.jar,
+ activiti-bpmn-layout-5.15.1-sources.jar,
+ activiti-bpmn-layout-5.15.1.jar,
+ activiti-bpmn-model-5.15.1-sources.jar,
+ activiti-bpmn-model-5.15.1.jar,
+ activiti-simple-workflow-5.15.1-sources.jar,
+ activiti-simple-workflow-5.15.1.jar,
+ joda-time-2.1.jar

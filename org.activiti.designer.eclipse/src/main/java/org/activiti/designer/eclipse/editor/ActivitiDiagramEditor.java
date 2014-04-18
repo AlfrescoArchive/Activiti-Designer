@@ -16,7 +16,6 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamReader;
 
 import org.activiti.bpmn.BpmnAutoLayout;
-import org.activiti.bpmn.converter.BpmnXMLConverter;
 import org.activiti.bpmn.model.Artifact;
 import org.activiti.bpmn.model.Association;
 import org.activiti.bpmn.model.BaseElement;
@@ -86,6 +85,8 @@ import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.progress.IProgressService;
+
+import com.tuniu.nfbird.bpm.converter.BirdBpmnXMLConverter;
 
 public class ActivitiDiagramEditor extends DiagramEditor {
 
@@ -183,7 +184,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     final IFeatureProvider featureProvider = getDiagramTypeProvider().getFeatureProvider();
     new GraphitiToBpmnDI(model, featureProvider).processGraphitiElements();
 
-    BpmnXMLConverter converter = new BpmnXMLConverter();
+    BirdBpmnXMLConverter converter = new BirdBpmnXMLConverter();
     byte[] xmlBytes = converter.convertToXML(model.getBpmnModel());
 
     File objectsFile = new File(diagramFileString);
@@ -324,7 +325,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
         XMLInputFactory xif = XMLInputFactory.newInstance();
         InputStreamReader in = new InputStreamReader(fileStream, "UTF-8");
         XMLStreamReader xtr = xif.createXMLStreamReader(in);
-        BpmnXMLConverter bpmnConverter = new BpmnXMLConverter();
+        BirdBpmnXMLConverter bpmnConverter = new BirdBpmnXMLConverter();
         bpmnConverter.setUserTaskFormTypes(PreferencesUtil.getStringArray(Preferences.ALFRESCO_FORMTYPES_USERTASK));
         bpmnConverter.setStartEventFormTypes(PreferencesUtil.getStringArray(Preferences.ALFRESCO_FORMTYPES_STARTEVENT));
         BpmnModel bpmnModel = null;

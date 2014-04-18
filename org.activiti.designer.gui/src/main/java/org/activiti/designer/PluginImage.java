@@ -74,6 +74,8 @@ public enum PluginImage {
   IMG_ASSOCIATION("association", "association.png"),
 
   IMG_ALFRESCO_LOGO("alfresco.logo", "alfresco.png"), //$NON-NLS-1$
+  
+  IMG_TUNIU_LOGO("tuniu.logo", "tuniu.png"), //$NON-NLS-1$
 
   EDIT_ICON("edit.icon", "edit.png"), //$NON-NLS-1$
   NEW_ICON("new.icon", "new.png"), //$NON-NLS-1$

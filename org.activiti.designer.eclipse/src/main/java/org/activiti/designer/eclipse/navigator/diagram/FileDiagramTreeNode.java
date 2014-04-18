@@ -29,6 +29,8 @@ import org.activiti.designer.eclipse.navigator.TreeNode;
 import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.eclipse.core.resources.IFile;
 
+import com.tuniu.nfbird.bpm.converter.BirdBpmnXMLConverter;
+
 /**
  * @author Tiese Barrell
  */
@@ -137,7 +139,7 @@ public class FileDiagramTreeNode extends AbstractDiagramTreeNode<IFile> {
         final XMLInputFactory xif = XMLInputFactory.newInstance();
         final InputStreamReader in = new InputStreamReader(fileStream, "UTF-8");
         final XMLStreamReader xtr = xif.createXMLStreamReader(in);
-        BpmnXMLConverter converter = new BpmnXMLConverter();
+        BirdBpmnXMLConverter converter = new BirdBpmnXMLConverter();
         BpmnModel bpmnModel = converter.convertToBpmnModel(xtr);
         result.setBpmnModel(bpmnModel);
       }

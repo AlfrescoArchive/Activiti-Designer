@@ -17,6 +17,7 @@ public class CreateMailTaskFeature extends AbstractCreateFastBPMNFeature {
   public Object[] create(ICreateContext context) {
     ServiceTask newMailTask = new ServiceTask();
     newMailTask.setType(ServiceTask.MAIL_TASK);
+    newMailTask.setAsynchronous(true);
     addObjectToContainer(context, newMailTask, "Mail Task");
 
     return new Object[] { newMailTask };

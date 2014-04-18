@@ -16,6 +16,7 @@ public class CreateEmbeddedSubProcessFeature extends AbstractCreateBPMNFeature {
   @Override
   public Object[] create(ICreateContext context) {
     SubProcess newSubProcess = new SubProcess();
+    newSubProcess.setAsynchronous(true);
     addObjectToContainer(context, newSubProcess, "Sub Process");
 
     // return newly created business object(s)
