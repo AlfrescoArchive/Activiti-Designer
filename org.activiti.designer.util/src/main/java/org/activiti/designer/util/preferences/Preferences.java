@@ -33,6 +33,11 @@ public enum Preferences {
   SAVE_IMAGE_ADD_OVERLAY_BORDER_COLOR("org.activiti.designer.preferences.save.imageAddOverlayBorderColor"),
   SAVE_IMAGE_ADD_OVERLAY_BACKGROUND_COLOR("org.activiti.designer.preferences.save.imageAddOverlayBackgroundColor"),
   
+  ACTIVITI_CLOUD_EDITOR_URL("org.activiti.designer.preferences.activiticloudeditor.url"),
+  ACTIVITI_CLOUD_EDITOR_USERNAME("org.activiti.designer.preferences.activiticloudeditor.username"),
+  ACTIVITI_CLOUD_EDITOR_PASSWORD("org.activiti.designer.preferences.activiticloudeditor.password"),
+  ACTIVITI_CLOUD_EDITOR_COOKIE("org.activiti.designer.preferences.activiticloudeditor.cookie"),
+  
   CMIS_URL("org.activiti.designer.kickstart.preferences.cmis.url"),
   CMIS_USERNAME("org.activiti.designer.kickstart.preferences.cmis.username"),
   CMIS_PASSWORD("org.activiti.designer.kickstart.preferences.cmis.password"),

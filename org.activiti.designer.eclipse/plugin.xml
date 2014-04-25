@@ -128,6 +128,9 @@
       <initializer
             class="org.activiti.designer.eclipse.preferences.ActivitiSavePreferencesPageInitializer">
       </initializer>
+      <initializer
+            class="org.activiti.designer.eclipse.preferences.ActivitiCloudEditorPreferencesPageInitializer">
+      </initializer>
    </extension>
    
    <!-- Navigator extensions -->
@@ -149,6 +152,13 @@
       id="org.activiti.designer.eclipse.view"
       name="Activiti">
     </category>
+    <view
+          category="org.activiti.designer.eclipse.view"
+          class="org.activiti.designer.eclipse.navigator.cloudrepo.ActivitiCloudEditorNavigator"
+          id="org.activiti.designer.eclipse.activiticloudeditor.view"
+          name="Activiti Cloud Editor"
+          restorable="true">
+    </view>
     
   </extension>
   
@@ -222,6 +232,18 @@
           pattern="org.activiti.designer.eclipse.navigator.filters.*">
         </contentExtension>
       </includes>
+    </viewerContentBinding>
+    <viewer
+          viewerId="org.activiti.designer.eclipse.activiticloudeditor.view">
+    </viewer>
+    <viewerContentBinding
+          viewerId="org.activiti.designer.eclipse.activiticloudeditor.view">
+       <includes>
+          <contentExtension
+                isRoot="true"
+                pattern="org.activiti.designer.eclipse.activiticloudeditor.navigatorContent">
+          </contentExtension>
+       </includes>
     </viewerContentBinding>
   
   </extension>
@@ -318,6 +340,35 @@
          	</adapt>
          </filterExpression>
       </commonFilter>
+      <navigatorContent
+            contentProvider="org.activiti.designer.eclipse.navigator.cloudrepo.ProcessModelContentProvider"
+            id="org.activiti.designer.eclipse.activiticloudeditor.navigatorContent"
+            labelProvider="org.activiti.designer.eclipse.navigator.cloudrepo.ProcessModelLabelProvider"
+            name="Activiti Cloud Editor content">
+         <triggerPoints>
+            <or>
+               <instanceof
+                     value="org.activiti.designer.eclipse.navigator.cloudrepo.ActivitiCloudEditorRoot">
+               </instanceof>
+            </or>
+         </triggerPoints>
+      </navigatorContent>
    </extension>
+  <extension
+        point="org.eclipse.ui.preferencePages">
+     <page
+           class="org.activiti.designer.eclipse.preferences.ActivitiCloudEditorPreferencePage"
+           id="org.activiti.designer.eclipse..preferencepage.activiticloudeditor"
+           name="Activiti cloud editor">
+     </page>
+  </extension>
+  <extension
+        point="org.eclipse.ui.commands">
+     <command
+           description="Activiti Cloud Editor refresh"
+           id="org.activiti.designer.command.refreshActivitiCloudEditorNavigator"
+           name="Activiti Cloud Editor refresh">
+     </command>
+  </extension>
   
 </plugin>
