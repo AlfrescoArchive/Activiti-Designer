@@ -2,7 +2,7 @@ Manifest-Version: 1.0
 Bundle-ManifestVersion: 2
 Bundle-Name: Activiti Designer - Libs
 Bundle-SymbolicName: org.activiti.designer.libs;singleton:=true
-Bundle-Version: 5.14.1
+Bundle-Version: 5.15.0.qualifier
 Export-Package: org.activiti.bpmn;
   uses:="com.mxgraph.layout.hierarchical,
    com.mxgraph.view,
@@ -112,25 +112,20 @@ Export-Package: org.activiti.bpmn;
  org.apache.http.config,
  org.apache.http.cookie,
  org.apache.http.entity,
+ org.apache.http.entity.mime,
  org.apache.http.impl.client,
  org.apache.http.impl.cookie,
  org.apache.http.protocol,
  org.apache.http.util,
  org.codehaus.jackson,
  org.codehaus.jackson.map,
- org.codehaus.jackson.node
+ org.codehaus.jackson.node,
+ org.joda.time
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Require-Bundle: org.apache.commons.lang
 Bundle-Vendor: Activiti
 Bundle-ClassPath: .,
  activation-1.1.jar,
- activiti-bpmn-converter-5.15-SNAPSHOT-sources.jar,
- activiti-bpmn-converter-5.15-SNAPSHOT.jar,
- activiti-bpmn-layout-5.15-SNAPSHOT.jar,
- activiti-bpmn-model-5.15-SNAPSHOT-sources.jar,
- activiti-bpmn-model-5.15-SNAPSHOT.jar,
- activiti-simple-workflow-5.15-SNAPSHOT-sources.jar,
- activiti-simple-workflow-5.15-SNAPSHOT.jar,
  activiti-simple-workflow-alfresco-5.15-SNAPSHOT-sources.jar,
  activiti-simple-workflow-alfresco-5.15-SNAPSHOT.jar,
  chemistry-opencmis-client-api-0.10.0.jar,
@@ -157,4 +152,14 @@ Bundle-ClassPath: .,
  streambuffer-0.9.jar,
  httpclient-4.3.3.jar,
  httpcore-4.3.2.jar,
- commons-logging-1.1.3.jar
+ commons-logging-1.1.3.jar,
+ activiti-bpmn-converter-5.15.1.jar,
+ activiti-bpmn-converter-5.15.1-sources.jar,
+ activiti-bpmn-layout-5.15.1-sources.jar,
+ activiti-bpmn-layout-5.15.1.jar,
+ activiti-bpmn-model-5.15.1-sources.jar,
+ activiti-bpmn-model-5.15.1.jar,
+ activiti-simple-workflow-5.15.1-sources.jar,
+ activiti-simple-workflow-5.15.1.jar,
+ httpmime-4.3.3.jar,
+ joda-time-2.1.jar

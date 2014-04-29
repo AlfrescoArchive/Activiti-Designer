@@ -13,7 +13,9 @@
 package org.activiti.designer.eclipse.navigator.cloudrepo;
 
 import org.codehaus.jackson.JsonNode;
+import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.node.ArrayNode;
+import org.codehaus.jackson.node.ObjectNode;
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
@@ -26,23 +28,40 @@ public class ProcessModelContentProvider implements ITreeContentProvider {
 	
 	public static JsonNode modelsNode;
 	
-	public ProcessModelContentProvider() {
-	}
-
 	public Object[] getChildren(Object parentElement) {
 		if (parentElement instanceof ActivitiCloudEditorRoot) {
-		  System.out.println("modelsNode " + modelsNode);
 			if (modelsNode == null) {
-				initializeRootElements();
+			  try {
+			    initializeRootElements();
+			  } catch (final ActivitiCloudEditorException e) {
+			    String detailMessage = null;
+	        if (e.getExceptionNode() != null) {
+	          detailMessage = e.getExceptionNode().get("message").asText();
+	        } else {
+	          detailMessage = e.getMessage();
+	        }
+	        // creating fake entry
+	        ObjectMapper objectMapper = new ObjectMapper();
+	        modelsNode = objectMapper.createObjectNode();
+	        ArrayNode modelArrayNode = objectMapper.createArrayNode();
+	        ((ObjectNode) modelsNode).put("data", modelArrayNode);
+	        ObjectNode errorNode = objectMapper.createObjectNode();
+	        modelArrayNode.add(errorNode);
+	        errorNode.put("name", "Process models could not be retrieved: " + detailMessage);
+			  }
 			}
 			
-			ArrayNode modelArrayNode =  (ArrayNode) modelsNode.get("data");
-			Object[] objectArray = new Object[modelArrayNode.size()];
-			for (int i = 0; i < modelArrayNode.size(); i++) {
-			  JsonNode modelNode = modelArrayNode.get(i);
-			  objectArray[i] = modelNode;
+			if (modelsNode != null) {
+  			ArrayNode modelArrayNode =  (ArrayNode) modelsNode.get("data");
+  			Object[] objectArray = new Object[modelArrayNode.size()];
+  			for (int i = 0; i < modelArrayNode.size(); i++) {
+  			  JsonNode modelNode = modelArrayNode.get(i);
+  			  objectArray[i] = modelNode;
+  			}
+  			return objectArray;
+			} else {
+			  return EMPTY_ARRAY;
 			}
-			return objectArray;
 			
 		} else {
 			return EMPTY_ARRAY;
@@ -69,7 +88,7 @@ public class ProcessModelContentProvider implements ITreeContentProvider {
 	}
 
 	private void initializeRootElements() {
-		modelsNode = ActivitiCloudEditorUtil.getProcessModels();
+		modelsNode = ActivitiCloudEditorUtil.getProcessModels(true);
 	}
 
 }

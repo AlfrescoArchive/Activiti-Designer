@@ -20,15 +20,21 @@ import java.io.ObjectOutputStream;
 import java.net.URI;
 import java.util.List;
 
+import org.activiti.designer.eclipse.Logger;
 import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.util.preferences.Preferences;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpEntity;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
 import org.apache.http.client.methods.HttpUriRequest;
 import org.apache.http.client.methods.RequestBuilder;
 import org.apache.http.cookie.Cookie;
+import org.apache.http.entity.ContentType;
+import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.BasicCookieStore;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
@@ -36,6 +42,7 @@ import org.apache.http.impl.cookie.BasicClientCookie;
 import org.apache.http.util.EntityUtils;
 import org.codehaus.jackson.JsonNode;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.preferences.InstanceScope;
 
 
@@ -97,7 +104,7 @@ public class ActivitiCloudEditorUtil {
 	      }
 	      
 	    } catch (Exception e) {
-	      e.printStackTrace();
+	      Logger.logError("Error authenticating " + userName, e);
 	    }
 		
 		} else {
@@ -142,210 +149,213 @@ public class ActivitiCloudEditorUtil {
       return data;
   }
   
-  public static JsonNode getProcessModels() {
+  public static JsonNode getProcessModels(boolean firstTry) {
     JsonNode resultNode = null;
     CloseableHttpClient client = getAuthenticatedClient();
     try {
       
       CloseableHttpResponse response = client.execute(new HttpGet(PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_URL) + "/rest/app/rest/process-models"));
       try {
+        int statusCode = response.getStatusLine().getStatusCode();
         InputStream responseContent = response.getEntity().getContent();
-        resultNode = objectMapper.readTree(responseContent);
-        
-      } catch (Exception e) {
-        e.printStackTrace();
-        
+        if (statusCode >= 200 && statusCode < 300) {
+          resultNode = objectMapper.readTree(responseContent);
+          
+        } else if (statusCode == 401 && firstTry) {
+          String cookieString = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE);
+          if (StringUtils.isNotEmpty(cookieString)) {
+            PreferencesUtil.getActivitiDesignerPreferenceStore().setValue(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE.getPreferenceId(), "");
+            InstanceScope.INSTANCE.getNode(ActivitiPlugin.PLUGIN_ID).flush();
+            return getProcessModels(false);
+          }
+          
+        } else {
+          JsonNode exceptionNode = null;
+          String exceptionString = IOUtils.toString(responseContent);
+          try {
+            exceptionNode = objectMapper.readTree(exceptionString);
+          } catch(Exception e) {
+            throw new ActivitiCloudEditorException(exceptionString);
+          }
+          throw new ActivitiCloudEditorException(exceptionNode);
+        }
+          
       } finally {
         response.close();
       }
       
+    } catch (ActivitiCloudEditorException e) {
+      throw e;
+      
     } catch (Exception e) {
-      e.printStackTrace();
+      Logger.logError("Error getting process models", e);
     
     } finally {
       try {
         client.close();
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
+      } catch (Exception e) {}
     }
     return resultNode;
   }
   
-  /*public static Document createDocument(Folder folder, String fileName, String mimetype, byte[] content) throws Exception {
-    Map<String, Object> docProps = new HashMap<String, Object>();
-    docProps.put(PropertyIds.NAME, fileName);
-    docProps.put(PropertyIds.OBJECT_TYPE_ID, DocumentType.DOCUMENT_BASETYPE_ID);
-    
-    ByteArrayInputStream in = new ByteArrayInputStream(content);
-    ContentStream contentStream = getCurrentSession().getObjectFactory().createContentStream(fileName, content.length, mimetype, in);
-    
-    ObjectId documentId = getCurrentSession().createDocument(docProps, getCurrentSession().createObjectId((String) folder.getPropertyValue(PropertyIds.OBJECT_ID)), contentStream, null, null, null, null);
-    Document document = (Document) getCurrentSession().getObject(documentId);
-    return document;
-  }
-  
-  public static void deleteCmisObjects(Collection<CmisObject> cmisObjects) {
-	  for (CmisObject cmisObject : cmisObjects) {
-	  	getCurrentSession().delete(new ObjectIdImpl(cmisObject.getId()));
-	  }
-  }
-  
-  public static void deleteCmisObjects(CmisObject... cmisObjects) {
-    for (CmisObject cmisObject : cmisObjects) {
-      getCurrentSession().delete(new ObjectIdImpl(cmisObject.getId()));
-    }
-}
-  
-  public static InputStream downloadDocument(Document document) {
-  	return getCurrentSession().getContentStream(new ObjectIdImpl(document.getId())).getStream();
-  }
-  
-  public static String uploadDocumentToFolder(Folder folder, String fileName, byte[] content) {
-  	Map<String, Object> properties = new HashMap<String, Object>();
-  	properties.put(PropertyIds.OBJECT_TYPE_ID, "cmis:document");
-  	properties.put(PropertyIds.NAME, fileName);
-
-  	// content
-  	InputStream stream = new ByteArrayInputStream(content);
-  	ContentStream contentStream = new ContentStreamImpl(fileName, BigInteger.valueOf(content.length), "application/zip", stream);
-
-  	// create document
-  	return folder.createDocument(properties, contentStream, VersioningState.MAJOR).getId();
-  }
-  
-  public static String uploadModel(Folder folder, File file, CmisObject existingModel) throws IOException {
-    if(existingModel != null) {
-      Document pwc = (Document) getCurrentSession().getObject(((Document) existingModel).checkOut());
-      InputStream stream = new FileInputStream(file);
-      ContentStream contentStream = getCurrentSession().getObjectFactory().createContentStream(
-          file.getName(), -1, "application/xml", stream);
-      try {
-          pwc.checkIn(false, null, contentStream, "minor version").getId();
-      } catch (Exception e) {
-          pwc.cancelCheckOut();
-          throw new IOException("Error while checking in new version of model", e);
-      }
-      return existingModel.getId();
-    } else {
-      Map<String, Object> properties = new HashMap<String, Object>();
-      properties.put(PropertyIds.OBJECT_TYPE_ID,  "D:cm:dictionaryModel");
-      properties.put(PropertyIds.NAME, file.getName());
-      properties.put("cm:modelActive", Boolean.TRUE);
-      
-      InputStream stream = new FileInputStream(file);
-      ContentStream contentStream = new ContentStreamImpl(file.getName(), new BigInteger("-1"), "application/xml", stream);
-      
-      // create document
-      return folder.createDocument(properties, contentStream, VersioningState.MAJOR).getId();
-    }
-  }
-  
-  public static String uploadProcess(Folder folder, File file) throws IOException {
-    Map<String, Object> properties = new HashMap<String, Object>();
-    properties.put(PropertyIds.OBJECT_TYPE_ID,  "D:bpm:workflowDefinition");
-    properties.put(PropertyIds.NAME, file.getName());
-    properties.put("bpm:definitionDeployed", Boolean.TRUE);
-    properties.put("bpm:engineId", "activiti");
-
-    InputStream stream = new FileInputStream(file);
-    ContentStream contentStream = new ContentStreamImpl(file.getName(), new BigInteger("-1"), "application/xml", stream);
-
-    // create document
-    return folder.createDocument(properties, contentStream, VersioningState.MAJOR).getId();
-  }
-  
-  public static void uploadPersistedExtensions(Folder folder, File file) throws Exception {
-    String fileName = "default-persisted-extension.xml";
-    CmisObject persistedExtensions = ActivitiCloudEditorUtil.getFolderChild(folder, fileName);
-    if(persistedExtensions != null) {
-      Document pwc = (Document) getCurrentSession().getObject(((Document) persistedExtensions).checkOut());
-      InputStream stream = new FileInputStream(file);
-      ContentStream contentStream = getCurrentSession().getObjectFactory().createContentStream(
-          fileName, -1, "application/xml", stream);
-      try {
-          pwc.checkIn(false, null, contentStream, "minor version").getId();
-      } catch (Exception e) {
-          pwc.cancelCheckOut();
-      }
-    } else {
-      Map<String, Object> properties = new HashMap<String, Object>();
-      properties.put(PropertyIds.OBJECT_TYPE_ID,  "cmis:document");
-      properties.put(PropertyIds.NAME, fileName);
-      properties.put(PropertyIds.CONTENT_STREAM_MIME_TYPE, "application/xml");
-      
-      InputStream stream = new FileInputStream(file);
-      ContentStreamImpl contentStream = new ContentStreamImpl(file.getName(), new BigInteger("-1"), "application/xml", stream);
-      folder.createDocument(properties, contentStream, VersioningState.MAJOR).getId();
-    }
-  }
-  
-  public static void uploadModuleDeployment(Folder folder, File file) throws Exception {
-    CmisObject persistedExtensions = ActivitiCloudEditorUtil.getFolderChild(folder, file.getName());
-    if(persistedExtensions != null) {
-      Document pwc = (Document) getCurrentSession().getObject(((Document) persistedExtensions).checkOut());
-      InputStream stream = new FileInputStream(file);
-      ContentStream contentStream = getCurrentSession().getObjectFactory().createContentStream(
-          file.getName(), -1, "application/xml", stream);
-      try {
-          pwc.checkIn(false, null, contentStream, "minor version").getId();
-      } catch (Exception e) {
-          pwc.cancelCheckOut();
-      }
-    } else {
-      Map<String, Object> properties = new HashMap<String, Object>();
-      properties.put(PropertyIds.OBJECT_TYPE_ID,  "cmis:document");
-      properties.put(PropertyIds.NAME, file.getName());
-      properties.put(PropertyIds.CONTENT_STREAM_MIME_TYPE, "application/xml");
-      
-      InputStream stream = new FileInputStream(file);
-      ContentStreamImpl contentStream = new ContentStreamImpl(file.getName(), new BigInteger("-1"), "application/xml", stream);
-      folder.createDocument(properties, contentStream, VersioningState.MAJOR).getId();
-    }
-  }
-  
-  public static CmisObject getFolderChild(Folder folder, String fileName) {
-    String path = folder.getPath() + "/" + fileName;
-    CmisObject child = null;
+  public static InputStream downloadProcessModel(String modelId, IFile file, boolean firstTry) {
+    InputStream bpmnStream = null;
+    CloseableHttpClient client = getAuthenticatedClient();
     try {
-      child = getCurrentSession().getObjectByPath(path);
-    } catch(CmisObjectNotFoundException onfe) {
-      // Ignore, return null
+      
+      CloseableHttpResponse response = client.execute(new HttpGet(PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_URL) + 
+          "/rest/app/rest/process-models/" + modelId + "/bpmn20"));
+      try {
+        int statusCode = response.getStatusLine().getStatusCode();
+        bpmnStream = response.getEntity().getContent();
+        if (statusCode >= 200 && statusCode < 300) {
+          if (file.exists()) {
+            String oldBpmn = IOUtils.toString(file.getContents());
+            String newBpmn = IOUtils.toString(bpmnStream);
+            if (oldBpmn.equals(newBpmn)) {
+              throw new ActivitiCloudEditorSameContentException("The local copy is already up to date");
+            } else {
+              file.setContents(IOUtils.toInputStream(newBpmn), true, true, null);
+            }
+          } else {
+            file.create(bpmnStream, true, null);
+          }
+          
+        } else if (statusCode == 401 && firstTry) {
+          String cookieString = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE);
+          if (StringUtils.isNotEmpty(cookieString)) {
+            PreferencesUtil.getActivitiDesignerPreferenceStore().setValue(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE.getPreferenceId(), "");
+            InstanceScope.INSTANCE.getNode(ActivitiPlugin.PLUGIN_ID).flush();
+            return downloadProcessModel(modelId, file, false);
+          }
+          
+        } else {
+          JsonNode exceptionNode = null;
+          String exceptionString = IOUtils.toString(bpmnStream);
+          try {
+            exceptionNode = objectMapper.readTree(exceptionString);
+          } catch(Exception e) {
+            throw new ActivitiCloudEditorException(exceptionString);
+          }
+          throw new ActivitiCloudEditorException(exceptionNode);
+        }
+          
+      } finally {
+        response.close();
+      }
+    } catch (ActivitiCloudEditorException e) {
+      throw e;
+      
+    } catch (Exception e) {
+      Logger.logError("Error getting process models", e);
+    
+    } finally {
+      try {
+        client.close();
+      } catch (Exception e) {}
     }
-    return child;
+    return bpmnStream;
   }
   
-  public static void overwriteDocumentContent(Document document, byte[] content, String mimetype) {
-  	InputStream stream = new ByteArrayInputStream(content);
-  	ContentStream contentStream = new ContentStreamImpl(document.getName(), BigInteger.valueOf(content.length), "application/zip", stream);
-  	document.setContentStream(contentStream, true);
-  }
-  
-  public static String uploadNewVersion(Document document, byte[] content, String mimetype) {
-  	 Document pwc = (Document) getCurrentSession().getObject(document.checkOut());
-     InputStream stream = new ByteArrayInputStream(content);
-     ContentStream contentStream = getCurrentSession().getObjectFactory().createContentStream(
-             document.getName(), content.length, mimetype, stream);
-     try {
-         return pwc.checkIn(false, null, contentStream, "minor version").getId();
-     } catch (Exception e) {
-         pwc.cancelCheckOut();
-     }
-     return null;
-  }
-  
-  public static void renameCmisObject(CmisObject cmisObject, String newName) {
-  	Map<String, String> properties = new HashMap<String, String>();
-  	properties.put(PropertyIds.NAME, newName);
-  	cmisObject.updateProperties(properties);
-  }
-
-  public static Folder getFolderByPath(String cmisModelsPath) {
-    CmisObject objectByPath = getCurrentSession().getObjectByPath(cmisModelsPath);
-    if(objectByPath instanceof Folder) {
-      return (Folder) objectByPath;
+  public static JsonNode uploadNewVersion(String modelId, String filename, byte[] content, boolean firstTry) {
+    JsonNode modelNode = null;
+    CloseableHttpClient client = getAuthenticatedClient();
+    try {
+      HttpPost post = new HttpPost(PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_URL) + 
+          "/rest/app/rest/process-models/" + modelId + "/newversion");
+      HttpEntity entity = MultipartEntityBuilder.create().addBinaryBody("file", content, ContentType.APPLICATION_XML, filename).build();
+      post.setEntity(entity);
+      CloseableHttpResponse response = client.execute(post);
+      try {
+        int statusCode = response.getStatusLine().getStatusCode();
+        InputStream responseContent = response.getEntity().getContent();
+        if (statusCode >= 200 && statusCode < 300) {
+          modelNode = objectMapper.readTree(responseContent);
+          
+        } else if (statusCode == 401 && firstTry) {
+          String cookieString = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE);
+          if (StringUtils.isNotEmpty(cookieString)) {
+            PreferencesUtil.getActivitiDesignerPreferenceStore().setValue(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE.getPreferenceId(), "");
+            InstanceScope.INSTANCE.getNode(ActivitiPlugin.PLUGIN_ID).flush();
+            return uploadNewVersion(modelId, filename, content, false);
+          }
+          
+        } else {
+          JsonNode exceptionNode = null;
+          String exceptionString = IOUtils.toString(responseContent);
+          try {
+            exceptionNode = objectMapper.readTree(exceptionString);
+          } catch(Exception e) {
+            throw new ActivitiCloudEditorException(exceptionString);
+          }
+          throw new ActivitiCloudEditorException(exceptionNode);
+        }
+          
+      } finally {
+        response.close();
+      }
+      
+    } catch (ActivitiCloudEditorException e) {
+      throw e;
+      
+    } catch (Exception e) {
+      Logger.logError("Error uploading new process model version", e);
+    
+    } finally {
+      try {
+        client.close();
+      } catch (Exception e) {}
     }
-    return null;
-  } */
+    return modelNode;
+  }
   
+  public static JsonNode importModel(String filename, byte[] content, boolean firstTry) {
+    JsonNode modelNode = null;
+    CloseableHttpClient client = getAuthenticatedClient();
+    try {
+      HttpPost post = new HttpPost(PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_URL) + 
+          "/rest/app/rest/import-process-model");
+      HttpEntity entity = MultipartEntityBuilder.create().addBinaryBody("file", content, ContentType.APPLICATION_XML, filename).build();
+      post.setEntity(entity);
+      CloseableHttpResponse response = client.execute(post);
+      try {
+        int statusCode = response.getStatusLine().getStatusCode();
+        InputStream responseContent = response.getEntity().getContent();
+        if (statusCode >= 200 && statusCode < 300) {
+          modelNode = objectMapper.readTree(responseContent);
+          
+        } else if (statusCode == 401 && firstTry) {
+          String cookieString = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE);
+          if (StringUtils.isNotEmpty(cookieString)) {
+            PreferencesUtil.getActivitiDesignerPreferenceStore().setValue(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE.getPreferenceId(), "");
+            InstanceScope.INSTANCE.getNode(ActivitiPlugin.PLUGIN_ID).flush();
+            return importModel(filename, content, false);
+          }
+          
+        } else {
+          JsonNode exceptionNode = null;
+          String exceptionString = IOUtils.toString(responseContent);
+          try {
+            exceptionNode = objectMapper.readTree(exceptionString);
+          } catch(Exception e) {
+            throw new ActivitiCloudEditorException(exceptionString);
+          }
+          throw new ActivitiCloudEditorException(exceptionNode);
+        }
+          
+      } finally {
+        response.close();
+      }
+    } catch (ActivitiCloudEditorException e) {
+      throw e;
+    } catch (Exception e) {
+      Logger.logError("Error importing process model", e);
+    
+    } finally {
+      try {
+        client.close();
+      } catch (Exception e) {}
+    }
+    return modelNode;
+  } 
 }
