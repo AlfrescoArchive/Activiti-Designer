@@ -4,7 +4,7 @@
 	<parent>
 		<groupId>org.activiti.designer</groupId>
 		<artifactId>org.activiti.designer.parent</artifactId>
-		<version>5.15.0.qualifier</version>
+		<version>5.15.0-SNAPSHOT</version>
 		<relativePath>../org.activiti.designer.parent/pom.xml</relativePath>
 	</parent>
 
