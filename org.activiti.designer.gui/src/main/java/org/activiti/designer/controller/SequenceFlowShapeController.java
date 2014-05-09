@@ -2,6 +2,7 @@ package org.activiti.designer.controller;
 
 import java.util.List;
 
+import org.activiti.bpmn.model.BoundaryEvent;
 import org.activiti.bpmn.model.EndEvent;
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.FlowNode;
@@ -154,15 +155,19 @@ public class SequenceFlowShapeController extends AbstractBusinessObjectShapeCont
       int targetX = targetShapeLocation.getX();
       int targetY = targetShapeLocation.getY();
       
+      int sourceMiddleY = sourceGraphics.getY() + (sourceGraphics.getHeight() / 2);
+      int sourceMiddleX = sourceGraphics.getX() + (sourceGraphics.getWidth() / 2);
+      int targetMiddleY = targetGraphics.getY() + (targetGraphics.getHeight() / 2);
+      int targetMiddleX = targetGraphics.getX() + (targetGraphics.getWidth() / 2);
+      
       if (sourceElement instanceof Gateway && targetElement instanceof Gateway == false) {
-        if (((sourceGraphics.getY() + 10) < targetGraphics.getY()
-            || (sourceGraphics.getY() - 10) > targetGraphics.getY())  && 
-            (sourceGraphics.getX() + (sourceGraphics.getWidth() / 2)) < targetGraphics.getX()) {
+        
+        if (((sourceMiddleY + 20) < targetMiddleY || (sourceMiddleY - 20) > targetMiddleY) && 
+            sourceMiddleX < targetGraphics.getX()) {
           
           boolean subProcessWithBendPoint = false;
-          if(targetElement instanceof SubProcess) {
-            int middleSub = targetGraphics.getY() + (targetGraphics.getHeight() / 2);
-            if((sourceGraphics.getY() + 20) < middleSub || (sourceGraphics.getY() - 20) > middleSub) {
+          if (targetElement instanceof SubProcess) {
+            if((sourceGraphics.getY() + 20) < targetMiddleY || (sourceGraphics.getY() - 20) > targetMiddleY) {
               subProcessWithBendPoint = true;
             }
           }
@@ -170,42 +175,39 @@ public class SequenceFlowShapeController extends AbstractBusinessObjectShapeCont
           if(targetElement instanceof SubProcess == false || subProcessWithBendPoint == true) {
             Point bendPoint = StylesFactory.eINSTANCE.createPoint();
             bendPoint.setX(sourceX + 20);
-            bendPoint.setY(targetY + (targetGraphics.getHeight() / 2));
+            bendPoint.setY(targetMiddleY);
             connection.getBendpoints().add(bendPoint);
           }
         }
       } else if (targetElement instanceof Gateway) {
-        if (((sourceGraphics.getY() + 10) < targetGraphics.getY()
-            || (sourceGraphics.getY() - 10) > targetGraphics.getY()) && 
+        
+        if (((sourceMiddleY + 20) < targetMiddleY || (sourceMiddleY - 20) > targetMiddleY) && 
             (sourceGraphics.getX() + sourceGraphics.getWidth()) < targetGraphics.getX()) {
           
           boolean subProcessWithBendPoint = false;
-          if(sourceElement instanceof SubProcess) {
-            int middleSub = sourceGraphics.getY() + (sourceGraphics.getHeight() / 2);
-            if((middleSub + 20) < targetGraphics.getY() || (middleSub - 20) > targetGraphics.getY()) {
+          if (sourceElement instanceof SubProcess) {
+            if ((sourceMiddleY + 20) < targetGraphics.getY() || (sourceMiddleY - 20) > targetGraphics.getY()) {
               subProcessWithBendPoint = true;
             }
           }
           
-          if(sourceElement instanceof SubProcess == false || subProcessWithBendPoint == true) {
+          if (sourceElement instanceof SubProcess == false || subProcessWithBendPoint == true) {
             Point bendPoint = StylesFactory.eINSTANCE.createPoint();
             bendPoint.setX(targetX + 20);
-            bendPoint.setY(sourceY + (sourceGraphics.getHeight() / 2));
+            bendPoint.setY(sourceMiddleY);
             connection.getBendpoints().add(bendPoint);
           }
         }
       } else if (targetElement instanceof EndEvent) {
-        int middleSource = sourceGraphics.getY() + (sourceGraphics.getHeight() / 2);
-        int middleTarget = targetGraphics.getY() + (targetGraphics.getHeight() / 2);
-        if (((middleSource + 10) < middleTarget && 
+        if (((sourceMiddleY + 10) < sourceMiddleY && 
             (sourceGraphics.getX() + sourceGraphics.getWidth()) < targetGraphics.getX()) ||
             
-            ((middleSource - 10) > middleTarget && 
+            ((sourceMiddleY - 10) > sourceMiddleY && 
             (sourceGraphics.getX() + sourceGraphics.getWidth()) < targetGraphics.getX())) {
           
           Point bendPoint = StylesFactory.eINSTANCE.createPoint();
-          bendPoint.setX(targetX + (targetGraphics.getWidth() / 2));
-          bendPoint.setY(sourceY + (sourceGraphics.getHeight() / 2));
+          bendPoint.setX(targetMiddleX);
+          bendPoint.setY(sourceMiddleY);
           connection.getBendpoints().add(bendPoint);
         }
       }
@@ -216,7 +218,7 @@ public class SequenceFlowShapeController extends AbstractBusinessObjectShapeCont
     polyline.setForeground(Graphiti.getGaService().manageColor(diagram, IColorConstant.BLACK));
 
     // add dynamic text decorator for the reference name
-    ConnectionDecorator textDecorator = peCreateService.createConnectionDecorator(connection, true, 0.5, true);
+    ConnectionDecorator textDecorator = peCreateService.createConnectionDecorator(connection, true, 0.5, false);
     MultiText text = gaService.createDefaultMultiText(diagram, textDecorator);
     text.setStyle(StyleUtil.getStyleForTask((diagram)));
     text.setHorizontalAlignment(Orientation.ALIGNMENT_LEFT);
@@ -230,7 +232,16 @@ public class SequenceFlowShapeController extends AbstractBusinessObjectShapeCont
     
     if(addConContext.getProperty("org.activiti.designer.connectionlabel") != null) {
       GraphicInfo labelLocation = (GraphicInfo) addConContext.getProperty("org.activiti.designer.connectionlabel");
-      gaService.setLocation(text, (int)labelLocation.getX(), (int)labelLocation.getY());
+      GraphicInfo startFlowLocation = calculateFlowStart(sourceElement, targetElement, connection);
+      
+      int labelX = (int) labelLocation.getX();
+      int labelY = (int) labelLocation.getY();
+      if (labelLocation.getX() > 10) {
+        labelX = (int) (labelLocation.getX() - startFlowLocation.getX());
+        labelY = (int) (labelLocation.getY() - startFlowLocation.getY());
+      }
+      
+      gaService.setLocation(text, labelX, labelY);
       if (StringUtils.isNotEmpty(addedSequenceFlow.getName())) {
         TextUtil.setTextSize((int) labelLocation.getWidth(), text);
       }
@@ -258,5 +269,74 @@ public class SequenceFlowShapeController extends AbstractBusinessObjectShapeCont
 
   protected PictogramElement getPictogramElement(Object businessObject) {
     return getFeatureProvider().getPictogramElementForBusinessObject(businessObject);
+  }
+  
+  protected GraphicInfo calculateFlowStart(FlowElement sourceElement, FlowElement targetElement, FreeFormConnection freeFormConnection) {
+    Shape sourceShape = (Shape) getPictogramElement(sourceElement); 
+    Shape targetShape = (Shape) getPictogramElement(targetElement);
+    
+    ILocation sourceLocation = Graphiti.getLayoutService().getLocationRelativeToDiagram(sourceShape);
+    int sourceX = sourceLocation.getX();
+    int sourceY = sourceLocation.getY();
+    int sourceWidth = sourceShape.getGraphicsAlgorithm().getWidth();
+    int sourceHeight = sourceShape.getGraphicsAlgorithm().getHeight();
+    int sourceMiddleX = sourceX + (sourceWidth / 2);
+    int sourceMiddleY = sourceY + (sourceHeight / 2);
+    int sourceBottomY = sourceY + sourceHeight;
+    
+    ILocation targetLocation = Graphiti.getLayoutService().getLocationRelativeToDiagram(targetShape);
+    int targetX = targetLocation.getX();
+    int targetY = targetLocation.getY();
+    int targetHeight = targetShape.getGraphicsAlgorithm().getHeight();
+    
+    GraphicInfo sourceInfo = null;
+    
+    if (sourceElement instanceof BoundaryEvent) {
+      sourceInfo = createFlowGraphicInfo(sourceMiddleX, sourceY + sourceHeight);
+    } else {
+      
+     if((freeFormConnection.getBendpoints() == null || freeFormConnection.getBendpoints().size() == 0)) {
+    
+       if((sourceBottomY + 11) < targetY) {
+         sourceInfo = createFlowGraphicInfo(sourceMiddleX, sourceY + sourceHeight);
+        
+       } else if((sourceY - 11) > (targetY + targetHeight)) {
+         sourceInfo = createFlowGraphicInfo(sourceMiddleX, sourceY);
+      
+       } else if(sourceX > targetX) {
+         sourceInfo = createFlowGraphicInfo(sourceX, sourceMiddleY);
+      
+       } else {
+         sourceInfo = createFlowGraphicInfo(sourceX + sourceWidth, sourceMiddleY);
+       }
+    
+     } else {
+    
+       org.eclipse.graphiti.mm.algorithms.styles.Point bendPoint = freeFormConnection.getBendpoints().get(0);
+       if ((sourceBottomY + 5) < bendPoint.getY()) {
+         sourceInfo = createFlowGraphicInfo(sourceMiddleX, sourceY + sourceHeight);
+      
+       } else if((sourceY - 5) > bendPoint.getY()) {
+         sourceInfo = createFlowGraphicInfo(sourceMiddleX, sourceY);
+      
+       } else if(sourceX > bendPoint.getX()) {
+         sourceInfo = createFlowGraphicInfo(sourceX, sourceMiddleY);
+      
+       } else {
+         sourceInfo = createFlowGraphicInfo(sourceX + sourceWidth, sourceMiddleY);
+       }
+     }
+    }
+    
+    return sourceInfo;
+  }
+  
+  
+  
+  protected GraphicInfo createFlowGraphicInfo(int x, int y) {
+    GraphicInfo graphicInfo = new GraphicInfo();
+    graphicInfo.setX(x);
+    graphicInfo.setY(y);
+    return graphicInfo;
   }
 }

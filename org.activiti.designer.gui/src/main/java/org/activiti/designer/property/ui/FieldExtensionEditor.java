@@ -26,10 +26,9 @@ public class FieldExtensionEditor extends TableFieldEditor {
 	public Diagram diagram;
 	
 	public FieldExtensionEditor(String key, Composite parent) {
-		
-        super(key, "", new String[] {"Field name", "String value", "Expression"},
-        		new int[] {150, 150, 150}, parent);
-        this.parent = parent;
+    super(key, "", new String[] {"Field name", "String value", "Expression"},
+    		new int[] {150, 150, 150}, parent);
+    this.parent = parent;
 	}
 	
 	public void initialize(List<FieldExtension> fieldList) {
@@ -47,6 +46,11 @@ public class FieldExtensionEditor extends TableFieldEditor {
       addTableItem(fieldExtension.getFieldName(), fieldExtension.getStringValue(), fieldExtension.getExpression());
     }
 	}
+	
+	@Override
+  protected boolean isTableChangeEnabled() {
+    return true;
+  }
 
 	@Override
 	protected String createList(String[][] items) {
@@ -118,9 +122,9 @@ public class FieldExtensionEditor extends TableFieldEditor {
 	
 	@Override
 	protected void selectionChanged() {
-		super.selectionChanged();
-		saveFieldExtensions();
-	}
+    super.selectionChanged();
+    saveFieldExtensions();
+  }
 	
 	private void saveFieldExtensions() {
 		if (pictogramElement != null) {

@@ -271,7 +271,12 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
   protected void upPressed() {
 	  final int index = table.getSelectionIndex();
 	  Object updatableBo = modelUpdater.getProcessModelUpdater().getUpdatableBusinessObject();
-    List<ActivitiListener> boListeners = BpmnBOUtil.getExecutionListeners(updatableBo, diagram);
+    List<ActivitiListener> boListeners = null;
+    if (listenerType == EXECUTION_LISTENER) {
+      boListeners = BpmnBOUtil.getExecutionListeners(updatableBo, diagram);
+    } else {
+      boListeners = ((UserTask) updatableBo).getTaskListeners();
+    }
     ActivitiListener listener = boListeners.remove(index);
     boListeners.add(index - 1, listener);
     listenerList = boListeners;
@@ -283,7 +288,12 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
   protected void downPressed() {
     final int index = table.getSelectionIndex();
     Object updatableBo = modelUpdater.getProcessModelUpdater().getUpdatableBusinessObject();
-    List<ActivitiListener> boListeners = BpmnBOUtil.getExecutionListeners(updatableBo, diagram);
+    List<ActivitiListener> boListeners = null;
+    if (listenerType == EXECUTION_LISTENER) {
+      boListeners = BpmnBOUtil.getExecutionListeners(updatableBo, diagram);
+    } else {
+      boListeners = ((UserTask) updatableBo).getTaskListeners();
+    }
     ActivitiListener listener = boListeners.remove(index);
     boListeners.add(index + 1, listener);
     listenerList = boListeners;

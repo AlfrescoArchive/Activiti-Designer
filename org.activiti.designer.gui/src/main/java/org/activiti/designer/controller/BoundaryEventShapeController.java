@@ -15,6 +15,7 @@ import org.eclipse.graphiti.datatypes.ILocation;
 import org.eclipse.graphiti.features.context.IAddContext;
 import org.eclipse.graphiti.mm.algorithms.Ellipse;
 import org.eclipse.graphiti.mm.algorithms.Image;
+import org.eclipse.graphiti.mm.algorithms.styles.LineStyle;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
@@ -80,11 +81,17 @@ public class BoundaryEventShapeController extends AbstractBusinessObjectShapeCon
     Ellipse circle = gaService.createEllipse(invisibleCircle);
     circle.setParentGraphicsAlgorithm(invisibleCircle);
     circle.setStyle(StyleUtil.getStyleForEvent(diagram));
+    if (addedEvent.isCancelActivity() == false) {
+      circle.setLineStyle(LineStyle.DOT);
+    }
     gaService.setLocationAndSize(circle, 0, 0, width, height);
 
     Ellipse secondCircle = gaService.createEllipse(circle);
     secondCircle.setParentGraphicsAlgorithm(circle);
     secondCircle.setStyle(StyleUtil.getStyleForEvent(diagram));
+    if (addedEvent.isCancelActivity() == false) {
+      secondCircle.setLineStyle(LineStyle.DOT);
+    }
     gaService.setLocationAndSize(secondCircle, 3, 3, width - 6, height - 6);
     
     String imageKey = getImageKey(addedEvent);

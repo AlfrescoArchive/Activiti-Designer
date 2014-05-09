@@ -69,9 +69,9 @@ public class PropertyIOParameterSection extends ActivitiPropertySection implemen
   public void refresh() {
     PictogramElement pe = getSelectedPictogramElement();
     if (pe != null) {
-      
       PictogramElement element = getSelectedPictogramElement();
       CallActivity bo = (CallActivity) getBusinessObject(element);
+      resetModelUpdater();
 
       List<IOParameter> inParameterList = bo.getInParameters();
       

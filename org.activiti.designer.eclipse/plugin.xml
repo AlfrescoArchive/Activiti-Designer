@@ -128,6 +128,9 @@
       <initializer
             class="org.activiti.designer.eclipse.preferences.ActivitiSavePreferencesPageInitializer">
       </initializer>
+      <initializer
+            class="org.activiti.designer.eclipse.preferences.ActivitiCloudEditorPreferencesPageInitializer">
+      </initializer>
    </extension>
    
    <!-- Navigator extensions -->
@@ -149,6 +152,14 @@
       id="org.activiti.designer.eclipse.view"
       name="Activiti">
     </category>
+    <view
+          category="org.activiti.designer.eclipse.view"
+          class="org.activiti.designer.eclipse.navigator.cloudrepo.ActivitiCloudEditorNavigator"
+          icon="icons/logo/activiti.logo.gradients.16x16.png"
+          id="org.activiti.designer.eclipse.activiticloudeditor.view"
+          name="Activiti Cloud Editor"
+          restorable="true">
+    </view>
     
   </extension>
   
@@ -222,6 +233,22 @@
           pattern="org.activiti.designer.eclipse.navigator.filters.*">
         </contentExtension>
       </includes>
+    </viewerContentBinding>
+    <viewer
+          viewerId="org.activiti.designer.eclipse.activiticloudeditor.view">
+       <popupMenu
+             allowsPlatformContributions="true"
+             id="org.activiti.designer.navigator.processmodel.view.popup">
+       </popupMenu>
+    </viewer>
+    <viewerContentBinding
+          viewerId="org.activiti.designer.eclipse.activiticloudeditor.view">
+       <includes>
+          <contentExtension
+                isRoot="true"
+                pattern="org.activiti.designer.eclipse.activiticloudeditor.navigatorContent">
+          </contentExtension>
+       </includes>
     </viewerContentBinding>
   
   </extension>
@@ -318,6 +345,110 @@
          	</adapt>
          </filterExpression>
       </commonFilter>
+      <navigatorContent
+            contentProvider="org.activiti.designer.eclipse.navigator.cloudrepo.ProcessModelContentProvider"
+            id="org.activiti.designer.eclipse.activiticloudeditor.navigatorContent"
+            labelProvider="org.activiti.designer.eclipse.navigator.cloudrepo.ProcessModelLabelProvider"
+            name="Activiti Cloud Editor content">
+         <triggerPoints>
+            <or>
+               <instanceof
+                     value="org.activiti.designer.eclipse.navigator.cloudrepo.ActivitiCloudEditorRoot">
+               </instanceof>
+            </or>
+         </triggerPoints>
+      </navigatorContent>
    </extension>
+  <extension
+        point="org.eclipse.ui.preferencePages">
+     <page
+           class="org.activiti.designer.eclipse.preferences.ActivitiCloudEditorPreferencePage"
+           id="org.activiti.designer.eclipse..preferencepage.activiticloudeditor"
+           name="Activiti cloud editor">
+     </page>
+  </extension>
+  <extension
+        point="org.eclipse.ui.commands">
+     <command
+           description="Activiti Cloud Editor refresh"
+           id="org.activiti.designer.command.refreshActivitiCloudEditorNavigator"
+           name="Activiti Cloud Editor refresh">
+     </command>
+  </extension>
+  <extension
+        point="org.eclipse.core.expressions.definitions">
+     <definition
+           id="org.activiti.designer.eclipse.navigator.isModelNode">
+        <with
+              variable="selection">
+           <iterate
+                 ifEmpty="false">
+              <instanceof
+                    value="org.codehaus.jackson.JsonNode">
+              </instanceof>
+           </iterate>
+        </with>
+     </definition>
+  </extension>
+  <extension
+        point="org.eclipse.ui.handlers">
+     <handler
+           class="org.activiti.designer.eclipse.navigator.cloudrepo.dialog.DownloadHandler"
+           commandId="org.activiti.designer.eclipse.navigator.processmodel.download">
+        <activeWhen>
+           <reference
+                 definitionId="org.activiti.designer.eclipse.navigator.isModelNode">
+           </reference>
+        </activeWhen>
+        <enabledWhen>
+           <reference
+                 definitionId="org.activiti.designer.eclipse.navigator.isModelNode">
+           </reference>
+        </enabledWhen>
+     </handler>
+  </extension>
+  <extension
+        point="org.eclipse.ui.menus">
+     <menuContribution
+           allPopups="false"
+           locationURI="popup:org.activiti.designer.navigator.processmodel.view.popup">
+        <command
+              commandId="org.activiti.designer.eclipse.navigator.processmodel.download"
+              id="org.activiti.designer.eclipse.navigator.processmodel.download"
+              label="Download"
+              style="push">
+        </command>
+     </menuContribution>
+  </extension>
+  <extension
+        point="org.eclipse.ui.popupMenus">
+     <objectContribution
+           adaptable="false"
+           id="org.activiti.designer.eclipse.cloudrepo.synchronize.processmodel"
+           nameFilter="*.bpmn"
+           objectClass="org.eclipse.core.resources.IFile">
+        <menu
+              icon="icons/logo/activiti.logo.gradients.16x16.png"
+              id="org.activiti.designer.eclipse.cloudrepo.menu"
+              label="Activiti Editor"
+              path="additions">
+           <separator
+                 name="group1">
+           </separator>
+        </menu>
+        <action
+              class="org.activiti.designer.eclipse.navigator.cloudrepo.sync.UploadNewVersionToRepositoryDelegate"
+              id="org.activiti.designer.eclipse.cloudrepo.uploadnewversion"
+              label="Upload new version"
+              menubarPath="org.activiti.designer.eclipse.cloudrepo.menu/group1">
+        </action>
+        <action
+              class="org.activiti.designer.eclipse.navigator.cloudrepo.sync.DownloadLatestVersionFromRepositoryDelegate"
+              id="org.activiti.designer.eclipse.cloudrepo.downloadlatestversion"
+              label="Download latest version"
+              menubarPath="org.activiti.designer.eclipse.cloudrepo.menu/group1">
+        </action>
+     </objectContribution>
+  </extension>
   
 </plugin>

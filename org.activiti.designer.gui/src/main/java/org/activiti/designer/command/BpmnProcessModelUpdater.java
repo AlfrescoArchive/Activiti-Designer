@@ -2,7 +2,6 @@ package org.activiti.designer.command;
 
 import org.activiti.bpmn.model.BaseElement;
 import org.activiti.designer.util.editor.BpmnMemoryModel;
-import org.activiti.designer.util.editor.KickstartProcessMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;

@@ -118,6 +118,8 @@ public abstract class TableFieldEditor extends FieldEditor {
 		parent.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
 		createControl(parent);
 	}
+	
+	protected abstract boolean isTableChangeEnabled(); 
 
 	/**
 	 * Combines the given list of items into a single string. This method is the
@@ -476,8 +478,10 @@ public abstract class TableFieldEditor extends FieldEditor {
 		setPresentsDefaultValue(false);
 		String[] newInputObject = getNewInputObject();
 		if(newInputObject != null) {
-			TableItem tableItem = new TableItem(table, SWT.NONE);
-			tableItem.setText(newInputObject);
+		  if (isTableChangeEnabled()) {
+		    TableItem tableItem = new TableItem(table, SWT.NONE);
+		    tableItem.setText(newInputObject);
+		  }
 			selectionChanged();
 		}
 	}
@@ -488,7 +492,9 @@ public abstract class TableFieldEditor extends FieldEditor {
 	  TableItem tableItem = table.getItem(index);
     String[] changedInputObject = getChangedInputObject(tableItem);
     if(changedInputObject != null) {
-      tableItem.setText(changedInputObject);
+      if (isTableChangeEnabled()) {
+        tableItem.setText(changedInputObject);
+      }
       selectionChanged();
     }
 	}
@@ -500,7 +506,9 @@ public abstract class TableFieldEditor extends FieldEditor {
 		setPresentsDefaultValue(false);
 		int index = table.getSelectionIndex();
 		if (index >= 0) {
-			table.remove(index);
+		  if (isTableChangeEnabled()) {
+		    table.remove(index);
+		  }
 			removedItem(index);
 			selectionChanged();
 		}
@@ -543,7 +551,7 @@ public abstract class TableFieldEditor extends FieldEditor {
 		editButton.setEnabled(index >= 0);
 		removeButton.setEnabled(index >= 0);
 		upButton.setEnabled(size > 1 && index > 0);
-    downButton.setEnabled(size > 1 && index >= 0 && index < size - 1);
+		downButton.setEnabled(size > 1 && index >= 0 && index < size - 1);
 	}
 
 	/*

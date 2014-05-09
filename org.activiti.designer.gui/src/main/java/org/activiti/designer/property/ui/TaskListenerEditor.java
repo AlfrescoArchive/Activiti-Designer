@@ -13,6 +13,11 @@ public class TaskListenerEditor extends AbstractListenerEditor {
   public TaskListenerEditor(String key, Composite parent, ModelUpdater modelUpdater) {
     super(key, parent, TASK_LISTENER, modelUpdater);
   }
+  
+  @Override
+  protected boolean isTableChangeEnabled() {
+    return false;
+  }
 
   @Override
   protected AbstractListenerDialog getDialog(Shell shell, TableItem[] items) {

@@ -17,11 +17,13 @@ package org.activiti.designer.property;
 
 import org.activiti.bpmn.model.BaseElement;
 import org.activiti.bpmn.model.FlowElement;
+import org.activiti.bpmn.model.FlowElementsContainer;
 import org.activiti.bpmn.model.FlowNode;
 import org.activiti.bpmn.model.Lane;
 import org.activiti.bpmn.model.Pool;
 import org.activiti.bpmn.model.Process;
 import org.activiti.bpmn.model.SequenceFlow;
+import org.activiti.bpmn.model.SubProcess;
 import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -82,13 +84,30 @@ public class PropertyGeneralSection extends ActivitiPropertySection implements I
   }
 
   protected void updateFlows(BaseElement element, String newElementId) {
+    BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
     if (element instanceof FlowNode) {
       FlowNode flowNode = (FlowNode) element;
-      for (SequenceFlow sequenceFlow : flowNode.getIncomingFlows()) {
-        sequenceFlow.setTargetRef(newElementId);
+      for (Process process : model.getBpmnModel().getProcesses()) {
+        updateSequenceFlows(process, flowNode.getId(), newElementId);
       }
-      for (SequenceFlow sequenceFlow : flowNode.getOutgoingFlows()) {
-        sequenceFlow.setSourceRef(newElementId);
+    }
+  }
+  
+  protected void updateSequenceFlows(FlowElementsContainer container, String oldElementId, String newElementId) {
+    for (FlowElement flowElement : container.getFlowElements()) {
+      if (flowElement instanceof SequenceFlow) {
+        SequenceFlow sequenceFlow = (SequenceFlow) flowElement;
+        if (sequenceFlow.getSourceRef().equals(oldElementId)) {
+          sequenceFlow.setSourceRef(newElementId);
+        }
+        
+        if (sequenceFlow.getTargetRef().equals(oldElementId)) {
+          sequenceFlow.setTargetRef(newElementId);
+        }
+        
+      } else if(flowElement instanceof SubProcess) {
+        SubProcess subProcess = (SubProcess) flowElement;
+        updateSequenceFlows(subProcess, oldElementId, newElementId);
       }
     }
   }

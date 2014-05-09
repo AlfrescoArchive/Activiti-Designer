@@ -54,6 +54,7 @@ import org.activiti.designer.controller.SubProcessShapeController;
 import org.activiti.designer.controller.TaskShapeController;
 import org.activiti.designer.controller.TextAnnotationShapeController;
 import org.activiti.designer.controller.ThrowEventShapeController;
+import org.activiti.designer.features.ActivityResizeFeature;
 import org.activiti.designer.features.AddBaseElementFeature;
 import org.activiti.designer.features.ChangeElementTypeFeature;
 import org.activiti.designer.features.ContainerResizeFeature;
@@ -107,10 +108,11 @@ import org.activiti.designer.features.MoveBoundaryEventFeature;
 import org.activiti.designer.features.MoveEventFeature;
 import org.activiti.designer.features.MoveGatewayFeature;
 import org.activiti.designer.features.MoveLaneFeature;
+import org.activiti.designer.features.MovePoolFeature;
+import org.activiti.designer.features.MoveTextAnnotationFeature;
 import org.activiti.designer.features.PasteFlowElementFeature;
 import org.activiti.designer.features.ReconnectAssociationFeature;
 import org.activiti.designer.features.ReconnectSequenceFlowFeature;
-import org.activiti.designer.features.ActivityResizeFeature;
 import org.activiti.designer.features.UpdateFlowElementFeature;
 import org.activiti.designer.features.UpdatePoolAndLaneFeature;
 import org.activiti.designer.features.UpdateTextAnnotationFeature;
@@ -374,8 +376,7 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
       return new MoveBoundaryEventFeature(this);
 
     } else if (bo instanceof Activity) {
-      // in case an activity is moved, make sure, attached boundary events will
-      // move too
+      // in case an activity is moved, make sure, attached boundary events will move too
       return new MoveActivityFeature(this);
 
     } else if (bo instanceof Gateway) {
@@ -386,6 +387,13 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 
     } else if (bo instanceof Lane) {
       return new MoveLaneFeature(this);
+    
+    } else if (bo instanceof Pool) {
+      // in case a pool is moved, make sure, attached boundary events will move too
+      return new MovePoolFeature(this);
+    
+    } else if (bo instanceof TextAnnotation) {
+      return new MoveTextAnnotationFeature(this);
     }
     return super.getMoveShapeFeature(context);
   }
