@@ -40,8 +40,10 @@ public abstract class AbstractTreeNode<T extends Object> implements TreeNode {
     this.parent = parent;
     this.treeObject = treeObject;
     this.name = getName(name);
-
-    extractChildren();
+    
+    if (treeObject != null) {
+      extractChildren();
+    }
   }
 
   private final String getName(final String name) {

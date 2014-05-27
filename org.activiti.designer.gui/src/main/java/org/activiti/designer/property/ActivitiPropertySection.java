@@ -242,8 +242,9 @@ public abstract class ActivitiPropertySection extends BaseActivitiPropertySectio
   protected BpmnProcessModelUpdater createProcessModelUpdater() {
     PictogramElement element = getSelectedPictogramElement();
     ActivitiBPMNFeatureProvider featureProvider = getFeatureProvider(element);
-    if (featureProvider != null) {
-      return featureProvider.getModelUpdaterFor(getBusinessObject(element), element);
+    Object bo = getBusinessObject(element);
+    if (featureProvider != null && bo != null) {
+      return featureProvider.getModelUpdaterFor(bo, element);
     }
     return null;
   }
