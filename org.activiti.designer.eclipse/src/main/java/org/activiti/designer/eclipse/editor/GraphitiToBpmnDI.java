@@ -9,6 +9,7 @@ import org.activiti.bpmn.model.Artifact;
 import org.activiti.bpmn.model.Association;
 import org.activiti.bpmn.model.BaseElement;
 import org.activiti.bpmn.model.BoundaryEvent;
+import org.activiti.bpmn.model.DataObject;
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.GraphicInfo;
 import org.activiti.bpmn.model.Lane;
@@ -112,8 +113,11 @@ public class GraphitiToBpmnDI {
           }
         }
       } else {
-        // no pictogram exist so delete it from the model as well
-        toDeleteElementList.add(element);
+    	  // no pictogram exist so delete it from the model as well
+    	  // except for Data Objects
+    	  if (element instanceof DataObject == false) {
+    	    toDeleteElementList.add(element);
+    	  }
       }
     }
     

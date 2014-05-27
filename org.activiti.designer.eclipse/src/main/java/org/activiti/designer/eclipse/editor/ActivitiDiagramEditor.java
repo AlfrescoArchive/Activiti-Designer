@@ -23,6 +23,7 @@ import org.activiti.bpmn.model.BaseElement;
 import org.activiti.bpmn.model.BoundaryEvent;
 import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.bpmn.model.CustomProperty;
+import org.activiti.bpmn.model.DataObject;
 import org.activiti.bpmn.model.FieldExtension;
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.GraphicInfo;
@@ -572,7 +573,10 @@ public class ActivitiDiagramEditor extends DiagramEditor {
       if (flowElement instanceof BoundaryEvent) {
         ((BoundaryEvent) flowElement).getAttachedToRef().getBoundaryEvents().remove(flowElement);
       } else {
-        elementList.remove(flowElement);
+    	  // do not remove Data Objects
+    	  if (flowElement instanceof DataObject == false) {
+    		  elementList.remove(flowElement);
+    	  }
       }
     }
   }

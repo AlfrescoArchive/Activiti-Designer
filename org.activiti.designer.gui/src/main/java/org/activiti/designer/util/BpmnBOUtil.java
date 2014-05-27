@@ -20,6 +20,9 @@ import org.activiti.bpmn.model.ActivitiListener;
 import org.activiti.bpmn.model.FieldExtension;
 import org.activiti.bpmn.model.HasExecutionListeners;
 import org.activiti.bpmn.model.Pool;
+import org.activiti.bpmn.model.Process;
+import org.activiti.bpmn.model.SubProcess;
+import org.activiti.bpmn.model.ValuedDataObject;
 import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
@@ -94,7 +97,41 @@ public class BpmnBOUtil {
       model.getBpmnModel().getProcess(pool.getId()).getExecutionListeners().remove(index);
     }
   }
-  
+
+  public static List<ValuedDataObject> getDataObjects(Object bo, Diagram diagram) {
+    List<ValuedDataObject> dataObjects = null;
+    if (bo instanceof Process) {
+        dataObjects = ((Process) bo).getDataObjects();
+    } else if (bo instanceof SubProcess) {
+        dataObjects = ((SubProcess) bo).getDataObjects();
+    }
+    return dataObjects;
+  }
+	  
+  public static void addDataObject(Object bo, ValuedDataObject dataObject, Diagram diagram) {
+  	if (bo instanceof Process) {
+      ((Process) bo).getDataObjects().add(dataObject);
+    } else if (bo instanceof SubProcess) {
+      ((SubProcess) bo).getDataObjects().add(dataObject);
+    }
+  }
+	  
+  public static void setDataObject(Object bo, ValuedDataObject dataObject, int index, Diagram diagram) {
+  	if (bo instanceof Process) {
+      ((Process) bo).getDataObjects().set(index, dataObject);
+    } else if (bo instanceof SubProcess) {
+      ((SubProcess) bo).getDataObjects().set(index, dataObject);
+    }
+  }
+	  
+  public static void removeDataObject(Object bo, int index, Diagram diagram) {
+  	if (bo instanceof Process) {
+     ((Process) bo).getDataObjects().remove(index);
+	} else if (bo instanceof SubProcess) {
+	  ((SubProcess) bo).getDataObjects().remove(index);
+	}
+  }
+	  
   public static List<FieldExtension> getFieldModelList(String fieldString) {
     String[] fieldStringList = fieldString.split("|");
     List<FieldExtension> fieldList = new ArrayList<FieldExtension>();

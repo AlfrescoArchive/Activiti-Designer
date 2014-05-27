@@ -75,6 +75,12 @@
          <propertyTab
                afterTab="org.activiti.designer.documentationTab"
                category="Activiti"
+               id="org.activiti.designer.dataTab"
+               label="Data Objects">
+         </propertyTab>
+         <propertyTab
+               afterTab="org.activiti.designer.documentationTab"
+               category="Activiti"
                id="org.activiti.designer.listenerTab"
                label="Listeners">
          </propertyTab>
@@ -240,6 +246,12 @@
                filter="org.activiti.designer.property.PropertyFormPropertyFilter"
                id="org.activiti.designer.formTab.formProperty"
                tab="org.activiti.designer.formTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyDataPropertySection"
+               filter="org.activiti.designer.property.PropertyDataPropertyFilter"
+               id="org.activiti.designer.dataTab.dataProperty"
+               tab="org.activiti.designer.dataTab">
          </propertySection>
          <propertySection
                afterSection="org.activiti.designer.mainConfigTab.callactivity"
