@@ -27,7 +27,7 @@ public class CustomServiceTaskContextImpl implements CustomServiceTaskContext {
     try {
       this.extensionJarFile = new JarFile(this.extensionJarPath);
     } catch (IOException e) {
-      throw new IllegalArgumentException(String.format("Path '%s' is an invalid path for a JarFile"));
+      throw new IllegalArgumentException("Path is an invalid path for a JarFile", e);
     }
   }
 

@@ -68,7 +68,7 @@ public class JarClassLoader extends ClassLoader {
           throw new ClassNotFoundException(name);
 
       } catch (IOException e) {
-        throw new ClassNotFoundException("Error reading file: " + className);
+        throw new ClassNotFoundException("Error reading file: " + className, e);
       }
     }
 

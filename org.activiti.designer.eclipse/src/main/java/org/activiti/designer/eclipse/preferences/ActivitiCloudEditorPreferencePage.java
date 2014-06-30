@@ -6,6 +6,7 @@ import org.eclipse.jface.preference.FieldEditorPreferencePage;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.StringFieldEditor;
 import org.eclipse.swt.layout.FillLayout;
+import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
 
@@ -20,7 +21,16 @@ public class ActivitiCloudEditorPreferencePage extends FieldEditorPreferencePage
 
     addField(new StringFieldEditor(Preferences.ACTIVITI_CLOUD_EDITOR_URL.getPreferenceId(), "&Activiti cloud editor URL", getFieldEditorParent()));
     addField(new StringFieldEditor(Preferences.ACTIVITI_CLOUD_EDITOR_USERNAME.getPreferenceId(), "&Activiti cloud editor username", getFieldEditorParent()));
-    addField(new StringFieldEditor(Preferences.ACTIVITI_CLOUD_EDITOR_PASSWORD.getPreferenceId(), "&Activiti cloud editor password", getFieldEditorParent()));
+    addField(new StringFieldEditor(Preferences.ACTIVITI_CLOUD_EDITOR_PASSWORD.getPreferenceId(), "&Activiti cloud editor password", getFieldEditorParent()) {
+
+      @Override
+      protected void doFillIntoGrid(Composite parent, int numColumns) {
+          super.doFillIntoGrid(parent, numColumns);
+  
+          getTextControl().setEchoChar('*');
+      }
+    
+    });
 	}
 
 	@Override
