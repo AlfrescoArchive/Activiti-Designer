@@ -37,7 +37,7 @@
 			<id>Graphiti</id>
 			<layout>p2</layout>
 			<!-- <url>http://download.eclipse.org/graphiti/updates/milestones/</url> -->
-			<url>http://download.eclipse.org/graphiti/updates/0.10.1</url>
+			<url>http://archive.eclipse.org/graphiti/updates/0.10.1</url>
 		</repository>
 	</repositories>
 
