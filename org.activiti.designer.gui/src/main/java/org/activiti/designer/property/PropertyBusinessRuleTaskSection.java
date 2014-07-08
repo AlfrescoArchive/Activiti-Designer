@@ -5,7 +5,7 @@ import java.util.List;
 
 import org.activiti.bpmn.model.BusinessRuleTask;
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
@@ -15,9 +15,8 @@ public class PropertyBusinessRuleTaskSection extends ActivitiPropertySection imp
 
   private Text ruleNamesText;
   private Text inputVariableNamesText;
-  private Combo excludedCombo;
+  private Button excludedButton;
   private Text resultVariableNameText;
-  private String[] cancelFormats = new String[] {"true", "false"};
   
   @Override
   public void createFormControls(TabbedPropertySheetPage aTabbedPropertySheetPage) {
@@ -25,8 +24,7 @@ public class PropertyBusinessRuleTaskSection extends ActivitiPropertySection imp
     createLabel("Rule names", ruleNamesText);
     inputVariableNamesText = createTextControl(false);
     createLabel("Input variables", inputVariableNamesText);
-    excludedCombo = createCombobox(cancelFormats, 1);
-    createLabel("Excluded", excludedCombo);
+    excludedButton = createCheckboxControl("Excluded");
     resultVariableNameText = createTextControl(false);
     createLabel("Result variable", resultVariableNameText);
   }
@@ -40,7 +38,7 @@ public class PropertyBusinessRuleTaskSection extends ActivitiPropertySection imp
     } else if (control == inputVariableNamesText) {
       return transformToString(task.getInputVariables());
     
-    } else if (control == excludedCombo) {
+    } else if (control == excludedButton) {
       return task.isExclude();
     
     } else if (control == resultVariableNameText) {
@@ -58,8 +56,8 @@ public class PropertyBusinessRuleTaskSection extends ActivitiPropertySection imp
     } else if (control == inputVariableNamesText) {
       task.setInputVariables(convertToList(inputVariableNamesText.getText()));
     
-    } else if (control == excludedCombo) {
-      task.setExclude(Boolean.valueOf(cancelFormats[excludedCombo.getSelectionIndex()]));
+    } else if (control == excludedButton) {
+      task.setExclude(excludedButton.getSelection());
       
     } else if (control == resultVariableNameText) {
       task.setResultVariableName(resultVariableNameText.getText());
