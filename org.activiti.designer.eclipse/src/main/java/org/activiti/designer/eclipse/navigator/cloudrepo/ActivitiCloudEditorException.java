@@ -1,6 +1,7 @@
 package org.activiti.designer.eclipse.navigator.cloudrepo;
 
-import org.codehaus.jackson.JsonNode;
+import com.fasterxml.jackson.databind.JsonNode;
+
 
 public class ActivitiCloudEditorException extends RuntimeException {
 

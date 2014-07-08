@@ -384,7 +384,7 @@
            <iterate
                  ifEmpty="false">
               <instanceof
-                    value="org.codehaus.jackson.JsonNode">
+                    value="com.fasterxml.jackson.databind.JsonNode">
               </instanceof>
            </iterate>
         </with>

@@ -15,10 +15,11 @@ package org.activiti.designer.eclipse.navigator.cloudrepo;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.codehaus.jackson.JsonNode;
 import org.eclipse.jface.viewers.ISelectionChangedListener;
 import org.eclipse.jface.viewers.SelectionChangedEvent;
 import org.eclipse.jface.viewers.TreeSelection;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * @author Joram Barrez

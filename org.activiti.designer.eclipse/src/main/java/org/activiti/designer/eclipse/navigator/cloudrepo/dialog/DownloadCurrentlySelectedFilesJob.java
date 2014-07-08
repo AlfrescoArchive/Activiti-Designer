@@ -22,7 +22,6 @@ import org.activiti.designer.eclipse.navigator.cloudrepo.ActivitiCloudEditorNavi
 import org.activiti.designer.eclipse.navigator.cloudrepo.ActivitiCloudEditorSameContentException;
 import org.activiti.designer.eclipse.navigator.cloudrepo.ActivitiCloudEditorUtil;
 import org.activiti.designer.eclipse.util.FileService;
-import org.codehaus.jackson.JsonNode;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
@@ -37,6 +36,8 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * @author jbarrez

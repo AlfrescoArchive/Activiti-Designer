@@ -17,7 +17,6 @@ import org.activiti.designer.eclipse.navigator.cloudrepo.ActivitiCloudEditorExce
 import org.activiti.designer.eclipse.navigator.cloudrepo.ActivitiCloudEditorSameContentException;
 import org.activiti.designer.eclipse.navigator.cloudrepo.ActivitiCloudEditorUtil;
 import org.apache.commons.io.IOUtils;
-import org.codehaus.jackson.JsonNode;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.IStatus;
@@ -26,6 +25,8 @@ import org.eclipse.core.runtime.jobs.Job;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Shell;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * @author Tijs Rademakers

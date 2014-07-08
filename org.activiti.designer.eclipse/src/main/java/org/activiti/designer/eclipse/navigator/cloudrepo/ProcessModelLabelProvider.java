@@ -12,13 +12,14 @@
  */
 package org.activiti.designer.eclipse.navigator.cloudrepo;
 
-import org.codehaus.jackson.JsonNode;
 import org.eclipse.jface.viewers.ILabelProvider;
 import org.eclipse.jface.viewers.LabelProvider;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.ui.ISharedImages;
 import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.navigator.IDescriptionProvider;
+
+import com.fasterxml.jackson.databind.JsonNode;
 
 public class ProcessModelLabelProvider extends LabelProvider implements ILabelProvider, IDescriptionProvider {
 	

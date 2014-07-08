@@ -82,10 +82,6 @@ public class FileDiagramTreeNode extends AbstractDiagramTreeNode<IFile> {
     extractTransparentProcess(this, model.getBpmnModel().getMainProcess());
   }
 
-  private void extractProcess(final TreeNode parent, final Process mainProcess) {
-    addChildNode(DiagramTreeNodeFactory.createProcessNode(parent, mainProcess));
-  }
-
   private void extractTransparentProcess(final TreeNode parent, final Process mainProcess) {
     final TreeNode transparentProcessNode = DiagramTreeNodeFactory.createTransparentProcessNode(parent, mainProcess);
     referenceChildNodesToOwnChildren(transparentProcessNode);
@@ -99,11 +95,6 @@ public class FileDiagramTreeNode extends AbstractDiagramTreeNode<IFile> {
     for (final Pool pool : pools) {
       addChildNode(DiagramTreeNodeFactory.createPoolNode(this, pool));
     }
-  }
-
-  private void extractChildrenForPoolsAndMainProcess(final BpmnMemoryModel model) {
-    extractProcess(this, model.getBpmnModel().getMainProcess());
-    extractPools(model.getBpmnModel().getPools());
   }
 
   private BpmnMemoryModel buildModel(final IFile modelFile) {
@@ -122,7 +113,7 @@ public class FileDiagramTreeNode extends AbstractDiagramTreeNode<IFile> {
         result.setBpmnModel(bpmnModel);
       }
     } catch (Exception e) {
-      e.printStackTrace();
+      
     }
 
     return result;
