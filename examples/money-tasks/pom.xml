@@ -9,9 +9,9 @@
 	<name>Acme Corporation Money Tasks</name>
 
 	<properties>
-		<activiti.designer.version>5.14.1</activiti.designer.version>
+		<activiti.designer.version>5.15.0-SNAPSHOT</activiti.designer.version>
 	</properties>
-
+	
 	<repositories>
 		<repository>
 			<id>Activiti</id>
