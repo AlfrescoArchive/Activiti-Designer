@@ -31,6 +31,8 @@ import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
+import com.sun.xml.internal.txw2.IllegalAnnotationException;
+
 /**
  * @author Tiese Barrell
  * @since 0.7.0
@@ -89,6 +91,10 @@ public class CustomPropertyComboboxChoiceField extends AbstractCustomPropertyFie
 
         final String[] itemValues = propertyItemsAnnotation.value();
 
+        if (itemValues.length % 2 != 0) {
+          throw new IllegalAnnotationException("Only an even number of property items is supported, every label must have a value item");
+        }
+        
         values = new HashMap<String, String>();
         labels = new String[itemValues.length / 2];
 

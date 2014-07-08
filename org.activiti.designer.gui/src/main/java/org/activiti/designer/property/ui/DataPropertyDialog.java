@@ -105,9 +105,9 @@ public class DataPropertyDialog extends Dialog implements ITabbedPropertyConstan
 		data.top = new FormAttachment(nameText, VSPACE);
 		typeDropDown.setLayoutData(data);
 		typeDropDown.select(0);
-	    createLabel("Type", shell, typeDropDown);
+	  createLabel("Type", shell, typeDropDown);
 
-		final Text valueText = createText(savedDataProperty != null ? savedDataProperty.getValue().toString() : "", shell, typeDropDown);
+		final Text valueText = createText(savedDataProperty != null && savedDataProperty.getValue() != null ? savedDataProperty.getValue().toString() : "", shell, typeDropDown);
 		createLabel("Value", shell, valueText);
 
 		// Create the cancel button and add a handler

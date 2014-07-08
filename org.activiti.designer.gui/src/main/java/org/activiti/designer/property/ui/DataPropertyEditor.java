@@ -67,7 +67,7 @@ public class DataPropertyEditor extends TableFieldEditor {
 			tableItem.setText(0, dataProperty.getId() != null ? dataProperty.getId() : "");
 			tableItem.setText(1, dataProperty.getName() != null ? dataProperty.getName() : "");
 			tableItem.setText(2, dataType != null ? dataType : "");
-			tableItem.setText(3, dataProperty.getValue().toString() != null ? dataProperty.getValue().toString() : "");
+			tableItem.setText(3, dataProperty.getValue() != null ? dataProperty.getValue().toString() : "");
 		}
 	}
 
