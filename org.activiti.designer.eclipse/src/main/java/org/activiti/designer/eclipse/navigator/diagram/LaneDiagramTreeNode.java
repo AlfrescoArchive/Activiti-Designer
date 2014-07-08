@@ -37,8 +37,10 @@ public class LaneDiagramTreeNode extends AbstractDiagramTreeNode<Lane> {
 
     final List<FlowElement> laneElements = extractLaneElements();
 
-    for (final FlowElement flowElement : laneElements) {
-      addChildNode(DiagramTreeNodeFactory.createFlowElementNode(this, flowElement));
+    if (laneElements != null) {
+      for (final FlowElement flowElement : laneElements) {
+        addChildNode(DiagramTreeNodeFactory.createFlowElementNode(this, flowElement));
+      }
     }
   }
 
@@ -50,8 +52,6 @@ public class LaneDiagramTreeNode extends AbstractDiagramTreeNode<Lane> {
 
     if (parentProcess != null) {
       result = extractLaneElements(parentProcess);
-    } else {
-      throw new IllegalArgumentException("extractLaneElements was called on a lane that has no process as a parent");
     }
     return result;
   }
@@ -59,27 +59,13 @@ public class LaneDiagramTreeNode extends AbstractDiagramTreeNode<Lane> {
   private Process findParentProcess() {
     Process result = null;
 
-    final Pool parentPool = findParentPool();
-    if (parentPool != null) {
-      final String poolId = parentPool.getId();
-
-      final BpmnMemoryModel bpmn2MemoryModel = findRootModel();
-
-      result = bpmn2MemoryModel.getBpmnModel().getProcess(poolId);
-
-    } else {
-      throw new IllegalArgumentException("findParentPool was called on a lane that has no pool as a parent");
-    }
-    return result;
-  }
-
-  private Pool findParentPool() {
-    Pool result = null;
-
     if (getParentNode() instanceof AbstractDiagramTreeNode) {
       final Object modelObject = ((AbstractDiagramTreeNode< ? >) getParentNode()).getModelObject();
       if (modelObject instanceof Pool) {
-        result = (Pool) modelObject;
+        Pool pool = (Pool) modelObject;
+        String poolId = pool.getId();
+        BpmnMemoryModel bpmn2MemoryModel = findRootModel();
+        result = bpmn2MemoryModel.getBpmnModel().getProcess(poolId);
       }
     }
     return result;

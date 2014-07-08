@@ -45,13 +45,13 @@ public class FileDiagramTreeNode extends AbstractDiagramTreeNode<IFile> {
     if (isDiagramRoot()) {
 
       model = buildModel((IFile) getParent());
-
-      if (hasPoolsOnly(model)) {
+      if (model == null || model.getBpmnModel() == null) {
+        return;
+      }
+      if (hasPools(model)) {
         extractChildrenForPoolsOnly(model);
-      } else if (hasMainProcessOnly(model)) {
+      } else if (hasMainProcess(model)) {
         extractChildrenForMainProcessOnly(model);
-      } else if (hasMixedPoolsAndMainProcess(model)) {
-        extractChildrenForPoolsAndMainProcess(model);
       }
     }
   }
@@ -70,28 +70,8 @@ public class FileDiagramTreeNode extends AbstractDiagramTreeNode<IFile> {
     return getParent() instanceof IFile;
   }
 
-  private boolean hasMainProcessOnly(final BpmnMemoryModel model) {
-    return hasMainProcess(model) && hasNoPools(model);
-  }
-
-  private boolean hasPoolsOnly(final BpmnMemoryModel model) {
-    return hasPools(model) && hasNoMainProcess(model);
-  }
-
-  private boolean hasMixedPoolsAndMainProcess(final BpmnMemoryModel model) {
-    return hasPools(model) && hasMainProcess(model);
-  }
-
   private boolean hasMainProcess(final BpmnMemoryModel model) {
     return model.getBpmnModel().getMainProcess() != null;
-  }
-
-  private boolean hasNoMainProcess(final BpmnMemoryModel model) {
-    return !hasMainProcess(model) || model.getBpmnModel().getMainProcess().getFlowElements().isEmpty();
-  }
-
-  private boolean hasNoPools(final BpmnMemoryModel model) {
-    return model.getBpmnModel().getPools() == null || model.getBpmnModel().getPools().isEmpty();
   }
 
   private boolean hasPools(final BpmnMemoryModel model) {
