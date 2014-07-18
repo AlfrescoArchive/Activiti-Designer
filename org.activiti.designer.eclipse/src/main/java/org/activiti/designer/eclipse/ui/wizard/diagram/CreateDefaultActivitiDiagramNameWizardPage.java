@@ -35,6 +35,23 @@ public class CreateDefaultActivitiDiagramNameWizardPage extends WizardNewFileCre
       }
     }
   }
+  
+  public CreateDefaultActivitiDiagramNameWizardPage(String pageName, IStructuredSelection selection) {
+    super(pageName, selection);
+    super.setFileName(DEFAULT_DIAGRAM_NAME);
+
+    // Set selection to the default folder if the project itself was selected
+    final IProject project = getProjectFromSelection(selection);
+    if (project != null)
+    {
+        final IFolder folder = project.getFolder(ActivitiConstants.DIAGRAM_FOLDER);
+        if (folder != null && folder.exists())
+        {
+            selection.toList().set(0, folder);
+        }
+    }
+}
+  
   private IProject getProjectFromSelection(final IStructuredSelection selection) {
     IProject result = null;
     if (selection.size() == 1) {

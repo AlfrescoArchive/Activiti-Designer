@@ -26,8 +26,8 @@ import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 public class CreateDefaultActivitiDiagramWizard extends BasicNewResourceWizard {
 
   private Diagram diagram;
-  private CreateDefaultActivitiDiagramNameWizardPage namePage;
-  private CreateDefaultActivitiDiagramInitialContentPage initialContentPage;
+  protected CreateDefaultActivitiDiagramNameWizardPage namePage;
+  protected CreateDefaultActivitiDiagramInitialContentPage initialContentPage;
 
   @Override
   public void addPages() {

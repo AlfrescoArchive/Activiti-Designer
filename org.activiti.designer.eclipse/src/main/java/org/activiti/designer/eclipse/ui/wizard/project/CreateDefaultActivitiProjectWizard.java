@@ -131,7 +131,7 @@ public class CreateDefaultActivitiProjectWizard extends BasicNewProjectResourceW
    * Gets the WizardNewProjectCreationPage from the Wizard, which is the first
    * page allowing the user to specify the project name and location.
    */
-  private WizardNewProjectCreationPage getBasicNewProjectPage() {
+  protected WizardNewProjectCreationPage getBasicNewProjectPage() {
 
     WizardNewProjectCreationPage result = null;
 

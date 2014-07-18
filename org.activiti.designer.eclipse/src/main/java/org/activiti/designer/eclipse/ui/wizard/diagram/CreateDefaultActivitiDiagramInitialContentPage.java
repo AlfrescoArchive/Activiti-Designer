@@ -25,12 +25,17 @@ public class CreateDefaultActivitiDiagramInitialContentPage extends WizardPage {
   public Button contentSourceImport;
   public Button contentSourceTemplate;
   public Table templateTable;
+  public Group templateGroup;
 
   public CreateDefaultActivitiDiagramInitialContentPage() {
     super(PAGE_NAME);
     setTitle("New Activiti Diagram");
     setImageDescriptor(ActivitiPlugin.getImageDescriptor(PluginImage.ACTIVITI_LOGO_64x64));
     setDescription("Select the initial content for the new diagram.");
+  }
+
+  public CreateDefaultActivitiDiagramInitialContentPage(String pageName) {
+    super(pageName);
   }
 
   @Override
@@ -64,7 +69,7 @@ public class CreateDefaultActivitiDiagramInitialContentPage extends WizardPage {
     contentSourceTemplate = toolkit.createButton(contentSourceGroup, "Yes, use a template", SWT.RADIO);
     contentSourceTemplate.setEnabled(true);
     
-    Group templateGroup = new Group(container, SWT.SHADOW_IN);
+    templateGroup = new Group(container, SWT.SHADOW_IN);
     templateGroup.setText("Choose template");
     data = new GridData();
     data.grabExcessHorizontalSpace = true;

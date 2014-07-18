@@ -178,7 +178,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     updateDirtyState();
   }
 
-  private void doSaveToBpmn(final BpmnMemoryModel model, final String diagramFileString) throws Exception {
+  protected void doSaveToBpmn(final BpmnMemoryModel model, final String diagramFileString) throws Exception {
 
     // add sequence flow bend-points to the model
     final IFeatureProvider featureProvider = getDiagramTypeProvider().getFeatureProvider();
@@ -469,7 +469,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     return pictElement;
   }
 
-  private void drawFlowElements(Collection<FlowElement> elementList, Map<String, GraphicInfo> locationMap, ContainerShape parentShape, Process process) {
+  protected void drawFlowElements(Collection<FlowElement> elementList, Map<String, GraphicInfo> locationMap, ContainerShape parentShape, Process process) {
 
     final IFeatureProvider featureProvider = getDiagramTypeProvider().getFeatureProvider();
 
@@ -581,7 +581,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     }
   }
 
-  private CustomServiceTask findCustomServiceTask(ServiceTask serviceTask) {
+  protected CustomServiceTask findCustomServiceTask(ServiceTask serviceTask) {
     CustomServiceTask result = null;
     if (serviceTask.isExtended()) {
 
@@ -598,7 +598,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     return result;
   }
 
-  private ContainerShape getParentContainer(String flowElementId, Process process, Diagram diagram) {
+  protected ContainerShape getParentContainer(String flowElementId, Process process, Diagram diagram) {
     Lane foundLane = null;
     for (Lane lane : process.getLanes()) {
       if (lane.getFlowReferences().contains(flowElementId)) {
@@ -615,7 +615,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     }
   }
 
-  private Point getLocation(ContainerShape containerShape) {
+  protected Point getLocation(ContainerShape containerShape) {
     if (containerShape instanceof Diagram == true) {
       return new Point(containerShape.getGraphicsAlgorithm().getX(), containerShape.getGraphicsAlgorithm().getY());
     }
