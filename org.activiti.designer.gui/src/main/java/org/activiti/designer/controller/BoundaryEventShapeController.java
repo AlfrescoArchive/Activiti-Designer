@@ -1,6 +1,7 @@
 package org.activiti.designer.controller;
 
 import org.activiti.bpmn.model.BoundaryEvent;
+import org.activiti.bpmn.model.CompensateEventDefinition;
 import org.activiti.bpmn.model.ErrorEventDefinition;
 import org.activiti.bpmn.model.EventDefinition;
 import org.activiti.bpmn.model.MessageEventDefinition;
@@ -120,6 +121,8 @@ public class BoundaryEventShapeController extends AbstractBusinessObjectShapeCon
         imageKey = PluginImage.IMG_EVENT_ERROR.getImageKey();
       } else if (eventDefinition instanceof SignalEventDefinition) {
         imageKey = PluginImage.IMG_EVENT_SIGNAL.getImageKey();
+      } else if (eventDefinition instanceof CompensateEventDefinition) {
+    	  imageKey = PluginImage.IMG_EVENT_COMPENSATE.getImageKey();
       }
     }
     return imageKey;

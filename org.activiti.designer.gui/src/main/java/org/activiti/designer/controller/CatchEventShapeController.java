@@ -1,5 +1,6 @@
 package org.activiti.designer.controller;
 
+import org.activiti.bpmn.model.CompensateEventDefinition;
 import org.activiti.bpmn.model.Event;
 import org.activiti.bpmn.model.EventDefinition;
 import org.activiti.bpmn.model.IntermediateCatchEvent;
@@ -98,6 +99,8 @@ public class CatchEventShapeController extends AbstractBusinessObjectShapeContro
         image = gaService.createImage(shape, PluginImage.IMG_EVENT_MESSAGE.getImageKey());
       } else if (eventDefinition instanceof TimerEventDefinition) {
         image = gaService.createImage(shape, PluginImage.IMG_EVENT_TIMER.getImageKey());
+      } else if (eventDefinition instanceof CompensateEventDefinition) {
+    	image = gaService.createImage(shape, PluginImage.IMG_EVENT_COMPENSATE.getImageKey());
       }
       
       if (image != null) {

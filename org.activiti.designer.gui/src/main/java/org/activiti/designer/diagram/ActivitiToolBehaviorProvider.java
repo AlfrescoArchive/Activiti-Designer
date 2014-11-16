@@ -13,6 +13,7 @@ import org.activiti.bpmn.model.Activity;
 import org.activiti.bpmn.model.BoundaryEvent;
 import org.activiti.bpmn.model.BusinessRuleTask;
 import org.activiti.bpmn.model.CallActivity;
+import org.activiti.bpmn.model.CompensateEventDefinition;
 import org.activiti.bpmn.model.EndEvent;
 import org.activiti.bpmn.model.ErrorEventDefinition;
 import org.activiti.bpmn.model.EventDefinition;
@@ -42,12 +43,14 @@ import org.activiti.designer.PluginImage;
 import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.features.AbstractCreateBPMNFeature;
 import org.activiti.designer.features.ChangeElementTypeFeature;
+import org.activiti.designer.features.CreateBoundaryCompensateFeature;
 import org.activiti.designer.features.CreateBoundaryErrorFeature;
 import org.activiti.designer.features.CreateBoundaryMessageFeature;
 import org.activiti.designer.features.CreateBoundarySignalFeature;
 import org.activiti.designer.features.CreateBoundaryTimerFeature;
 import org.activiti.designer.features.CreateBusinessRuleTaskFeature;
 import org.activiti.designer.features.CreateCallActivityFeature;
+import org.activiti.designer.features.CreateCompensateThrowingEventFeature;
 import org.activiti.designer.features.CreateCustomServiceTaskFeature;
 import org.activiti.designer.features.CreateEmbeddedSubProcessFeature;
 import org.activiti.designer.features.CreateEndEventFeature;
@@ -161,6 +164,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     toolMapping.put(CreateEventSubProcessFeature.class, PaletteEntry.EVENT_SUBPROCESS);
     toolMapping.put(CreateUserTaskFeature.class, PaletteEntry.USER_TASK);
     toolMapping.put(CreateAlfrescoUserTaskFeature.class, PaletteEntry.ALFRESCO_USER_TASK);
+    toolMapping.put(CreateBoundaryCompensateFeature.class, PaletteEntry.BOUNDARY_COMPENSATE);
     toolMapping.put(CreateBoundaryTimerFeature.class, PaletteEntry.BOUNDARY_TIMER);
     toolMapping.put(CreateBoundaryErrorFeature.class, PaletteEntry.BOUNDARY_ERROR);
     toolMapping.put(CreateBoundaryMessageFeature.class, PaletteEntry.BOUNDARY_MESSAGE);
@@ -169,6 +173,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     toolMapping.put(CreateSignalCatchingEventFeature.class, PaletteEntry.CATCH_SIGNAL);
     toolMapping.put(CreateMessageCatchingEventFeature.class, PaletteEntry.CATCH_MESSAGE);
     toolMapping.put(CreateSignalThrowingEventFeature.class, PaletteEntry.THROW_SIGNAL);
+    toolMapping.put(CreateCompensateThrowingEventFeature.class, PaletteEntry.THROW_COMPENSATE);
     toolMapping.put(CreateNoneThrowingEventFeature.class, PaletteEntry.THROW_NONE);
     toolMapping.put(CreateBusinessRuleTaskFeature.class, PaletteEntry.BUSINESSRULE_TASK);
     toolMapping.put(CreateAlfrescoScriptTaskFeature.class, PaletteEntry.ALFRESCO_SCRIPT_TASK);
@@ -309,6 +314,8 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
           "Create a new intermediate catch signal event", PluginImage.IMG_EVENT_SIGNAL);
       addContextButton(otherElementButton, new CreateNoneThrowingEventFeature(getFeatureProvider()), taskContext, "Create intermediate throw none event",
           "Create a new intermediate throw none event", PluginImage.IMG_THROW_NONE);
+      addContextButton(otherElementButton, new CreateCompensateThrowingEventFeature(getFeatureProvider()), taskContext, "Create intermediate throw compensate event",
+              "Create a new intermediate throw compensate event", PluginImage.IMG_THROW_COMPENSATE);
       addContextButton(otherElementButton, new CreateSignalThrowingEventFeature(getFeatureProvider()), taskContext, "Create intermediate throw signal event",
           "Create a new intermediate throw signal event", PluginImage.IMG_THROW_SIGNAL);
       addContextButton(otherElementButton, new CreateAlfrescoScriptTaskFeature(getFeatureProvider()), taskContext, "Create alfresco script task",
@@ -440,6 +447,8 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
         eventType = "error";
       } else if (eventDefinition instanceof SignalEventDefinition) {
         eventType = "signal";
+      } else if (eventDefinition instanceof CompensateEventDefinition) {
+    	eventType = "compensate";
       }
     }
     if (eventType == null) {
@@ -465,6 +474,10 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
       addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), ChangeElementTypeFeature.EVENT_BOUNDARY_SIGNAL), customContext,
               "Change to signal boundary event", "Change to a signal boundary event", PluginImage.IMG_EVENT_SIGNAL);
     }
+    if ("compensate".equals(eventType) == false) {
+        addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), ChangeElementTypeFeature.EVENT_BOUNDARY_COMPENSATE), customContext,
+                "Change to compensate boundary event", "Change to a compensate boundary event", PluginImage.IMG_EVENT_COMPENSATE);
+      }
   }
   
   private void addIntermediateCatchEventButtons(ContextButtonEntry otherElementButton, IntermediateCatchEvent catchEvent, CustomContext customContext) {
@@ -476,6 +489,8 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
         eventType = "message";
       } else if (eventDefinition instanceof SignalEventDefinition) {
         eventType = "signal";
+      } else if (eventDefinition instanceof CompensateEventDefinition) {
+    	eventType = "compensate";
       }
     }
     if (eventType == null) {
@@ -502,6 +517,9 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
       if (eventDefinition instanceof SignalEventDefinition) {
         eventType = "signal";
       }
+      if (eventDefinition instanceof CompensateEventDefinition) {
+    	eventType = "compensate";
+      }
     }
     
     if (eventType == null) {
@@ -516,6 +534,10 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
       addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), ChangeElementTypeFeature.EVENT_THROW_SIGNAL), customContext,
               "Change to intermediate throw signal event", "Change to an intermediate throw signal event", PluginImage.IMG_THROW_SIGNAL);
     }
+    if ("compensate".equals(eventType) == false) {
+        addContextButton(otherElementButton, new ChangeElementTypeFeature(getFeatureProvider(), ChangeElementTypeFeature.EVENT_THROW_COMPENSATE), customContext,
+                "Change to intermediate throw compensate event", "Change to an intermediate throw compensate event", PluginImage.IMG_THROW_COMPENSATE);
+      }
   }
 
   private void addTaskButtons(ContextButtonEntry otherElementButton, Task notTask, CustomContext customContext) {
@@ -675,6 +697,8 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
           boundaryEventCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("messageboundaryevent".equalsIgnoreCase(toolEntry.getLabel())) {
           boundaryEventCompartmentEntry.getToolEntries().add(toolEntry);
+        } else if ("compensateboundaryevent".equalsIgnoreCase(toolEntry.getLabel())) {
+          boundaryEventCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("timercatchingevent".equalsIgnoreCase(toolEntry.getLabel())) {
           intermediateEventCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("signalcatchingevent".equalsIgnoreCase(toolEntry.getLabel())) {
@@ -682,6 +706,8 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
         } else if ("messagecatchingevent".equalsIgnoreCase(toolEntry.getLabel())) {
           intermediateEventCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("signalthrowingevent".equalsIgnoreCase(toolEntry.getLabel())) {
+          intermediateEventCompartmentEntry.getToolEntries().add(toolEntry);
+        } else if ("compensatethrowingevent".equalsIgnoreCase(toolEntry.getLabel())) {
           intermediateEventCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("nonethrowingevent".equalsIgnoreCase(toolEntry.getLabel())) {
           intermediateEventCompartmentEntry.getToolEntries().add(toolEntry);

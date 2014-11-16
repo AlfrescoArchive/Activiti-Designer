@@ -38,6 +38,7 @@ public enum PluginImage {
   IMG_EVENT_MESSAGE("event.message", "letter.png"),
   IMG_EVENT_TIMER("event.timer", "timer.png"), //$NON-NLS-1$
   IMG_EVENT_SIGNAL("event.signal", "signal.png"), //$NON-NLS-1$
+  IMG_EVENT_COMPENSATE("event.compensate", "compensate.png"), //$NON-NLS-1$
 
   // Gateway image icons
   IMG_GATEWAY_PARALLEL("gateway.parallel", "type.gateway.parallel.png"), //$NON-NLS-1$
@@ -68,6 +69,7 @@ public enum PluginImage {
   IMG_ACTION_ZOOM("action.magnifier", "action.magnifier.png"), //$NON-NLS-1$
 
   IMG_THROW_SIGNAL("throw.signal", "throw.signal.png"), //$NON-NLS-1$
+  IMG_THROW_COMPENSATE("throw.compensate", "throw.compensate.png"), //$NON-NLS-1$
   IMG_THROW_NONE("throw.none", "throw.none.png"), //$NON-NLS-1$
   
   IMG_TEXT_ANNOTATION("textannotation", "textannotation.png"),

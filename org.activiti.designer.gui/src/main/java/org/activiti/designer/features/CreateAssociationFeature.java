@@ -4,6 +4,7 @@ import org.activiti.bpmn.model.Association;
 import org.activiti.bpmn.model.BaseElement;
 import org.activiti.bpmn.model.Lane;
 import org.activiti.bpmn.model.SubProcess;
+import org.activiti.bpmn.model.Task;
 import org.activiti.bpmn.model.TextAnnotation;
 import org.activiti.designer.PluginImage;
 import org.activiti.designer.util.editor.BpmnMemoryModel;
@@ -32,7 +33,8 @@ public class CreateAssociationFeature extends AbstractCreateBPMNConnectionFeatur
     
     boolean canCreate = false;
     
-    if (sourceBo != targetBo && (sourceBo instanceof TextAnnotation || targetBo instanceof TextAnnotation)) {
+    //if (sourceBo != targetBo && (sourceBo instanceof TextAnnotation || targetBo instanceof TextAnnotation)) {
+   if (sourceBo != targetBo && targetBo != null && sourceBo != targetBo && (targetBo instanceof Task ||sourceBo instanceof Task || sourceBo instanceof TextAnnotation || targetBo instanceof TextAnnotation)) {
       canCreate = true;
     }
     
