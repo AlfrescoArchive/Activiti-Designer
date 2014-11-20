@@ -746,7 +746,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
 
     final Map<String, List<CustomServiceTaskContext>> tasksInDrawers = new HashMap<String, List<CustomServiceTaskContext>>();
 
-    final List<CustomServiceTaskContext> customServiceTaskContexts = ExtensionUtil.getCustomServiceTaskContexts(project);
+    final List<CustomServiceTaskContext> customServiceTaskContexts = getCustomServiceTaskContexts(project);
 
     // Graphiti sets the diagram type prover id with || in front of the image key
     String prefixId = getDiagramTypeProvider().getProviderId() + "||";
@@ -795,6 +795,16 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
   }
 
   /**
+   * Returns the custom service task entries that should be enabled for the given project.
+   * 
+   * @param project
+   * @return
+   */
+  protected List<CustomServiceTaskContext> getCustomServiceTaskContexts(IProject project) {
+	return ExtensionUtil.getCustomServiceTaskContexts(project);
+  }
+
+  /**
    * Prunes the disabled palette entries from the
    * {@link IPaletteCompartmentEntry}.
    *
@@ -803,7 +813,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
    */
   private void pruneDisabledPaletteEntries(final IProject project, final IPaletteCompartmentEntry entry) {
 
-    final Set<PaletteEntry> disabledPaletteEntries = ExtensionUtil.getDisabledPaletteEntries(project);
+    final Set<PaletteEntry> disabledPaletteEntries = getDisabledPaletteEntries(project);
 
     if (!disabledPaletteEntries.isEmpty()) {
 
@@ -827,6 +837,16 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
         }
       }
     }
+  }
+  
+ /**
+  * Returns the palette entries that should be disabled for the given project.
+  * 
+  * @param project
+  * @return
+  */
+  protected Set<PaletteEntry> getDisabledPaletteEntries(IProject project) {
+	return ExtensionUtil.getDisabledPaletteEntries(project);
   }
 
   private boolean subProcessDiagramExists(SubProcess subProcess) {
