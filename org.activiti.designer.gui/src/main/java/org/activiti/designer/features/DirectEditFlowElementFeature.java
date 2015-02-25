@@ -1,6 +1,8 @@
 package org.activiti.designer.features;
 
 import org.activiti.bpmn.model.FlowElement;
+import org.activiti.designer.eclipse.common.ActivitiPlugin;
+import org.activiti.designer.util.bpmn.BpmnExtensionUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IDirectEditingContext;
 import org.eclipse.graphiti.features.impl.AbstractDirectEditingFeature;
@@ -46,7 +48,7 @@ public class DirectEditFlowElementFeature extends AbstractDirectEditingFeature {
 		// return the current name of the EClass
 		PictogramElement pe = context.getPictogramElement();
 		FlowElement flowElement = (FlowElement) getBusinessObjectForPictogramElement(pe);
-		return flowElement.getName();
+		return BpmnExtensionUtil.getFlowElementName(flowElement, ActivitiPlugin.getDefault());
 	}
 
 	@Override
@@ -64,7 +66,7 @@ public class DirectEditFlowElementFeature extends AbstractDirectEditingFeature {
 		// set the new name for the EClass
 		PictogramElement pe = context.getPictogramElement();
 		FlowElement flowElement = (FlowElement) getBusinessObjectForPictogramElement(pe);
-		flowElement.setName(value);
+		BpmnExtensionUtil.setFlowElementName(flowElement, value, ActivitiPlugin.getDefault());
 
 		// Explicitly update the shape to display the new value in the diagram
 		// Note, that this might not be necessary in future versions of the GFW

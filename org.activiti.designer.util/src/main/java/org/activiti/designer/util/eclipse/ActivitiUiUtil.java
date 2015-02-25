@@ -10,6 +10,7 @@ import org.activiti.bpmn.model.BaseElement;
 import org.activiti.bpmn.model.BoundaryEvent;
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.Lane;
+import org.activiti.bpmn.model.MessageFlow;
 import org.activiti.bpmn.model.Pool;
 import org.activiti.bpmn.model.Process;
 import org.activiti.bpmn.model.SubProcess;
@@ -214,6 +215,8 @@ public class ActivitiUiUtil {
           determinedId = loopThroughLanes(featureClass, determinedId, process.getLanes(), featureIdKey);
         } else if (featureClass.equals(TextAnnotation.class) || featureClass.equals(Association.class)) {
           determinedId = loopThroughArtifacts(featureClass, determinedId, process.getArtifacts(), featureIdKey);
+        } else if (featureClass.equals(MessageFlow.class)) {
+          determinedId = loopThroughMessageFlows(determinedId, model.getBpmnModel().getMessageFlows().values(), featureIdKey);
         } else {
           determinedId = loopThroughElements(featureClass, determinedId, process.getFlowElements(), featureIdKey);
         }
@@ -253,6 +256,16 @@ public class ActivitiUiUtil {
     return determinedId;
   }
   
+  public static int loopThroughMessageFlows(int determinedId, Collection<MessageFlow> messageFlowList, 
+      final String featureIdKey) {
+    
+    for (MessageFlow messageFlow : messageFlowList) {
+      String contentObjectId = messageFlow.getId().replace(featureIdKey, "");
+      determinedId = getId(contentObjectId, determinedId);
+    }
+    return determinedId;
+  }
+  
   public static int loopThroughElements(final Class<? extends BaseElement> featureClass, int determinedId, 
   		Collection<FlowElement> elementList, final String featureIdKey) {
   	
@@ -283,14 +296,14 @@ public class ActivitiUiUtil {
   private static int getId(String contentObjectId, int determinedId) {
     int newdId = determinedId;
     boolean isNumber = true;
-    if(contentObjectId != null && contentObjectId.length() > 0) {
+    if (contentObjectId != null && contentObjectId.length() > 0) {
       
-      for(int i = 0; i < contentObjectId.length(); i++) {
-        if(Character.isDigit(contentObjectId.charAt(i)) == false) {
+      for (int i = 0; i < contentObjectId.length(); i++) {
+        if (Character.isDigit(contentObjectId.charAt(i)) == false) {
           isNumber = false;
         }
       }
-      if(isNumber == true) {
+      if (isNumber == true) {
         Integer intNumber = Integer.valueOf(contentObjectId);
         if (intNumber > newdId) {
           newdId = intNumber;

@@ -4,6 +4,8 @@ import org.activiti.bpmn.model.EventSubProcess;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.bpmn.model.Task;
 import org.activiti.designer.diagram.ActivitiBPMNFeatureProvider;
+import org.activiti.designer.eclipse.common.ActivitiPlugin;
+import org.activiti.designer.util.bpmn.BpmnExtensionUtil;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.platform.OSEnum;
 import org.activiti.designer.util.platform.OSUtil;
@@ -78,7 +80,8 @@ public class EventSubProcessShapeController extends AbstractBusinessObjectShapeC
     final Shape shape = peCreateService.createShape(containerShape, false);
 
     // create and set text graphics algorithm
-    final Text text = gaService.createDefaultText(diagram, shape, addedSubProcess.getName());
+    String name = BpmnExtensionUtil.getFlowElementName(addedSubProcess, ActivitiPlugin.getDefault());
+    final Text text = gaService.createDefaultText(diagram, shape, name);
     text.setStyle(StyleUtil.getStyleForEvent(diagram));
     text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
     text.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);

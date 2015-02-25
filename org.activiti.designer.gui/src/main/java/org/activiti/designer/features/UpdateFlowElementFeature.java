@@ -8,7 +8,9 @@ import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.MultiInstanceLoopCharacteristics;
 import org.activiti.designer.PluginImage;
 import org.activiti.designer.controller.TaskShapeController;
+import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.util.TextUtil;
+import org.activiti.designer.util.bpmn.BpmnExtensionUtil;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -128,7 +130,7 @@ public class UpdateFlowElementFeature extends AbstractUpdateFeature {
       }
     }
 
-		String businessName = flowElement.getName();
+		String businessName = BpmnExtensionUtil.getFlowElementName(flowElement, ActivitiPlugin.getDefault());
 
 		// update needed, if names are different
 		boolean updateNameNeeded = ((pictogramName == null && businessName != null) || 
@@ -148,7 +150,7 @@ public class UpdateFlowElementFeature extends AbstractUpdateFeature {
 		Object bo = getBusinessObjectForPictogramElement(pictogramElement);
 		if (bo instanceof FlowElement) {
 			FlowElement flowElement = (FlowElement) bo;
-			businessName = flowElement.getName();
+			businessName = BpmnExtensionUtil.getFlowElementName(flowElement, ActivitiPlugin.getDefault());
 		}
 		
 		boolean updated = false;

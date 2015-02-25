@@ -5,6 +5,8 @@ import org.activiti.bpmn.model.MultiInstanceLoopCharacteristics;
 import org.activiti.bpmn.model.Task;
 import org.activiti.designer.PluginImage;
 import org.activiti.designer.diagram.ActivitiBPMNFeatureProvider;
+import org.activiti.designer.eclipse.common.ActivitiPlugin;
+import org.activiti.designer.util.bpmn.BpmnExtensionUtil;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.platform.OSEnum;
 import org.activiti.designer.util.platform.OSUtil;
@@ -82,7 +84,8 @@ public class CallActivityShapeController extends AbstractBusinessObjectShapeCont
     Shape shape = peCreateService.createShape(containerShape, false);
 
     // create and set text graphics algorithm
-    final MultiText text = gaService.createDefaultMultiText(diagram, shape, addedCallActivity.getName());
+    String name = BpmnExtensionUtil.getFlowElementName(addedCallActivity, ActivitiPlugin.getDefault());
+    final MultiText text = gaService.createDefaultMultiText(diagram, shape, name);
     text.setStyle(StyleUtil.getStyleForTask(diagram));
     text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
     text.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);

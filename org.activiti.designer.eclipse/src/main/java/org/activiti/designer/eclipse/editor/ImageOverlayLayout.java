@@ -1,7 +1,8 @@
 package org.activiti.designer.eclipse.editor;
 
-import org.activiti.designer.eclipse.preferences.PreferencesUtil;
+import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.util.preferences.Preferences;
+import org.activiti.designer.util.preferences.PreferencesUtil;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
@@ -166,7 +167,7 @@ public class ImageOverlayLayout {
   }
 
   private Color getColorPreference(final Preferences preference) {
-    final String fontPreference = PreferencesUtil.getStringPreference(preference);
+    final String fontPreference = PreferencesUtil.getStringPreference(preference, ActivitiPlugin.getDefault());
     final String[] rgbArray = fontPreference.split(",");
 
     return new Color(context.getImageGC().getDevice(), new RGB(Integer.parseInt(rgbArray[0]), Integer.parseInt(rgbArray[1]), Integer.parseInt(rgbArray[2])));

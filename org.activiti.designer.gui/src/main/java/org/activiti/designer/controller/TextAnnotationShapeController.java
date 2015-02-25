@@ -3,6 +3,8 @@ package org.activiti.designer.controller;
 import org.activiti.bpmn.model.Task;
 import org.activiti.bpmn.model.TextAnnotation;
 import org.activiti.designer.diagram.ActivitiBPMNFeatureProvider;
+import org.activiti.designer.eclipse.common.ActivitiPlugin;
+import org.activiti.designer.util.bpmn.BpmnExtensionUtil;
 import org.activiti.designer.util.platform.OSEnum;
 import org.activiti.designer.util.platform.OSUtil;
 import org.activiti.designer.util.style.StyleUtil;
@@ -57,15 +59,15 @@ public class TextAnnotationShapeController extends AbstractBusinessObjectShapeCo
     gaService.setLocationAndSize(rect, context.getX(), context.getY(), width, height);
     
     final Shape lineShape = peCreateService.createShape(containerShape, false);
-    final Polyline line 
-            = gaService.createPolyline(lineShape
-                            , new int[] { commentEdge, 0, 0, 0, 0, height, commentEdge, height });
+    final Polyline line = gaService.createPolyline(lineShape, new int[] { 
+        commentEdge, 0, 0, 0, 0, height, commentEdge, height });
     line.setStyle(StyleUtil.getStyleForTask(diagram));
     line.setLineWidth(2);
     gaService.setLocationAndSize(line, 0, 0, commentEdge, height);
     
     final Shape textShape = peCreateService.createShape(containerShape, false);
-    final MultiText text = gaService.createDefaultMultiText(diagram, textShape, annotation.getText());
+    String annotationText = BpmnExtensionUtil.getTextAnnotationText(annotation, ActivitiPlugin.getDefault());
+    final MultiText text = gaService.createDefaultMultiText(diagram, textShape, annotationText);
     text.setStyle(StyleUtil.getStyleForTask(diagram));
     text.setVerticalAlignment(Orientation.ALIGNMENT_TOP);
     if (OSUtil.getOperatingSystem() == OSEnum.Mac) {

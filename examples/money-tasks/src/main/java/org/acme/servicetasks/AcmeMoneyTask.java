@@ -7,6 +7,8 @@ import org.activiti.designer.integration.servicetask.AbstractCustomServiceTask;
 import org.activiti.designer.integration.servicetask.PropertyType;
 import org.activiti.designer.integration.servicetask.annotation.DatePickerProperty;
 import org.activiti.designer.integration.servicetask.annotation.Help;
+import org.activiti.designer.integration.servicetask.annotation.Locale;
+import org.activiti.designer.integration.servicetask.annotation.Locales;
 import org.activiti.designer.integration.servicetask.annotation.Property;
 import org.activiti.designer.integration.servicetask.annotation.PropertyItems;
 import org.activiti.designer.integration.servicetask.annotation.Runtime;
@@ -51,6 +53,12 @@ public class AcmeMoneyTask extends AbstractCustomServiceTask {
 
   @Property(type = PropertyType.TEXT, displayName = "Account Number", required = true, defaultValue = "1234567890")
   @Help(displayHelpShort = "Provide an account number", displayHelpLong = HELP_ACCOUNT_NUMBER_LONG)
+  @Locales(
+      {
+        @Locale(locale = "en", name = "Account number"),
+        @Locale(locale = "de", name = "Kontonummer")
+      }
+  )
   private String accountNumber;
 
   @Property(type = PropertyType.MULTILINE_TEXT, displayName = "Comments", required = true)
@@ -94,7 +102,12 @@ public class AcmeMoneyTask extends AbstractCustomServiceTask {
     return "Acme Corporation";
   }
 
-  @Override
+  @Locales(
+      {
+        @Locale(locale = "en", name = "Money node"),
+        @Locale(locale = "de", name = "Geld node")
+      }
+  )
   public String getName() {
     return "Money node";
   }

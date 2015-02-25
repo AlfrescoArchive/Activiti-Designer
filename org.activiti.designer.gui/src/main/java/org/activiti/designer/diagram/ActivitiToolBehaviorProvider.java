@@ -1,5 +1,6 @@
 package org.activiti.designer.diagram;
 
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -39,7 +40,7 @@ import org.activiti.bpmn.model.TimerEventDefinition;
 import org.activiti.bpmn.model.UserTask;
 import org.activiti.bpmn.model.alfresco.AlfrescoStartEvent;
 import org.activiti.designer.PluginImage;
-import org.activiti.designer.eclipse.preferences.PreferencesUtil;
+import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.features.AbstractCreateBPMNFeature;
 import org.activiti.designer.features.ChangeElementTypeFeature;
 import org.activiti.designer.features.CreateBoundaryErrorFeature;
@@ -67,6 +68,7 @@ import org.activiti.designer.features.CreateParallelGatewayFeature;
 import org.activiti.designer.features.CreatePoolFeature;
 import org.activiti.designer.features.CreateReceiveTaskFeature;
 import org.activiti.designer.features.CreateScriptTaskFeature;
+import org.activiti.designer.features.CreateSendTaskFeature;
 import org.activiti.designer.features.CreateServiceTaskFeature;
 import org.activiti.designer.features.CreateSignalCatchingEventFeature;
 import org.activiti.designer.features.CreateSignalThrowingEventFeature;
@@ -79,11 +81,14 @@ import org.activiti.designer.features.CreateUserTaskFeature;
 import org.activiti.designer.features.DeletePoolFeature;
 import org.activiti.designer.features.contextmenu.OpenCalledElementForCallActivity;
 import org.activiti.designer.integration.palette.PaletteEntry;
+import org.activiti.designer.integration.servicetask.annotation.Locale;
+import org.activiti.designer.integration.servicetask.annotation.Locales;
 import org.activiti.designer.util.ActivitiConstants;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.extension.CustomServiceTaskContext;
 import org.activiti.designer.util.extension.ExtensionUtil;
 import org.activiti.designer.util.preferences.Preferences;
+import org.activiti.designer.util.preferences.PreferencesUtil;
 import org.activiti.designer.util.workspace.ActivitiWorkspaceUtil;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFile;
@@ -154,6 +159,7 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     toolMapping.put(CreateParallelGatewayFeature.class, PaletteEntry.PARALLEL_GATEWAY);
     toolMapping.put(CreateScriptTaskFeature.class, PaletteEntry.SCRIPT_TASK);
     toolMapping.put(CreateServiceTaskFeature.class, PaletteEntry.SERVICE_TASK);
+    toolMapping.put(CreateSendTaskFeature.class, PaletteEntry.SEND_TASK);
     toolMapping.put(CreateCallActivityFeature.class, PaletteEntry.CALL_ACTIVITY);
     toolMapping.put(CreateEmbeddedSubProcessFeature.class, PaletteEntry.SUBPROCESS);
     toolMapping.put(CreatePoolFeature.class, PaletteEntry.POOL);
@@ -312,11 +318,11 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
       addContextButton(otherElementButton, new CreateSignalThrowingEventFeature(getFeatureProvider()), taskContext, "Create intermediate throw signal event",
           "Create a new intermediate throw signal event", PluginImage.IMG_THROW_SIGNAL);
       addContextButton(otherElementButton, new CreateAlfrescoScriptTaskFeature(getFeatureProvider()), taskContext, "Create alfresco script task",
-              "Create a new alfresco script task", PluginImage.IMG_SERVICETASK);
+          "Create a new alfresco script task", PluginImage.IMG_SERVICETASK);
       addContextButton(otherElementButton, new CreateAlfrescoUserTaskFeature(getFeatureProvider()), taskContext, "Create alfresco user task",
-              "Create a new alfresco user task", PluginImage.IMG_USERTASK);
+          "Create a new alfresco user task", PluginImage.IMG_USERTASK);
       addContextButton(otherElementButton, new CreateAlfrescoMailTaskFeature(getFeatureProvider()), taskContext, "Create alfresco mail task",
-              "Create a new alfresco mail task", PluginImage.IMG_MAILTASK);
+          "Create a new alfresco mail task", PluginImage.IMG_MAILTASK);
     }
 
     ContextButtonEntry editElementButton = new ContextButtonEntry(null, null);
@@ -637,6 +643,8 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
       for (IToolEntry toolEntry : toolEntries) {
         if ("sequenceflow".equalsIgnoreCase(toolEntry.getLabel())) {
           connectionCompartmentEntry.getToolEntries().add(toolEntry);
+        } else if ("messageflow".equalsIgnoreCase(toolEntry.getLabel())) {
+          connectionCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("association".equalsIgnoreCase(toolEntry.getLabel())) {
           connectionCompartmentEntry.getToolEntries().add(toolEntry);
         } else if ("startevent".equalsIgnoreCase(toolEntry.getLabel())) {
@@ -740,7 +748,8 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     if (!artifactsCompartmentEntry.getToolEntries().isEmpty()) {
       ret.add(artifactsCompartmentEntry);
     }
-    if (PreferencesUtil.getBooleanPreference(Preferences.ALFRESCO_ENABLE) && alfrescoCompartmentEntry.getToolEntries().size() > 0) {
+    if (PreferencesUtil.getBooleanPreference(Preferences.ALFRESCO_ENABLE, ActivitiPlugin.getDefault()) && 
+        alfrescoCompartmentEntry.getToolEntries().size() > 0) {
       ret.add(alfrescoCompartmentEntry);
     }
 
@@ -781,10 +790,36 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
 
       final IPaletteCompartmentEntry paletteCompartmentEntry = new PaletteCompartmentEntry(drawer.getKey(), null);
 
+      String defaultLanguage = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_DEFAULT_LANGUAGE, ActivitiPlugin.getDefault());
       for (final CustomServiceTaskContext currentDrawerItem : drawer.getValue()) {
-        final CreateCustomServiceTaskFeature feature = new CreateCustomServiceTaskFeature(getFeatureProvider(), currentDrawerItem.getServiceTask().getName(),
+        
+        String name = null;
+        if (StringUtils.isNotEmpty(defaultLanguage)) {
+          Method[] methods = currentDrawerItem.getServiceTask().getClass().getMethods();
+          for (Method method : methods) {
+            if ("getName".equals(method.getName())) {
+              if (method.isAnnotationPresent(Locales.class)) {
+                Locales locales = method.getAnnotation(Locales.class);
+                if (locales.value() != null && locales.value().length > 0) {
+                  for (Locale locale : locales.value()) {
+                    if (locale.locale().equalsIgnoreCase(defaultLanguage)) {
+                      name = locale.name();
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        
+        if (StringUtils.isEmpty(name)) {
+          name = currentDrawerItem.getServiceTask().getName();
+        }
+        
+        final CreateCustomServiceTaskFeature feature = new CreateCustomServiceTaskFeature(getFeatureProvider(), name,
                 currentDrawerItem.getServiceTask().getDescription(), currentDrawerItem.getServiceTask().getClass().getCanonicalName());
-        final IToolEntry entry = new ObjectCreationToolEntry(currentDrawerItem.getServiceTask().getName(), currentDrawerItem.getServiceTask().getDescription(),
+        
+        final IToolEntry entry = new ObjectCreationToolEntry(name, currentDrawerItem.getServiceTask().getDescription(),
               currentDrawerItem.getSmallImageKey(), currentDrawerItem.getSmallImageKey(), feature);
         paletteCompartmentEntry.getToolEntries().add(entry);
       }

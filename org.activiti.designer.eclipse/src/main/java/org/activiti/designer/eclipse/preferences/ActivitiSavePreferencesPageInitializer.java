@@ -3,7 +3,9 @@
  */
 package org.activiti.designer.eclipse.preferences;
 
+import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.util.preferences.Preferences;
+import org.activiti.designer.util.preferences.PreferencesUtil;
 import org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer;
 import org.eclipse.jface.preference.IPreferenceStore;
 
@@ -23,7 +25,7 @@ public class ActivitiSavePreferencesPageInitializer extends AbstractPreferenceIn
 
   @Override
   public void initializeDefaultPreferences() {
-    IPreferenceStore store = PreferencesUtil.getActivitiDesignerPreferenceStore();
+    IPreferenceStore store = PreferencesUtil.getActivitiDesignerPreferenceStore(ActivitiPlugin.getDefault());
 
     // BPMN 2 Marshaller
     store.setDefault(Preferences.ALFRESCO_ENABLE.getPreferenceId(), true);

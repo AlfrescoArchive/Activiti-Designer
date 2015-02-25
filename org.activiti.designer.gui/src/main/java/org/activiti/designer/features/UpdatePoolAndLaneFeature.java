@@ -2,6 +2,8 @@ package org.activiti.designer.features;
 
 import org.activiti.bpmn.model.Lane;
 import org.activiti.bpmn.model.Pool;
+import org.activiti.designer.eclipse.common.ActivitiPlugin;
+import org.activiti.designer.util.bpmn.BpmnExtensionUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.IReason;
 import org.eclipse.graphiti.features.context.IUpdateContext;
@@ -42,9 +44,9 @@ public class UpdatePoolAndLaneFeature extends AbstractUpdateFeature {
 		String businessName = null;
 		Object bo = getBusinessObjectForPictogramElement(pictogramElement);
 		if (bo instanceof Pool) {
-			businessName = ((Pool) bo).getName();
+			businessName = BpmnExtensionUtil.getPoolName((Pool) bo, ActivitiPlugin.getDefault());
 		} else {
-		  businessName = ((Lane) bo).getName();
+		  businessName = BpmnExtensionUtil.getLaneName((Lane) bo, ActivitiPlugin.getDefault());
 		}
 
 		// update needed, if names are different
@@ -64,9 +66,9 @@ public class UpdatePoolAndLaneFeature extends AbstractUpdateFeature {
 		PictogramElement pictogramElement = context.getPictogramElement();
 		Object bo = getBusinessObjectForPictogramElement(pictogramElement);
 		if (bo instanceof Pool) {
-      businessName = ((Pool) bo).getName();
+      businessName = BpmnExtensionUtil.getPoolName((Pool) bo, ActivitiPlugin.getDefault());
     } else {
-      businessName = ((Lane) bo).getName();
+      businessName = BpmnExtensionUtil.getLaneName((Lane) bo, ActivitiPlugin.getDefault());
     }
 
 		// Set name in pictogram model

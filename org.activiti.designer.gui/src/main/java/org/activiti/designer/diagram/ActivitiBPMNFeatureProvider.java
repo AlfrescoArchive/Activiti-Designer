@@ -10,6 +10,7 @@ import org.activiti.bpmn.model.Event;
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.Gateway;
 import org.activiti.bpmn.model.Lane;
+import org.activiti.bpmn.model.MessageFlow;
 import org.activiti.bpmn.model.Pool;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.bpmn.model.TextAnnotation;
@@ -23,6 +24,7 @@ import org.activiti.designer.command.GatewayModelUpdater;
 import org.activiti.designer.command.IntermediateCatchEventModelUpdater;
 import org.activiti.designer.command.LaneModelUpdater;
 import org.activiti.designer.command.ManualTaskModelUpdater;
+import org.activiti.designer.command.MessageFlowModelUpdater;
 import org.activiti.designer.command.PoolModelUpdater;
 import org.activiti.designer.command.ProcessModelUpdater;
 import org.activiti.designer.command.ReceiveTaskModelUpdater;
@@ -46,6 +48,7 @@ import org.activiti.designer.controller.EventSubProcessShapeController;
 import org.activiti.designer.controller.ExclusiveGatewayShapeController;
 import org.activiti.designer.controller.InclusiveGatewayShapeController;
 import org.activiti.designer.controller.LaneShapeController;
+import org.activiti.designer.controller.MessageFlowShapeController;
 import org.activiti.designer.controller.ParallelGatewayShapeController;
 import org.activiti.designer.controller.PoolShapeController;
 import org.activiti.designer.controller.SequenceFlowShapeController;
@@ -77,6 +80,7 @@ import org.activiti.designer.features.CreateLaneFeature;
 import org.activiti.designer.features.CreateMailTaskFeature;
 import org.activiti.designer.features.CreateManualTaskFeature;
 import org.activiti.designer.features.CreateMessageCatchingEventFeature;
+import org.activiti.designer.features.CreateMessageFlowFeature;
 import org.activiti.designer.features.CreateMessageStartEventFeature;
 import org.activiti.designer.features.CreateNoneThrowingEventFeature;
 import org.activiti.designer.features.CreateParallelGatewayFeature;
@@ -96,6 +100,7 @@ import org.activiti.designer.features.CreateUserTaskFeature;
 import org.activiti.designer.features.DeleteArtifactFeature;
 import org.activiti.designer.features.DeleteFlowElementFeature;
 import org.activiti.designer.features.DeleteLaneFeature;
+import org.activiti.designer.features.DeleteMessageFlowFeature;
 import org.activiti.designer.features.DeletePoolFeature;
 import org.activiti.designer.features.DirectEditFlowElementFeature;
 import org.activiti.designer.features.DirectEditTextAnnotationFeature;
@@ -110,6 +115,7 @@ import org.activiti.designer.features.MoveTextAnnotationFeature;
 import org.activiti.designer.features.PasteFlowElementFeature;
 import org.activiti.designer.features.ReconnectSequenceFlowFeature;
 import org.activiti.designer.features.UpdateFlowElementFeature;
+import org.activiti.designer.features.UpdateMessageFlowFeature;
 import org.activiti.designer.features.UpdatePoolAndLaneFeature;
 import org.activiti.designer.features.UpdateTextAnnotationFeature;
 import org.activiti.designer.util.editor.BpmnIndependenceSolver;
@@ -179,6 +185,7 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
     shapeControllers.add(new LaneShapeController(this));
     shapeControllers.add(new TextAnnotationShapeController(this));
     shapeControllers.add(new SequenceFlowShapeController(this));
+    shapeControllers.add(new MessageFlowShapeController(this));
     shapeControllers.add(new AssociationShapeController(this));
     shapeControllers.add(new AlfrescoStartEventShapeController(this));
     shapeControllers.add(new AlfrescoTaskShapeController(this));
@@ -204,6 +211,7 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
     modelUpdaters.add(new TextAnnotationModelUpdater(this));
     modelUpdaters.add(new ProcessModelUpdater(this));
     modelUpdaters.add(new SequenceFlowModelUpdater(this));
+    modelUpdaters.add(new MessageFlowModelUpdater(this));
     modelUpdaters.add(new AssociationModelUpdater(this));
   }
   
@@ -283,6 +291,8 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
       return new DeleteLaneFeature(this);
     } else if (bo instanceof Artifact) {
       return new DeleteArtifactFeature(this);
+    } else if (bo instanceof MessageFlow) {
+      return new DeleteMessageFlowFeature(this);
     }
     return super.getDeleteFeature(context);
   }
@@ -299,8 +309,8 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
 
   @Override
   public ICreateConnectionFeature[] getCreateConnectionFeatures() {
-
-    return new ICreateConnectionFeature[] { new CreateSequenceFlowFeature(this), new CreateAssociationFeature(this) };
+    return new ICreateConnectionFeature[] { new CreateSequenceFlowFeature(this), 
+        new CreateMessageFlowFeature(this), new CreateAssociationFeature(this) };
   }
 
   @Override
@@ -324,6 +334,8 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
     } else if (pictogramElement instanceof FreeFormConnection) {
       if (bo instanceof FlowElement) {
         return new UpdateFlowElementFeature(this);
+      } else if (bo instanceof MessageFlow) {
+        return new UpdateMessageFlowFeature(this);
       }
     }
     return super.getUpdateFeature(context);

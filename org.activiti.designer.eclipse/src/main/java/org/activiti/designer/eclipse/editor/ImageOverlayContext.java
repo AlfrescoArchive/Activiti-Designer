@@ -6,8 +6,9 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-import org.activiti.designer.eclipse.preferences.PreferencesUtil;
+import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.util.preferences.Preferences;
+import org.activiti.designer.util.preferences.PreferencesUtil;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.swt.graphics.GC;
 import org.eclipse.team.core.RepositoryProvider;
@@ -73,27 +74,27 @@ public class ImageOverlayContext {
   }
 
   public boolean isKeyEnabled() {
-    return PreferencesUtil.getBooleanPreference(Preferences.SAVE_IMAGE_ADD_OVERLAY_KEY);
+    return PreferencesUtil.getBooleanPreference(Preferences.SAVE_IMAGE_ADD_OVERLAY_KEY, ActivitiPlugin.getDefault());
   }
 
   public boolean isNamespaceEnabled() {
-    return PreferencesUtil.getBooleanPreference(Preferences.SAVE_IMAGE_ADD_OVERLAY_NAMESPACE);
+    return PreferencesUtil.getBooleanPreference(Preferences.SAVE_IMAGE_ADD_OVERLAY_NAMESPACE, ActivitiPlugin.getDefault());
   }
 
   public boolean isFilenameEnabled() {
-    return PreferencesUtil.getBooleanPreference(Preferences.SAVE_IMAGE_ADD_OVERLAY_FILENAME);
+    return PreferencesUtil.getBooleanPreference(Preferences.SAVE_IMAGE_ADD_OVERLAY_FILENAME, ActivitiPlugin.getDefault());
   }
 
   public boolean isDateEnabled() {
-    return PreferencesUtil.getBooleanPreference(Preferences.SAVE_IMAGE_ADD_OVERLAY_DATE);
+    return PreferencesUtil.getBooleanPreference(Preferences.SAVE_IMAGE_ADD_OVERLAY_DATE, ActivitiPlugin.getDefault());
   }
 
   public boolean isRevisionEnabled() {
-    return PreferencesUtil.getBooleanPreference(Preferences.SAVE_IMAGE_ADD_OVERLAY_REVISION);
+    return PreferencesUtil.getBooleanPreference(Preferences.SAVE_IMAGE_ADD_OVERLAY_REVISION, ActivitiPlugin.getDefault());
   }
 
   public int getCornerPreference() {
-    return Integer.parseInt(PreferencesUtil.getStringPreference(Preferences.SAVE_IMAGE_ADD_OVERLAY_POSITION));
+    return Integer.parseInt(PreferencesUtil.getStringPreference(Preferences.SAVE_IMAGE_ADD_OVERLAY_POSITION, ActivitiPlugin.getDefault()));
   }
 
   public String getProcessNameDisplay() {

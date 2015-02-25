@@ -22,8 +22,8 @@ import java.util.List;
 
 import org.activiti.designer.eclipse.Logger;
 import org.activiti.designer.eclipse.common.ActivitiPlugin;
-import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.util.preferences.Preferences;
+import org.activiti.designer.util.preferences.PreferencesUtil;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
@@ -53,11 +53,12 @@ public class ActivitiCloudEditorUtil {
 
   public static CloseableHttpClient getAuthenticatedClient() {
   	
+    ActivitiPlugin plugin = ActivitiPlugin.getDefault();
   	// Get settings from preferences
-  	String url = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_URL);
-		String userName = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_USERNAME);
-		String password = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_PASSWORD);
-		String cookieString = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE);
+  	String url = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_URL, plugin);
+		String userName = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_USERNAME, plugin);
+		String password = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_PASSWORD, plugin);
+		String cookieString = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE, plugin);
   	
 		Cookie cookie = null;
 		if (StringUtils.isNotEmpty(cookieString)) {
@@ -96,7 +97,8 @@ public class ActivitiCloudEditorUtil {
 	            ByteArrayOutputStream os = new ByteArrayOutputStream();
 	            ObjectOutputStream outputStream = new ObjectOutputStream(os);
               outputStream.writeObject(reponseCookie);
-              PreferencesUtil.getActivitiDesignerPreferenceStore().setValue(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE.getPreferenceId(), byteArrayToHexString(os.toByteArray()));
+              PreferencesUtil.getActivitiDesignerPreferenceStore(plugin).setValue(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE.getPreferenceId(), 
+                  byteArrayToHexString(os.toByteArray()));
               InstanceScope.INSTANCE.getNode(ActivitiPlugin.PLUGIN_ID).flush();
 	        }
 	        
@@ -155,7 +157,9 @@ public class ActivitiCloudEditorUtil {
     CloseableHttpClient client = getAuthenticatedClient();
     try {
       
-      CloseableHttpResponse response = client.execute(new HttpGet(PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_URL) + "/rest/app/rest/process-models"));
+      ActivitiPlugin plugin = ActivitiPlugin.getDefault();
+      CloseableHttpResponse response = client.execute(new HttpGet(PreferencesUtil.getStringPreference(
+          Preferences.ACTIVITI_CLOUD_EDITOR_URL, plugin) + "/rest/app/rest/models"));
       try {
         int statusCode = response.getStatusLine().getStatusCode();
         InputStream responseContent = response.getEntity().getContent();
@@ -163,9 +167,9 @@ public class ActivitiCloudEditorUtil {
           resultNode = objectMapper.readTree(responseContent);
           
         } else if (statusCode == 401 && firstTry) {
-          String cookieString = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE);
+          String cookieString = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE, plugin);
           if (StringUtils.isNotEmpty(cookieString)) {
-            PreferencesUtil.getActivitiDesignerPreferenceStore().setValue(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE.getPreferenceId(), "");
+            PreferencesUtil.getActivitiDesignerPreferenceStore(plugin).setValue(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE.getPreferenceId(), "");
             InstanceScope.INSTANCE.getNode(ActivitiPlugin.PLUGIN_ID).flush();
             return getProcessModels(false);
           }
@@ -203,9 +207,10 @@ public class ActivitiCloudEditorUtil {
     InputStream bpmnStream = null;
     CloseableHttpClient client = getAuthenticatedClient();
     try {
-      
-      CloseableHttpResponse response = client.execute(new HttpGet(PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_URL) + 
-          "/rest/app/rest/process-models/" + modelId + "/bpmn20"));
+      ActivitiPlugin plugin = ActivitiPlugin.getDefault();
+      CloseableHttpResponse response = client.execute(new HttpGet(PreferencesUtil.getStringPreference(
+          Preferences.ACTIVITI_CLOUD_EDITOR_URL, plugin) + 
+          "/rest/app/rest/models/" + modelId + "/bpmn20"));
       try {
         int statusCode = response.getStatusLine().getStatusCode();
         bpmnStream = response.getEntity().getContent();
@@ -223,9 +228,10 @@ public class ActivitiCloudEditorUtil {
           }
           
         } else if (statusCode == 401 && firstTry) {
-          String cookieString = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE);
+          String cookieString = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE, plugin);
           if (StringUtils.isNotEmpty(cookieString)) {
-            PreferencesUtil.getActivitiDesignerPreferenceStore().setValue(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE.getPreferenceId(), "");
+            PreferencesUtil.getActivitiDesignerPreferenceStore(plugin).setValue(
+                Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE.getPreferenceId(), "");
             InstanceScope.INSTANCE.getNode(ActivitiPlugin.PLUGIN_ID).flush();
             return downloadProcessModel(modelId, file, false);
           }
@@ -262,8 +268,9 @@ public class ActivitiCloudEditorUtil {
     JsonNode modelNode = null;
     CloseableHttpClient client = getAuthenticatedClient();
     try {
-      HttpPost post = new HttpPost(PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_URL) + 
-          "/rest/app/rest/process-models/" + modelId + "/newversion");
+      ActivitiPlugin plugin = ActivitiPlugin.getDefault();
+      HttpPost post = new HttpPost(PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_URL, plugin) + 
+          "/rest/app/rest/models/" + modelId + "/newversion");
       HttpEntity entity = MultipartEntityBuilder.create().addBinaryBody("file", content, ContentType.APPLICATION_XML, filename).build();
       post.setEntity(entity);
       CloseableHttpResponse response = client.execute(post);
@@ -274,9 +281,9 @@ public class ActivitiCloudEditorUtil {
           modelNode = objectMapper.readTree(responseContent);
           
         } else if (statusCode == 401 && firstTry) {
-          String cookieString = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE);
+          String cookieString = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE, plugin);
           if (StringUtils.isNotEmpty(cookieString)) {
-            PreferencesUtil.getActivitiDesignerPreferenceStore().setValue(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE.getPreferenceId(), "");
+            PreferencesUtil.getActivitiDesignerPreferenceStore(plugin).setValue(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE.getPreferenceId(), "");
             InstanceScope.INSTANCE.getNode(ActivitiPlugin.PLUGIN_ID).flush();
             return uploadNewVersion(modelId, filename, content, false);
           }
@@ -314,7 +321,8 @@ public class ActivitiCloudEditorUtil {
     JsonNode modelNode = null;
     CloseableHttpClient client = getAuthenticatedClient();
     try {
-      HttpPost post = new HttpPost(PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_URL) + 
+      ActivitiPlugin plugin = ActivitiPlugin.getDefault();
+      HttpPost post = new HttpPost(PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_URL, plugin) + 
           "/rest/app/rest/import-process-model");
       HttpEntity entity = MultipartEntityBuilder.create().addBinaryBody("file", content, ContentType.APPLICATION_XML, filename).build();
       post.setEntity(entity);
@@ -326,9 +334,9 @@ public class ActivitiCloudEditorUtil {
           modelNode = objectMapper.readTree(responseContent);
           
         } else if (statusCode == 401 && firstTry) {
-          String cookieString = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE);
+          String cookieString = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE, plugin);
           if (StringUtils.isNotEmpty(cookieString)) {
-            PreferencesUtil.getActivitiDesignerPreferenceStore().setValue(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE.getPreferenceId(), "");
+            PreferencesUtil.getActivitiDesignerPreferenceStore(plugin).setValue(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE.getPreferenceId(), "");
             InstanceScope.INSTANCE.getNode(ActivitiPlugin.PLUGIN_ID).flush();
             return importModel(filename, content, false);
           }

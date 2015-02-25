@@ -20,6 +20,7 @@ Require-Bundle: org.eclipse.ui,
 Bundle-ActivationPolicy: lazy
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Export-Package: org.activiti.designer.util,
+ org.activiti.designer.util.bpmn,
  org.activiti.designer.util.eclipse,
  org.activiti.designer.util.editor,
  org.activiti.designer.util.extension,

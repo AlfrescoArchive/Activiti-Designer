@@ -13,6 +13,7 @@ import org.activiti.bpmn.model.DataObject;
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.GraphicInfo;
 import org.activiti.bpmn.model.Lane;
+import org.activiti.bpmn.model.MessageFlow;
 import org.activiti.bpmn.model.Pool;
 import org.activiti.bpmn.model.Process;
 import org.activiti.bpmn.model.SequenceFlow;
@@ -22,7 +23,9 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.graphiti.datatypes.ILocation;
 import org.eclipse.graphiti.features.IFeatureProvider;
+import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
 import org.eclipse.graphiti.mm.pictograms.ConnectionDecorator;
+import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.FreeFormConnection;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
@@ -76,6 +79,10 @@ public class GraphitiToBpmnDI {
       model.getBpmnModel().removeGraphicInfo(toDeletePool.getId());
     }
     
+    for (MessageFlow messageFlow : model.getBpmnModel().getMessageFlows().values()) {
+      updateMessageFlow(messageFlow);
+    }
+    
     for (Process process : model.getBpmnModel().getProcesses()) {
       loopThroughElements(process.getFlowElements(), process);
       loopThroughElements(process.getArtifacts(), process);
@@ -94,12 +101,12 @@ public class GraphitiToBpmnDI {
           updateSequenceFlow((SequenceFlow) element);
         } else if (element instanceof FlowElement) {
           updateFlowElement(element);
-          if(element instanceof SubProcess) {
+          if (element instanceof SubProcess) {
             SubProcess subProcess = (SubProcess) element;
             loopThroughElements(subProcess.getFlowElements(), subProcess);
             loopThroughElements(subProcess.getArtifacts(), subProcess);
           }
-          if(element instanceof Activity) {
+          if (element instanceof Activity) {
             Activity activity = (Activity) element;
             for (BoundaryEvent boundaryEvent : activity.getBoundaryEvents()) {
               updateFlowElement(boundaryEvent);
@@ -144,7 +151,7 @@ public class GraphitiToBpmnDI {
   
   protected void updateFlowElement(BaseElement flowElement) {
     PictogramElement picElement = featureProvider.getPictogramElementForBusinessObject(flowElement);
-    if(picElement instanceof Shape) {
+    if (picElement instanceof Shape) {
       Shape shape = (Shape) picElement;
       ILocation shapeLocation = Graphiti.getLayoutService().getLocationRelativeToDiagram(shape);
       model.getBpmnModel().addGraphicInfo(flowElement.getId(), createGraphicInfo(shapeLocation.getX(), shapeLocation.getY(), 
@@ -155,20 +162,20 @@ public class GraphitiToBpmnDI {
   protected void updateSequenceFlow(SequenceFlow sequenceFlow) {
     Shape sourceShape = null;
     Shape targetShape = null;
-    if(StringUtils.isNotEmpty(sequenceFlow.getSourceRef())) {
+    if (StringUtils.isNotEmpty(sequenceFlow.getSourceRef())) {
       sourceShape = (Shape) featureProvider.getPictogramElementForBusinessObject(model.getFlowElement(sequenceFlow.getSourceRef()));
     }
-    if(StringUtils.isNotEmpty(sequenceFlow.getTargetRef())) {
+    if (StringUtils.isNotEmpty(sequenceFlow.getTargetRef())) {
       targetShape = (Shape) featureProvider.getPictogramElementForBusinessObject(model.getFlowElement(sequenceFlow.getTargetRef()));
     }
    
-    if(sourceShape == null || targetShape == null) {
+    if (sourceShape == null || targetShape == null) {
       return;
     }
     
     FreeFormConnection freeFormConnection = (FreeFormConnection) featureProvider.getPictogramElementForBusinessObject(sequenceFlow);
     
-    if(freeFormConnection == null) 
+    if (freeFormConnection == null) 
       return;
     
     List<GraphicInfo> flowGraphicsList = createFlowGraphicInfoList(sourceShape, targetShape, freeFormConnection);
@@ -185,8 +192,72 @@ public class GraphitiToBpmnDI {
             startX = flowGraphicsList.get(0).getX();
             startY = flowGraphicsList.get(0).getY();
           }
+          
+          Diagram diagram = featureProvider.getDiagramTypeProvider().getDiagram();
+          int parentX = 0;
+          int parentY = 0;
+          if (sourceShape.getContainer().equals(diagram) == false) {
+            GraphicInfo graphicInfo = new GraphicInfo();
+            getParentGraphicsAlgorithm(sourceShape, diagram, graphicInfo);
+            parentX = (int) graphicInfo.getX();
+            parentY = (int) graphicInfo.getY();
+          }
+          
           model.getBpmnModel().addLabelGraphicInfo(sequenceFlow.getId(), createGraphicInfo(
-                  (int) startX + text.getX(), (int) startY + text.getY(), text.getWidth(), text.getHeight()));
+                  (int) startX + text.getX() - parentX, (int) startY + text.getY() - parentY, text.getWidth(), text.getHeight()));
+          break;
+        }
+      }
+    }
+  }
+  
+  protected void updateMessageFlow(MessageFlow messageFlow) {
+    Shape sourceShape = null;
+    Shape targetShape = null;
+    if (StringUtils.isNotEmpty(messageFlow.getSourceRef())) {
+      sourceShape = (Shape) featureProvider.getPictogramElementForBusinessObject(model.getFlowElement(messageFlow.getSourceRef()));
+    }
+    if (StringUtils.isNotEmpty(messageFlow.getTargetRef())) {
+      targetShape = (Shape) featureProvider.getPictogramElementForBusinessObject(model.getFlowElement(messageFlow.getTargetRef()));
+    }
+   
+    if (sourceShape == null || targetShape == null) {
+      return;
+    }
+    
+    FreeFormConnection freeFormConnection = (FreeFormConnection) featureProvider.getPictogramElementForBusinessObject(messageFlow);
+    
+    if (freeFormConnection == null) 
+      return;
+    
+    List<GraphicInfo> flowGraphicsList = createFlowGraphicInfoList(sourceShape, targetShape, freeFormConnection);
+    model.getBpmnModel().addFlowGraphicInfoList(messageFlow.getId(), flowGraphicsList);
+    
+    EList<ConnectionDecorator> decoratorList = freeFormConnection.getConnectionDecorators();
+    for (ConnectionDecorator decorator : decoratorList) {
+      if (decorator.getGraphicsAlgorithm() instanceof org.eclipse.graphiti.mm.algorithms.MultiText) {
+        org.eclipse.graphiti.mm.algorithms.MultiText text = (org.eclipse.graphiti.mm.algorithms.MultiText) decorator.getGraphicsAlgorithm();
+        if (text.getHeight() > 0) {
+          double startX = 0;
+          double startY = 0;
+          if (flowGraphicsList != null && flowGraphicsList.size() > 0) {
+            startX = flowGraphicsList.get(0).getX();
+            startY = flowGraphicsList.get(0).getY();
+          }
+          
+          Diagram diagram = featureProvider.getDiagramTypeProvider().getDiagram();
+          int parentX = 0;
+          int parentY = 0;
+          if (sourceShape.getContainer().equals(diagram) == false) {
+            GraphicInfo graphicInfo = new GraphicInfo();
+            getParentGraphicsAlgorithm(sourceShape, diagram, graphicInfo);
+            parentX = (int) graphicInfo.getX();
+            parentY = (int) graphicInfo.getY();
+          }
+          
+          model.getBpmnModel().addLabelGraphicInfo(messageFlow.getId(), createGraphicInfo(
+                  (int) startX + text.getX() - parentX, (int) startY + text.getY() - parentY, 
+                  text.getWidth(), text.getHeight()));
           break;
         }
       }
@@ -196,14 +267,14 @@ public class GraphitiToBpmnDI {
   protected void updateAssociation(Association association) {
     Shape sourceShape = null;
     Shape targetShape = null;
-    if(StringUtils.isNotEmpty(association.getSourceRef())) {
+    if (StringUtils.isNotEmpty(association.getSourceRef())) {
       BaseElement sourceElement = model.getFlowElement(association.getSourceRef());
       if (sourceElement == null) {
         sourceElement = model.getArtifact(association.getSourceRef());
       }
       sourceShape = (Shape) featureProvider.getPictogramElementForBusinessObject(sourceElement);
     }
-    if(StringUtils.isNotEmpty(association.getTargetRef())) {
+    if (StringUtils.isNotEmpty(association.getTargetRef())) {
       BaseElement targetElement = model.getFlowElement(association.getTargetRef());
       if (targetElement == null) {
         targetElement = model.getArtifact(association.getTargetRef());
@@ -211,13 +282,13 @@ public class GraphitiToBpmnDI {
       targetShape = (Shape) featureProvider.getPictogramElementForBusinessObject(targetElement);
     }
    
-    if(sourceShape == null || targetShape == null) {
+    if (sourceShape == null || targetShape == null) {
       return;
     }
     
     FreeFormConnection freeFormConnection = (FreeFormConnection) featureProvider.getPictogramElementForBusinessObject(association);
     
-    if(freeFormConnection == null) 
+    if (freeFormConnection == null) 
       return;
     
     List<GraphicInfo> flowGraphicsList = createFlowGraphicInfoList(sourceShape, targetShape, freeFormConnection);
@@ -249,40 +320,40 @@ public class GraphitiToBpmnDI {
       flowGraphicsList.add(createFlowGraphicInfo(sourceMiddleX, sourceY + sourceHeight));
     } else {
       
-     if((freeFormConnection.getBendpoints() == null || freeFormConnection.getBendpoints().size() == 0)) {
-    
-       if((sourceBottomY + 11) < targetY) {
-         flowGraphicsList.add(createFlowGraphicInfo(sourceMiddleX, sourceY + sourceHeight));
+      if ((freeFormConnection.getBendpoints() == null || freeFormConnection.getBendpoints().size() == 0)) {
         
-       } else if((sourceY - 11) > (targetY + targetHeight)) {
-         flowGraphicsList.add(createFlowGraphicInfo(sourceMiddleX, sourceY));
+        if ((sourceBottomY + 11) < targetY) {
+          flowGraphicsList.add(createFlowGraphicInfo(sourceMiddleX, sourceY + sourceHeight));
+        
+        } else if ((sourceY - 11) > (targetY + targetHeight)) {
+          flowGraphicsList.add(createFlowGraphicInfo(sourceMiddleX, sourceY));
       
-       } else if(sourceX > targetX) {
-         flowGraphicsList.add(createFlowGraphicInfo(sourceX, sourceMiddleY));
+        } else if (sourceX > targetX) {
+          flowGraphicsList.add(createFlowGraphicInfo(sourceX, sourceMiddleY));
       
-       } else {
-         flowGraphicsList.add(createFlowGraphicInfo(sourceX + sourceWidth, sourceMiddleY));
-       }
+        } else {
+          flowGraphicsList.add(createFlowGraphicInfo(sourceX + sourceWidth, sourceMiddleY));
+        }
+        
+      } else {
     
-     } else {
-    
-       org.eclipse.graphiti.mm.algorithms.styles.Point bendPoint = freeFormConnection.getBendpoints().get(0);
-       if((sourceBottomY + 5) < bendPoint.getY()) {
-         flowGraphicsList.add(createFlowGraphicInfo(sourceMiddleX, sourceY + sourceHeight));
+        org.eclipse.graphiti.mm.algorithms.styles.Point bendPoint = freeFormConnection.getBendpoints().get(0);
+        if ((sourceBottomY + 5) < bendPoint.getY()) {
+          flowGraphicsList.add(createFlowGraphicInfo(sourceMiddleX, sourceY + sourceHeight));
       
-       } else if((sourceY - 5) > bendPoint.getY()) {
-         flowGraphicsList.add(createFlowGraphicInfo(sourceMiddleX, sourceY));
+        } else if((sourceY - 5) > bendPoint.getY()) {
+          flowGraphicsList.add(createFlowGraphicInfo(sourceMiddleX, sourceY));
       
-       } else if(sourceX > bendPoint.getX()) {
-         flowGraphicsList.add(createFlowGraphicInfo(sourceX, sourceMiddleY));
+        } else if(sourceX > bendPoint.getX()) {
+          flowGraphicsList.add(createFlowGraphicInfo(sourceX, sourceMiddleY));
       
-       } else {
-         flowGraphicsList.add(createFlowGraphicInfo(sourceX + sourceWidth, sourceMiddleY));
-       }
-     }
+        } else {
+          flowGraphicsList.add(createFlowGraphicInfo(sourceX + sourceWidth, sourceMiddleY));
+        }
+      }
     }
     
-    if(freeFormConnection.getBendpoints() != null && freeFormConnection.getBendpoints().size() > 0) {
+    if (freeFormConnection.getBendpoints() != null && freeFormConnection.getBendpoints().size() > 0) {
       for (org.eclipse.graphiti.mm.algorithms.styles.Point point : freeFormConnection.getBendpoints()) {
         flowGraphicsList.add(createFlowGraphicInfo(point.getX(), point.getY()));
       }
@@ -290,19 +361,19 @@ public class GraphitiToBpmnDI {
     
     int difference = 5;
   
-    if((freeFormConnection.getBendpoints() == null || freeFormConnection.getBendpoints().size() == 0)) {
+    if ((freeFormConnection.getBendpoints() == null || freeFormConnection.getBendpoints().size() == 0)) {
       difference = 11;
     }
   
     GraphicInfo lastGraphicInfo = flowGraphicsList.get(flowGraphicsList.size() - 1);
     
-    if((targetBottomY + difference) < lastGraphicInfo.getY()) {
+    if ((targetBottomY + difference) < lastGraphicInfo.getY()) {
       flowGraphicsList.add(createFlowGraphicInfo(targetMiddleX, targetY + targetHeight));
 
-    } else if((targetY - difference) > lastGraphicInfo.getY()) {
+    } else if ((targetY - difference) > lastGraphicInfo.getY()) {
       flowGraphicsList.add(createFlowGraphicInfo(targetMiddleX, targetY));
 
-    } else if(targetX > lastGraphicInfo.getX()) {
+    } else if (targetX > lastGraphicInfo.getX()) {
       flowGraphicsList.add(createFlowGraphicInfo(targetX, targetMiddleY));
 
     } else {
@@ -326,5 +397,19 @@ public class GraphitiToBpmnDI {
     graphicInfo.setWidth(width);
     graphicInfo.setHeight(height);
     return graphicInfo;
+  }
+  
+  protected void getParentGraphicsAlgorithm(Shape sourceShape, Diagram diagram, 
+      GraphicInfo graphicInfo) {
+    
+    if (sourceShape.getContainer().equals(diagram)) {
+      return;
+    
+    } else {
+      GraphicsAlgorithm parentSourceGraphics = sourceShape.getContainer().getGraphicsAlgorithm();
+      graphicInfo.setX(graphicInfo.getX() + parentSourceGraphics.getX());
+      graphicInfo.setY(graphicInfo.getY() + parentSourceGraphics.getY());
+      getParentGraphicsAlgorithm(sourceShape.getContainer(), diagram, graphicInfo);
+    }
   }
 }

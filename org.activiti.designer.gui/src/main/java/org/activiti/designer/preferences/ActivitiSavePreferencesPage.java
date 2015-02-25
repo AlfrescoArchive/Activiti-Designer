@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.eclipse.extension.export.ExportMarshaller;
-import org.activiti.designer.eclipse.preferences.PreferencesUtil;
+import org.activiti.designer.eclipse.extension.export.MarshallerUtil;
 import org.activiti.designer.eclipse.util.ExtensionPointUtil;
 import org.activiti.designer.util.preferences.Preferences;
 import org.eclipse.jface.layout.GridDataFactory;
@@ -93,7 +93,7 @@ public class ActivitiSavePreferencesPage extends FieldEditorPreferencePage imple
 
     if (marshallers.size() > 0) {
       for (final ExportMarshaller exportMarshaller : marshallers) {
-        addField(new BooleanFieldEditor(PreferencesUtil.getPreferenceId(exportMarshaller), exportMarshaller.getFormatName(), getFieldEditorParent()));
+        addField(new BooleanFieldEditor(MarshallerUtil.getPreferenceId(exportMarshaller), exportMarshaller.getFormatName(), getFieldEditorParent()));
       }
     }
 

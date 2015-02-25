@@ -8,9 +8,12 @@ import java.util.List;
 import org.activiti.bpmn.model.ComplexDataType;
 import org.activiti.bpmn.model.CustomProperty;
 import org.activiti.bpmn.model.ServiceTask;
+import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.integration.servicetask.CustomServiceTask;
 import org.activiti.designer.integration.servicetask.DelegateType;
 import org.activiti.designer.integration.servicetask.annotation.Help;
+import org.activiti.designer.integration.servicetask.annotation.Locale;
+import org.activiti.designer.integration.servicetask.annotation.Locales;
 import org.activiti.designer.integration.servicetask.annotation.Property;
 import org.activiti.designer.property.extension.field.CustomPropertyBooleanChoiceField;
 import org.activiti.designer.property.extension.field.CustomPropertyComboboxChoiceField;
@@ -24,6 +27,8 @@ import org.activiti.designer.property.extension.field.FieldInfo;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.extension.ExtensionUtil;
 import org.activiti.designer.util.extension.FormToolTip;
+import org.activiti.designer.util.preferences.Preferences;
+import org.activiti.designer.util.preferences.PreferencesUtil;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
@@ -268,9 +273,24 @@ public class PropertyCustomServiceTaskSection extends BaseActivitiPropertySectio
           previousAnchor = createdControl;
 
           // Create a label for the field
-          String displayName = property.displayName();
-          if (StringUtils.isBlank(property.displayName())) {
-            displayName = fieldInfo.getFieldName();
+          String displayName = null;
+          String defaultLanguage = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_DEFAULT_LANGUAGE, ActivitiPlugin.getDefault());
+          if (StringUtils.isNotEmpty(defaultLanguage)) {
+            final Locales locales = fieldInfo.getLocalesAnnotation();
+            if (locales != null && locales.value() != null && locales.value().length > 0) {
+              for (Locale locale : locales.value()) {
+                if (defaultLanguage.equalsIgnoreCase(locale.locale())) {
+                  displayName = locale.name();
+                }
+              }
+            }
+          }
+          
+          if (StringUtils.isEmpty(displayName)) {
+            displayName = property.displayName();
+            if (StringUtils.isEmpty(property.displayName())) {
+              displayName = fieldInfo.getFieldName();
+            }
           }
 
           if (property.required()) {

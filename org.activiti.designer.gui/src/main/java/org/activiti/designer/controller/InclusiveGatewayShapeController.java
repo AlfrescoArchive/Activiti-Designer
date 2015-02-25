@@ -46,8 +46,10 @@ public class InclusiveGatewayShapeController extends AbstractBusinessObjectShape
     
     // check whether the context has a size (e.g. from a create feature)
     // otherwise define a default size for the shape
-    width = width <= 0 ? 40 : width;
-    height = height <= 0 ? 40 : height;
+    //width = width <= 0 ? 40 : width;
+    //height = height <= 0 ? 40 : height;
+    width = 40;
+    height = 40;
     
     int xy[] = new int[] { 0, 20, 20, 0, 40, 20, 20, 40, 0, 20 };
     final Polygon invisiblePolygon = gaService.createPolygon(containerShape, xy);

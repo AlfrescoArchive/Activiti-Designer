@@ -7,6 +7,7 @@ import org.activiti.bpmn.model.ManualTask;
 import org.activiti.bpmn.model.MultiInstanceLoopCharacteristics;
 import org.activiti.bpmn.model.ReceiveTask;
 import org.activiti.bpmn.model.ScriptTask;
+import org.activiti.bpmn.model.SendTask;
 import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.bpmn.model.Task;
 import org.activiti.bpmn.model.UserTask;
@@ -15,8 +16,10 @@ import org.activiti.bpmn.model.alfresco.AlfrescoScriptTask;
 import org.activiti.bpmn.model.alfresco.AlfrescoUserTask;
 import org.activiti.designer.PluginImage;
 import org.activiti.designer.diagram.ActivitiBPMNFeatureProvider;
+import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.integration.servicetask.CustomServiceTask;
 import org.activiti.designer.integration.servicetask.DiagramBaseShape;
+import org.activiti.designer.util.bpmn.BpmnExtensionUtil;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.extension.CustomServiceTaskContext;
 import org.activiti.designer.util.extension.ExtensionUtil;
@@ -70,7 +73,7 @@ public class TaskShapeController extends AbstractBusinessObjectShapeController {
       }
       
     } else if (businessObject instanceof UserTask || businessObject instanceof BusinessRuleTask || businessObject instanceof ManualTask ||
-            businessObject instanceof ReceiveTask || businessObject instanceof ScriptTask) {
+            businessObject instanceof ReceiveTask || businessObject instanceof ScriptTask || businessObject instanceof SendTask) {
       
       return true;
     } else {
@@ -182,7 +185,9 @@ public class TaskShapeController extends AbstractBusinessObjectShapeController {
     final Shape shape = peCreateService.createShape(containerShape, false);
 
     // create and set text graphics algorithm
-    final MultiText text = gaService.createDefaultMultiText(diagram, shape, addedTask.getName());
+    String taskName = BpmnExtensionUtil.getFlowElementName(addedTask, ActivitiPlugin.getDefault());
+    
+    final MultiText text = gaService.createDefaultMultiText(diagram, shape, taskName);
     text.setStyle(StyleUtil.getStyleForTask(diagram));
     text.setHorizontalAlignment(Orientation.ALIGNMENT_CENTER);
     text.setVerticalAlignment(Orientation.ALIGNMENT_CENTER);
@@ -298,6 +303,9 @@ public class TaskShapeController extends AbstractBusinessObjectShapeController {
     
     } else if (bo instanceof ScriptTask) {
       return PluginImage.IMG_SCRIPTTASK.getImageKey();
+      
+    } else if (bo instanceof SendTask) {
+      return PluginImage.IMG_SENDTASK.getImageKey();
     
     } else {
       // fallback

@@ -8,8 +8,9 @@ import org.activiti.bpmn.model.FieldExtension;
 import org.activiti.bpmn.model.ImplementationType;
 import org.activiti.bpmn.model.alfresco.AlfrescoScriptTask;
 import org.activiti.bpmn.model.alfresco.AlfrescoUserTask;
-import org.activiti.designer.eclipse.preferences.PreferencesUtil;
+import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.util.preferences.Preferences;
+import org.activiti.designer.util.preferences.PreferencesUtil;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.jdt.core.IType;
 import org.eclipse.jdt.core.search.SearchEngine;
@@ -202,7 +203,7 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
       
     });
     
-    if(PreferencesUtil.getBooleanPreference(Preferences.ALFRESCO_ENABLE)) {
+    if (PreferencesUtil.getBooleanPreference(Preferences.ALFRESCO_ENABLE, ActivitiPlugin.getDefault())) {
       alfrescoExecutionTypeButton = new Button(radioTypeComposite, SWT.RADIO);
       alfrescoExecutionTypeButton.setText("Alfresco execution script");
       alfrescoExecutionTypeButton.addSelectionListener(new SelectionListener() {
@@ -458,10 +459,12 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
 		if(savedListener == null || savedListener.getImplementationType() == null) {
 		  classTypeButton.setSelection(true);
       enableClassType();
-		} else if (PreferencesUtil.getBooleanPreference(Preferences.ALFRESCO_ENABLE) && AlfrescoUserTask.ALFRESCO_SCRIPT_TASK_LISTENER.equalsIgnoreCase(savedListener.getImplementation())) {
+		} else if (PreferencesUtil.getBooleanPreference(Preferences.ALFRESCO_ENABLE, ActivitiPlugin.getDefault()) && 
+		    AlfrescoUserTask.ALFRESCO_SCRIPT_TASK_LISTENER.equalsIgnoreCase(savedListener.getImplementation())) {
 		  alfrescoTaskTypeButton.setSelection(true);
       enableAlfrescoType(true);
-		} else if (PreferencesUtil.getBooleanPreference(Preferences.ALFRESCO_ENABLE) && AlfrescoScriptTask.ALFRESCO_SCRIPT_EXECUTION_LISTENER.equalsIgnoreCase(savedListener.getImplementation())) {
+		} else if (PreferencesUtil.getBooleanPreference(Preferences.ALFRESCO_ENABLE, ActivitiPlugin.getDefault()) && 
+		    AlfrescoScriptTask.ALFRESCO_SCRIPT_EXECUTION_LISTENER.equalsIgnoreCase(savedListener.getImplementation())) {
       alfrescoExecutionTypeButton.setSelection(true);
       enableAlfrescoType(false);
 		} else if(ImplementationType.IMPLEMENTATION_TYPE_CLASS.equals(savedListener.getImplementationType())) {
@@ -541,7 +544,7 @@ public abstract class AbstractListenerDialog extends Dialog implements ITabbedPr
   }
   
   private void setVisibleAlfrescoType(boolean visible, boolean isTask) {
-    if(PreferencesUtil.getBooleanPreference(Preferences.ALFRESCO_ENABLE)) {
+    if (PreferencesUtil.getBooleanPreference(Preferences.ALFRESCO_ENABLE, ActivitiPlugin.getDefault())) {
       if (visible) {
         if (isTask) {
           alfrescoTaskTypeButton.setSelection(visible);

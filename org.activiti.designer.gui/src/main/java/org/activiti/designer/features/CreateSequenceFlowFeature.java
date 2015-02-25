@@ -3,16 +3,19 @@ package org.activiti.designer.features;
 import org.activiti.bpmn.model.Activity;
 import org.activiti.bpmn.model.BaseElement;
 import org.activiti.bpmn.model.BoundaryEvent;
+import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.bpmn.model.EndEvent;
 import org.activiti.bpmn.model.FlowNode;
 import org.activiti.bpmn.model.Lane;
+import org.activiti.bpmn.model.Process;
 import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.bpmn.model.StartEvent;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.designer.PluginImage;
-import org.activiti.designer.eclipse.preferences.PreferencesUtil;
+import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.designer.util.preferences.Preferences;
+import org.activiti.designer.util.preferences.PreferencesUtil;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateConnectionContext;
@@ -46,6 +49,24 @@ public class CreateSequenceFlowFeature extends AbstractCreateBPMNConnectionFeatu
             return false;
           }
         }
+        
+        BpmnModel bpmnModel = ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getBpmnModel();
+        Process sourceProcess = null;
+        Process targetProcess = null;
+        for (Process process : bpmnModel.getProcesses()) {
+          if (process.getFlowElementRecursive(source.getId()) != null) {
+            sourceProcess = process;
+          }
+          
+          if (process.getFlowElementRecursive(target.getId()) != null) {
+            targetProcess = process;
+          }
+        }
+        
+        if (sourceProcess != null && targetProcess != null && sourceProcess.equals(targetProcess) == false) {
+          return false;
+        }
+        
         return true;
       }
     }
@@ -101,7 +122,7 @@ public class CreateSequenceFlowFeature extends AbstractCreateBPMNConnectionFeatu
     sequenceFlow.setSourceRef(source.getId());
     sequenceFlow.setTargetRef(target.getId());
 
-    if (PreferencesUtil.getBooleanPreference(Preferences.EDITOR_ADD_LABELS_TO_NEW_SEQUENCEFLOWS)) {
+    if (PreferencesUtil.getBooleanPreference(Preferences.EDITOR_ADD_LABELS_TO_NEW_SEQUENCEFLOWS, ActivitiPlugin.getDefault())) {
       sequenceFlow.setName(String.format("to %s", target.getName()));
     } else {
       sequenceFlow.setName("");

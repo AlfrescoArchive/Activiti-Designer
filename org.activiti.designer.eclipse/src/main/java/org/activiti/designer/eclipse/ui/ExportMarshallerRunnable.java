@@ -16,11 +16,13 @@ package org.activiti.designer.eclipse.ui;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.eclipse.extension.export.ExportMarshaller;
 import org.activiti.designer.eclipse.extension.export.ExportMarshallerContext;
-import org.activiti.designer.eclipse.preferences.PreferencesUtil;
+import org.activiti.designer.eclipse.extension.export.MarshallerUtil;
 import org.activiti.designer.eclipse.util.ExtensionPointUtil;
 import org.activiti.designer.util.editor.BpmnMemoryModel;
+import org.activiti.designer.util.preferences.PreferencesUtil;
 import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.core.runtime.ISafeRunnable;
 import org.eclipse.core.runtime.SafeRunner;
@@ -52,7 +54,8 @@ public class ExportMarshallerRunnable implements IRunnableWithProgress {
   private Collection<ExportMarshaller> checkMarshallers(final Collection<ExportMarshaller> marshallers) {
     final Collection<ExportMarshaller> result = new ArrayList<ExportMarshaller>();
     for (final ExportMarshaller exportMarshaller : marshallers) {
-      if (PreferencesUtil.getBooleanPreference(PreferencesUtil.getExportMarshallerPreferenceId(exportMarshaller.getMarshallerName()))) {
+      if (PreferencesUtil.getBooleanPreference(MarshallerUtil.getExportMarshallerPreferenceId(
+          exportMarshaller.getMarshallerName()), ActivitiPlugin.getDefault())) {
         result.add(exportMarshaller);
       }
     }

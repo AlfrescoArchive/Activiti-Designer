@@ -1,6 +1,8 @@
 package org.activiti.designer.features;
 
 import org.activiti.bpmn.model.TextAnnotation;
+import org.activiti.designer.eclipse.common.ActivitiPlugin;
+import org.activiti.designer.util.bpmn.BpmnExtensionUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IDirectEditingContext;
 import org.eclipse.graphiti.features.impl.AbstractDirectEditingFeature;
@@ -27,7 +29,7 @@ public class DirectEditTextAnnotationFeature extends
 		final PictogramElement pe = context.getPictogramElement();
 		final TextAnnotation annotation = (TextAnnotation) getBusinessObjectForPictogramElement(pe);	
 		
-		return annotation.getText();
+		return BpmnExtensionUtil.getTextAnnotationText(annotation, ActivitiPlugin.getDefault());
 	}
 
 	@Override
@@ -44,8 +46,7 @@ public class DirectEditTextAnnotationFeature extends
 		final PictogramElement pe = context.getPictogramElement();
 		final TextAnnotation annotation = (TextAnnotation) getBusinessObjectForPictogramElement(pe);
 		
-		annotation.setText(value);
-		
+		BpmnExtensionUtil.setTextAnnotationText(annotation, value, ActivitiPlugin.getDefault());
 		updatePictogramElement(((Shape) pe).getContainer());
 	}
 }

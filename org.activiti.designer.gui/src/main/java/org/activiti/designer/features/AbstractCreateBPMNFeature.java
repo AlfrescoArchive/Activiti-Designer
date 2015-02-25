@@ -139,10 +139,9 @@ public abstract class AbstractCreateBPMNFeature extends AbstractCreateFeature {
         final Lane lane = (Lane) parent;
         
         // for flow elements, the lane gets informed about the flow elements Id 
-        if (baseElement instanceof FlowElement)
-        {
-          final FlowElement flowElement = (FlowElement) baseElement;
-          lane.getFlowReferences().add(flowElement.getId());
+        if (baseElement instanceof FlowNode) {
+          final FlowNode flowNode = (FlowNode) baseElement;
+          lane.getFlowReferences().add(flowNode.getId());
         }
   
         addFlowNodeOrArtifact(baseElement, lane.getParentProcess());

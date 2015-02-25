@@ -17,6 +17,7 @@ import java.lang.reflect.Field;
 
 import org.activiti.designer.integration.servicetask.CustomServiceTask;
 import org.activiti.designer.integration.servicetask.annotation.Help;
+import org.activiti.designer.integration.servicetask.annotation.Locales;
 import org.activiti.designer.integration.servicetask.annotation.Property;
 
 /**
@@ -31,6 +32,7 @@ public class FieldInfo implements Comparable<FieldInfo> {
 
   private Property propertyAnnotation;
   private Help helpAnnotation;
+  private Locales localesAnnotation;
   private final Field field;
 
   public FieldInfo(Field field) {
@@ -47,13 +49,23 @@ public class FieldInfo implements Comparable<FieldInfo> {
     if (helpAnnotation != null) {
       this.helpAnnotation = helpAnnotation;
     }
+    
+    final Locales localesAnnotation = field.getAnnotation(Locales.class);
+    if (localesAnnotation != null) {
+      this.localesAnnotation = localesAnnotation;
+    }
   }
+  
   public Property getPropertyAnnotation() {
     return propertyAnnotation;
   }
 
   public Help getHelpAnnotation() {
     return helpAnnotation;
+  }
+  
+  public Locales getLocalesAnnotation() {
+    return localesAnnotation;
   }
 
   public String getFieldName() {

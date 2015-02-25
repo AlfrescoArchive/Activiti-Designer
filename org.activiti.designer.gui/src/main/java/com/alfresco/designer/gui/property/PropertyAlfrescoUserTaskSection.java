@@ -3,9 +3,10 @@ package com.alfresco.designer.gui.property;
 import java.util.List;
 
 import org.activiti.bpmn.model.UserTask;
-import org.activiti.designer.eclipse.preferences.PreferencesUtil;
+import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.property.ActivitiPropertySection;
 import org.activiti.designer.util.preferences.Preferences;
+import org.activiti.designer.util.preferences.PreferencesUtil;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
@@ -30,7 +31,7 @@ public class PropertyAlfrescoUserTaskSection extends ActivitiPropertySection imp
     expressionText = createTextControl(false);
     createLabel("Expression", expressionText);
 
-    List<String> userTaskFormTypes = PreferencesUtil.getStringArray(Preferences.ALFRESCO_FORMTYPES_USERTASK);
+    List<String> userTaskFormTypes = PreferencesUtil.getStringArray(Preferences.ALFRESCO_FORMTYPES_USERTASK, ActivitiPlugin.getDefault());
     formTypeCombo = createCombobox(userTaskFormTypes.toArray(new String[userTaskFormTypes.size()]), 0);
     createLabel("Form key", formTypeCombo);
     

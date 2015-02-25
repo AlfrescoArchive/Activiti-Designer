@@ -127,6 +127,12 @@
                id="org.activiti.designer.mainConfigTab.sequenceflow"
                tab="org.activiti.designer.mainConfigTab">
          </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyMessageFlowSection"
+               filter="org.activiti.designer.property.PropertyMessageFlowFilter"
+               id="org.activiti.designer.mainConfigTab.messageflow"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
          <propertySection 
          	class="org.activiti.designer.property.PropertyTextAnnotationSection"
          	filter="org.activiti.designer.property.PropertyTextAnnotationFilter"
@@ -366,6 +372,12 @@
             class="org.activiti.designer.preferences.ActivitiSavePreferencesPage"
             id="org.activiti.designer.gui.savepage"
             name="Save Actions">
+      </page>
+      <page
+            category="org.activiti.designer.preferences"
+            class="org.activiti.designer.preferences.ActivitiLanguagePreferencesPage"
+            id="org.activiti.designer.gui.languagepage"
+            name="Activiti languages">
       </page>
       <page
             category="org.activiti.designer.preferences"

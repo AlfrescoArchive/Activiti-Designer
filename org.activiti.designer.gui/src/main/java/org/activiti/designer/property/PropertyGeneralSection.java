@@ -15,17 +15,29 @@
  *******************************************************************************/
 package org.activiti.designer.property;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.activiti.bpmn.model.BaseElement;
+import org.activiti.bpmn.model.ExtensionAttribute;
+import org.activiti.bpmn.model.ExtensionElement;
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.FlowElementsContainer;
 import org.activiti.bpmn.model.FlowNode;
 import org.activiti.bpmn.model.Lane;
+import org.activiti.bpmn.model.MessageFlow;
 import org.activiti.bpmn.model.Pool;
 import org.activiti.bpmn.model.Process;
 import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.bpmn.model.SubProcess;
+import org.activiti.designer.eclipse.common.ActivitiPlugin;
+import org.activiti.designer.util.bpmn.BpmnExtensions;
 import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
+import org.activiti.designer.util.preferences.Preferences;
+import org.activiti.designer.util.preferences.PreferencesUtil;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
@@ -36,13 +48,24 @@ public class PropertyGeneralSection extends ActivitiPropertySection implements I
 
   private Text idText;
   private Text nameText;
+  private List<String> languages;
+  private Map<Text, String> languageTextMap = new HashMap<Text, String>();
   
   @Override
   public void createFormControls(TabbedPropertySheetPage aTabbedPropertySheetPage) {
     idText = createTextControl(false);
     createLabel("Id", idText);
-    nameText = createTextControl(false);
-    createLabel("Name", nameText);
+    languages = PreferencesUtil.getStringArray(Preferences.ACTIVITI_LANGUAGES, ActivitiPlugin.getDefault());
+    if (languages != null && languages.size() > 0) {
+    	for (String language : languages) {
+    		Text languageText = createTextControl(false);
+    		createLabel("Name (" + language + ")", languageText);
+    		languageTextMap.put(languageText, language);	
+    	}
+    } else {
+	    nameText = createTextControl(false);
+	    createLabel("Name", nameText);
+    }
   }
 
   @Override
@@ -51,6 +74,13 @@ public class PropertyGeneralSection extends ActivitiPropertySection implements I
     if (control == idText) {
       return element.getId();
       
+    } else if (languages != null && languages.size() > 0) {
+    	for (Text languageText : languageTextMap.keySet()) {
+  			if (control == languageText) {
+  				return getName(businessObject, languageTextMap.get(languageText));
+  			}
+  		}
+    	
     } else if (control == nameText) {
       return getName(businessObject);
     }
@@ -61,9 +91,18 @@ public class PropertyGeneralSection extends ActivitiPropertySection implements I
   protected void storeValueInModel(Control control, final Object businessObject) {
     BaseElement element = (BaseElement) businessObject;
     if (control == idText) {
-      updateParentLane(element.getId(), idText.getText());
-      updateFlows(element, idText.getText());
+      if (element instanceof FlowNode) {
+        updateParentLane(element.getId(), idText.getText());
+        updateFlows(element, idText.getText());
+      }
       element.setId(idText.getText());
+      
+    } else if (languages != null && languages.size() > 0) {
+    	for (Text languageText : languageTextMap.keySet()) {
+  			if (control == languageText) {
+  				setName(businessObject, languageText.getText(), languageTextMap.get(languageText));
+  			}
+  		}
       
     } else if (control == nameText) {
       setName(businessObject, nameText.getText());
@@ -85,11 +124,9 @@ public class PropertyGeneralSection extends ActivitiPropertySection implements I
 
   protected void updateFlows(BaseElement element, String newElementId) {
     BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
-    if (element instanceof FlowNode) {
-      FlowNode flowNode = (FlowNode) element;
-      for (Process process : model.getBpmnModel().getProcesses()) {
-        updateSequenceFlows(process, flowNode.getId(), newElementId);
-      }
+    FlowNode flowNode = (FlowNode) element;
+    for (Process process : model.getBpmnModel().getProcesses()) {
+      updateSequenceFlows(process, flowNode.getId(), newElementId);
     }
   }
   
@@ -120,6 +157,8 @@ public class PropertyGeneralSection extends ActivitiPropertySection implements I
       name = ((Pool) bo).getName();
     } else if (bo instanceof Lane) {
       name = ((Lane) bo).getName();
+    } else if (bo instanceof MessageFlow) {
+      name = ((MessageFlow) bo).getName();
     }
     return name;
   }
@@ -131,7 +170,70 @@ public class PropertyGeneralSection extends ActivitiPropertySection implements I
       ((Pool) bo).setName(name);
     } else if (bo instanceof Lane) {
       ((Lane) bo).setName(name);
+    } else if (bo instanceof MessageFlow) {
+      ((MessageFlow) bo).setName(name);
     }
   }
-
+  
+  protected String getName(Object bo, String language) {
+    BaseElement element = (BaseElement) bo;
+    String resultValue = null;
+    if (element.getExtensionElements().containsKey(BpmnExtensions.LANGUAGE_EXTENSION)) {
+    	List<ExtensionElement> extensionElements = element.getExtensionElements().get(BpmnExtensions.LANGUAGE_EXTENSION);
+    	if (extensionElements != null && extensionElements.size() > 0) {
+    		for (ExtensionElement extensionElement : extensionElements) {
+    			List<ExtensionAttribute> languageAttributes = extensionElement.getAttributes().get("language");
+  				if (languageAttributes != null && languageAttributes.size() == 1) {
+  					String languageValue = languageAttributes.get(0).getValue();
+  					if (language.equals(languageValue)) {
+  						resultValue = extensionElement.getElementText();
+  					}
+  				}
+    		}
+    	}
+    }
+    
+    if (resultValue != null && resultValue.length() > 0) {
+    	return resultValue;
+    } else {
+    	return "";
+    }
+  }
+  
+  protected void setName(Object bo, String name, String language) {
+    BaseElement element = (BaseElement) bo;
+    List<ExtensionElement> extensionElements = null;
+    if (element.getExtensionElements().containsKey(BpmnExtensions.LANGUAGE_EXTENSION)) {
+    	extensionElements = element.getExtensionElements().get(BpmnExtensions.LANGUAGE_EXTENSION);
+    }
+    
+    if (extensionElements == null) {
+    	extensionElements = new ArrayList<ExtensionElement>();
+    	element.getExtensionElements().put(BpmnExtensions.LANGUAGE_EXTENSION, extensionElements);
+    }
+    
+    ExtensionElement languageElement = null;
+    for (ExtensionElement extensionElement : extensionElements) {
+    	List<ExtensionAttribute> languageAttributes = extensionElement.getAttributes().get("language");
+    	if (languageAttributes != null && languageAttributes.size() == 1) {
+    	  String languageValue = languageAttributes.get(0).getValue();
+    	  if (language.equals(languageValue)) {
+    	    languageElement = extensionElement;
+    	  }
+    	}
+    }
+    
+    if (languageElement == null) {
+    	languageElement = new ExtensionElement();
+    	languageElement.setName(BpmnExtensions.LANGUAGE_EXTENSION);
+    	languageElement.setNamespace(BpmnExtensions.DESIGNER_EXTENSION_NAMESPACE);
+    	languageElement.setNamespacePrefix(BpmnExtensions.DESIGNER_EXTENSION_NAMESPACE_PREFIX);
+    	ExtensionAttribute languageAttribute = new ExtensionAttribute("language");
+    	languageAttribute.setValue(language);
+    	languageElement.addAttribute(languageAttribute);
+    	extensionElements.add(languageElement);
+    }
+    
+    languageElement.setElementText(name);
+  }
 }

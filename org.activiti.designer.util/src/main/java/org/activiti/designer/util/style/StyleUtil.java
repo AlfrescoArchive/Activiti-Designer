@@ -96,6 +96,21 @@ public class StyleUtil {
 		return style;
 	}
 	
+	public static Style getStyleForMessageFlow(Diagram diagram) {
+    final String styleId = "BPMN-MESSAGE-FLOW-ARROW"; //$NON-NLS-1$
+
+    Style style = findStyle(diagram, styleId);
+
+    if (style == null) { // style not found - create new style
+      IGaService gaService = Graphiti.getGaService();
+      style = gaService.createStyle(diagram, styleId);
+      style.setForeground(gaService.manageColor(diagram, IColorConstant.BLACK));
+      style.setBackground(gaService.manageColor(diagram, IColorConstant.WHITE));
+      style.setLineWidth(1);
+    }
+    return style;
+  }
+	
 	// find the style with a given id in the style-container, can return null
 	private static Style findStyle(StyleContainer styleContainer, String id) {
 		// find and return style

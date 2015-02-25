@@ -5,12 +5,13 @@ import java.util.ArrayList;
 import java.util.Collection;
 
 import org.activiti.bpmn.model.SubProcess;
+import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.eclipse.editor.ActivitiDiagramEditor;
-import org.activiti.designer.eclipse.preferences.PreferencesUtil;
 import org.activiti.designer.eclipse.util.FileService;
 import org.activiti.designer.eclipse.util.Util;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.preferences.Preferences;
+import org.activiti.designer.util.preferences.PreferencesUtil;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -110,8 +111,8 @@ public class ExpandCollapseSubProcessFeature extends AbstractDrillDownFeature {
 
 		TransactionalEditingDomain domain = null;
 
-		boolean createContent = PreferencesUtil
-				.getBooleanPreference(Preferences.EDITOR_ADD_DEFAULT_CONTENT_TO_DIAGRAMS);
+		boolean createContent = PreferencesUtil.getBooleanPreference(
+		    Preferences.EDITOR_ADD_DEFAULT_CONTENT_TO_DIAGRAMS, ActivitiPlugin.getDefault());
 
 		final ActivitiDiagramEditor diagramEditor
 		  = (ActivitiDiagramEditor) getFeatureProvider().getDiagramTypeProvider().getDiagramEditor();

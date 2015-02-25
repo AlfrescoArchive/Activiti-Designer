@@ -50,6 +50,7 @@ public enum PluginImage {
   IMG_SCRIPTTASK("scripttask", "type.script.png"), //$NON-NLS-1$
   IMG_SERVICETASK("servicetask", "type.service.png"), //$NON-NLS-1$
   IMG_MAILTASK("mail", "type.send.png"), //$NON-NLS-1$
+  IMG_SENDTASK("sendtask", "type.send.png"), //$NON-NLS-1$
   IMG_RECEIVETASK("receive", "type.receive.png"), //$NON-NLS-1$
   IMG_MANUALTASK("manual", "type.manual.png"), //$NON-NLS-1$
   IMG_BUSINESSRULETASK("businessrule", "type.business.rule.png"), //$NON-NLS-1$

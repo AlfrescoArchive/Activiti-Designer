@@ -38,6 +38,9 @@ public enum Preferences {
   ACTIVITI_CLOUD_EDITOR_PASSWORD("org.activiti.designer.preferences.activiticloudeditor.password"),
   ACTIVITI_CLOUD_EDITOR_COOKIE("org.activiti.designer.preferences.activiticloudeditor.cookie"),
   
+  ACTIVITI_LANGUAGES("org.activiti.designer.preferences.activiti.languages"),
+  ACTIVITI_DEFAULT_LANGUAGE("org.activiti.designer.preferences.activiti.defaultlanguage"),
+  
   CMIS_URL("org.activiti.designer.kickstart.preferences.cmis.url"),
   CMIS_USERNAME("org.activiti.designer.kickstart.preferences.cmis.username"),
   CMIS_PASSWORD("org.activiti.designer.kickstart.preferences.cmis.password"),
