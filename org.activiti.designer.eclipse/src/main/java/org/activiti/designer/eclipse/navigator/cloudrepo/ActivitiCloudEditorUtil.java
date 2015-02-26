@@ -12,36 +12,29 @@
  */
 package org.activiti.designer.eclipse.navigator.cloudrepo;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.io.InputStream;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.net.URI;
-import java.util.List;
 
 import org.activiti.designer.eclipse.Logger;
 import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.util.preferences.Preferences;
 import org.activiti.designer.util.preferences.PreferencesUtil;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.http.HttpEntity;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpUriRequest;
-import org.apache.http.client.methods.RequestBuilder;
-import org.apache.http.cookie.Cookie;
+import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
+import org.apache.http.conn.ssl.SSLContextBuilder;
+import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
-import org.apache.http.impl.client.BasicCookieStore;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.cookie.BasicClientCookie;
-import org.apache.http.util.EntityUtils;
+import org.apache.http.impl.client.HttpClientBuilder;
 import org.eclipse.core.resources.IFile;
-import org.eclipse.core.runtime.preferences.InstanceScope;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -55,124 +48,45 @@ public class ActivitiCloudEditorUtil {
   	
     ActivitiPlugin plugin = ActivitiPlugin.getDefault();
   	// Get settings from preferences
-  	String url = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_URL, plugin);
-		String userName = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_USERNAME, plugin);
+  	String userName = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_USERNAME, plugin);
 		String password = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_PASSWORD, plugin);
-		String cookieString = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE, plugin);
-  	
-		Cookie cookie = null;
-		if (StringUtils.isNotEmpty(cookieString)) {
-  		ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(hexStringToByteArray(cookieString));
-      try {
-        ObjectInputStream objectInputStream = new ObjectInputStream(byteArrayInputStream);
-        cookie = (BasicClientCookie) objectInputStream.readObject();
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-		}
 		
-		// Build session
-    BasicCookieStore cookieStore = new BasicCookieStore();
-    CloseableHttpClient httpClient = HttpClients.custom()
-        .setDefaultCookieStore(cookieStore).build();
-		
-    if (cookie == null) {
-		  try {
-	      HttpUriRequest login = RequestBuilder.post()
-	          .setUri(new URI(url + "/rest/app/authentication"))
-	          .addParameter("j_username", userName)
-	          .addParameter("j_password", password)
-	          .addParameter("_spring_security_remember_me", "true")
-	          .build();
-	      
-	      CloseableHttpResponse response = httpClient.execute(login);
-	      
-	      try {
-	        EntityUtils.consume(response.getEntity());
-	        List<Cookie> cookies = cookieStore.getCookies();
-	        if (cookies.isEmpty()) {
-	            // nothing to do
-	        } else {
-	            Cookie reponseCookie = cookies.get(0);
-	            ByteArrayOutputStream os = new ByteArrayOutputStream();
-	            ObjectOutputStream outputStream = new ObjectOutputStream(os);
-              outputStream.writeObject(reponseCookie);
-              PreferencesUtil.getActivitiDesignerPreferenceStore(plugin).setValue(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE.getPreferenceId(), 
-                  byteArrayToHexString(os.toByteArray()));
-              InstanceScope.INSTANCE.getNode(ActivitiPlugin.PLUGIN_ID).flush();
-	        }
-	        
-	      } finally {
-	          response.close();
-	      }
-	      
-	    } catch (Exception e) {
-	      Logger.logError("Error authenticating " + userName, e);
-	    }
-		
-		} else {
-		  // setting cookie from cache
-		  cookieStore.addCookie(cookie);
-		}
-    
-    return httpClient;
-  }
-  
-  /**
-   * Using some super basic byte array &lt;-&gt; hex conversions so we don't have to rely on any
-   * large Base64 libraries. Can be overridden if you like!
-   *
-   * @param bytes byte array to be converted
-   * @return string containing hex values
-   */
-  protected static String byteArrayToHexString(byte[] bytes) {
-      StringBuilder sb = new StringBuilder(bytes.length * 2);
-      for (byte element : bytes) {
-          int v = element & 0xff;
-          if (v < 16) {
-              sb.append('0');
-          }
-          sb.append(Integer.toHexString(v));
-      }
-      return sb.toString().toUpperCase();
-  }
+		CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+    credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(userName, password));
 
-  /**
-   * Converts hex values from strings to byte arra
-   *
-   * @param hexString string of hex-encoded values
-   * @return decoded byte array
-   */
-  protected static byte[] hexStringToByteArray(String hexString) {
-      int len = hexString.length();
-      byte[] data = new byte[len / 2];
-      for (int i = 0; i < len; i += 2) {
-          data[i / 2] = (byte) ((Character.digit(hexString.charAt(i), 16) << 4) + Character.digit(hexString.charAt(i + 1), 16));
-      }
-      return data;
+    SSLConnectionSocketFactory sslsf = null;
+    try {
+        SSLContextBuilder builder = new SSLContextBuilder();
+        builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
+        sslsf = new SSLConnectionSocketFactory(builder.build(), SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+    } catch (Exception e) {
+      Logger.logError("Could not configure HTTP client to use SSL" , e);
+    }
+
+    HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
+    httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
+
+    if (sslsf != null) {
+        httpClientBuilder.setSSLSocketFactory(sslsf);
+    }
+
+    return httpClientBuilder.build();
   }
   
-  public static JsonNode getProcessModels(boolean firstTry) {
+  public static JsonNode getProcessModels() {
     JsonNode resultNode = null;
     CloseableHttpClient client = getAuthenticatedClient();
     try {
       
       ActivitiPlugin plugin = ActivitiPlugin.getDefault();
-      CloseableHttpResponse response = client.execute(new HttpGet(PreferencesUtil.getStringPreference(
-          Preferences.ACTIVITI_CLOUD_EDITOR_URL, plugin) + "/rest/app/rest/models"));
+      HttpGet httpGet = new HttpGet(PreferencesUtil.getStringPreference(
+          Preferences.ACTIVITI_CLOUD_EDITOR_URL, plugin) + "/rest/api/enterprise/models");
+      CloseableHttpResponse response = client.execute(httpGet);
       try {
         int statusCode = response.getStatusLine().getStatusCode();
         InputStream responseContent = response.getEntity().getContent();
         if (statusCode >= 200 && statusCode < 300) {
           resultNode = objectMapper.readTree(responseContent);
-          
-        } else if (statusCode == 401 && firstTry) {
-          String cookieString = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE, plugin);
-          if (StringUtils.isNotEmpty(cookieString)) {
-            PreferencesUtil.getActivitiDesignerPreferenceStore(plugin).setValue(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE.getPreferenceId(), "");
-            InstanceScope.INSTANCE.getNode(ActivitiPlugin.PLUGIN_ID).flush();
-            return getProcessModels(false);
-          }
           
         } else {
           JsonNode exceptionNode = null;
@@ -203,14 +117,14 @@ public class ActivitiCloudEditorUtil {
     return resultNode;
   }
   
-  public static InputStream downloadProcessModel(String modelId, IFile file, boolean firstTry) {
+  public static InputStream downloadProcessModel(String modelId, IFile file) {
     InputStream bpmnStream = null;
     CloseableHttpClient client = getAuthenticatedClient();
     try {
       ActivitiPlugin plugin = ActivitiPlugin.getDefault();
       CloseableHttpResponse response = client.execute(new HttpGet(PreferencesUtil.getStringPreference(
           Preferences.ACTIVITI_CLOUD_EDITOR_URL, plugin) + 
-          "/rest/app/rest/models/" + modelId + "/bpmn20"));
+          "/rest/api/enterprise/models/" + modelId + "/bpmn20"));
       try {
         int statusCode = response.getStatusLine().getStatusCode();
         bpmnStream = response.getEntity().getContent();
@@ -225,15 +139,6 @@ public class ActivitiCloudEditorUtil {
             }
           } else {
             file.create(bpmnStream, true, null);
-          }
-          
-        } else if (statusCode == 401 && firstTry) {
-          String cookieString = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE, plugin);
-          if (StringUtils.isNotEmpty(cookieString)) {
-            PreferencesUtil.getActivitiDesignerPreferenceStore(plugin).setValue(
-                Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE.getPreferenceId(), "");
-            InstanceScope.INSTANCE.getNode(ActivitiPlugin.PLUGIN_ID).flush();
-            return downloadProcessModel(modelId, file, false);
           }
           
         } else {
@@ -264,13 +169,13 @@ public class ActivitiCloudEditorUtil {
     return bpmnStream;
   }
   
-  public static JsonNode uploadNewVersion(String modelId, String filename, byte[] content, boolean firstTry) {
+  public static JsonNode uploadNewVersion(String modelId, String filename, byte[] content) {
     JsonNode modelNode = null;
     CloseableHttpClient client = getAuthenticatedClient();
     try {
       ActivitiPlugin plugin = ActivitiPlugin.getDefault();
       HttpPost post = new HttpPost(PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_URL, plugin) + 
-          "/rest/app/rest/models/" + modelId + "/newversion");
+          "/rest/api/enterprise/models/" + modelId + "/newversion");
       HttpEntity entity = MultipartEntityBuilder.create().addBinaryBody("file", content, ContentType.APPLICATION_XML, filename).build();
       post.setEntity(entity);
       CloseableHttpResponse response = client.execute(post);
@@ -279,14 +184,6 @@ public class ActivitiCloudEditorUtil {
         InputStream responseContent = response.getEntity().getContent();
         if (statusCode >= 200 && statusCode < 300) {
           modelNode = objectMapper.readTree(responseContent);
-          
-        } else if (statusCode == 401 && firstTry) {
-          String cookieString = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE, plugin);
-          if (StringUtils.isNotEmpty(cookieString)) {
-            PreferencesUtil.getActivitiDesignerPreferenceStore(plugin).setValue(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE.getPreferenceId(), "");
-            InstanceScope.INSTANCE.getNode(ActivitiPlugin.PLUGIN_ID).flush();
-            return uploadNewVersion(modelId, filename, content, false);
-          }
           
         } else {
           JsonNode exceptionNode = null;
@@ -317,13 +214,13 @@ public class ActivitiCloudEditorUtil {
     return modelNode;
   }
   
-  public static JsonNode importModel(String filename, byte[] content, boolean firstTry) {
+  public static JsonNode importModel(String filename, byte[] content) {
     JsonNode modelNode = null;
     CloseableHttpClient client = getAuthenticatedClient();
     try {
       ActivitiPlugin plugin = ActivitiPlugin.getDefault();
       HttpPost post = new HttpPost(PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_URL, plugin) + 
-          "/rest/app/rest/import-process-model");
+          "/rest/api/enterprise/process-models/import");
       HttpEntity entity = MultipartEntityBuilder.create().addBinaryBody("file", content, ContentType.APPLICATION_XML, filename).build();
       post.setEntity(entity);
       CloseableHttpResponse response = client.execute(post);
@@ -332,14 +229,6 @@ public class ActivitiCloudEditorUtil {
         InputStream responseContent = response.getEntity().getContent();
         if (statusCode >= 200 && statusCode < 300) {
           modelNode = objectMapper.readTree(responseContent);
-          
-        } else if (statusCode == 401 && firstTry) {
-          String cookieString = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE, plugin);
-          if (StringUtils.isNotEmpty(cookieString)) {
-            PreferencesUtil.getActivitiDesignerPreferenceStore(plugin).setValue(Preferences.ACTIVITI_CLOUD_EDITOR_COOKIE.getPreferenceId(), "");
-            InstanceScope.INSTANCE.getNode(ActivitiPlugin.PLUGIN_ID).flush();
-            return importModel(filename, content, false);
-          }
           
         } else {
           JsonNode exceptionNode = null;

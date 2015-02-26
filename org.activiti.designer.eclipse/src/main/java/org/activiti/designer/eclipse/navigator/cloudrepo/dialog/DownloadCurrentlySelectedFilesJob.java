@@ -62,7 +62,7 @@ public class DownloadCurrentlySelectedFilesJob extends Job {
 		for (JsonNode modelNode : selectedObjects) {
 			try {
         IFile file = containerToDownloadTo.getProject().getFile(new Path(modelNode.get("name").asText() + ".bpmn"));
-	      ActivitiCloudEditorUtil.downloadProcessModel(modelNode.get("id").asText(), file, true);
+	      ActivitiCloudEditorUtil.downloadProcessModel(modelNode.get("id").asText(), file);
 	      
 	      containerToDownloadTo.getProject().refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
 	      

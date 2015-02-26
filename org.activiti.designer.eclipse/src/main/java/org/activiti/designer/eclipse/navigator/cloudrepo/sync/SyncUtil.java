@@ -40,9 +40,9 @@ public class SyncUtil {
 
 	  	protected IStatus run(IProgressMonitor monitor) {
 	  		try {
-	  		  JsonNode modelNode = ActivitiCloudEditorUtil.uploadNewVersion(modelId, sourceFile.getName(), IOUtils.toByteArray(sourceFile.getContents()), true);
+	  		  JsonNode modelNode = ActivitiCloudEditorUtil.uploadNewVersion(modelId, sourceFile.getName(), IOUtils.toByteArray(sourceFile.getContents()));
 	  		  if (modelNode != null && modelNode.get("id") != null) {
-	  		    ActivitiCloudEditorUtil.downloadProcessModel(modelNode.get("id").asText(), sourceFile, false);
+	  		    ActivitiCloudEditorUtil.downloadProcessModel(modelNode.get("id").asText(), sourceFile);
 	  		    showSuccessMessage(shell);
 	  		  
 	  		  } else {
@@ -72,9 +72,9 @@ public class SyncUtil {
 
       protected IStatus run(IProgressMonitor monitor) {
         try {
-          JsonNode modelNode = ActivitiCloudEditorUtil.importModel(sourceFile.getName(), IOUtils.toByteArray(sourceFile.getContents()), true);
+          JsonNode modelNode = ActivitiCloudEditorUtil.importModel(sourceFile.getName(), IOUtils.toByteArray(sourceFile.getContents()));
           if (modelNode != null && modelNode.get("id") != null) {
-            ActivitiCloudEditorUtil.downloadProcessModel(modelNode.get("id").asText(), sourceFile, false);
+            ActivitiCloudEditorUtil.downloadProcessModel(modelNode.get("id").asText(), sourceFile);
             showSuccessImportMessage(shell);
           
           } else {
@@ -104,7 +104,7 @@ public class SyncUtil {
 
       protected IStatus run(IProgressMonitor monitor) {
         try {
-          ActivitiCloudEditorUtil.downloadProcessModel(modelId, sourceFile, true);
+          ActivitiCloudEditorUtil.downloadProcessModel(modelId, sourceFile);
           showSuccessDownloadMessage(shell);
           
         } catch (ActivitiCloudEditorSameContentException e) {

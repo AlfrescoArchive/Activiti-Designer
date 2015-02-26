@@ -89,7 +89,7 @@ public class ProcessModelContentProvider implements ITreeContentProvider {
 	}
 
 	private void initializeRootElements() {
-		modelsNode = ActivitiCloudEditorUtil.getProcessModels(true);
+		modelsNode = ActivitiCloudEditorUtil.getProcessModels();
 	}
 
 }
