@@ -9,6 +9,7 @@ import java.util.Set;
 import org.activiti.bpmn.model.CallActivity;
 import org.activiti.designer.Activator;
 import org.activiti.designer.PluginImage;
+import org.activiti.designer.command.BpmnProcessModelUpdater;
 import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.util.ActivitiConstants;
 import org.activiti.designer.util.dialog.ActivitiResourceSelectionDialog;
@@ -175,6 +176,12 @@ public class PropertyCallActivitySection extends ActivitiPropertySection impleme
         final Object[] data = (Object[]) dialog.getFirstResult();
 
         calledElementText.setText((String) data[1]);
+        
+        //Fix "called element" value not save when select from pop up.
+        BpmnProcessModelUpdater updater = getProcessModelUpdater();
+        Object updatableBo = updater.getUpdatableBusinessObject();
+        storeValueInModel(calledElementText, updatableBo);
+        executeModelUpdater();
       }
     }
 
@@ -194,12 +201,12 @@ public class PropertyCallActivitySection extends ActivitiPropertySection impleme
     public void widgetSelected(SelectionEvent event) {
       final String calledElement = calledElementText.getText();
 
-      final Set<IFile> resources
-        = ActivitiWorkspaceUtil.getDiagramDataFilesByProcessId(calledElement);
+      final Set<IFile> resources = ActivitiWorkspaceUtil.getDiagramDataFilesByProcessId(calledElement);
 
       if (resources.size() == 1) {
         // open diagram
         openDiagramForBpmnFile(resources.iterator().next());
+        
       } else if (resources.size() > 1) {
         final ActivitiResourceSelectionDialog dialog = new ActivitiResourceSelectionDialog(
                 Display.getCurrent().getActiveShell(), resources.toArray(new IResource[] {}));

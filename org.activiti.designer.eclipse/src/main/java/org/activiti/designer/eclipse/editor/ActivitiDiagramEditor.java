@@ -577,7 +577,6 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 
         context.setNewObject(flowElement);
         context.setSize((int) graphicInfo.getWidth(), (int) graphicInfo.getHeight());
-        System.out.println("parentShape " + parentShape);
         ContainerShape parentContainer = null;
         if (parentShape instanceof Diagram) {
           parentContainer = getParentContainer(flowElement.getId(), process, (Diagram) parentShape);
@@ -587,7 +586,6 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 
         context.setTargetContainer(parentContainer);
         if (parentContainer instanceof Diagram == false) {
-          System.out.println("flowelement " + flowElement.getId() + " " + flowElement.getName());
           Point location = getLocation(parentContainer);
           context.setLocation((int) graphicInfo.getX() - location.x, (int) graphicInfo.getY() - location.y);
         } else {
@@ -687,11 +685,9 @@ public class ActivitiDiagramEditor extends DiagramEditor {
         break;
       }
     }
-    System.out.println("foundLane " + foundLane);
-
+    
     if (foundLane != null) {
       final IFeatureProvider featureProvider = getDiagramTypeProvider().getFeatureProvider();
-      System.out.println("foundLane pict " + featureProvider.getPictogramElementForBusinessObject(foundLane));
       return (ContainerShape) featureProvider.getPictogramElementForBusinessObject(foundLane);
     } else {
       return diagram;
@@ -703,8 +699,6 @@ public class ActivitiDiagramEditor extends DiagramEditor {
       return new Point(containerShape.getGraphicsAlgorithm().getX(), containerShape.getGraphicsAlgorithm().getY());
     }
     
-    System.out.println("container " + containerShape);
-
     Point location = getLocation(containerShape.getContainer());
     return new Point(location.x + containerShape.getGraphicsAlgorithm().getX(), location.y + containerShape.getGraphicsAlgorithm().getY());
   }

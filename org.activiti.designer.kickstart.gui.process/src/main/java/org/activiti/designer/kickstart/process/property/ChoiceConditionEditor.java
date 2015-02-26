@@ -102,8 +102,7 @@ public class ChoiceConditionEditor {
     rightText.addFocusListener(new FocusAdapter() {
       @Override
       public void focusGained(FocusEvent e) {
-        if(definition != null) {
-          System.out.println(rightText.getText() + "---");
+        if (definition != null) {
           rightText.setText(getSafeText(definition.getRightOperand()));
         }
       }
@@ -141,7 +140,6 @@ public class ChoiceConditionEditor {
   
   protected void flushRightValue() {
     String newValue = getSafeModelValue(rightText.getText());
-    System.out.println("New value: " + newValue);
     if(!StringUtils.equals(newValue, definition.getRightOperand())) {
       definition.setRightOperand((String) newValue);
       notifyListener();

@@ -124,7 +124,6 @@ public class ImageOverlayContext {
     for (final String currentPrefix : prefixes) {
       maxLength = Math.max(maxLength, currentPrefix.length());
     }
-    // TODO align
     return prefix + ": ";
   }
 
@@ -144,10 +143,6 @@ public class ImageOverlayContext {
           } catch (TeamException e) {
             e.printStackTrace();
           }
-          // IFileRevision revision =
-          // provider.getWorkspaceFileRevision(model.getModelFile());
-          // final String revisionContentId = revision.getComment();
-          // System.out.println(revisionContentId);
         }
       }
     }

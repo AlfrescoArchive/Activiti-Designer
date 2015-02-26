@@ -189,6 +189,10 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
      * ExpandCollapseSubProcessFeature(getFeatureProvider()); if
      * (customFeature.canExecute(context)) { return customFeature; }
      */
+    
+    //open call activity called element
+    openCallActivityCalledElement(context);
+    
     return super.getDoubleClickFeature(context);
   }
 
@@ -890,5 +894,27 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     }
     // Safe default assumption
     return true;
+  }
+  
+  //method for open call activity called element
+  public void openCallActivityCalledElement(ICustomContext context) {
+    if (context.getPictogramElements() != null) {
+      for (PictogramElement pictogramElement : context.getPictogramElements()) {
+        if (getFeatureProvider().getBusinessObjectForPictogramElement(pictogramElement) == null) {
+          continue;
+        }
+        Object object = getFeatureProvider().getBusinessObjectForPictogramElement(pictogramElement);
+        if (object instanceof CallActivity) {
+          final CallActivity ca = (CallActivity) object;
+          final String calledElement = ca.getCalledElement();
+          if (calledElement != null && StringUtils.isNotBlank(calledElement)
+              && ActivitiWorkspaceUtil.getDiagramDataFilesByProcessId(calledElement).size() == 1) {
+            
+            OpenCalledElementForCallActivity openCalledElement = new OpenCalledElementForCallActivity(getFeatureProvider());
+            openCalledElement.execute(context);
+          }
+        }
+      }
+    }
   }
 }

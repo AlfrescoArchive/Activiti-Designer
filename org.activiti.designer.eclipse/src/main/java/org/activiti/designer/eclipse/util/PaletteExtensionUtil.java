@@ -34,7 +34,6 @@ public class PaletteExtensionUtil {
 		ISafeRunnable runnable = new ISafeRunnable() {
 			@Override
 			public void handleException(Throwable e) {
-				System.out.println("Exception in client");
 				e.printStackTrace();
 			}
 
