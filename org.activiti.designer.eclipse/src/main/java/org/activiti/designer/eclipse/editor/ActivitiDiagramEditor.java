@@ -92,6 +92,7 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.ImageLoader;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Display;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.ui.IEditorInput;
 import org.eclipse.ui.IEditorSite;
 import org.eclipse.ui.PartInitException;
@@ -198,9 +199,16 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     byte[] xmlBytes = converter.convertToXML(model.getBpmnModel());
 
     File objectsFile = new File(diagramFileString);
-    FileOutputStream fos = new FileOutputStream(objectsFile);
-    fos.write(xmlBytes);
-    fos.close();
+    try {
+      FileOutputStream fos = new FileOutputStream(objectsFile);
+      fos.write(xmlBytes);
+      fos.close();
+    } catch (Exception e) {
+      MessageBox messageBox = new MessageBox(Display.getCurrent().getActiveShell(), SWT.ICON_WARNING | SWT.OK);
+      messageBox.setText("Warning");
+      messageBox.setMessage("Error while saving the model " + e.getLocalizedMessage());
+      messageBox.open();
+    }
 
   }
 

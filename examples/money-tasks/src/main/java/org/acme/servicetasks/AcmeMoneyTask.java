@@ -89,6 +89,9 @@ public class AcmeMoneyTask extends AbstractCustomServiceTask {
   @Help(displayHelpShort = "The date the account expires ", displayHelpLong = "Choose the date when the account will expire if no extended before the date.")
   @DatePickerProperty()
   private String expiryDate;
+  
+  @Property(type = PropertyType.TEXT, visible = false, defaultValue = "test")
+  private String hiddenField;
 
   /*
    * (non-Javadoc)

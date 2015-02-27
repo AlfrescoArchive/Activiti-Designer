@@ -46,6 +46,11 @@ public @interface Property {
    * Whether this {@link Property} denotes a read only field.
    */
   boolean readOnly() default false;
+  
+  /**
+   * Whether this {@link Property} is a visible field.
+   */
+  boolean visible() default true;
 
   /**
    * The order for the {@link Property} to appear in a list of {@link Property}
