@@ -1,10 +1,6 @@
 package org.activiti.designer.property;
 
 import org.activiti.bpmn.model.SubProcess;
-import org.activiti.designer.util.editor.BpmnMemoryModel;
-import org.activiti.designer.util.editor.ModelHandler;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 

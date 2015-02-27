@@ -97,8 +97,8 @@ public class RenameActionProvider extends CommonActionProvider {
 				Resource resource = eclass.eResource();
 				ResourceSet resourceSet = resource.getResourceSet();
 				TransactionalEditingDomain domain = TransactionalEditingDomain.Factory.INSTANCE.createEditingDomain(resourceSet);
-				try{
 				if (domain != null){
+			    try{
 					Command setCommand = domain.createCommand(SetCommand.class, new CommandParameter(eclass,
 							EcorePackage.Literals.ENAMED_ELEMENT__NAME, newName));
 					domain.getCommandStack().execute(setCommand);
@@ -107,9 +107,9 @@ public class RenameActionProvider extends CommonActionProvider {
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
-				}
 				}finally{
 					domain.dispose();
+				}
 				}
 			}
 		}
