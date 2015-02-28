@@ -85,6 +85,10 @@ public class ChangeElementTypeFeature extends AbstractCustomFeature {
 		createFeatureMap.put(EVENT_START_MESSAGE, new CreateMessageStartEventFeature(fp));
 		createFeatureMap.put(EVENT_START_ERROR, new CreateErrorStartEventFeature(fp));
 		
+    createFeatureMap.put(EVENT_END_NONE, new CreateEndEventFeature(fp));
+    createFeatureMap.put(EVENT_END_TERMINATE, new CreateTerminateEndEventFeature(fp));
+    createFeatureMap.put(EVENT_END_ERROR, new CreateErrorEndEventFeature(fp));
+    
 		createFeatureMap.put(EVENT_BOUNDARY_TIMER, new CreateBoundaryTimerFeature(fp));
     createFeatureMap.put(EVENT_BOUNDARY_ERROR, new CreateBoundaryErrorFeature(fp));
     createFeatureMap.put(EVENT_BOUNDARY_MESSAGE, new CreateBoundaryMessageFeature(fp));
