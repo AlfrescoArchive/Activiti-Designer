@@ -155,7 +155,7 @@ public class CreateDefaultActivitiDiagramWizard extends BasicNewResourceWizard {
     return (CreateDefaultActivitiDiagramNameWizardPage) getPage(CreateDefaultActivitiDiagramNameWizardPage.PAGE_NAME);
   }
 
-  private String getDiagramName() {
+  protected String getDiagramName() {
     return getNamePage().getDiagramName();
   }
 
