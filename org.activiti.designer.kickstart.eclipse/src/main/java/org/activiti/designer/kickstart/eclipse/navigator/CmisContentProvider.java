@@ -15,8 +15,6 @@ package org.activiti.designer.kickstart.eclipse.navigator;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.designer.kickstart.eclipse.preferences.PreferencesUtil;
-import org.activiti.designer.util.preferences.Preferences;
 import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Document;
 import org.apache.chemistry.opencmis.client.api.Folder;

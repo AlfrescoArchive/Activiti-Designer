@@ -66,9 +66,11 @@ public class DeleteLaneFeature extends DefaultDeleteFeature {
 		    }
 		  }
 		  
+		  if (parentPool == null) return;
+		  
 		  Process laneProcess = model.getBpmnModel().getProcess(parentPool.getId());
 		  
-		  if (parentPool == null || laneProcess == null) return;
+		  if (laneProcess == null) return;
 		  
 		  if(laneProcess.getLanes().size() == 1) {
         Process process = model.getBpmnModel().getProcess(parentPool.getId());
