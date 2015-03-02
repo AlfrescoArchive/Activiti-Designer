@@ -1,16 +1,58 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+
+	<prerequisites>
+          <maven>3.0</maven>
+	</prerequisites>
+	
 	<groupId>org.activiti.designer</groupId>
 	<artifactId>org.activiti.designer.parent</artifactId>
 	<version>5.16.0-SNAPSHOT</version>
 	<packaging>pom</packaging>
-	<name>Activiti Designer - Parent project</name>
 
+	<name>Activiti Designer - Parent project</name>
+	<description>Activiti Designer - Parent project pom</description>
+	
 	<properties>
-		<tycho-version>0.19.0</tycho-version>
+          <tycho-version>0.19.0</tycho-version>
+          <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 	</properties>
 
+        <profiles>
+                <profile>
+                        <id>platform-juno</id>
+                        <activation>
+                          <property>
+                            <name>platform-version-name</name>
+                            <value>juno</value>
+                          </property>
+                        </activation>
+                        <properties>
+                          <eclipse-site>http://download.eclipse.org/releases/juno</eclipse-site>
+                          <platform-version>[3.8)</platform-version>
+                          <platform-version-name>juno</platform-version-name>
+                          <graphiti-site>http://archive.eclipse.org/graphiti/updates/0.10.1</graphiti-site>
+                        </properties>
+                </profile>
+                <profile>
+                        <id>platform-kepler</id>
+                        <activation>
+                          <activeByDefault>true</activeByDefault>
+                          <property>
+                            <name>platform-version-name</name>
+                            <value>kepler</value>
+                          </property>
+                        </activation>
+                        <properties>
+                          <eclipse-site>http://download.eclipse.org/releases/kepler</eclipse-site>
+                          <platform-version>[4.3)</platform-version>
+                          <platform-version-name>kepler</platform-version-name>
+                          <graphiti-site>http://download.eclipse.org/graphiti/updates/0.10.2</graphiti-site>
+                        </properties>
+                </profile>
+        </profiles>
+		
 	<modules>
 		<module>../org.activiti.designer.libs</module>
 		<module>../org.activiti.designer.eclipse</module>
@@ -29,77 +71,81 @@
 
 	<repositories>
 		<repository>
-			<id>eclipse-juno</id>
+			<id>eclipse-platform</id>
 			<layout>p2</layout>
-			<url>http://download.eclipse.org/releases/juno</url>
+			<url>${eclipse-site}</url>
 		</repository>
+		
 		<repository>
 			<id>Graphiti</id>
 			<layout>p2</layout>
-			<!-- <url>http://download.eclipse.org/graphiti/updates/milestones/</url> -->
-			<url>http://archive.eclipse.org/graphiti/updates/0.10.1</url>
+			<url>${graphiti-site}</url>
 		</repository>
 	</repositories>
 
 	<build>
-		<!-- To define the plugin version in your parent POM -->
-    	<pluginManagement>
-      		<plugins>
-        		<plugin>
-          			<groupId>org.eclipse.tycho</groupId>
-         			<artifactId>tycho-versions-plugin</artifactId>
-          			<version>0.19.0</version>
-        		</plugin>
-      		</plugins>
-   		</pluginManagement>
-		<plugins>
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>tycho-maven-plugin</artifactId>
-				<version>${tycho-version}</version>
-				<extensions>true</extensions>
-			</plugin>
-			<plugin>
-        		<groupId>org.eclipse.tycho</groupId>
-        		<artifactId>tycho-versions-plugin</artifactId>
-        		<version>${tycho-version}</version>
-      		</plugin>
-			<plugin>
-				<groupId>org.eclipse.tycho</groupId>
-				<artifactId>target-platform-configuration</artifactId>
-				<version>${tycho-version}</version>
-				<configuration>
-					<resolver>p2</resolver>
-					<environments>
-						<!-- <environment>
-							<os>linux</os>
-							<ws>gtk</ws>
-							<arch>x86_64</arch>
-						</environment>
-						<environment>
-							<os>linux</os>
-							<ws>gtk</ws>
-							<arch>x86</arch>
-						</environment>
-						<environment>
-							<os>win32</os>
-							<ws>win32</ws>
-							<arch>x86</arch>
-						</environment>
-						<environment>
-							<os>win32</os>
-							<ws>win32</ws>
-							<arch>x86_64</arch>
-						</environment> -->
-						<environment>
-							<os>macosx</os>
-							<ws>cocoa</ws>
-							<arch>x86_64</arch>
-						</environment>
-					</environments>
-				</configuration>
-			</plugin>
-		</plugins>
+
+	<plugins>
+	  <plugin>
+	    <groupId>org.eclipse.tycho</groupId>
+	    <artifactId>tycho-maven-plugin</artifactId>
+	    <version>${tycho-version}</version>
+	    <extensions>true</extensions>
+	  </plugin>
+
+	  <plugin>
+	    <groupId>org.eclipse.tycho</groupId>
+	    <artifactId>tycho-versions-plugin</artifactId>
+	    <version>${tycho-version}</version>
+	  </plugin>
+	  
+	  <plugin>
+	    <groupId>org.eclipse.tycho</groupId>
+	    <artifactId>target-platform-configuration</artifactId>
+	    <version>${tycho-version}</version>
+	    <configuration>
+	      <resolver>p2</resolver>
+	      <environments>
+		<!-- <environment>
+		     <os>linux</os>
+		     <ws>gtk</ws>
+		     <arch>x86_64</arch>
+		     </environment>
+		     <environment>
+		     <os>linux</os>
+		     <ws>gtk</ws>
+		     <arch>x86</arch>
+		     </environment>
+		     <environment>
+		     <os>win32</os>
+		     <ws>win32</ws>
+		     <arch>x86</arch>
+		     </environment>
+		     <environment>
+		     <os>win32</os>
+		     <ws>win32</ws>
+		     <arch>x86_64</arch>
+		     </environment> -->
+		<environment>
+		  <os>macosx</os>
+		  <ws>cocoa</ws>
+		  <arch>x86_64</arch>
+		</environment>
+	      </environments>
+	    </configuration>
+	  </plugin>
+	</plugins>
+
+	<pluginManagement>
+	  <plugins>
+	    <plugin>
+	      <groupId>org.eclipse.tycho</groupId>
+	      <artifactId>tycho-versions-plugin</artifactId>
+	      <version>${tycho-version}</version>
+	      <extensions>true</extensions>
+	    </plugin>
+	  </plugins>
+	</pluginManagement>
 	</build>
 	
 	<distributionManagement>
@@ -112,6 +158,6 @@
 		  <id>alfresco.release.repo</id>
 		  <url>https://artifacts.alfresco.com/nexus/content/repositories/activiti-releases/</url>
 		</repository>
-  	</distributionManagement>
+	</distributionManagement>
 
 </project>
