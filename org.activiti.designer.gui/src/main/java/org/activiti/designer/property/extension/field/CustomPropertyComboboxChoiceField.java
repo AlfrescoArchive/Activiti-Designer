@@ -13,14 +13,23 @@
 
 package org.activiti.designer.property.extension.field;
 
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
 import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.designer.integration.servicetask.PropertyType;
 import org.activiti.designer.integration.servicetask.annotation.PropertyItems;
+import org.activiti.designer.integration.servicetask.annotation.PropertyItemsDataSource;
 import org.activiti.designer.integration.servicetask.validator.RequiredFieldValidator;
 import org.activiti.designer.property.PropertyCustomServiceTaskSection;
 import org.eclipse.swt.SWT;
@@ -40,6 +49,7 @@ public class CustomPropertyComboboxChoiceField extends AbstractCustomPropertyFie
 
   private CCombo comboControl;
   private PropertyItems propertyItemsAnnotation;
+  private PropertyItemsDataSource propertyItemsDataSource;
 
   private Map<String, String> values;
 
@@ -99,6 +109,77 @@ public class CustomPropertyComboboxChoiceField extends AbstractCustomPropertyFie
         for (int i = 0; i < itemValues.length; i += 2) {
           values.put(itemValues[i + 1], itemValues[i]);
           labels[i / 2] = itemValues[i];
+        }
+      }
+    }
+    
+    /*
+     * Load values from the annotation data source and append them to the values and labels.
+     * 
+     * If necessary, initialize both variables.
+     */
+    if(propertyItemsDataSource == null) {
+      propertyItemsDataSource = getField().getAnnotation(PropertyItemsDataSource.class);
+      if(propertyItemsDataSource != null) {
+        
+        String filename = propertyItemsDataSource.filename();
+        if(filename != null) {
+          
+          FileReader fr = null;
+          BufferedReader br = null;
+          try {
+            File file = new File(filename);
+            if(!file.isFile()) {
+              throw new IllegalArgumentException("Unable to find file: "+file.getAbsolutePath());
+            }
+            fr = new FileReader(file);
+            br = new BufferedReader(fr);
+            
+            List<String> valueList = new ArrayList<String>();
+            String line = null;
+            while((line=br.readLine()) != null) {
+              valueList.add(line);
+            }
+            
+            if(values == null) {
+              values = new HashMap<String, String>();
+            }
+            
+            List<String> labelList = new ArrayList<String>();
+            
+            if(labels != null) {
+              labelList.addAll(Arrays.asList(labels));
+            }
+            
+            for(int i = 0; i < valueList.size(); i+=2) {
+              values.put(valueList.get(i+1), valueList.get(i));
+              labelList.add(valueList.get(i));
+            }
+            
+            labels = labelList.toArray(new String[labelList.size()]);
+          } catch (FileNotFoundException e) {
+            e.printStackTrace();
+            throw new IllegalArgumentException("Unable to find file "+filename);
+          } catch (IOException e) {
+            throw new IllegalArgumentException("Unable to read file "+filename);
+          } finally {
+            if(br != null) {
+              try {
+                br.close();
+              } catch (IOException e) {
+                e.printStackTrace();
+              }
+            }
+            if(fr != null) {
+              try {
+                fr.close();
+              } catch (IOException e) {
+                e.printStackTrace();
+              }
+            }
+          }
+        } else {
+          throw new IllegalArgumentException("The filename is mandatory");
         }
       }
     }

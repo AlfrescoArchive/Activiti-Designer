@@ -9,20 +9,13 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * @author Tiese Barrell
+ * @author André Macedo
  * @version 1
- * @since 0.7.0
+ * @since 5.16.0
  * 
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.FIELD)
-public @interface PropertyItems {
-
-  public static final String[] DEFAULT_VALUE = new String[] {};
-
-  /**
-   * The items.
-   */
-  abstract String[] value();
-
+public @interface PropertyItemsDataSource {
+	abstract String filename();
 }
