@@ -115,4 +115,9 @@ public class AcmeMoneyTask extends AbstractCustomServiceTask {
     return "Money node";
   }
 
+  @Override
+  public String getSmallIconPath() {
+    return "icons/coins.png";
+  }
+
 }
