@@ -7,6 +7,7 @@ import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,12 +39,15 @@ import org.activiti.bpmn.model.Process;
 import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.bpmn.model.SubProcess;
+import org.activiti.bpmn.model.UserTask;
 import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.eclipse.extension.export.ExportMarshaller;
 import org.activiti.designer.eclipse.ui.ExportMarshallerRunnable;
 import org.activiti.designer.eclipse.util.ExtensionPointUtil;
 import org.activiti.designer.eclipse.util.FileService;
+import org.activiti.designer.integration.annotation.Property;
 import org.activiti.designer.integration.servicetask.CustomServiceTask;
+import org.activiti.designer.integration.usertask.CustomUserTask;
 import org.activiti.designer.util.bpmn.BpmnExtensions;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.editor.BpmnMemoryModel;
@@ -624,7 +628,55 @@ public class ActivitiDiagramEditor extends DiagramEditor {
               serviceTask.getFieldExtensions().clear();
             }
           }
+          
+        } else if (flowElement instanceof UserTask) {
 
+          UserTask userTask = (UserTask) flowElement;
+
+          if (userTask.isExtended()) {
+
+            CustomUserTask targetTask = findCustomUserTask(userTask);
+
+            if (targetTask != null) {
+              
+              final List<Class<CustomUserTask>> classHierarchy = new ArrayList<Class<CustomUserTask>>();
+              final List<String> fieldInfoObjects = new ArrayList<String>();
+
+              Class clazz = targetTask.getClass();
+              classHierarchy.add(clazz);
+
+              boolean hierarchyOpen = true;
+              while (hierarchyOpen) {
+                clazz = clazz.getSuperclass();
+                if (CustomUserTask.class.isAssignableFrom(clazz)) {
+                  classHierarchy.add(clazz);
+                } else {
+                  hierarchyOpen = false;
+                }
+              }
+              
+              for (final Class<CustomUserTask> currentClass : classHierarchy) {
+                for (final Field field : currentClass.getDeclaredFields()) {
+                  if (field.isAnnotationPresent(Property.class)) {
+                    fieldInfoObjects.add(field.getName());
+                  }
+                }
+              }
+              
+              for (String fieldName : userTask.getExtensionElements().keySet()) {
+                if (fieldInfoObjects.contains(fieldName)) {
+                  CustomProperty customFieldProperty = new CustomProperty();
+                  customFieldProperty.setName(fieldName);
+                  customFieldProperty.setSimpleValue(userTask.getExtensionElements().get(fieldName).get(0).getElementText());
+                  userTask.getCustomProperties().add(customFieldProperty);
+                }
+              }
+              
+              for (String fieldName : fieldInfoObjects) {
+                userTask.getExtensionElements().remove(fieldName);
+              }
+            }
+          }
         }
 
         if (flowElement instanceof BoundaryEvent) {
@@ -672,12 +724,29 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     CustomServiceTask result = null;
     if (serviceTask.isExtended()) {
 
-      final List<CustomServiceTask> customServiceTasks = ExtensionUtil.getCustomServiceTasks(ActivitiUiUtil.getProjectFromDiagram(getDiagramTypeProvider()
-              .getDiagram()));
+      final List<CustomServiceTask> customServiceTasks = ExtensionUtil.getCustomServiceTasks(
+          ActivitiUiUtil.getProjectFromDiagram(getDiagramTypeProvider().getDiagram()));
 
       for (final CustomServiceTask customServiceTask : customServiceTasks) {
         if (serviceTask.getExtensionId().equals(customServiceTask.getId())) {
           result = customServiceTask;
+          break;
+        }
+      }
+    }
+    return result;
+  }
+  
+  protected CustomUserTask findCustomUserTask(UserTask userTask) {
+    CustomUserTask result = null;
+    if (userTask.isExtended()) {
+
+      final List<CustomUserTask> customUserTasks = ExtensionUtil.getCustomUserTasks(
+          ActivitiUiUtil.getProjectFromDiagram(getDiagramTypeProvider().getDiagram()));
+
+      for (final CustomUserTask customUserTask : customUserTasks) {
+        if (userTask.getExtensionId().equals(customUserTask.getId())) {
+          result = customUserTask;
           break;
         }
       }

@@ -15,10 +15,10 @@ package org.activiti.designer.property.extension.field;
 
 import java.lang.reflect.Field;
 
-import org.activiti.bpmn.model.ServiceTask;
+import org.activiti.bpmn.model.Task;
 import org.activiti.designer.integration.servicetask.PropertyType;
-import org.activiti.designer.integration.servicetask.validator.RequiredFieldValidator;
-import org.activiti.designer.property.PropertyCustomServiceTaskSection;
+import org.activiti.designer.integration.validator.RequiredFieldValidator;
+import org.activiti.designer.property.AbstractPropertyCustomTaskSection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.layout.FormAttachment;
@@ -36,8 +36,8 @@ public class CustomPropertyMultilineTextField extends AbstractCustomPropertyFiel
 
   private Text textControl;
 
-  public CustomPropertyMultilineTextField(final PropertyCustomServiceTaskSection section, final ServiceTask serviceTask, final Field field) {
-    super(section, serviceTask, field);
+  public CustomPropertyMultilineTextField(final AbstractPropertyCustomTaskSection section, final Task task, final Field field) {
+    super(section, task, field);
   }
 
   @Override

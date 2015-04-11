@@ -3,9 +3,9 @@
  */
 package org.acme.servicetasks;
 
+import org.activiti.designer.integration.annotation.Help;
+import org.activiti.designer.integration.annotation.Runtime;
 import org.activiti.designer.integration.servicetask.AbstractCustomServiceTask;
-import org.activiti.designer.integration.servicetask.annotation.Help;
-import org.activiti.designer.integration.servicetask.annotation.Runtime;
 
 /**
  * Example of a CustomServiceTask that uses an expression for the Runtime
@@ -15,13 +15,6 @@ import org.activiti.designer.integration.servicetask.annotation.Runtime;
 @Help(displayHelpShort = "Echos the customerName", displayHelpLong = "Echoes the process variable customerName")
 public class RuntimeExpressionEchoTask extends AbstractCustomServiceTask {
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.activiti.designer.integration.servicetask.AbstractCustomServiceTask
-   * #contributeToPaletteDrawer()
-   */
   @Override
   public String contributeToPaletteDrawer() {
     return "Acme Corporation";
@@ -32,13 +25,6 @@ public class RuntimeExpressionEchoTask extends AbstractCustomServiceTask {
     return "Echo customer name (expression)";
   }
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.activiti.designer.integration.servicetask.AbstractCustomServiceTask
-   * #getSmallIconPath()
-   */
   @Override
   public String getSmallIconPath() {
     return "icons/coins.png";

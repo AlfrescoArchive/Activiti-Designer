@@ -19,11 +19,11 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 
-import org.activiti.bpmn.model.ServiceTask;
+import org.activiti.bpmn.model.Task;
+import org.activiti.designer.integration.annotation.DatePickerProperty;
 import org.activiti.designer.integration.servicetask.PropertyType;
-import org.activiti.designer.integration.servicetask.annotation.DatePickerProperty;
-import org.activiti.designer.integration.servicetask.validator.RequiredFieldValidator;
-import org.activiti.designer.property.PropertyCustomServiceTaskSection;
+import org.activiti.designer.integration.validator.RequiredFieldValidator;
+import org.activiti.designer.property.AbstractPropertyCustomTaskSection;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusListener;
@@ -43,8 +43,8 @@ public class CustomPropertyDatePickerField extends AbstractCustomPropertyField {
   private DateTime calendarControl;
   private SimpleDateFormat sdf;
 
-  public CustomPropertyDatePickerField(final PropertyCustomServiceTaskSection section, final ServiceTask serviceTask, final Field field) {
-    super(section, serviceTask, field);
+  public CustomPropertyDatePickerField(final AbstractPropertyCustomTaskSection section, final Task task, final Field field) {
+    super(section, task, field);
   }
 
   @Override

@@ -18,11 +18,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.activiti.bpmn.model.ServiceTask;
+import org.activiti.bpmn.model.Task;
+import org.activiti.designer.integration.annotation.PropertyItems;
 import org.activiti.designer.integration.servicetask.PropertyType;
-import org.activiti.designer.integration.servicetask.annotation.PropertyItems;
-import org.activiti.designer.integration.servicetask.validator.RequiredFieldValidator;
-import org.activiti.designer.property.PropertyCustomServiceTaskSection;
+import org.activiti.designer.integration.validator.RequiredFieldValidator;
+import org.activiti.designer.property.AbstractPropertyCustomTaskSection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.FocusListener;
@@ -43,8 +43,8 @@ public class CustomPropertyComboboxChoiceField extends AbstractCustomPropertyFie
 
   private Map<String, String> values;
 
-  public CustomPropertyComboboxChoiceField(final PropertyCustomServiceTaskSection section, final ServiceTask serviceTask, final Field field) {
-    super(section, serviceTask, field);
+  public CustomPropertyComboboxChoiceField(final AbstractPropertyCustomTaskSection section, final Task task, final Field field) {
+    super(section, task, field);
   }
 
   @Override

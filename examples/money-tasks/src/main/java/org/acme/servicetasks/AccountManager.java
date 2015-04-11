@@ -1,8 +1,8 @@
 package org.acme.servicetasks;
 
+import org.activiti.designer.integration.annotation.Help;
+import org.activiti.designer.integration.annotation.Property;
 import org.activiti.designer.integration.servicetask.PropertyType;
-import org.activiti.designer.integration.servicetask.annotation.Help;
-import org.activiti.designer.integration.servicetask.annotation.Property;
 
 /**
  * Defines fields for a data grid managing AccountManagers.

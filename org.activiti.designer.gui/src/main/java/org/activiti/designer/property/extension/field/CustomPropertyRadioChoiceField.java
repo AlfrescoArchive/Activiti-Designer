@@ -18,10 +18,10 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.activiti.bpmn.model.ServiceTask;
+import org.activiti.bpmn.model.Task;
+import org.activiti.designer.integration.annotation.PropertyItems;
 import org.activiti.designer.integration.servicetask.PropertyType;
-import org.activiti.designer.integration.servicetask.annotation.PropertyItems;
-import org.activiti.designer.property.PropertyCustomServiceTaskSection;
+import org.activiti.designer.property.AbstractPropertyCustomTaskSection;
 import org.activiti.designer.property.extension.field.validator.RadioRequiredFieldValidator;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.swt.SWT;
@@ -47,8 +47,8 @@ public class CustomPropertyRadioChoiceField extends AbstractCustomPropertyField 
 
   private Map<String, String> values;
 
-  public CustomPropertyRadioChoiceField(final PropertyCustomServiceTaskSection section, final ServiceTask serviceTask, final Field field) {
-    super(section, serviceTask, field);
+  public CustomPropertyRadioChoiceField(final AbstractPropertyCustomTaskSection section, final Task task, final Field field) {
+    super(section, task, field);
   }
 
   @Override

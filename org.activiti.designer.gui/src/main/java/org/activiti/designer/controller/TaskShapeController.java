@@ -17,11 +17,13 @@ import org.activiti.bpmn.model.alfresco.AlfrescoUserTask;
 import org.activiti.designer.PluginImage;
 import org.activiti.designer.diagram.ActivitiBPMNFeatureProvider;
 import org.activiti.designer.eclipse.common.ActivitiPlugin;
+import org.activiti.designer.integration.DiagramBaseShape;
 import org.activiti.designer.integration.servicetask.CustomServiceTask;
-import org.activiti.designer.integration.servicetask.DiagramBaseShape;
+import org.activiti.designer.integration.usertask.CustomUserTask;
 import org.activiti.designer.util.bpmn.BpmnExtensionUtil;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.extension.CustomServiceTaskContext;
+import org.activiti.designer.util.extension.CustomUserTaskContext;
 import org.activiti.designer.util.extension.ExtensionUtil;
 import org.activiti.designer.util.platform.OSEnum;
 import org.activiti.designer.util.platform.OSUtil;
@@ -102,6 +104,24 @@ public class TaskShapeController extends AbstractBusinessObjectShapeController {
       for (final CustomServiceTask customServiceTask : customServiceTasks) {
         if (customServiceTask.getId().equals(serviceTask.getExtensionId())) {
           targetTask = customServiceTask;
+          break;
+        }
+      }
+
+      if (!DiagramBaseShape.ACTIVITY.equals(targetTask.getDiagramBaseShape())) {
+        baseShape = targetTask.getDiagramBaseShape();
+      }
+    }
+    
+    if (ExtensionUtil.isCustomUserTask(addedTask)) {
+      final UserTask userTask = (UserTask) addedTask;
+      final List<CustomUserTask> customUserTasks = ExtensionUtil.getCustomUserTasks(ActivitiUiUtil.getProjectFromDiagram(diagram));
+
+      CustomUserTask targetTask = null;
+
+      for (final CustomUserTask customUserTask : customUserTasks) {
+        if (customUserTask.getId().equals(userTask.getExtensionId())) {
+          targetTask = customUserTask;
           break;
         }
       }
@@ -290,6 +310,17 @@ public class TaskShapeController extends AbstractBusinessObjectShapeController {
       }
     
     } else if (bo instanceof UserTask) {
+      UserTask userTask = (UserTask) bo;
+      if (ExtensionUtil.isCustomUserTask(bo)) {
+        final List<CustomUserTaskContext> customUserTaskContexts = ExtensionUtil.getCustomUserTaskContexts(
+            ActivitiUiUtil.getProjectFromDiagram(getFeatureProvider().getDiagramTypeProvider().getDiagram()));
+        for (CustomUserTaskContext customUserTaskContext : customUserTaskContexts) {
+          if (customUserTaskContext.getUserTask().getId().equals(userTask.getExtensionId())) {
+            return customUserTaskContext.getShapeImageKey();
+          }
+        }
+      }
+      
       return PluginImage.IMG_USERTASK.getImageKey();
     
     } else if (bo instanceof BusinessRuleTask) {

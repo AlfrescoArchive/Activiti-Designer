@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.activiti.designer.integration.servicetask;
+package org.activiti.designer.integration;
 
 /**
  * @author Tiese Barrell

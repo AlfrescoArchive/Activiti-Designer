@@ -6,8 +6,9 @@ package org.activiti.designer.integration.servicetask;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
-import org.activiti.designer.integration.servicetask.annotation.Property;
-import org.activiti.designer.integration.servicetask.annotation.Runtime;
+import org.activiti.designer.integration.DiagramBaseShape;
+import org.activiti.designer.integration.annotation.Property;
+import org.activiti.designer.integration.annotation.Runtime;
 
 /**
  * Abstract base class for implementing CustomServiceTasks. Defaults provided by

@@ -63,6 +63,12 @@
          <propertyTab
                afterTab="org.activiti.designer.mainConfigTab"
                category="Activiti"
+               id="org.activiti.designer.taskConfigTab"
+               label="Task config">
+         </propertyTab>
+         <propertyTab
+               afterTab="org.activiti.designer.mainConfigTab"
+               category="Activiti"
                id="org.activiti.designer.documentationTab"
                label="Documentation">
          </propertyTab>
@@ -155,6 +161,12 @@
                filter="org.activiti.designer.property.PropertyCustomServiceTaskFilter"
                id="org.activiti.designer.mainConfigTab.customservicetask"
                tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyCustomUserTaskSection"
+               filter="org.activiti.designer.property.PropertyCustomUserTaskFilter"
+               id="org.activiti.designer.taskConfigTab.customusertask"
+               tab="org.activiti.designer.taskConfigTab">
          </propertySection>
          <propertySection
                class="org.activiti.designer.property.PropertyUserTaskSection"

@@ -1,45 +1,45 @@
 /**
  * 
  */
-package org.activiti.designer.integration.servicetask;
+package org.activiti.designer.integration.usertask;
 
 import org.activiti.designer.integration.DiagramBaseShape;
 
 /**
- * Interface for customizations of the default ServiceTask from BPMN.
+ * Interface for customizations of the default UserTask from BPMN.
  * 
  * This interface should not be implemented directly by clients - an abstract
  * base class that implements this interface should be extended instead
  * 
- * @author Tiese Barrell
- * @since 0.5.1
+ * @author Tijs Rademakers
+ * @since 5.17
  * 
  */
-public interface CustomServiceTask {
+public interface CustomUserTask {
 
   public static final String MANIFEST_EXTENSION_NAME = "ActivitiDesigner-Extension-Name";
 
   /**
    * Gets the identifier for this custom service task. The qualified identifier
-   * uniquely identifies this service task.
+   * uniquely identifies this user task.
    * 
    * @return the identifier
    */
   String getId();
 
   /**
-   * Gets a descriptive name for the service task. This name is presented to the
+   * Gets a descriptive name for the user task. This name is presented to the
    * user in the designer.
    * 
-   * @return the service task's name
+   * @return the user task's name
    */
   String getName();
 
   /**
-   * Gets a description for the service task. This name is presented to the user
+   * Gets a description for the user task. This name is presented to the user
    * in the designer.
    * 
-   * @return the service task's description
+   * @return the user task's description
    */
   String getDescription();
 
@@ -54,7 +54,7 @@ public interface CustomServiceTask {
 
   /**
    * Gets the path to the icon image file used for small icon display. Returns
-   * null if this {@link CustomServiceTask} has no image of its own.
+   * null if this {@link CustomUserTask} has no image of its own.
    * 
    * @return the path to the icon file or null if there is none
    */
@@ -62,7 +62,7 @@ public interface CustomServiceTask {
 
   /**
    * Gets the path to the icon image file used for large icon display. Returns
-   * null if this {@link CustomServiceTask} has no image of its own.
+   * null if this {@link CustomUserTask} has no image of its own.
    * 
    * @return the path to the icon file or null if there is none
    */
@@ -70,7 +70,7 @@ public interface CustomServiceTask {
 
   /**
    * Gets the path to the icon image file used for display in the shape on the
-   * canvas. Returns null if this {@link CustomServiceTask} has no image of its
+   * canvas. Returns null if this {@link CustomUserTask} has no image of its
    * own.
    * 
    * @return the path to the icon file or null if there is none
@@ -78,38 +78,18 @@ public interface CustomServiceTask {
   String getShapeIconPath();
 
   /**
-   * Gets the base shape for the diagram for this {@link CustomServiceTask}. The
+   * Gets the base shape for the diagram for this {@link CustomUserTask}. The
    * base shape is the type of shape used to display a node in the diagram. For
    * ServiceTasks, this a rounded rectangle by default. Override this method and
    * return a different base shape to customize the base shape drawn for this
-   * {@link CustomServiceTask}.
+   * {@link CustomUserTask}.
    * 
    * @return the base shape for the element in the diagram
    */
   DiagramBaseShape getDiagramBaseShape();
 
   /**
-   * Gets the type of delegate defined by the {@link @Runtime} annotation.
-   * 
-   * @return the delegate type
-   */
-  DelegateType getDelegateType();
-
-  /**
-   * Gets the specification of the delegate to be used at runtime for this
-   * {@link CustomServiceTask}. This specification is determined by the task's
-   * {@link org.activiti.designer.integration.annotation.Runtime}
-   * annotation. The type of the specification is provided by
-   * {@link #getDelegateType()}
-   * 
-   * @see #getDelegateType()
-   * 
-   * @return the specification or an empty string if there is none
-   */
-  String getDelegateSpecification();
-
-  /**
-   * Gets the order index for this {@link CustomServiceTask} within it's
+   * Gets the order index for this {@link CustomUserTask} within it's
    * container drawer. Used to sort the tools in the Palette.
    * 
    * @return the order index

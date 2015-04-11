@@ -1,4 +1,4 @@
-package org.activiti.designer.integration.servicetask.validator;
+package org.activiti.designer.integration.validator;
 
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.widgets.Control;

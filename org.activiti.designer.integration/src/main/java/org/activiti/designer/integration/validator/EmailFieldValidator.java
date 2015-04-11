@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.activiti.designer.integration.servicetask.validator;
+package org.activiti.designer.integration.validator;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

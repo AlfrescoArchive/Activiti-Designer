@@ -1,7 +1,7 @@
 package org.activiti.designer.property.extension.field.validator;
 
-import org.activiti.designer.integration.servicetask.validator.FieldValidator;
-import org.activiti.designer.integration.servicetask.validator.ValidationException;
+import org.activiti.designer.integration.validator.FieldValidator;
+import org.activiti.designer.integration.validator.ValidationException;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Spinner;

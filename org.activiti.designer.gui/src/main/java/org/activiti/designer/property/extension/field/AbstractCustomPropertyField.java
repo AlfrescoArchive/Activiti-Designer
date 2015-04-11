@@ -22,12 +22,12 @@ import java.util.Map.Entry;
 
 import org.activiti.bpmn.model.ComplexDataType;
 import org.activiti.bpmn.model.CustomProperty;
-import org.activiti.bpmn.model.ServiceTask;
-import org.activiti.designer.integration.servicetask.annotation.Help;
-import org.activiti.designer.integration.servicetask.annotation.Property;
-import org.activiti.designer.integration.servicetask.validator.FieldValidator;
-import org.activiti.designer.integration.servicetask.validator.ValidationException;
-import org.activiti.designer.property.PropertyCustomServiceTaskSection;
+import org.activiti.bpmn.model.Task;
+import org.activiti.designer.integration.annotation.Help;
+import org.activiti.designer.integration.annotation.Property;
+import org.activiti.designer.integration.validator.FieldValidator;
+import org.activiti.designer.integration.validator.ValidationException;
+import org.activiti.designer.property.AbstractPropertyCustomTaskSection;
 import org.activiti.designer.util.extension.ExtensionUtil;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.swt.custom.CCombo;
@@ -51,8 +51,8 @@ public abstract class AbstractCustomPropertyField implements CustomPropertyField
 
   private Map<Control, List<FieldValidator>> validators = new HashMap<Control, List<FieldValidator>>();
 
-  private final PropertyCustomServiceTaskSection section;
-  private final ServiceTask serviceTask;
+  private final AbstractPropertyCustomTaskSection section;
+  private final Task task;
   private final String customPropertyId;
 
   private final Field field;
@@ -60,9 +60,9 @@ public abstract class AbstractCustomPropertyField implements CustomPropertyField
   private final Property propertyAnnotation;
   private final Help helpAnnotation;
 
-  public AbstractCustomPropertyField(final PropertyCustomServiceTaskSection section, final ServiceTask serviceTask, final Field field) {
+  public AbstractCustomPropertyField(final AbstractPropertyCustomTaskSection section, final Task task, final Field field) {
     this.section = section;
-    this.serviceTask = serviceTask;
+    this.task = task;
     this.customPropertyId = field.getName();
     this.field = field;
 
@@ -114,15 +114,13 @@ public abstract class AbstractCustomPropertyField implements CustomPropertyField
     try {
       this.validators.get(control).add(fieldValidatorClass.newInstance());
     } catch (Exception e) {
-      // TODO: handle
       // fail silently
     }
-
   }
 
   protected String getSimpleValueFromModel() {
     String result = null;
-    final CustomProperty property = ExtensionUtil.getCustomProperty(serviceTask, customPropertyId);
+    final CustomProperty property = ExtensionUtil.getCustomProperty(task, customPropertyId);
     if (property != null) {
       final String propertyValue = property.getSimpleValue();
       if (propertyValue != null) {
@@ -153,7 +151,7 @@ public abstract class AbstractCustomPropertyField implements CustomPropertyField
 
   protected ComplexDataType getComplexValueFromModel() {
     ComplexDataType result = null;
-    final CustomProperty property = ExtensionUtil.getCustomProperty(serviceTask, customPropertyId);
+    final CustomProperty property = ExtensionUtil.getCustomProperty(task, customPropertyId);
     if (property != null) {
       final ComplexDataType propertyValue = property.getComplexValue();
       if (propertyValue != null) {
@@ -175,7 +173,7 @@ public abstract class AbstractCustomPropertyField implements CustomPropertyField
     return this.field;
   }
 
-  protected PropertyCustomServiceTaskSection getSection() {
+  protected AbstractPropertyCustomTaskSection getSection() {
     return section;
   }
 

@@ -7,14 +7,13 @@ import java.util.List;
 
 import org.activiti.bpmn.model.ComplexDataType;
 import org.activiti.bpmn.model.CustomProperty;
-import org.activiti.bpmn.model.ServiceTask;
+import org.activiti.bpmn.model.UserTask;
 import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.integration.annotation.Help;
 import org.activiti.designer.integration.annotation.Locale;
 import org.activiti.designer.integration.annotation.Locales;
 import org.activiti.designer.integration.annotation.Property;
-import org.activiti.designer.integration.servicetask.CustomServiceTask;
-import org.activiti.designer.integration.servicetask.DelegateType;
+import org.activiti.designer.integration.usertask.CustomUserTask;
 import org.activiti.designer.property.extension.field.CustomPropertyBooleanChoiceField;
 import org.activiti.designer.property.extension.field.CustomPropertyComboboxChoiceField;
 import org.activiti.designer.property.extension.field.CustomPropertyDatePickerField;
@@ -53,7 +52,7 @@ import org.eclipse.ui.PlatformUI;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
-public class PropertyCustomServiceTaskSection extends AbstractPropertyCustomTaskSection {
+public class PropertyCustomUserTaskSection extends AbstractPropertyCustomTaskSection {
 
   public static Font boldFont;
   public static Font italicFont;
@@ -63,7 +62,7 @@ public class PropertyCustomServiceTaskSection extends AbstractPropertyCustomTask
   private static final int LABEL_COLUMN_WIDTH = 200;
   private static final int HELP_COLUMN_WIDTH = 40;
 
-  private List<CustomServiceTask> customServiceTasks;
+  private List<CustomUserTask> customUserTasks;
   private List<CustomPropertyField> customPropertyFields;
 
   private Composite parent;
@@ -105,24 +104,24 @@ public class PropertyCustomServiceTaskSection extends AbstractPropertyCustomTask
 
     workParent = factory.createFlatFormComposite(parent);
 
-    customServiceTasks = ExtensionUtil.getCustomServiceTasks(ActivitiUiUtil.getProjectFromDiagram(getDiagram()));
+    customUserTasks = ExtensionUtil.getCustomUserTasks(ActivitiUiUtil.getProjectFromDiagram(getDiagram()));
 
-    final ServiceTask serviceTask = getServiceTask();
+    final UserTask userTask = getUserTask();
 
-    if (serviceTask != null) {
+    if (userTask != null) {
 
-      CustomServiceTask targetTask = null;
+      CustomUserTask targetTask = null;
 
-      for (final CustomServiceTask customServiceTask : customServiceTasks) {
-        if (customServiceTask.getId().equals(serviceTask.getExtensionId())) {
-          targetTask = customServiceTask;
+      for (final CustomUserTask customUserTask : customUserTasks) {
+        if (customUserTask.getId().equals(userTask.getExtensionId())) {
+          targetTask = customUserTask;
           break;
         }
       }
 
       if (targetTask != null) {
 
-        final List<Class<CustomServiceTask>> classHierarchy = new ArrayList<Class<CustomServiceTask>>();
+        final List<Class<CustomUserTask>> classHierarchy = new ArrayList<Class<CustomUserTask>>();
         final List<FieldInfo> fieldInfoObjects = new ArrayList<FieldInfo>();
 
         Class clazz = targetTask.getClass();
@@ -131,20 +130,17 @@ public class PropertyCustomServiceTaskSection extends AbstractPropertyCustomTask
         boolean hierarchyOpen = true;
         while (hierarchyOpen) {
           clazz = clazz.getSuperclass();
-          if (CustomServiceTask.class.isAssignableFrom(clazz)) {
+          if (CustomUserTask.class.isAssignableFrom(clazz)) {
             classHierarchy.add(clazz);
           } else {
             hierarchyOpen = false;
           }
         }
 
-        // only process properties if the type is not an expression.
-        if (taskNotExpressionImplementationType(targetTask)) {
-          for (final Class<CustomServiceTask> currentClass : classHierarchy) {
-            for (final Field field : currentClass.getDeclaredFields()) {
-              if (field.isAnnotationPresent(Property.class)) {
-                fieldInfoObjects.add(new FieldInfo(field));
-              }
+        for (final Class<CustomUserTask> currentClass : classHierarchy) {
+          for (final Field field : currentClass.getDeclaredFields()) {
+            if (field.isAnnotationPresent(Property.class)) {
+              fieldInfoObjects.add(new FieldInfo(field));
             }
           }
         }
@@ -195,7 +191,7 @@ public class PropertyCustomServiceTaskSection extends AbstractPropertyCustomTask
             switch (property.type()) {
   
             case TEXT:
-              createdCustomPropertyField = new CustomPropertyTextField(this, serviceTask, fieldInfo.getField());
+              createdCustomPropertyField = new CustomPropertyTextField(this, userTask, fieldInfo.getField());
               createdControl = createdCustomPropertyField.render(workParent, factory, listener);
               data = new FormData();
               data.top = new FormAttachment(previousAnchor, VSPACE);
@@ -205,7 +201,7 @@ public class PropertyCustomServiceTaskSection extends AbstractPropertyCustomTask
               break;
   
             case MULTILINE_TEXT:
-              createdCustomPropertyField = new CustomPropertyMultilineTextField(this, serviceTask, fieldInfo.getField());
+              createdCustomPropertyField = new CustomPropertyMultilineTextField(this, userTask, fieldInfo.getField());
               createdControl = createdCustomPropertyField.render(workParent, factory, listener);
               data = new FormData();
               data.top = new FormAttachment(previousAnchor, VSPACE);
@@ -216,7 +212,7 @@ public class PropertyCustomServiceTaskSection extends AbstractPropertyCustomTask
               break;
   
             case PERIOD:
-              createdCustomPropertyField = new CustomPropertyPeriodField(this, serviceTask, fieldInfo.getField());
+              createdCustomPropertyField = new CustomPropertyPeriodField(this, userTask, fieldInfo.getField());
               createdControl = createdCustomPropertyField.render(workParent, factory, listener);
               data = new FormData();
               data.top = new FormAttachment(previousAnchor, VSPACE);
@@ -226,7 +222,7 @@ public class PropertyCustomServiceTaskSection extends AbstractPropertyCustomTask
               break;
   
             case BOOLEAN_CHOICE:
-              createdCustomPropertyField = new CustomPropertyBooleanChoiceField(this, serviceTask, fieldInfo.getField());
+              createdCustomPropertyField = new CustomPropertyBooleanChoiceField(this, userTask, fieldInfo.getField());
               createdControl = createdCustomPropertyField.render(workParent, factory, listener);
               data = new FormData();
               data.top = new FormAttachment(previousAnchor, VSPACE);
@@ -236,7 +232,7 @@ public class PropertyCustomServiceTaskSection extends AbstractPropertyCustomTask
               break;
   
             case COMBOBOX_CHOICE:
-              createdCustomPropertyField = new CustomPropertyComboboxChoiceField(this, serviceTask, fieldInfo.getField());
+              createdCustomPropertyField = new CustomPropertyComboboxChoiceField(this, userTask, fieldInfo.getField());
               createdControl = createdCustomPropertyField.render(workParent, factory, listener);
               data = new FormData();
               data.top = new FormAttachment(previousAnchor, VSPACE);
@@ -246,7 +242,7 @@ public class PropertyCustomServiceTaskSection extends AbstractPropertyCustomTask
               break;
   
             case RADIO_CHOICE:
-              createdCustomPropertyField = new CustomPropertyRadioChoiceField(this, serviceTask, fieldInfo.getField());
+              createdCustomPropertyField = new CustomPropertyRadioChoiceField(this, userTask, fieldInfo.getField());
               createdControl = createdCustomPropertyField.render(workParent, factory, listener);
               data = new FormData();
               data.top = new FormAttachment(previousAnchor, VSPACE);
@@ -256,7 +252,7 @@ public class PropertyCustomServiceTaskSection extends AbstractPropertyCustomTask
               break;
   
             case DATE_PICKER:
-              createdCustomPropertyField = new CustomPropertyDatePickerField(this, serviceTask, fieldInfo.getField());
+              createdCustomPropertyField = new CustomPropertyDatePickerField(this, userTask, fieldInfo.getField());
               createdControl = createdCustomPropertyField.render(workParent, factory, listener);
               data = new FormData();
               data.top = new FormAttachment(previousAnchor, VSPACE);
@@ -345,7 +341,7 @@ public class PropertyCustomServiceTaskSection extends AbstractPropertyCustomTask
 
         // ensure the model is populated with custom properties if this is the
         // first time the section is shown for this serviceTask.
-        if (customPropertiesMustBeInitialized(serviceTask)) {
+        if (customPropertiesMustBeInitialized(userTask)) {
           storeFieldsToModel();
         }
 
@@ -355,12 +351,8 @@ public class PropertyCustomServiceTaskSection extends AbstractPropertyCustomTask
     this.workParent.getParent().getParent().layout(true, true);
   }
 
-  private boolean taskNotExpressionImplementationType(CustomServiceTask task) {
-    return !DelegateType.EXPRESSION.equals(task.getDelegateType());
-  }
-
-  private boolean customPropertiesMustBeInitialized(final ServiceTask serviceTask) {
-    return customPropertyFields.size() > 0 && serviceTask.getCustomProperties().size() == 0;
+  private boolean customPropertiesMustBeInitialized(final UserTask userTask) {
+    return customPropertyFields.size() > 0 && userTask.getCustomProperties().size() == 0;
   }
 
   @Override
@@ -417,7 +409,7 @@ public class PropertyCustomServiceTaskSection extends AbstractPropertyCustomTask
        * null simpleValue or complexValue to indicate which value type needs to
        * be stored.
        */
-      private final void storeField(final ServiceTask task, final String key, final String simpleValue, final ComplexDataType complexValue) {
+      private final void storeField(final UserTask task, final String key, final String simpleValue, final ComplexDataType complexValue) {
 
         CustomProperty property = ExtensionUtil.getCustomProperty(task, key);
 
@@ -442,7 +434,7 @@ public class PropertyCustomServiceTaskSection extends AbstractPropertyCustomTask
           return;
         }
 
-        ServiceTask task = (ServiceTask) bo;
+        UserTask task = (UserTask) bo;
         for (final CustomPropertyField field : customPropertyFields) {
 
           if (!field.isComplex()) {
@@ -456,12 +448,12 @@ public class PropertyCustomServiceTaskSection extends AbstractPropertyCustomTask
     runModelChange(runnable);
   }
 
-  private ServiceTask getServiceTask() {
+  private UserTask getUserTask() {
     PictogramElement pe = getSelectedPictogramElement();
     if (pe != null) {
       Object bo = getBusinessObject(pe);
-      if (bo != null && bo instanceof ServiceTask) {
-        return (ServiceTask) bo;
+      if (bo != null && bo instanceof UserTask) {
+        return (UserTask) bo;
       }
     }
     return null;

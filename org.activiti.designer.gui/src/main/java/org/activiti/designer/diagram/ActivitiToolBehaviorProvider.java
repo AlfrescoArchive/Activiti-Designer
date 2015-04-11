@@ -40,6 +40,7 @@ import org.activiti.bpmn.model.TimerEventDefinition;
 import org.activiti.bpmn.model.UserTask;
 import org.activiti.bpmn.model.alfresco.AlfrescoStartEvent;
 import org.activiti.designer.PluginImage;
+import org.activiti.designer.eclipse.Logger;
 import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.features.AbstractCreateBPMNFeature;
 import org.activiti.designer.features.ChangeElementTypeFeature;
@@ -50,6 +51,7 @@ import org.activiti.designer.features.CreateBoundaryTimerFeature;
 import org.activiti.designer.features.CreateBusinessRuleTaskFeature;
 import org.activiti.designer.features.CreateCallActivityFeature;
 import org.activiti.designer.features.CreateCustomServiceTaskFeature;
+import org.activiti.designer.features.CreateCustomUserTaskFeature;
 import org.activiti.designer.features.CreateEmbeddedSubProcessFeature;
 import org.activiti.designer.features.CreateEndEventFeature;
 import org.activiti.designer.features.CreateErrorEndEventFeature;
@@ -80,12 +82,13 @@ import org.activiti.designer.features.CreateTimerStartEventFeature;
 import org.activiti.designer.features.CreateUserTaskFeature;
 import org.activiti.designer.features.DeletePoolFeature;
 import org.activiti.designer.features.contextmenu.OpenCalledElementForCallActivity;
+import org.activiti.designer.integration.annotation.Locale;
+import org.activiti.designer.integration.annotation.Locales;
 import org.activiti.designer.integration.palette.PaletteEntry;
-import org.activiti.designer.integration.servicetask.annotation.Locale;
-import org.activiti.designer.integration.servicetask.annotation.Locales;
 import org.activiti.designer.util.ActivitiConstants;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.extension.CustomServiceTaskContext;
+import org.activiti.designer.util.extension.CustomUserTaskContext;
 import org.activiti.designer.util.extension.ExtensionUtil;
 import org.activiti.designer.util.preferences.Preferences;
 import org.activiti.designer.util.preferences.PreferencesUtil;
@@ -127,7 +130,7 @@ import org.eclipse.graphiti.ui.internal.GraphitiUIPlugin;
 import org.eclipse.graphiti.ui.internal.services.GraphitiUiInternal;
 import org.eclipse.jface.resource.ImageRegistry;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.ui.PlatformUI;
+import org.eclipse.swt.widgets.Display;
 
 import com.alfresco.designer.gui.features.CreateAlfrescoMailTaskFeature;
 import com.alfresco.designer.gui.features.CreateAlfrescoScriptTaskFeature;
@@ -757,6 +760,13 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
       ret.add(alfrescoCompartmentEntry);
     }
 
+    addCustomServiceTasks(project, ret);
+    addCustomUserTasks(project, ret);
+
+    return ret.toArray(new IPaletteCompartmentEntry[ret.size()]);
+  }
+  
+  protected void addCustomServiceTasks(IProject project, List<IPaletteCompartmentEntry> ret) {
     final Map<String, List<CustomServiceTaskContext>> tasksInDrawers = new HashMap<String, List<CustomServiceTaskContext>>();
 
     final List<CustomServiceTaskContext> customServiceTaskContexts = ExtensionUtil.getCustomServiceTaskContexts(project);
@@ -766,17 +776,21 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     @SuppressWarnings("restriction")
     final ImageRegistry reg = GraphitiUIPlugin.getDefault().getImageRegistry();
     for (final CustomServiceTaskContext taskContext : customServiceTaskContexts) {
-      if (reg.get(prefixId + taskContext.getSmallImageKey()) == null) {
-        reg.put(prefixId + taskContext.getSmallImageKey(), 
-            new Image(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().getDisplay(), taskContext.getSmallIconStream()));
-      }
-      if (reg.get(prefixId + taskContext.getLargeImageKey()) == null) {
-        reg.put(prefixId + taskContext.getLargeImageKey(),
-                new Image(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().getDisplay(), taskContext.getLargeIconStream()));
-      }
-      if (reg.get(prefixId + taskContext.getShapeImageKey()) == null) {
-        reg.put(prefixId + taskContext.getShapeImageKey(),
-                new Image(PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell().getDisplay(), taskContext.getShapeIconStream()));
+      try {
+        if (reg.get(prefixId + taskContext.getSmallImageKey()) == null) {
+          reg.put(prefixId + taskContext.getSmallImageKey(), 
+              new Image(Display.getCurrent(), taskContext.getSmallIconStream()));
+        }
+        if (reg.get(prefixId + taskContext.getLargeImageKey()) == null) {
+          reg.put(prefixId + taskContext.getLargeImageKey(),
+                  new Image(Display.getCurrent(), taskContext.getLargeIconStream()));
+        }
+        if (reg.get(prefixId + taskContext.getShapeImageKey()) == null) {
+          reg.put(prefixId + taskContext.getShapeImageKey(),
+                  new Image(Display.getCurrent(), taskContext.getShapeIconStream()));
+        }
+      } catch (Exception e) {
+        Logger.logError("Error loading image", e);
       }
     }
 
@@ -829,8 +843,85 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
       }
       ret.add(paletteCompartmentEntry);
     }
+  }
+  
+  protected void addCustomUserTasks(IProject project, List<IPaletteCompartmentEntry> ret) {
+    final Map<String, List<CustomUserTaskContext>> tasksInDrawers = new HashMap<String, List<CustomUserTaskContext>>();
 
-    return ret.toArray(new IPaletteCompartmentEntry[ret.size()]);
+    final List<CustomUserTaskContext> customUserTaskContexts = ExtensionUtil.getCustomUserTaskContexts(project);
+
+    // Graphiti sets the diagram type prover id with || in front of the image key
+    String prefixId = getDiagramTypeProvider().getProviderId() + "||";
+    @SuppressWarnings("restriction")
+    final ImageRegistry reg = GraphitiUIPlugin.getDefault().getImageRegistry();
+    for (final CustomUserTaskContext taskContext : customUserTaskContexts) {
+      try {
+        if (reg.get(prefixId + taskContext.getSmallImageKey()) == null) {
+          reg.put(prefixId + taskContext.getSmallImageKey(), 
+              new Image(Display.getCurrent(), taskContext.getSmallIconStream()));
+        }
+        if (reg.get(prefixId + taskContext.getLargeImageKey()) == null) {
+          reg.put(prefixId + taskContext.getLargeImageKey(),
+                  new Image(Display.getCurrent(), taskContext.getLargeIconStream()));
+        }
+        if (reg.get(prefixId + taskContext.getShapeImageKey()) == null) {
+          reg.put(prefixId + taskContext.getShapeImageKey(),
+                  new Image(Display.getCurrent(), taskContext.getShapeIconStream()));
+        }
+      } catch (Exception e) {
+        Logger.logError("Error loading image", e);
+      }
+    }
+
+    for (final CustomUserTaskContext taskContext : customUserTaskContexts) {
+      if (!tasksInDrawers.containsKey(taskContext.getUserTask().contributeToPaletteDrawer())) {
+        tasksInDrawers.put(taskContext.getUserTask().contributeToPaletteDrawer(), new ArrayList<CustomUserTaskContext>());
+      }
+      tasksInDrawers.get(taskContext.getUserTask().contributeToPaletteDrawer()).add(taskContext);
+    }
+
+    for (final Entry<String, List<CustomUserTaskContext>> drawer : tasksInDrawers.entrySet()) {
+
+      // Sort the list
+      Collections.sort(drawer.getValue());
+
+      final IPaletteCompartmentEntry paletteCompartmentEntry = new PaletteCompartmentEntry(drawer.getKey(), null);
+
+      String defaultLanguage = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_DEFAULT_LANGUAGE, ActivitiPlugin.getDefault());
+      for (final CustomUserTaskContext currentDrawerItem : drawer.getValue()) {
+        
+        String name = null;
+        if (StringUtils.isNotEmpty(defaultLanguage)) {
+          Method[] methods = currentDrawerItem.getUserTask().getClass().getMethods();
+          for (Method method : methods) {
+            if ("getName".equals(method.getName())) {
+              if (method.isAnnotationPresent(Locales.class)) {
+                Locales locales = method.getAnnotation(Locales.class);
+                if (locales.value() != null && locales.value().length > 0) {
+                  for (Locale locale : locales.value()) {
+                    if (locale.locale().equalsIgnoreCase(defaultLanguage)) {
+                      name = locale.name();
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+        
+        if (StringUtils.isEmpty(name)) {
+          name = currentDrawerItem.getUserTask().getName();
+        }
+        
+        final CreateCustomUserTaskFeature feature = new CreateCustomUserTaskFeature(getFeatureProvider(), name,
+                currentDrawerItem.getUserTask().getDescription(), currentDrawerItem.getUserTask().getClass().getCanonicalName());
+        
+        final IToolEntry entry = new ObjectCreationToolEntry(name, currentDrawerItem.getUserTask().getDescription(),
+              currentDrawerItem.getSmallImageKey(), currentDrawerItem.getSmallImageKey(), feature);
+        paletteCompartmentEntry.getToolEntries().add(entry);
+      }
+      ret.add(paletteCompartmentEntry);
+    }
   }
 
   /**

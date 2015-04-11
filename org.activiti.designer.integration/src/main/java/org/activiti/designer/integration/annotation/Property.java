@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.activiti.designer.integration.servicetask.annotation;
+package org.activiti.designer.integration.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -9,7 +9,7 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 import org.activiti.designer.integration.servicetask.PropertyType;
-import org.activiti.designer.integration.servicetask.validator.FieldValidator;
+import org.activiti.designer.integration.validator.FieldValidator;
 
 /**
  * @author Tiese Barrell

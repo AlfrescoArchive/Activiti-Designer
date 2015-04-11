@@ -1,7 +1,7 @@
 /**
  * 
  */
-package org.acme.servicetasks;
+package org.acme.usertasks;
 
 import org.activiti.designer.integration.annotation.DatePickerProperty;
 import org.activiti.designer.integration.annotation.Help;
@@ -9,9 +9,8 @@ import org.activiti.designer.integration.annotation.Locale;
 import org.activiti.designer.integration.annotation.Locales;
 import org.activiti.designer.integration.annotation.Property;
 import org.activiti.designer.integration.annotation.PropertyItems;
-import org.activiti.designer.integration.annotation.Runtime;
-import org.activiti.designer.integration.servicetask.AbstractCustomServiceTask;
 import org.activiti.designer.integration.servicetask.PropertyType;
+import org.activiti.designer.integration.usertask.AbstractCustomUserTask;
 
 /**
  * Defines the Money Task node.
@@ -20,9 +19,8 @@ import org.activiti.designer.integration.servicetask.PropertyType;
  * @version 1
  * @since 1.0.0
  */
-@Runtime(javaDelegateClass = "org.acme.runtime.AcmeMoneyJavaDelegation")
 @Help(displayHelpShort = "Creates a new account", displayHelpLong = "Creates a new account using the account number specified")
-public class AcmeMoneyTask extends AbstractCustomServiceTask {
+public class AcmeMoneyUserTask extends AbstractCustomUserTask {
 
   private static final String HELP_ACCOUNT_NUMBER_LONG = "Provide a number that is suitable as an account number.";
 
@@ -95,7 +93,7 @@ public class AcmeMoneyTask extends AbstractCustomServiceTask {
 
   @Override
   public String contributeToPaletteDrawer() {
-    return "Acme Corporation";
+    return "Acme user task";
   }
 
   @Locales(
@@ -105,7 +103,7 @@ public class AcmeMoneyTask extends AbstractCustomServiceTask {
       }
   )
   public String getName() {
-    return "Money node";
+    return "Money user task";
   }
   
   @Override

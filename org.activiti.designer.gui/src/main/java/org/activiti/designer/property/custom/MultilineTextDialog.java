@@ -13,7 +13,7 @@
 
 package org.activiti.designer.property.custom;
 
-import org.activiti.designer.integration.servicetask.annotation.Help;
+import org.activiti.designer.integration.annotation.Help;
 import org.eclipse.draw2d.ColorConstants;
 import org.eclipse.jface.dialogs.Dialog;
 import org.eclipse.swt.SWT;

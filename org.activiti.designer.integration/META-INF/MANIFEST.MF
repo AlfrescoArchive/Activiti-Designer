@@ -10,8 +10,9 @@ Require-Bundle: org.eclipse.core.runtime,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ActivationPolicy: lazy
 Export-Package: org.activiti.designer.integration;uses:="org.osgi.framework",
+ org.activiti.designer.integration.annotation,
  org.activiti.designer.integration.palette,
  org.activiti.designer.integration.servicetask,
- org.activiti.designer.integration.servicetask.annotation,
- org.activiti.designer.integration.servicetask.validator
+ org.activiti.designer.integration.usertask,
+ org.activiti.designer.integration.validator
 Bundle-ClassPath: .

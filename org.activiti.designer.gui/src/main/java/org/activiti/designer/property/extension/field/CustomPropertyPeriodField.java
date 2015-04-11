@@ -15,9 +15,9 @@ package org.activiti.designer.property.extension.field;
 
 import java.lang.reflect.Field;
 
-import org.activiti.bpmn.model.ServiceTask;
+import org.activiti.bpmn.model.Task;
 import org.activiti.designer.integration.servicetask.PropertyType;
-import org.activiti.designer.property.PropertyCustomServiceTaskSection;
+import org.activiti.designer.property.AbstractPropertyCustomTaskSection;
 import org.activiti.designer.property.custom.PeriodPropertyElement;
 import org.activiti.designer.property.extension.field.validator.PeriodRequiredFieldValidator;
 import org.activiti.designer.property.extension.util.ExtensionPropertyUtil;
@@ -41,8 +41,8 @@ public class CustomPropertyPeriodField extends AbstractCustomPropertyField {
 
   private Composite periodControl;
 
-  public CustomPropertyPeriodField(final PropertyCustomServiceTaskSection section, final ServiceTask serviceTask, final Field field) {
-    super(section, serviceTask, field);
+  public CustomPropertyPeriodField(final AbstractPropertyCustomTaskSection section, final Task task, final Field field) {
+    super(section, task, field);
   }
 
   @Override

@@ -15,10 +15,10 @@ package org.activiti.designer.property.extension.field;
 
 import java.lang.reflect.Field;
 
+import org.activiti.designer.integration.annotation.Help;
+import org.activiti.designer.integration.annotation.Locales;
+import org.activiti.designer.integration.annotation.Property;
 import org.activiti.designer.integration.servicetask.CustomServiceTask;
-import org.activiti.designer.integration.servicetask.annotation.Help;
-import org.activiti.designer.integration.servicetask.annotation.Locales;
-import org.activiti.designer.integration.servicetask.annotation.Property;
 
 /**
  * Container object for Fields used in property screens for

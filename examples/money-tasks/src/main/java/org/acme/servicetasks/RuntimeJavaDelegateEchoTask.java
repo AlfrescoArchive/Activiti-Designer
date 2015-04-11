@@ -3,11 +3,11 @@
  */
 package org.acme.servicetasks;
 
+import org.activiti.designer.integration.annotation.Help;
+import org.activiti.designer.integration.annotation.Property;
+import org.activiti.designer.integration.annotation.Runtime;
 import org.activiti.designer.integration.servicetask.AbstractCustomServiceTask;
 import org.activiti.designer.integration.servicetask.PropertyType;
-import org.activiti.designer.integration.servicetask.annotation.Help;
-import org.activiti.designer.integration.servicetask.annotation.Property;
-import org.activiti.designer.integration.servicetask.annotation.Runtime;
 
 /**
  * Example of a CustomServiceTask that uses a Java Delegate for the Runtime
