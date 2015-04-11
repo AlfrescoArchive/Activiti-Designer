@@ -619,7 +619,7 @@ public abstract class ActivitiPropertySection extends BaseActivitiPropertySectio
       mailTask.getFieldExtensions().add(fieldExtension);
     }
 
-    if (fieldValue != null && fieldValue.contains("${") || fieldValue.contains("#{")) {
+    if (fieldValue != null && (fieldValue.contains("${") || fieldValue.contains("#{"))) {
       fieldExtension.setExpression(fieldValue);
       fieldExtension.setStringValue(null);
     } else {

@@ -124,7 +124,14 @@ public class CreateDefaultActivitiProjectWizard extends BasicNewProjectResourceW
 
   @Override
   public void setWindowTitle(final String newTitle) {
-    super.setWindowTitle("New Activiti Project");
+    if (null == newTitle || "".equals(newTitle))
+    {
+      super.setWindowTitle("New Activiti Project");
+    }
+    else
+    {
+      super.setWindowTitle(newTitle);
+    }
   }
 
   /**

@@ -222,7 +222,7 @@ public class DataPropertyEditor extends TableFieldEditor {
 	private ValuedDataObject getDataObject(String type) {
 	    if (type.equals("string")) {
 	        return new StringDataObject();
-	      } else if (type.equals("integer")) {
+	      } else if (type.equals("int")) {
 	       return new IntegerDataObject();
 	      } else if (type.equals("long")) {
 	    	  return new LongDataObject();
