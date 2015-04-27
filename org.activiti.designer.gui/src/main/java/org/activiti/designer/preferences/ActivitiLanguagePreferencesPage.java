@@ -31,8 +31,8 @@ public class ActivitiLanguagePreferencesPage extends FieldEditorPreferencePage i
 
     Group languageGroup = new Group(getFieldEditorParent(), SWT.BORDER);
     languageGroup.setLayoutData(new GridData(SWT.FILL, SWT.NULL, true, false, 2, 1));
-    addField(new ModifiableListEditor(Preferences.ACTIVITI_LANGUAGES.getPreferenceId(), 
-            "&Languages", languageGroup) {
+    
+    ModifiableListEditor languageEditor = new ModifiableListEditor(Preferences.ACTIVITI_LANGUAGES.getPreferenceId(), "&Languages", languageGroup) {
       
       @Override
       protected String[] parseString(String input) {
@@ -45,18 +45,23 @@ public class ActivitiLanguagePreferencesPage extends FieldEditorPreferencePage i
       @Override
       protected String getNewInputObject() {
         InputDialog entryDialog = new InputDialog(
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            "New entry", "New entry:", null, null);
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "New entry", "New entry:", null, null);
+        
         if (entryDialog.open() == InputDialog.OK) {
-            String value = entryDialog.getValue();
-            value = value.replace(":", "");
-            value = value.replace(";", "");
-            value = value.replace("{", "");
-            value = value.replace("}", "");
-            value = value.replace("^", "");
-            value = value.replace("&", "");
-            value = value.replace("@", "");
-            return value;
+            String value = removeInvalidCharacters(entryDialog.getValue());
+            String[] existingLanguages = getList().getItems();
+            boolean containsLanguage = false;
+            if (existingLanguages != null) {
+              for (String existing : existingLanguages) {
+                if (existing.equals(value)) {
+                  containsLanguage = true;
+                  break;
+                }
+              }
+            }
+            if (containsLanguage == false) {
+              return value;
+            }
         }
         return null;
       }
@@ -64,18 +69,23 @@ public class ActivitiLanguagePreferencesPage extends FieldEditorPreferencePage i
       @Override
       protected String getModifiedEntry(String original) {
         InputDialog entryDialog = new InputDialog(
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(),
-            "Update entry", "Update entry:", original, null);
+            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getShell(), "Update entry", "Update entry:", original, null);
+        
         if (entryDialog.open() == InputDialog.OK) {
-            String value = entryDialog.getValue();
-            value = value.replace(":", "");
-            value = value.replace(";", "");
-            value = value.replace("{", "");
-            value = value.replace("}", "");
-            value = value.replace("^", "");
-            value = value.replace("&", "");
-            value = value.replace("@", "");
-            return value;
+            String value = removeInvalidCharacters(entryDialog.getValue());
+            String[] existingLanguages = getList().getItems();
+            boolean containsLanguage = false;
+            if (existingLanguages != null) {
+              for (String existing : existingLanguages) {
+                if (existing.equals(value)) {
+                  containsLanguage = true;
+                  break;
+                }
+              }
+            }
+            if (containsLanguage == false) {
+              return value;
+            }
         }
         return null;
       }
@@ -83,7 +93,7 @@ public class ActivitiLanguagePreferencesPage extends FieldEditorPreferencePage i
       @Override
       protected String createList(String[] outputArray) {
         StringBuilder output = new StringBuilder();
-        if(outputArray != null && outputArray.length > 0) {
+        if (outputArray != null && outputArray.length > 0) {
           for (String string : outputArray) {
             if(output.length() > 0) {
               output.append(";");
@@ -93,7 +103,9 @@ public class ActivitiLanguagePreferencesPage extends FieldEditorPreferencePage i
         }
         return output.toString();
       }
-    });
+    };
+    
+    addField(languageEditor);
     
     languages = PreferencesUtil.getStringArray(Preferences.ACTIVITI_LANGUAGES, ActivitiPlugin.getDefault());
     String[][] languageArray = null;
@@ -119,6 +131,17 @@ public class ActivitiLanguagePreferencesPage extends FieldEditorPreferencePage i
     setPreferenceStore(prefStore);
     setDescription("Activiti language settings");
     setTitle("Activiti language settings");
+  }
+  
+  protected String removeInvalidCharacters(String value) {
+    value = value.replace(":", "");
+    value = value.replace(";", "");
+    value = value.replace("{", "");
+    value = value.replace("}", "");
+    value = value.replace("^", "");
+    value = value.replace("&", "");
+    value = value.replace("@", "");
+    return value;
   }
 
 }

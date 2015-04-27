@@ -12,8 +12,8 @@ import java.lang.annotation.Target;
  * @author Tijs Rademakers
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target({ElementType.METHOD, ElementType.FIELD})
-public @interface Locale {
+@Target({ElementType.TYPE})
+public @interface TaskName {
 
   /**
    * The locale.
@@ -21,12 +21,7 @@ public @interface Locale {
   String locale() default "";
 
   /**
-   * The label name.
+   * The name.
    */
-  String labelName() default "";
-  
-  /**
-   * The default value.
-   */
-  String defaultValue() default "";
+  String name() default "";
 }

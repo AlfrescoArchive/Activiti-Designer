@@ -30,11 +30,11 @@ import org.activiti.designer.integration.servicetask.CustomServiceTask;
  */
 public class FieldInfo implements Comparable<FieldInfo> {
 
-  private Property propertyAnnotation;
-  private Help helpAnnotation;
-  private Locales localesAnnotation;
-  private final Field field;
-
+  protected Property propertyAnnotation;
+  protected Help helpAnnotation;
+  protected Locales localesAnnotation;
+  protected final Field field;
+  
   public FieldInfo(Field field) {
     this.field = field;
     final Property propertyAnnotation = field.getAnnotation(Property.class);

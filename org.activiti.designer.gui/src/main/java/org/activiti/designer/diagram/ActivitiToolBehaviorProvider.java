@@ -1,6 +1,5 @@
 package org.activiti.designer.diagram;
 
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -82,8 +81,8 @@ import org.activiti.designer.features.CreateTimerStartEventFeature;
 import org.activiti.designer.features.CreateUserTaskFeature;
 import org.activiti.designer.features.DeletePoolFeature;
 import org.activiti.designer.features.contextmenu.OpenCalledElementForCallActivity;
-import org.activiti.designer.integration.annotation.Locale;
-import org.activiti.designer.integration.annotation.Locales;
+import org.activiti.designer.integration.annotation.TaskName;
+import org.activiti.designer.integration.annotation.TaskNames;
 import org.activiti.designer.integration.palette.PaletteEntry;
 import org.activiti.designer.util.ActivitiConstants;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
@@ -813,18 +812,11 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
         
         String name = null;
         if (StringUtils.isNotEmpty(defaultLanguage)) {
-          Method[] methods = currentDrawerItem.getServiceTask().getClass().getMethods();
-          for (Method method : methods) {
-            if ("getName".equals(method.getName())) {
-              if (method.isAnnotationPresent(Locales.class)) {
-                Locales locales = method.getAnnotation(Locales.class);
-                if (locales.value() != null && locales.value().length > 0) {
-                  for (Locale locale : locales.value()) {
-                    if (locale.locale().equalsIgnoreCase(defaultLanguage)) {
-                      name = locale.name();
-                    }
-                  }
-                }
+          TaskNames taskNames = currentDrawerItem.getServiceTask().getClass().getAnnotation(TaskNames.class);
+          if (taskNames != null && taskNames.value() != null) {
+            for (TaskName taskName : taskNames.value()) {
+              if (taskName.locale().equalsIgnoreCase(defaultLanguage)) {
+                name = taskName.name();
               }
             }
           }
@@ -892,18 +884,11 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
         
         String name = null;
         if (StringUtils.isNotEmpty(defaultLanguage)) {
-          Method[] methods = currentDrawerItem.getUserTask().getClass().getMethods();
-          for (Method method : methods) {
-            if ("getName".equals(method.getName())) {
-              if (method.isAnnotationPresent(Locales.class)) {
-                Locales locales = method.getAnnotation(Locales.class);
-                if (locales.value() != null && locales.value().length > 0) {
-                  for (Locale locale : locales.value()) {
-                    if (locale.locale().equalsIgnoreCase(defaultLanguage)) {
-                      name = locale.name();
-                    }
-                  }
-                }
+          TaskNames taskNames = currentDrawerItem.getUserTask().getClass().getAnnotation(TaskNames.class);
+          if (taskNames != null && taskNames.value() != null) {
+            for (TaskName taskName : taskNames.value()) {
+              if (taskName.locale().equalsIgnoreCase(defaultLanguage)) {
+                name = taskName.name();
               }
             }
           }

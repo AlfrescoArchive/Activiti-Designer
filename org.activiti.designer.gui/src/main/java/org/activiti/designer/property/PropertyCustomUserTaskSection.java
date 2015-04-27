@@ -275,7 +275,7 @@ public class PropertyCustomUserTaskSection extends AbstractPropertyCustomTaskSec
               if (locales != null && locales.value() != null && locales.value().length > 0) {
                 for (Locale locale : locales.value()) {
                   if (defaultLanguage.equalsIgnoreCase(locale.locale())) {
-                    displayName = locale.name();
+                    displayName = locale.labelName();
                   }
                 }
               }

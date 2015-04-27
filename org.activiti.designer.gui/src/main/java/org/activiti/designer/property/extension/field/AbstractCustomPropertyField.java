@@ -23,12 +23,17 @@ import java.util.Map.Entry;
 import org.activiti.bpmn.model.ComplexDataType;
 import org.activiti.bpmn.model.CustomProperty;
 import org.activiti.bpmn.model.Task;
+import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.integration.annotation.Help;
+import org.activiti.designer.integration.annotation.Locale;
+import org.activiti.designer.integration.annotation.Locales;
 import org.activiti.designer.integration.annotation.Property;
 import org.activiti.designer.integration.validator.FieldValidator;
 import org.activiti.designer.integration.validator.ValidationException;
 import org.activiti.designer.property.AbstractPropertyCustomTaskSection;
 import org.activiti.designer.util.extension.ExtensionUtil;
+import org.activiti.designer.util.preferences.Preferences;
+import org.activiti.designer.util.preferences.PreferencesUtil;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.graphics.Color;
@@ -47,18 +52,19 @@ import org.eclipse.swt.widgets.Text;
  */
 public abstract class AbstractCustomPropertyField implements CustomPropertyField {
 
-  private static final RGB ERROR_COLOR = new RGB(255, 220, 220);
+  protected static final RGB ERROR_COLOR = new RGB(255, 220, 220);
 
-  private Map<Control, List<FieldValidator>> validators = new HashMap<Control, List<FieldValidator>>();
+  protected Map<Control, List<FieldValidator>> validators = new HashMap<Control, List<FieldValidator>>();
 
-  private final AbstractPropertyCustomTaskSection section;
-  private final Task task;
-  private final String customPropertyId;
+  protected AbstractPropertyCustomTaskSection section;
+  protected Task task;
+  protected String customPropertyId;
 
-  private final Field field;
+  protected Field field;
 
-  private final Property propertyAnnotation;
-  private final Help helpAnnotation;
+  protected Property propertyAnnotation;
+  protected Help helpAnnotation;
+  protected Locales localesAnnotation;
 
   public AbstractCustomPropertyField(final AbstractPropertyCustomTaskSection section, final Task task, final Field field) {
     this.section = section;
@@ -69,6 +75,7 @@ public abstract class AbstractCustomPropertyField implements CustomPropertyField
     // Read and save references to annotations to be used later
     this.propertyAnnotation = field.getAnnotation(Property.class);
     this.helpAnnotation = field.getAnnotation(Help.class);
+    this.localesAnnotation = field.getAnnotation(Locales.class);
   }
   @Override
   public String getCustomPropertyId() {
@@ -141,9 +148,27 @@ public abstract class AbstractCustomPropertyField implements CustomPropertyField
    */
   protected String getSimpleValueOrDefault() {
     String result = getSimpleValueFromModel();
-    if (StringUtils.isEmpty(result) && StringUtils.isNotBlank(getPropertyAnnotation().defaultValue())) {
-      result = getPropertyAnnotation().defaultValue();
-    } else if (result == null) {
+    if (StringUtils.isEmpty(result)) {
+      String localeDefaultValue = null;
+      if (localesAnnotation != null && localesAnnotation.value() != null && localesAnnotation.value().length > 0) {
+        String defaultLanguage = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_DEFAULT_LANGUAGE, ActivitiPlugin.getDefault());
+        if (StringUtils.isNotEmpty(defaultLanguage)) {
+          for (Locale locale : localesAnnotation.value()) {
+            if (defaultLanguage.equalsIgnoreCase(locale.locale())) {
+              localeDefaultValue = locale.defaultValue();
+            }
+          }
+        }
+      }
+      
+      if (StringUtils.isNotEmpty(localeDefaultValue)) {  
+        result = localeDefaultValue;
+      } else if (StringUtils.isNotEmpty(getPropertyAnnotation().defaultValue())) {
+        result = getPropertyAnnotation().defaultValue();
+      }
+    }
+    
+    if (result == null) {
       result = "";
     }
     return result;

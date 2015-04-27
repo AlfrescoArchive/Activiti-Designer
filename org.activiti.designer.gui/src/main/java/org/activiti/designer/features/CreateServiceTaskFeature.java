@@ -4,16 +4,27 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.activiti.bpmn.model.BaseElement;
 import org.activiti.bpmn.model.CustomProperty;
+import org.activiti.bpmn.model.ExtensionAttribute;
+import org.activiti.bpmn.model.ExtensionElement;
 import org.activiti.bpmn.model.ImplementationType;
 import org.activiti.bpmn.model.ServiceTask;
 import org.activiti.designer.PluginImage;
+import org.activiti.designer.eclipse.common.ActivitiPlugin;
+import org.activiti.designer.integration.annotation.Locale;
+import org.activiti.designer.integration.annotation.Locales;
 import org.activiti.designer.integration.annotation.Property;
+import org.activiti.designer.integration.annotation.TaskName;
+import org.activiti.designer.integration.annotation.TaskNames;
 import org.activiti.designer.integration.servicetask.CustomServiceTask;
 import org.activiti.designer.integration.servicetask.DelegateType;
 import org.activiti.designer.property.extension.field.FieldInfo;
+import org.activiti.designer.util.bpmn.BpmnExtensions;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.extension.ExtensionUtil;
+import org.activiti.designer.util.preferences.Preferences;
+import org.activiti.designer.util.preferences.PreferencesUtil;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
@@ -39,6 +50,8 @@ public class CreateServiceTaskFeature extends AbstractCreateFastBPMNFeature {
     ServiceTask newServiceTask = new ServiceTask();
     newServiceTask.setName("Service Task");
     newServiceTask.setExtensionId(customServiceTaskId);
+    
+    boolean isCustomNameSet = false;
 
     // Process custom service tasks
     if (newServiceTask.isExtended()) {
@@ -88,6 +101,17 @@ public class CreateServiceTaskFeature extends AbstractCreateFastBPMNFeature {
         // only process properties if the type is not an expression.
         if (DelegateType.JAVA_DELEGATE_CLASS == targetTask.getDelegateType()) {
           for (final Class<CustomServiceTask> currentClass : classHierarchy) {
+            
+            if (currentClass.isAnnotationPresent(TaskNames.class)) {
+              TaskNames taskNames = currentClass.getAnnotation(TaskNames.class);
+              if (taskNames.value() != null && taskNames.value().length > 0) {
+                for (TaskName taskName : taskNames.value()) {
+                  setCustomTaskName(newServiceTask, taskName.name(), taskName.locale());
+                  isCustomNameSet = true;
+                }
+              }
+            }
+            
             for (final Field field : currentClass.getDeclaredFields()) {
               if (field.isAnnotationPresent(Property.class)) {
                 fieldInfoObjects.add(new FieldInfo(field));
@@ -109,19 +133,40 @@ public class CreateServiceTaskFeature extends AbstractCreateFastBPMNFeature {
 
           customProperty.setId(ExtensionUtil.wrapCustomPropertyId(newServiceTask, fieldInfo.getFieldName()));
           customProperty.setName(fieldInfo.getFieldName());
-          if (StringUtils.isNotEmpty(property.defaultValue())) {
+          
+          final Locales localesAnnotation = fieldInfo.getLocalesAnnotation();
+          String localeDefaultValue = null;
+          if (localesAnnotation != null && localesAnnotation.value() != null && localesAnnotation.value().length > 0) {
+            String defaultLanguage = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_DEFAULT_LANGUAGE, ActivitiPlugin.getDefault());
+            if (StringUtils.isNotEmpty(defaultLanguage)) {
+              for (Locale locale : localesAnnotation.value()) {
+                if (defaultLanguage.equalsIgnoreCase(locale.locale())) {
+                  localeDefaultValue = locale.defaultValue();
+                }
+              }
+            }
+          }
+          
+          if (StringUtils.isNotEmpty(localeDefaultValue)) {  
+            customProperty.setSimpleValue(localeDefaultValue);
+            
+          } else if (StringUtils.isNotEmpty(property.defaultValue())) {
             customProperty.setSimpleValue(property.defaultValue());
           }
         }
       }
     }
 
-    addObjectToContainer(context, newServiceTask, newServiceTask.getName());
+    if (isCustomNameSet == false) {
+      addObjectToContainer(context, newServiceTask, newServiceTask.getName());
+    } else {
+      addObjectToContainer(context, newServiceTask);
+    }
 
     return new Object[] { newServiceTask };
   }
 
-  private CustomServiceTask findCustomServiceTask(ServiceTask serviceTask) {
+  protected CustomServiceTask findCustomServiceTask(ServiceTask serviceTask) {
     CustomServiceTask result = null;
 
     if (serviceTask.isExtended()) {
@@ -136,6 +181,43 @@ public class CreateServiceTaskFeature extends AbstractCreateFastBPMNFeature {
       }
     }
     return result;
+  }
+  
+  protected void setCustomTaskName(Object bo, String name, String language) {
+    BaseElement element = (BaseElement) bo;
+    List<ExtensionElement> extensionElements = null;
+    if (element.getExtensionElements().containsKey(BpmnExtensions.LANGUAGE_EXTENSION)) {
+      extensionElements = element.getExtensionElements().get(BpmnExtensions.LANGUAGE_EXTENSION);
+    }
+    
+    if (extensionElements == null) {
+      extensionElements = new ArrayList<ExtensionElement>();
+      element.getExtensionElements().put(BpmnExtensions.LANGUAGE_EXTENSION, extensionElements);
+    }
+    
+    ExtensionElement languageElement = null;
+    for (ExtensionElement extensionElement : extensionElements) {
+      List<ExtensionAttribute> languageAttributes = extensionElement.getAttributes().get("language");
+      if (languageAttributes != null && languageAttributes.size() == 1) {
+        String languageValue = languageAttributes.get(0).getValue();
+        if (language.equals(languageValue)) {
+          languageElement = extensionElement;
+        }
+      }
+    }
+    
+    if (languageElement == null) {
+      languageElement = new ExtensionElement();
+      languageElement.setName(BpmnExtensions.LANGUAGE_EXTENSION);
+      languageElement.setNamespace(BpmnExtensions.DESIGNER_EXTENSION_NAMESPACE);
+      languageElement.setNamespacePrefix(BpmnExtensions.DESIGNER_EXTENSION_NAMESPACE_PREFIX);
+      ExtensionAttribute languageAttribute = new ExtensionAttribute("language");
+      languageAttribute.setValue(language);
+      languageElement.addAttribute(languageAttribute);
+      extensionElements.add(languageElement);
+    }
+    
+    languageElement.setElementText(name);
   }
 
   @Override

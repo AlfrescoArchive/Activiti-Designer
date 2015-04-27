@@ -10,6 +10,8 @@ import org.activiti.designer.integration.annotation.Locales;
 import org.activiti.designer.integration.annotation.Property;
 import org.activiti.designer.integration.annotation.PropertyItems;
 import org.activiti.designer.integration.annotation.Runtime;
+import org.activiti.designer.integration.annotation.TaskName;
+import org.activiti.designer.integration.annotation.TaskNames;
 import org.activiti.designer.integration.servicetask.AbstractCustomServiceTask;
 import org.activiti.designer.integration.servicetask.PropertyType;
 
@@ -22,6 +24,12 @@ import org.activiti.designer.integration.servicetask.PropertyType;
  */
 @Runtime(javaDelegateClass = "org.acme.runtime.AcmeMoneyJavaDelegation")
 @Help(displayHelpShort = "Creates a new account", displayHelpLong = "Creates a new account using the account number specified")
+@TaskNames(
+    {
+      @TaskName(locale = "en", name = "English money task"),
+      @TaskName(locale = "de", name = "Deutsche geld task")
+    }
+)
 public class AcmeMoneyTask extends AbstractCustomServiceTask {
 
   private static final String HELP_ACCOUNT_NUMBER_LONG = "Provide a number that is suitable as an account number.";
@@ -55,8 +63,8 @@ public class AcmeMoneyTask extends AbstractCustomServiceTask {
   @Help(displayHelpShort = "Provide an account number", displayHelpLong = HELP_ACCOUNT_NUMBER_LONG)
   @Locales(
       {
-        @Locale(locale = "en", name = "Account number"),
-        @Locale(locale = "de", name = "Kontonummer")
+        @Locale(locale = "en", labelName = "Account number", defaultValue = "01234"),
+        @Locale(locale = "de", labelName = "Kontonummer", defaultValue = "56789")
       }
   )
   private String accountNumber;
@@ -98,12 +106,6 @@ public class AcmeMoneyTask extends AbstractCustomServiceTask {
     return "Acme Corporation";
   }
 
-  @Locales(
-      {
-        @Locale(locale = "en", name = "Money node"),
-        @Locale(locale = "de", name = "Geld node")
-      }
-  )
   public String getName() {
     return "Money node";
   }
