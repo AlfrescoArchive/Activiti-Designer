@@ -2,7 +2,7 @@
 <feature
       id="org.activiti.designer.feature"
       label="Activiti Eclipse BPMN 2.0 Designer"
-      version="5.16.0.qualifier"
+      version="5.18.0.qualifier"
       provider-name="Activiti">
 
    <description url="http://www.activiti.org">
@@ -62,13 +62,13 @@ This Agreement is governed by the laws of the State of New York and the intellec
 
    <includes
          id="org.eclipse.graphiti.feature"
-         version="0.10.1"/>
+         version="0.11.4"/>
 
    <requires>
       <import plugin="org.eclipse.ui"/>
       <import plugin="org.eclipse.core.runtime" version="3.7.0.v20110110" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.graphiti" version="0.10.1" match="greaterOrEqual"/>
-      <import plugin="org.eclipse.graphiti.ui" version="0.10.1" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.graphiti" version="0.11.3" match="greaterOrEqual"/>
+      <import plugin="org.eclipse.graphiti.ui" version="0.11.3" match="greaterOrEqual"/>
       <import plugin="org.eclipse.core.resources" version="3.7.0" match="greaterOrEqual"/>
       <import plugin="org.eclipse.ui.views.properties.tabbed" version="3.5.100" match="greaterOrEqual"/>
       <import plugin="org.eclipse.emf" version="2.6.0" match="greaterOrEqual"/>
