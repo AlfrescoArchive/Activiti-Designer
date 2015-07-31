@@ -13,6 +13,10 @@
 package org.activiti.designer.eclipse.navigator.cloudrepo;
 
 import java.io.InputStream;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
+
+import javax.net.ssl.SSLContext;
 
 import org.activiti.designer.eclipse.Logger;
 import org.activiti.designer.eclipse.common.ActivitiPlugin;
@@ -26,9 +30,8 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.conn.ssl.SSLConnectionSocketFactory;
-import org.apache.http.conn.ssl.SSLContextBuilder;
-import org.apache.http.conn.ssl.TrustSelfSignedStrategy;
+import org.apache.http.conn.ssl.SSLContexts;
+import org.apache.http.conn.ssl.TrustStrategy;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.impl.client.BasicCredentialsProvider;
@@ -54,20 +57,28 @@ public class ActivitiCloudEditorUtil {
 		CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
     credentialsProvider.setCredentials(AuthScope.ANY, new UsernamePasswordCredentials(userName, password));
 
-    SSLConnectionSocketFactory sslsf = null;
-    try {
-        SSLContextBuilder builder = new SSLContextBuilder();
-        builder.loadTrustMaterial(null, new TrustSelfSignedStrategy());
-        sslsf = new SSLConnectionSocketFactory(builder.build(), SSLConnectionSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
-    } catch (Exception e) {
-      Logger.logError("Could not configure HTTP client to use SSL" , e);
-    }
-
     HttpClientBuilder httpClientBuilder = HttpClientBuilder.create();
     httpClientBuilder.setDefaultCredentialsProvider(credentialsProvider);
 
-    if (sslsf != null) {
-        httpClientBuilder.setSSLSocketFactory(sslsf);
+    SSLContext sslContext = null;
+    try {
+      sslContext = SSLContexts.custom()
+          .loadTrustMaterial(null, new TrustStrategy() {
+    
+              @Override
+              public boolean isTrusted(final X509Certificate[] chain, final String authType) throws CertificateException {
+                  return true;
+              }
+          })
+          .useTLS()
+          .build();
+      
+    } catch (Exception e) {
+      Logger.logError("Could not configure HTTP client to use SSL" , e);
+    }
+    
+    if (sslContext != null) {
+      httpClientBuilder.setSslcontext(sslContext);
     }
 
     return httpClientBuilder.build();
@@ -80,7 +91,7 @@ public class ActivitiCloudEditorUtil {
       
       ActivitiPlugin plugin = ActivitiPlugin.getDefault();
       HttpGet httpGet = new HttpGet(PreferencesUtil.getStringPreference(
-          Preferences.ACTIVITI_CLOUD_EDITOR_URL, plugin) + "/rest/api/enterprise/models");
+          Preferences.ACTIVITI_CLOUD_EDITOR_URL, plugin) + "/api/enterprise/models");
       CloseableHttpResponse response = client.execute(httpGet);
       try {
         int statusCode = response.getStatusLine().getStatusCode();
@@ -124,7 +135,7 @@ public class ActivitiCloudEditorUtil {
       ActivitiPlugin plugin = ActivitiPlugin.getDefault();
       CloseableHttpResponse response = client.execute(new HttpGet(PreferencesUtil.getStringPreference(
           Preferences.ACTIVITI_CLOUD_EDITOR_URL, plugin) + 
-          "/rest/api/enterprise/models/" + modelId + "/bpmn20"));
+          "/api/enterprise/models/" + modelId + "/bpmn20"));
       try {
         int statusCode = response.getStatusLine().getStatusCode();
         bpmnStream = response.getEntity().getContent();
@@ -175,7 +186,7 @@ public class ActivitiCloudEditorUtil {
     try {
       ActivitiPlugin plugin = ActivitiPlugin.getDefault();
       HttpPost post = new HttpPost(PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_URL, plugin) + 
-          "/rest/api/enterprise/models/" + modelId + "/newversion");
+          "/api/enterprise/models/" + modelId + "/newversion");
       HttpEntity entity = MultipartEntityBuilder.create().addBinaryBody("file", content, ContentType.APPLICATION_XML, filename).build();
       post.setEntity(entity);
       CloseableHttpResponse response = client.execute(post);
@@ -220,7 +231,7 @@ public class ActivitiCloudEditorUtil {
     try {
       ActivitiPlugin plugin = ActivitiPlugin.getDefault();
       HttpPost post = new HttpPost(PreferencesUtil.getStringPreference(Preferences.ACTIVITI_CLOUD_EDITOR_URL, plugin) + 
-          "/rest/api/enterprise/process-models/import");
+          "/api/enterprise/process-models/import");
       HttpEntity entity = MultipartEntityBuilder.create().addBinaryBody("file", content, ContentType.APPLICATION_XML, filename).build();
       post.setEntity(entity);
       CloseableHttpResponse response = client.execute(post);
