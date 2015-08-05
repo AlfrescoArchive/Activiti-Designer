@@ -245,12 +245,8 @@ public class MessageFlowShapeController extends AbstractBusinessObjectShapeContr
       GraphicInfo labelLocation = (GraphicInfo) addConContext.getProperty("org.activiti.designer.connectionlabel");
       GraphicInfo startFlowLocation = calculateFlowStart(sourceElement, targetElement, connection);
       
-      int labelX = (int) labelLocation.getX();
-      int labelY = (int) labelLocation.getY();
-      if (labelLocation.getX() > 10) {
-        labelX = (int) (labelLocation.getX() - startFlowLocation.getX()) + parentX;
-        labelY = (int) (labelLocation.getY() - startFlowLocation.getY()) + parentY;
-      }
+      int labelX = (int) (labelLocation.getX() - startFlowLocation.getX()) + parentX;
+      int labelY = (int) (labelLocation.getY() - startFlowLocation.getY()) + parentY;
       
       gaService.setLocation(text, labelX, labelY);
       if (StringUtils.isNotEmpty(name)) {

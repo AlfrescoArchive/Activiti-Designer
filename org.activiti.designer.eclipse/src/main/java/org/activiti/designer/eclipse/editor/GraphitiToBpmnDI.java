@@ -87,6 +87,58 @@ public class GraphitiToBpmnDI {
       loopThroughElements(process.getFlowElements(), process);
       loopThroughElements(process.getArtifacts(), process);
     }
+    
+    double minX = 0.0;
+    double minY = 0.0;
+    // check if there are negative x and/or y positions
+    for (GraphicInfo graphicInfo : model.getBpmnModel().getLocationMap().values()) {
+      if (minX > graphicInfo.getX()) {
+        minX = graphicInfo.getX();
+      }
+      if (minY > graphicInfo.getY()) {
+        minY = graphicInfo.getY();
+      }
+    }
+    
+    if (minX < 0 || minY < 0) {
+      double changeX = 0.0;
+      if (minX < 0.0) {
+        changeX = 0.0 - minX + 1;
+      }
+      double changeY = 0.0;
+      if (minY < 0.0) {
+        changeY = 0.0 - minY + 1;
+      }
+      
+      for (GraphicInfo graphicInfo : model.getBpmnModel().getLocationMap().values()) {
+        if (changeX > 0.0) {
+          graphicInfo.setX(graphicInfo.getX() + changeX);
+        }
+        if (changeY > 0.0) {
+          graphicInfo.setY(graphicInfo.getY() + changeY);
+        }
+      }
+      
+      for (List<GraphicInfo> graphicInfoList : model.getBpmnModel().getFlowLocationMap().values()) {
+        for (GraphicInfo graphicInfo : graphicInfoList) {
+          if (changeX > 0.0) {
+            graphicInfo.setX(graphicInfo.getX() + changeX);
+          }
+          if (changeY > 0.0) {
+            graphicInfo.setY(graphicInfo.getY() + changeY);
+          }
+        }
+      }
+      
+      for (GraphicInfo graphicInfo : model.getBpmnModel().getLabelLocationMap().values()) {
+        if (changeX > 0.0) {
+          graphicInfo.setX(graphicInfo.getX() + changeX);
+        }
+        if (changeY > 0.0) {
+          graphicInfo.setY(graphicInfo.getY() + changeY);
+        }
+      }
+    }
   }
   
   protected void loopThroughElements(Collection<? extends BaseElement> elementList, BaseElement parentElement) throws Exception {
