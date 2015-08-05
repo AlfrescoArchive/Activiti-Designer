@@ -6,30 +6,30 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
-public class PropertyIntermediateCatchMessageSection extends ActivitiPropertySection implements ITabbedPropertyConstants {
+public class PropertySignalStartEventSection extends ActivitiPropertySection implements ITabbedPropertyConstants {
+	
+  protected Combo signalCombo;
+  protected String[] signalArray;
 
-  protected Combo messageCombo;
-  protected String[] messageArray;
-
-	@Override
+  @Override
   public void createFormControls(TabbedPropertySheetPage aTabbedPropertySheetPage) {
-	  messageCombo = createCombobox(messageArray, 0);
-    createLabel("Message ref", messageCombo);
+    signalCombo = createCombobox(signalArray, 0);
+    createLabel("Signal ref", signalCombo);
   }
-
-	@Override
+  
+  @Override
   protected void populateControl(Control control, Object businessObject) {
-    if (control == messageCombo) {
-      MessagePropertyUtil.fillMessageCombo(messageCombo, selectionListener, getDiagram());
+    if (control == signalCombo) {
+      SignalPropertyUtil.fillSignalCombo(signalCombo, selectionListener, getDiagram());
     }
     super.populateControl(control, businessObject);
   }
-	
+
   @Override
   protected Object getModelValueForControl(Control control, Object businessObject) {
     Event event = (Event) businessObject;
-    if (control == messageCombo) {
-      return MessagePropertyUtil.getMessageValue(event, getDiagram());
+    if (control == signalCombo) {
+      return SignalPropertyUtil.getSignalValue(event, getDiagram());
     }
     return null;
   }
@@ -37,8 +37,8 @@ public class PropertyIntermediateCatchMessageSection extends ActivitiPropertySec
   @Override
   protected void storeValueInModel(Control control, Object businessObject) {
     Event event = (Event) businessObject;
-    if (control == messageCombo) {
-      MessagePropertyUtil.storeMessageValue(messageCombo, event, getDiagram());
+    if (control == signalCombo) {
+      SignalPropertyUtil.storeSignalValue(signalCombo, event, getDiagram());
     }
   }
 }

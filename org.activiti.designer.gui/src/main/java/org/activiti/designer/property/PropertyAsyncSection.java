@@ -15,9 +15,7 @@
  *******************************************************************************/
 package org.activiti.designer.property;
 
-import org.activiti.bpmn.model.Activity;
-import org.activiti.bpmn.model.SignalEventDefinition;
-import org.activiti.bpmn.model.ThrowEvent;
+import org.activiti.bpmn.model.FlowNode;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
@@ -43,42 +41,26 @@ public class PropertyAsyncSection extends ActivitiPropertySection implements ITa
 
   @Override
   protected Object getModelValueForControl(Control control, Object businessObject) {
-    if (businessObject instanceof ThrowEvent) {
-      exclusiveButton.setVisible(false);
-      if (control == asyncButton) {
-        ThrowEvent event = (ThrowEvent) businessObject;
-        SignalEventDefinition eventDef = (SignalEventDefinition) event.getEventDefinitions().get(0);
-        return eventDef.isAsync();
-      }
-      
-    } else {
-      Activity activity = (Activity) businessObject;
+    if (businessObject instanceof FlowNode) {
+      FlowNode flowNode = (FlowNode) businessObject;
       exclusiveButton.setVisible(true);
       if (control == asyncButton) {
-        return activity.isAsynchronous();
+        return flowNode.isAsynchronous();
+        
       } else if(control == exclusiveButton) {
-        return !activity.isNotExclusive();
+        return !flowNode.isNotExclusive();
       }
-    }
+    } 
     return null;
   }
 
   @Override
   protected void storeValueInModel(Control control, Object businessObject) {
-    if (businessObject instanceof ThrowEvent) {
-      if (control == asyncButton) {
-        ThrowEvent event = (ThrowEvent) businessObject;
-        SignalEventDefinition eventDef = (SignalEventDefinition) event.getEventDefinitions().get(0);
-        eventDef.setAsync(asyncButton.getSelection());
-      }
-      
-    } else {
-      Activity activity = (Activity) businessObject;
-      if (control == asyncButton) {
-        activity.setAsynchronous(asyncButton.getSelection());
-      } else if (control == exclusiveButton) {
-        activity.setNotExclusive(!exclusiveButton.getSelection());
-      }
+    FlowNode flowNode = (FlowNode) businessObject;
+    if (control == asyncButton) {
+      flowNode.setAsynchronous(asyncButton.getSelection());
+    } else if (control == exclusiveButton) {
+      flowNode.setNotExclusive(!exclusiveButton.getSelection());
     }
   }
 }

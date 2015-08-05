@@ -5,30 +5,35 @@ package org.activiti.designer.property;
  */
 
 import org.activiti.bpmn.model.Event;
-import org.activiti.bpmn.model.MessageEventDefinition;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 public class PropertyMessageStartEventSection extends ActivitiPropertySection implements ITabbedPropertyConstants {
 	
-  private Text messageText;
+  protected Combo messageCombo;
+  protected String[] messageArray;
 	
   @Override
   public void createFormControls(TabbedPropertySheetPage aTabbedPropertySheetPage) {
-    messageText = createTextControl(false);
-    createLabel("Message ref", messageText);
+    messageCombo = createCombobox(messageArray, 0);
+    createLabel("Message ref", messageCombo);
+  }
+  
+  @Override
+  protected void populateControl(Control control, Object businessObject) {
+    if (control == messageCombo) {
+      MessagePropertyUtil.fillMessageCombo(messageCombo, selectionListener, getDiagram());
+    }
+    super.populateControl(control, businessObject);
   }
 
   @Override
   protected Object getModelValueForControl(Control control, Object businessObject) {
     Event event = (Event) businessObject;
-    if (control == messageText) {
-      if (event.getEventDefinitions().get(0) != null) {
-        MessageEventDefinition messageDefinition = (MessageEventDefinition) event.getEventDefinitions().get(0);
-        return convertMessageRef(messageDefinition.getMessageRef());
-      }
+    if (control == messageCombo) {
+      return MessagePropertyUtil.getMessageValue(event, getDiagram());
     }
     return null;
   }
@@ -36,9 +41,8 @@ public class PropertyMessageStartEventSection extends ActivitiPropertySection im
   @Override
   protected void storeValueInModel(Control control, Object businessObject) {
     Event event = (Event) businessObject;
-    if (control == messageText) {
-      MessageEventDefinition messageDefinition = (MessageEventDefinition) event.getEventDefinitions().get(0);
-      messageDefinition.setMessageRef(messageText.getText());
+    if (control == messageCombo) {
+      MessagePropertyUtil.storeMessageValue(messageCombo, event, getDiagram());
     }
   }
 }

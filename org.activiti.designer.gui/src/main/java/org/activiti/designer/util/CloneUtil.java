@@ -17,6 +17,7 @@ import org.activiti.bpmn.model.EndEvent;
 import org.activiti.bpmn.model.ExclusiveGateway;
 import org.activiti.bpmn.model.FieldExtension;
 import org.activiti.bpmn.model.FlowElement;
+import org.activiti.bpmn.model.FlowNode;
 import org.activiti.bpmn.model.FormProperty;
 import org.activiti.bpmn.model.FormValue;
 import org.activiti.bpmn.model.InclusiveGateway;
@@ -98,9 +99,12 @@ public final class CloneUtil {
       ((Activity) cloneElement).setExecutionListeners(resultListenerList);
     }
 
-    if (element instanceof Activity) {
-      ((Activity) cloneElement).setAsynchronous(((Activity) element).isAsynchronous());
-      ((Activity) cloneElement).setDefaultFlow(((Activity) element).getDefaultFlow());
+    if (element instanceof FlowNode) {
+      ((FlowNode) cloneElement).setAsynchronous(((FlowNode) element).isAsynchronous());
+      ((FlowNode) cloneElement).setNotExclusive(((FlowNode) element).isNotExclusive());
+      if (element instanceof Activity) {
+        ((Activity) cloneElement).setDefaultFlow(((Activity) element).getDefaultFlow());
+      }
     }
 
     if (formProperties != null) {

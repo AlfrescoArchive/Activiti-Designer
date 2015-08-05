@@ -456,13 +456,15 @@ public abstract class ActivitiPropertySection extends BaseActivitiPropertySectio
     comboControl.setLayoutData(data);
     
     // Set possible values
-    comboControl.setItems(values);
-    
-    if(defaultSelectionIndex >= 0) {
-      comboControl.select(defaultSelectionIndex);
-      // Store the default-selection as "data", so we can reselect it when
-      // the combo needs to be reset
-      comboControl.setData(defaultSelectionIndex);
+    if (values != null && values.length > 0) {
+      comboControl.setItems(values);
+      
+      if (defaultSelectionIndex >= 0) {
+        comboControl.select(defaultSelectionIndex);
+        // Store the default-selection as "data", so we can reselect it when
+        // the combo needs to be reset
+        comboControl.setData(defaultSelectionIndex);
+      }
     }
     
     comboControl.addSelectionListener(selectionListener);

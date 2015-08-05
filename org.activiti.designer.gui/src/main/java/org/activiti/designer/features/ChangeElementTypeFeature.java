@@ -44,6 +44,7 @@ public class ChangeElementTypeFeature extends AbstractCustomFeature {
   public static final String EVENT_START_TIMER = "timerstartevent";
   public static final String EVENT_START_MESSAGE = "messagestartevent";
   public static final String EVENT_START_ERROR = "errorstartevent";
+  public static final String EVENT_START_SIGNAL = "signalstartevent";
   
   public static final String EVENT_END_NONE = "noneendevent";
   public static final String EVENT_END_ERROR = "errorendevent";
@@ -84,6 +85,7 @@ public class ChangeElementTypeFeature extends AbstractCustomFeature {
 		createFeatureMap.put(EVENT_START_TIMER, new CreateTimerStartEventFeature(fp));
 		createFeatureMap.put(EVENT_START_MESSAGE, new CreateMessageStartEventFeature(fp));
 		createFeatureMap.put(EVENT_START_ERROR, new CreateErrorStartEventFeature(fp));
+		createFeatureMap.put(EVENT_START_SIGNAL, new CreateSignalStartEventFeature(fp));
 		
     createFeatureMap.put(EVENT_END_NONE, new CreateEndEventFeature(fp));
     createFeatureMap.put(EVENT_END_TERMINATE, new CreateTerminateEndEventFeature(fp));

@@ -90,6 +90,7 @@ import org.activiti.designer.features.CreateScriptTaskFeature;
 import org.activiti.designer.features.CreateSequenceFlowFeature;
 import org.activiti.designer.features.CreateServiceTaskFeature;
 import org.activiti.designer.features.CreateSignalCatchingEventFeature;
+import org.activiti.designer.features.CreateSignalStartEventFeature;
 import org.activiti.designer.features.CreateSignalThrowingEventFeature;
 import org.activiti.designer.features.CreateStartEventFeature;
 import org.activiti.designer.features.CreateTerminateEndEventFeature;
@@ -267,7 +268,7 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
   @Override
   public ICreateFeature[] getCreateFeatures() {
     return new ICreateFeature[] { new CreateAlfrescoStartEventFeature(this), new CreateStartEventFeature(this), new CreateTimerStartEventFeature(this),
-        new CreateMessageStartEventFeature(this), new CreateErrorStartEventFeature(this), new CreateEndEventFeature(this),
+        new CreateMessageStartEventFeature(this), new CreateErrorStartEventFeature(this), new CreateSignalStartEventFeature(this), new CreateEndEventFeature(this),
         new CreateErrorEndEventFeature(this), new CreateTerminateEndEventFeature(this), new CreateUserTaskFeature(this),
         new CreateAlfrescoUserTaskFeature(this), new CreateScriptTaskFeature(this), new CreateServiceTaskFeature(this), new CreateMailTaskFeature(this),
         new CreateManualTaskFeature(this), new CreateReceiveTaskFeature(this), new CreateBusinessRuleTaskFeature(this), new CreateParallelGatewayFeature(this),

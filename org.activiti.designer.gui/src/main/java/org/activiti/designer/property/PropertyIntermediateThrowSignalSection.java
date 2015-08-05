@@ -1,30 +1,35 @@
 package org.activiti.designer.property;
 
 import org.activiti.bpmn.model.Event;
-import org.activiti.bpmn.model.SignalEventDefinition;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 public class PropertyIntermediateThrowSignalSection extends ActivitiPropertySection implements ITabbedPropertyConstants {
 
-	private Text signalText;
+  protected Combo signalCombo;
+  protected String[] signalArray;
 
 	@Override
   public void createFormControls(TabbedPropertySheetPage aTabbedPropertySheetPage) {
-    signalText = createTextControl(false);
-    createLabel("Signal ref", signalText);
+	  signalCombo = createCombobox(signalArray, 0);
+    createLabel("Signal ref", signalCombo);
+  }
+	
+	@Override
+  protected void populateControl(Control control, Object businessObject) {
+    if (control == signalCombo) {
+      SignalPropertyUtil.fillSignalCombo(signalCombo, selectionListener, getDiagram());
+    }
+    super.populateControl(control, businessObject);
   }
 
   @Override
   protected Object getModelValueForControl(Control control, Object businessObject) {
     Event event = (Event) businessObject;
-    if (control == signalText) {
-      if (event.getEventDefinitions().get(0) != null) {
-        SignalEventDefinition signalDefinition = (SignalEventDefinition) event.getEventDefinitions().get(0);
-        return signalDefinition.getSignalRef();
-      }
+    if (control == signalCombo) {
+      return SignalPropertyUtil.getSignalValue(event, getDiagram());
     }
     return null;
   }
@@ -32,9 +37,8 @@ public class PropertyIntermediateThrowSignalSection extends ActivitiPropertySect
   @Override
   protected void storeValueInModel(Control control, Object businessObject) {
     Event event = (Event) businessObject;
-    if (control == signalText) {
-      SignalEventDefinition signalDefinition = (SignalEventDefinition) event.getEventDefinitions().get(0);
-      signalDefinition.setSignalRef(signalText.getText());
+    if (control == signalCombo) {
+      SignalPropertyUtil.storeSignalValue(signalCombo, event, getDiagram());
     }
   }
 }

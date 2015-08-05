@@ -119,7 +119,7 @@ public class BpmnMemoryModel {
   }
 
   public void modelObjectUpdated(Object businessObject) {
-    for(BpmnModelListener listener : modelListeners) {
+    for (BpmnModelListener listener : modelListeners) {
       listener.objectUpdated(businessObject);
     }
   }

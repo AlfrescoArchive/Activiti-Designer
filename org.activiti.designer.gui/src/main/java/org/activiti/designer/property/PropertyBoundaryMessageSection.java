@@ -1,25 +1,32 @@
 package org.activiti.designer.property;
 
 import org.activiti.bpmn.model.BoundaryEvent;
-import org.activiti.bpmn.model.MessageEventDefinition;
 import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Control;
-import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 public class PropertyBoundaryMessageSection extends ActivitiPropertySection implements ITabbedPropertyConstants {
 
-  private Combo cancelActivityCombo;
-  private String[] cancelFormats = new String[] {"true", "false"};
-  private Text messageText;
+  protected Combo cancelActivityCombo;
+  protected String[] cancelFormats = new String[] {"true", "false"};
+  protected Combo messageCombo;
+  protected String[] messageArray;
   
   @Override
   public void createFormControls(TabbedPropertySheetPage aTabbedPropertySheetPage) {
     cancelActivityCombo = createCombobox(cancelFormats, 0);
     createLabel("Cancel activity", cancelActivityCombo);
-    messageText = createTextControl(false);
-    createLabel("Message ref", messageText);
+    messageCombo = createCombobox(messageArray, 0);
+    createLabel("Message ref", messageCombo);
+  }
+  
+  @Override
+  protected void populateControl(Control control, Object businessObject) {
+    if (control == messageCombo) {
+      MessagePropertyUtil.fillMessageCombo(messageCombo, selectionListener, getDiagram());
+    }
+    super.populateControl(control, businessObject);
   }
 
   @Override
@@ -28,11 +35,8 @@ public class PropertyBoundaryMessageSection extends ActivitiPropertySection impl
     if (control == cancelActivityCombo) {
       return String.valueOf(event.isCancelActivity());
       
-    } else if (control == messageText) {
-      if (event.getEventDefinitions().get(0) != null) {
-        MessageEventDefinition messageDefinition = (MessageEventDefinition) event.getEventDefinitions().get(0);
-        return convertMessageRef(messageDefinition.getMessageRef());
-      }
+    } else if (control == messageCombo) {
+      return MessagePropertyUtil.getMessageValue(event, getDiagram());
     }
     return null;
   }
@@ -43,9 +47,8 @@ public class PropertyBoundaryMessageSection extends ActivitiPropertySection impl
     if (control == cancelActivityCombo) {
       event.setCancelActivity(Boolean.valueOf(cancelFormats[cancelActivityCombo.getSelectionIndex()]));
       
-    } else if (control == messageText) {
-      MessageEventDefinition messageDefinition = (MessageEventDefinition) event.getEventDefinitions().get(0);
-      messageDefinition.setMessageRef(messageText.getText());
+    } else if (control == messageCombo) {
+      MessagePropertyUtil.storeMessageValue(messageCombo, event, getDiagram());
     }
   }
 }

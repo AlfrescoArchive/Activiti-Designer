@@ -691,9 +691,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
               boundaryContext.setLocation((int) graphicInfo.getX() - location.x, (int) graphicInfo.getY() - location.y);
 
               if (addFeature.canAdd(boundaryContext)) {
-                PictogramElement newBoundaryContainer = addFeature.add(boundaryContext);
-                // featureProvider.link(newBoundaryContainer, new Object[] {
-                // boundaryEvent });
+                addFeature.add(boundaryContext);
               }
             }
           }
