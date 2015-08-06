@@ -2,28 +2,24 @@ package org.activiti.designer.features;
 
 import org.activiti.bpmn.model.Activity;
 import org.activiti.bpmn.model.BoundaryEvent;
-import org.activiti.bpmn.model.CallActivity;
-import org.activiti.bpmn.model.ErrorEventDefinition;
-import org.activiti.bpmn.model.ScriptTask;
-import org.activiti.bpmn.model.ServiceTask;
+import org.activiti.bpmn.model.CompensateEventDefinition;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.designer.PluginImage;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
 
-public class CreateBoundaryErrorFeature extends AbstractCreateBPMNFeature {
+public class CreateBoundaryCompensateFeature extends AbstractCreateBPMNFeature {
 
-  public static final String FEATURE_ID_KEY = "boundaryerror";
+  public static final String FEATURE_ID_KEY = "boundarycompensation";
 
-  public CreateBoundaryErrorFeature(IFeatureProvider fp) {
+  public CreateBoundaryCompensateFeature(IFeatureProvider fp) {
     // set name and description of the creation feature
-    super(fp, "ErrorBoundaryEvent", "Add error boundary event");
+    super(fp, "CompensationBoundaryEvent", "Add compensation boundary event");
   }
 
   public boolean canCreate(ICreateContext context) {
     Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-    if (parentObject instanceof SubProcess == true || parentObject instanceof CallActivity == true || 
-        parentObject instanceof ServiceTask == true || parentObject instanceof ScriptTask == true) {
+    if (parentObject instanceof Activity && parentObject instanceof SubProcess == false) {
       return true;
     }
     return false;
@@ -31,14 +27,14 @@ public class CreateBoundaryErrorFeature extends AbstractCreateBPMNFeature {
 
   public Object[] create(ICreateContext context) {
     BoundaryEvent boundaryEvent = new BoundaryEvent();
-    ErrorEventDefinition errorEvent = new ErrorEventDefinition();
-    boundaryEvent.getEventDefinitions().add(errorEvent);
+    CompensateEventDefinition compensateEvent = new CompensateEventDefinition();
+    boundaryEvent.getEventDefinitions().add(compensateEvent);
 
     Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
     ((Activity) parentObject).getBoundaryEvents().add(boundaryEvent);
     boundaryEvent.setAttachedToRef((Activity) parentObject);
     
-    addObjectToContainer(context, boundaryEvent, "Error");
+    addObjectToContainer(context, boundaryEvent, "Compensate");
 
     // return newly created business object(s)
     return new Object[] { boundaryEvent };
@@ -46,7 +42,7 @@ public class CreateBoundaryErrorFeature extends AbstractCreateBPMNFeature {
 
   @Override
   public String getCreateImageId() {
-    return PluginImage.IMG_EVENT_ERROR.getImageKey();
+    return PluginImage.IMG_EVENT_COMPENSATION.getImageKey();
   }
 
   @Override

@@ -33,6 +33,8 @@ public enum PluginImage {
   IMG_STARTEVENT_NONE("startevent.none", "type.startevent.none.png"), //$NON-NLS-1$
   IMG_ENDEVENT_NONE("endevent.none", "type.endevent.none.png"), //$NON-NLS-1$
   IMG_EVENT_ERROR("event.error", "error.png"), //$NON-NLS-1$
+  IMG_EVENT_CANCEL("event.cancel", "cancel.png"), //$NON-NLS-1$
+  IMG_EVENT_COMPENSATION("event.compensation", "compensation.png"), //$NON-NLS-1$
   IMG_EVENT_TERMINATE("event.terminate", "terminate.png"), //$NON-NLS-1$
   IMG_STARTEVENT_MESSAGEICON("message.startevent.none", "type.startevent.message.png"),
   IMG_EVENT_MESSAGE("event.message", "letter.png"),
@@ -58,6 +60,8 @@ public enum PluginImage {
   
   IMG_MULTIINSTANCE_SEQUENTIAL("mi.sequential", "mi.sequential.png"),
   IMG_MULTIINSTANCE_PARALLEL("mi.parallel", "mi.parallel.png"),
+  
+  IMG_ACTIVITY_COMPENSATION("activity.compensation", "event.compensation.png"),
 
   // Container icons
   IMG_SUBPROCESS_COLLAPSED("subprocess.collapsed", "type.subprocess.collapsed.png"), //$NON-NLS-1$
@@ -69,6 +73,7 @@ public enum PluginImage {
   IMG_ACTION_ZOOM("action.magnifier", "action.magnifier.png"), //$NON-NLS-1$
 
   IMG_THROW_SIGNAL("throw.signal", "throw.signal.png"), //$NON-NLS-1$
+  IMG_THROW_COMPENSATION("throw.compensation", "throw.compensation.png"), //$NON-NLS-1$
   IMG_THROW_NONE("throw.none", "throw.none.png"), //$NON-NLS-1$
   
   IMG_TEXT_ANNOTATION("textannotation", "textannotation.png"),

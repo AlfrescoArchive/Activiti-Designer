@@ -1,5 +1,7 @@
 package org.activiti.designer.controller;
 
+import org.activiti.bpmn.model.CancelEventDefinition;
+import org.activiti.bpmn.model.CompensateEventDefinition;
 import org.activiti.bpmn.model.EndEvent;
 import org.activiti.bpmn.model.ErrorEventDefinition;
 import org.activiti.bpmn.model.Event;
@@ -107,6 +109,10 @@ public class EventShapeController extends AbstractBusinessObjectShapeController 
         image = gaService.createImage(shape, PluginImage.IMG_EVENT_SIGNAL.getImageKey());
       } else if (eventDefinition instanceof TerminateEventDefinition) {
         image = gaService.createImage(shape, PluginImage.IMG_EVENT_TERMINATE.getImageKey());
+      } else if (eventDefinition instanceof CancelEventDefinition) {
+        image = gaService.createImage(shape, PluginImage.IMG_EVENT_CANCEL.getImageKey());
+      } else if (eventDefinition instanceof CompensateEventDefinition) {
+        image = gaService.createImage(shape, PluginImage.IMG_EVENT_COMPENSATION.getImageKey());
       }
       
       if (image != null) {

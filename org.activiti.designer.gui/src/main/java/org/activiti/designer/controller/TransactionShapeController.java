@@ -1,6 +1,5 @@
 package org.activiti.designer.controller;
 
-import org.activiti.bpmn.model.EventSubProcess;
 import org.activiti.bpmn.model.MultiInstanceLoopCharacteristics;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.bpmn.model.Task;
@@ -37,21 +36,18 @@ import org.eclipse.graphiti.services.IPeCreateService;
  *  
  * @author Tijs Rademakers
  */
-public class SubProcessShapeController extends AbstractBusinessObjectShapeController {
+public class TransactionShapeController extends AbstractBusinessObjectShapeController {
   
   public static final int IMAGE_SIZE = 12;
   
-  public SubProcessShapeController(ActivitiBPMNFeatureProvider featureProvider) {
+  public TransactionShapeController(ActivitiBPMNFeatureProvider featureProvider) {
     super(featureProvider);
   }
 
   @Override
   public boolean canControlShapeFor(Object businessObject) {
-    if (businessObject instanceof SubProcess && businessObject instanceof EventSubProcess == false && 
-        businessObject instanceof Transaction == false) {
-      
+    if (businessObject instanceof Transaction) {
       return true;
-      
     } else {
       return false;
     }
@@ -71,8 +67,7 @@ public class SubProcessShapeController extends AbstractBusinessObjectShapeContro
     width = width <= 0 ? 205 : width;
     height = height <= 0 ? 205 : height;
 
-    // create invisible outer rectangle expanded by
-    // the width needed for the anchor
+    // create invisible outer rectangle expanded by the width needed for the anchor
     final Rectangle invisibleRectangle = gaService.createInvisibleRectangle(containerShape);
     gaService.setLocationAndSize(invisibleRectangle, context.getX(), context.getY(), width, height);
 
@@ -81,6 +76,12 @@ public class SubProcessShapeController extends AbstractBusinessObjectShapeContro
     roundedRectangle.setParentGraphicsAlgorithm(invisibleRectangle);
     roundedRectangle.setStyle(StyleUtil.getStyleForEvent(diagram));
     gaService.setLocationAndSize(roundedRectangle, 0, 0, width, height);
+    
+    // create another rectangle and set inside invisible rectangle
+    RoundedRectangle innerRectangle = gaService.createRoundedRectangle(invisibleRectangle, 5, 5);
+    innerRectangle.setParentGraphicsAlgorithm(invisibleRectangle);
+    innerRectangle.setStyle(StyleUtil.getStyleForEvent(diagram));
+    gaService.setLocationAndSize(innerRectangle, 2, 2, width - 4, height - 4);
 
     // SHAPE WITH TEXT
     

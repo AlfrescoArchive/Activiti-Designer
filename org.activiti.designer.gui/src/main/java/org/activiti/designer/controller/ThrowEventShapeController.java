@@ -1,5 +1,6 @@
 package org.activiti.designer.controller;
 
+import org.activiti.bpmn.model.CompensateEventDefinition;
 import org.activiti.bpmn.model.Event;
 import org.activiti.bpmn.model.EventDefinition;
 import org.activiti.bpmn.model.SignalEventDefinition;
@@ -92,6 +93,8 @@ public class ThrowEventShapeController extends AbstractBusinessObjectShapeContro
       Image image = null;
       if (eventDefinition instanceof SignalEventDefinition) {
         image = gaService.createImage(shape, PluginImage.IMG_THROW_SIGNAL.getImageKey());
+      } else if (eventDefinition instanceof CompensateEventDefinition) {
+        image = gaService.createImage(shape, PluginImage.IMG_THROW_COMPENSATION.getImageKey());
       } else {
         image = gaService.createImage(shape, PluginImage.IMG_THROW_NONE.getImageKey());
       }

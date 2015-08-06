@@ -350,8 +350,7 @@ public class SequenceFlowShapeController extends AbstractBusinessObjectShapeCont
     return graphicInfo;
   }
   
-  protected void getParentGraphicsAlgorithm(Shape sourceShape, Diagram diagram, 
-      GraphicInfo graphicInfo) {
+  protected void getParentGraphicsAlgorithm(Shape sourceShape, Diagram diagram, GraphicInfo graphicInfo) {
     
     if (sourceShape.getContainer().equals(diagram)) {
       return;

@@ -273,6 +273,12 @@ public class TaskShapeController extends AbstractBusinessObjectShapeController {
           gaService.setLocationAndSize(miImage, (width - MI_IMAGE_SIZE) / 2, (height - MI_IMAGE_SIZE), MI_IMAGE_SIZE, MI_IMAGE_SIZE);
         }
       }
+      
+      if (addedTask.isForCompensation()) {
+        final Shape compensationShape = peCreateService.createShape(containerShape, false);
+        Image compensationImage = gaService.createImage(compensationShape, PluginImage.IMG_ACTIVITY_COMPENSATION.getImageKey());
+        gaService.setLocationAndSize(compensationImage, (width - MI_IMAGE_SIZE) / 2 + (MI_IMAGE_SIZE + 5), (height - MI_IMAGE_SIZE), MI_IMAGE_SIZE, MI_IMAGE_SIZE);
+      }
     }
 
     // add a chopbox anchor to the shape

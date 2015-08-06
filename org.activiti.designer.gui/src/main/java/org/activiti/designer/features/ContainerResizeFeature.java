@@ -23,6 +23,7 @@ import org.activiti.bpmn.model.Lane;
 import org.activiti.bpmn.model.Pool;
 import org.activiti.bpmn.model.Process;
 import org.activiti.bpmn.model.SubProcess;
+import org.activiti.bpmn.model.Transaction;
 import org.activiti.designer.PluginImage;
 import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
@@ -70,10 +71,10 @@ public class ContainerResizeFeature extends DefaultResizeShapeFeature {
   public void resizeShape(IResizeShapeContext context) {
     int height = context.getHeight();
     int width = context.getWidth();
-    if(height < 55) {
+    if (height < 55) {
       height = 55;
     }
-    if(width < 105) {
+    if (width < 105) {
       width = 105;
     }
     
@@ -83,17 +84,17 @@ public class ContainerResizeFeature extends DefaultResizeShapeFeature {
     int deltaWidth = width - shape.getGraphicsAlgorithm().getWidth();
     int deltaHeight = height - shape.getGraphicsAlgorithm().getHeight();
     
-    setSize(shape, width, height);
-    
     Object bo = getBusinessObjectForPictogramElement(shape);
-    if(bo instanceof Lane || bo instanceof Pool) {
+    setSize(shape, bo, width, height);
+    
+    if (bo instanceof Lane || bo instanceof Pool) {
       centerText((ContainerShape) shape);
     }
     
     if (bo instanceof Lane) {
       Lane lane = (Lane) bo;
       ContainerShape poolShape = shape.getContainer();
-      setSize(poolShape, poolShape.getGraphicsAlgorithm().getWidth() + deltaWidth, 
+      setSize(poolShape, bo, poolShape.getGraphicsAlgorithm().getWidth() + deltaWidth, 
               poolShape.getGraphicsAlgorithm().getHeight() + deltaHeight);
       centerText(poolShape);
       
@@ -104,7 +105,7 @@ public class ContainerResizeFeature extends DefaultResizeShapeFeature {
         if(lane.equals(otherLane)) continue;
         
         ContainerShape otherLaneShape = (ContainerShape) getFeatureProvider().getPictogramElementForBusinessObject(otherLane);
-        setSize(otherLaneShape, otherLaneShape.getGraphicsAlgorithm().getWidth() + deltaWidth, 
+        setSize(otherLaneShape, bo, otherLaneShape.getGraphicsAlgorithm().getWidth() + deltaWidth, 
                 otherLaneShape.getGraphicsAlgorithm().getHeight());
         
         centerText(otherLaneShape);
@@ -127,7 +128,7 @@ public class ContainerResizeFeature extends DefaultResizeShapeFeature {
           int yShift = 0;
           for (Lane lane : sortedLanes) {
             ContainerShape laneShape = (ContainerShape) getFeatureProvider().getPictogramElementForBusinessObject(lane);
-            setSize(laneShape, laneShape.getGraphicsAlgorithm().getWidth() + deltaWidth, 
+            setSize(laneShape, bo, laneShape.getGraphicsAlgorithm().getWidth() + deltaWidth, 
                     laneShape.getGraphicsAlgorithm().getHeight() + deltaLaneHeight);
             centerText(laneShape);
             laneShape.getGraphicsAlgorithm().setY(laneShape.getGraphicsAlgorithm().getY() + yShift);
@@ -183,6 +184,15 @@ public class ContainerResizeFeature extends DefaultResizeShapeFeature {
 
               image.setX(xPos);
               image.setY(yPos);
+            
+            } else if (image.getId().endsWith(PluginImage.IMG_ACTIVITY_COMPENSATION.getImageKey())) {
+              
+              final int iconWidthAndHeight = 12;
+              final int xPos = (context.getShape().getGraphicsAlgorithm().getWidth() / 2) - (iconWidthAndHeight / 2) + iconWidthAndHeight + 5;
+              final int yPos = context.getShape().getGraphicsAlgorithm().getHeight() - iconWidthAndHeight;
+    
+              image.setX(xPos);
+              image.setY(yPos);
             } 
           }
         }
@@ -199,12 +209,19 @@ public class ContainerResizeFeature extends DefaultResizeShapeFeature {
     }
   }
   
-  protected void setSize(Shape shape, int width, int height) {
+  protected void setSize(Shape shape, Object bo, int width, int height) {
+    int originalWidth = shape.getGraphicsAlgorithm().getWidth();
     shape.getGraphicsAlgorithm().setHeight(height);
     shape.getGraphicsAlgorithm().setWidth(width);
     for (GraphicsAlgorithm graphicsAlgorithm : shape.getGraphicsAlgorithm().getGraphicsAlgorithmChildren()) {
-      graphicsAlgorithm.setHeight(height);
-      graphicsAlgorithm.setWidth(width);
+      // check if it's the transaction inner rectangle
+      if (bo instanceof Transaction && graphicsAlgorithm.getWidth() + 1 < originalWidth) {
+        graphicsAlgorithm.setHeight(height - 4);
+        graphicsAlgorithm.setWidth(width - 4);
+      } else {
+        graphicsAlgorithm.setHeight(height);
+        graphicsAlgorithm.setWidth(width);
+      }
     }
   }
   

@@ -41,6 +41,7 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
 	protected Text delegateExpressionText;
 	protected CLabel delegateExpressionLabel;
 	protected Text resultVariableText;
+	protected Text skipExpressionText;
 	protected FieldExtensionEditor fieldEditor;
 	protected Text documentationText;
 	protected String[] typeValues = new String[] {"Java class", "Expression", "Delegate expression"};
@@ -62,7 +63,7 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
     classSelectButton = getWidgetFactory().createButton(formComposite, "Select class", SWT.PUSH);
     data = new FormData();
     data.left = new FormAttachment(classNameText, 0);
-    data.right = new FormAttachment(78, 0);
+    data.right = new FormAttachment(90, 0);
     data.top = new FormAttachment(classNameText, -2, SWT.TOP);
     classSelectButton.setLayoutData(data);
     classSelectButton.addSelectionListener(new SelectionAdapter() {
@@ -137,6 +138,9 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
     resultVariableText = createTextControl(false);
     createLabel("Result variable", resultVariableText);
     
+    skipExpressionText = createTextControl(false);
+    createLabel("Skip expression", skipExpressionText);
+    
     Composite extensionsComposite = getWidgetFactory().createComposite(formComposite, SWT.WRAP);
     data = new FormData();
     data.left = new FormAttachment(0, 160);
@@ -203,6 +207,9 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
     } else if (control == resultVariableText) {
       return task.getResultVariableName();
       
+    } else if (control == skipExpressionText) {
+      return task.getSkipExpression();
+      
     } else if (control == documentationText) {
       return task.getDocumentation();
     }
@@ -239,6 +246,8 @@ public class PropertyServiceTaskSection extends ActivitiPropertySection implemen
       task.setImplementation(delegateExpressionText.getText());
     } else if (control == resultVariableText) {
       task.setResultVariableName(resultVariableText.getText());
+    } else if (control == skipExpressionText) {
+      task.setSkipExpression(skipExpressionText.getText());
     } else if (control == documentationText) {
       task.setDocumentation(documentationText.getText());
     }

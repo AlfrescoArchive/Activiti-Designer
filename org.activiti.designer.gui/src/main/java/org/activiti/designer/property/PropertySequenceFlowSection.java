@@ -17,11 +17,14 @@ public class PropertySequenceFlowSection extends ActivitiPropertySection impleme
 	
   protected Text flowLabelWidthText;
   protected Text conditionExpressionText;
+  protected Text skipExpressionText;
   
   @Override
   public void createFormControls(TabbedPropertySheetPage aTabbedPropertySheetPage) {
     flowLabelWidthText = createTextControl(false);
     createLabel("Label width (50-500)", flowLabelWidthText);
+    skipExpressionText = createTextControl(false);
+    createLabel("Skip expression", skipExpressionText);
     conditionExpressionText = createTextControl(true);
     createLabel("Condition", conditionExpressionText);
   }
@@ -40,6 +43,9 @@ public class PropertySequenceFlowSection extends ActivitiPropertySection impleme
       
     } else if (control == conditionExpressionText) {
       return sequenceFlow.getConditionExpression();
+      
+    } else if (control == skipExpressionText) {
+      return sequenceFlow.getSkipExpression();
     }
     return null;
   }
@@ -75,6 +81,9 @@ public class PropertySequenceFlowSection extends ActivitiPropertySection impleme
       
     } else if (control == conditionExpressionText) {
       sequenceFlow.setConditionExpression(conditionExpressionText.getText());
+      
+    } else if (control == skipExpressionText) {
+      sequenceFlow.setSkipExpression(skipExpressionText.getText());
     }
   }
 }

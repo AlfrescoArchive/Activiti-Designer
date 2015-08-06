@@ -49,11 +49,14 @@ public class ChangeElementTypeFeature extends AbstractCustomFeature {
   public static final String EVENT_END_NONE = "noneendevent";
   public static final String EVENT_END_ERROR = "errorendevent";
   public static final String EVENT_END_TERMINATE = "terminateendevent";
+  public static final String EVENT_END_CANCEL = "cancelendevent";
   
   public static final String EVENT_BOUNDARY_TIMER = "timerboundaryevent";
   public static final String EVENT_BOUNDARY_ERROR = "errorboundaryevent";
   public static final String EVENT_BOUNDARY_MESSAGE = "messageboundaryevent";
   public static final String EVENT_BOUNDARY_SIGNAL = "signalboundaryevent";
+  public static final String EVENT_BOUNDARY_CANCEL = "cancelboundaryevent";
+  public static final String EVENT_BOUNDARY_COMPENSATION = "compensationboundaryevent";
   
   public static final String EVENT_CATCH_TIMER = "timercatchevent";
   public static final String EVENT_CATCH_MESSAGE = "messagecatchevent";
@@ -61,6 +64,7 @@ public class ChangeElementTypeFeature extends AbstractCustomFeature {
   
   public static final String EVENT_THROW_NONE = "nonethrowevent";
   public static final String EVENT_THROW_SIGNAL = "signalthrowevent";
+  public static final String EVENT_THROW_COMPENSATION = "compensationthrowevent";
   
   protected Map<String, AbstractCreateFeature> createFeatureMap = new HashMap<String, AbstractCreateFeature>();
   
@@ -90,6 +94,7 @@ public class ChangeElementTypeFeature extends AbstractCustomFeature {
     createFeatureMap.put(EVENT_END_NONE, new CreateEndEventFeature(fp));
     createFeatureMap.put(EVENT_END_TERMINATE, new CreateTerminateEndEventFeature(fp));
     createFeatureMap.put(EVENT_END_ERROR, new CreateErrorEndEventFeature(fp));
+    createFeatureMap.put(EVENT_END_CANCEL, new CreateCancelEndEventFeature(fp));
     
 		createFeatureMap.put(EVENT_BOUNDARY_TIMER, new CreateBoundaryTimerFeature(fp));
     createFeatureMap.put(EVENT_BOUNDARY_ERROR, new CreateBoundaryErrorFeature(fp));
@@ -102,6 +107,7 @@ public class ChangeElementTypeFeature extends AbstractCustomFeature {
     
     createFeatureMap.put(EVENT_THROW_NONE, new CreateNoneThrowingEventFeature(fp));
     createFeatureMap.put(EVENT_THROW_SIGNAL, new CreateSignalThrowingEventFeature(fp));
+    createFeatureMap.put(EVENT_THROW_COMPENSATION, new CreateCompensationThrowingEventFeature(fp));
 	}
 
 	public ChangeElementTypeFeature(IFeatureProvider fp, String newType) {

@@ -4,6 +4,7 @@ import org.activiti.bpmn.model.Activity;
 import org.activiti.bpmn.model.BaseElement;
 import org.activiti.bpmn.model.BoundaryEvent;
 import org.activiti.bpmn.model.BpmnModel;
+import org.activiti.bpmn.model.CompensateEventDefinition;
 import org.activiti.bpmn.model.EndEvent;
 import org.activiti.bpmn.model.FlowNode;
 import org.activiti.bpmn.model.Lane;
@@ -46,6 +47,13 @@ public class CreateSequenceFlowFeature extends AbstractCreateBPMNConnectionFeatu
       } else {
         for (SequenceFlow flow : source.getOutgoingFlows()) {
           if (flow.getTargetRef().equals(target.getId())) {
+            return false;
+          }
+        }
+        
+        if (source instanceof BoundaryEvent) {
+          BoundaryEvent event = (BoundaryEvent) source;
+          if (event.getEventDefinitions().size() > 0 && event.getEventDefinitions().get(0) instanceof CompensateEventDefinition) {
             return false;
           }
         }
@@ -171,7 +179,7 @@ public class CreateSequenceFlowFeature extends AbstractCreateBPMNConnectionFeatu
 
   @Override
   protected Class< ? extends BaseElement> getFeatureClass() {
-    return new SequenceFlow().getClass();
+    return SequenceFlow.class;
   }
 
 }

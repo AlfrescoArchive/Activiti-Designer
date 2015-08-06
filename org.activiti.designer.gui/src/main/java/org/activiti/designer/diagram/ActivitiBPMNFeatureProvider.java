@@ -56,18 +56,23 @@ import org.activiti.designer.controller.SubProcessShapeController;
 import org.activiti.designer.controller.TaskShapeController;
 import org.activiti.designer.controller.TextAnnotationShapeController;
 import org.activiti.designer.controller.ThrowEventShapeController;
+import org.activiti.designer.controller.TransactionShapeController;
 import org.activiti.designer.features.ActivityResizeFeature;
 import org.activiti.designer.features.AddBaseElementFeature;
 import org.activiti.designer.features.ChangeElementTypeFeature;
 import org.activiti.designer.features.ContainerResizeFeature;
 import org.activiti.designer.features.CopyFlowElementFeature;
 import org.activiti.designer.features.CreateAssociationFeature;
+import org.activiti.designer.features.CreateBoundaryCancelFeature;
+import org.activiti.designer.features.CreateBoundaryCompensateFeature;
 import org.activiti.designer.features.CreateBoundaryErrorFeature;
 import org.activiti.designer.features.CreateBoundaryMessageFeature;
 import org.activiti.designer.features.CreateBoundarySignalFeature;
 import org.activiti.designer.features.CreateBoundaryTimerFeature;
 import org.activiti.designer.features.CreateBusinessRuleTaskFeature;
 import org.activiti.designer.features.CreateCallActivityFeature;
+import org.activiti.designer.features.CreateCancelEndEventFeature;
+import org.activiti.designer.features.CreateCompensationThrowingEventFeature;
 import org.activiti.designer.features.CreateEmbeddedSubProcessFeature;
 import org.activiti.designer.features.CreateEndEventFeature;
 import org.activiti.designer.features.CreateErrorEndEventFeature;
@@ -97,6 +102,7 @@ import org.activiti.designer.features.CreateTerminateEndEventFeature;
 import org.activiti.designer.features.CreateTextAnnotationFeature;
 import org.activiti.designer.features.CreateTimerCatchingEventFeature;
 import org.activiti.designer.features.CreateTimerStartEventFeature;
+import org.activiti.designer.features.CreateTransactionFeature;
 import org.activiti.designer.features.CreateUserTaskFeature;
 import org.activiti.designer.features.DeleteArtifactFeature;
 import org.activiti.designer.features.DeleteFlowElementFeature;
@@ -181,6 +187,7 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
     shapeControllers.add(new SubProcessShapeController(this));
     shapeControllers.add(new CallActivityShapeController(this));
     shapeControllers.add(new EventSubProcessShapeController(this));
+    shapeControllers.add(new TransactionShapeController(this));
     shapeControllers.add(new BoundaryEventShapeController(this));
     shapeControllers.add(new PoolShapeController(this));
     shapeControllers.add(new LaneShapeController(this));
@@ -269,14 +276,14 @@ public class ActivitiBPMNFeatureProvider extends DefaultFeatureProvider {
   public ICreateFeature[] getCreateFeatures() {
     return new ICreateFeature[] { new CreateAlfrescoStartEventFeature(this), new CreateStartEventFeature(this), new CreateTimerStartEventFeature(this),
         new CreateMessageStartEventFeature(this), new CreateErrorStartEventFeature(this), new CreateSignalStartEventFeature(this), new CreateEndEventFeature(this),
-        new CreateErrorEndEventFeature(this), new CreateTerminateEndEventFeature(this), new CreateUserTaskFeature(this),
+        new CreateErrorEndEventFeature(this), new CreateTerminateEndEventFeature(this), new CreateCancelEndEventFeature(this), new CreateUserTaskFeature(this),
         new CreateAlfrescoUserTaskFeature(this), new CreateScriptTaskFeature(this), new CreateServiceTaskFeature(this), new CreateMailTaskFeature(this),
-        new CreateManualTaskFeature(this), new CreateReceiveTaskFeature(this), new CreateBusinessRuleTaskFeature(this), new CreateParallelGatewayFeature(this),
-        new CreateExclusiveGatewayFeature(this), new CreateInclusiveGatewayFeature(this), new CreateEventGatewayFeature(this),
-        new CreateBoundaryTimerFeature(this), new CreateBoundaryErrorFeature(this), new CreateBoundaryMessageFeature(this),
-        new CreateBoundarySignalFeature(this), new CreateTimerCatchingEventFeature(this), new CreateSignalCatchingEventFeature(this),
-        new CreateMessageCatchingEventFeature(this), new CreateSignalThrowingEventFeature(this), new CreateNoneThrowingEventFeature(this),
-        new CreateEventSubProcessFeature(this), new CreateEmbeddedSubProcessFeature(this), new CreatePoolFeature(this), new CreateLaneFeature(this),
+        new CreateManualTaskFeature(this), new CreateReceiveTaskFeature(this), new CreateBusinessRuleTaskFeature(this), 
+        new CreateParallelGatewayFeature(this), new CreateExclusiveGatewayFeature(this), new CreateInclusiveGatewayFeature(this), new CreateEventGatewayFeature(this),
+        new CreateBoundaryTimerFeature(this), new CreateBoundaryErrorFeature(this), new CreateBoundaryMessageFeature(this), new CreateBoundaryCancelFeature(this), new CreateBoundaryCompensateFeature(this), new CreateBoundarySignalFeature(this), 
+        new CreateTimerCatchingEventFeature(this), new CreateSignalCatchingEventFeature(this), new CreateMessageCatchingEventFeature(this), 
+        new CreateSignalThrowingEventFeature(this), new CreateCompensationThrowingEventFeature(this), new CreateNoneThrowingEventFeature(this),
+        new CreateEventSubProcessFeature(this), new CreateTransactionFeature(this), new CreateEmbeddedSubProcessFeature(this), new CreatePoolFeature(this), new CreateLaneFeature(this),
         new CreateCallActivityFeature(this), new CreateAlfrescoScriptTaskFeature(this), new CreateAlfrescoMailTaskFeature(this),
         new CreateTextAnnotationFeature(this) };
   }

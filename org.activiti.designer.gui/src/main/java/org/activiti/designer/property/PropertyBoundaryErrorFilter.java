@@ -11,9 +11,9 @@ public class PropertyBoundaryErrorFilter extends ActivitiPropertyFilter {
 	protected boolean accept(PictogramElement pe) {
 		Object bo = getBusinessObject(pe);
 		if (bo instanceof BoundaryEvent) {
-		  if(((BoundaryEvent) bo).getEventDefinitions() != null) {
-		    for(EventDefinition eventDefinition : ((BoundaryEvent) bo).getEventDefinitions()) {
-		      if(eventDefinition instanceof ErrorEventDefinition) {
+		  if (((BoundaryEvent) bo).getEventDefinitions() != null) {
+		    for (EventDefinition eventDefinition : ((BoundaryEvent) bo).getEventDefinitions()) {
+		      if (eventDefinition instanceof ErrorEventDefinition) {
 		        return true;
 		      }
 		    }

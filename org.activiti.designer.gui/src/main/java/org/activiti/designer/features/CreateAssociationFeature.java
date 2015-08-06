@@ -2,6 +2,8 @@ package org.activiti.designer.features;
 
 import org.activiti.bpmn.model.Association;
 import org.activiti.bpmn.model.BaseElement;
+import org.activiti.bpmn.model.BoundaryEvent;
+import org.activiti.bpmn.model.CompensateEventDefinition;
 import org.activiti.bpmn.model.Lane;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.bpmn.model.TextAnnotation;
@@ -32,8 +34,15 @@ public class CreateAssociationFeature extends AbstractCreateBPMNConnectionFeatur
     
     boolean canCreate = false;
     
-    if (sourceBo != targetBo && (sourceBo instanceof TextAnnotation || targetBo instanceof TextAnnotation)) {
-      canCreate = true;
+    if (sourceBo != targetBo) {
+      if (sourceBo instanceof TextAnnotation || targetBo instanceof TextAnnotation) {
+        canCreate = true;
+      } else if (sourceBo instanceof BoundaryEvent) {
+        BoundaryEvent event = (BoundaryEvent) sourceBo;
+        if (event.getEventDefinitions().size() > 0 && event.getEventDefinitions().get(0) instanceof CompensateEventDefinition) {
+          canCreate = true;
+        }
+      }
     }
     
     return canCreate;

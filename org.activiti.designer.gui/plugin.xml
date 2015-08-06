@@ -375,6 +375,19 @@
                id="org.activiti.designer.mainConfigTab.signalStartEvent"
                tab="org.activiti.designer.mainConfigTab">
          </propertySection>
+         <propertySection
+               afterSection="org.activiti.designer.generalTab.async"
+               class="org.activiti.designer.property.PropertyCompensationSection"
+               filter="org.activiti.designer.property.PropertyCompensationFilter"
+               id="org.activiti.designer.generalTab.compensation"
+               tab="org.activiti.designer.generalTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyCompensationActivityRefSection"
+               filter="org.activiti.designer.property.PropertyCompensationActivityRefFilter"
+               id="org.activiti.designer.mainConfigTab.compensationActivityRef"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
          <!-- <propertySection
                class="org.activiti.designer.property.PropertyEventListenersSection"
                filter="org.activiti.designer.property.PropertyEventListenersFilter"

@@ -9,12 +9,14 @@ import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
 
 public class PropertyUserTaskSection extends ActivitiPropertySection implements ITabbedPropertyConstants {
 
-  private Text assigneeText;
-  private Text candidateUsersText;
-  private Text candidateGroupsText;
-  private Text formKeyText;
-  private Text dueDateText;
-  private Text priorityText;
+  protected Text assigneeText;
+  protected Text candidateUsersText;
+  protected Text candidateGroupsText;
+  protected Text formKeyText;
+  protected Text dueDateText;
+  protected Text priorityText;
+  protected Text categoryText;
+  protected Text skipExpressionText;
   
   @Override
   public void createFormControls(TabbedPropertySheetPage aTabbedPropertySheetPage) {
@@ -30,6 +32,10 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
     createLabel("Due date (variable)", dueDateText);
     priorityText = createTextControl(false);
     createLabel("Priority", priorityText);
+    categoryText = createTextControl(false);
+    createLabel("Category", categoryText);
+    skipExpressionText = createTextControl(false);
+    createLabel("Skip expression", skipExpressionText);
   }
 
   @Override
@@ -37,16 +43,20 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
     UserTask task = (UserTask) businessObject;
     if (control == assigneeText) {
       return task.getAssignee();
-    } else if(control == candidateUsersText) {
+    } else if (control == candidateUsersText) {
       return getCommaSeperatedString(task.getCandidateUsers());
-    } else if(control == candidateGroupsText) {
+    } else if (control == candidateGroupsText) {
       return getCommaSeperatedString(task.getCandidateGroups());
-    } else if(control == formKeyText) {
+    } else if (control == formKeyText) {
       return task.getFormKey();
-    } else if(control == dueDateText) {
+    } else if (control == dueDateText) {
       return task.getDueDate();
-    } else if(control == priorityText) {
+    } else if (control == priorityText) {
       return task.getPriority();
+    } else if (control == categoryText) {
+      return task.getCategory();
+    } else if (control == skipExpressionText) {
+      return task.getSkipExpression();
     }
     return null;
   }
@@ -66,6 +76,10 @@ public class PropertyUserTaskSection extends ActivitiPropertySection implements 
       task.setDueDate(dueDateText.getText());
     } else if (control == priorityText) {
       task.setPriority(priorityText.getText());
+    } else if (control == categoryText) {
+      task.setCategory(categoryText.getText());
+    } else if (control == skipExpressionText) {
+      task.setSkipExpression(skipExpressionText.getText());
     }
   }
   

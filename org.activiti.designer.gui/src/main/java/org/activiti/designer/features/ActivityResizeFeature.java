@@ -117,6 +117,15 @@ public class ActivityResizeFeature extends DefaultResizeShapeFeature {
 
             image.setX(xPos);
             image.setY(yPos);
+            
+      		} else if (image.getId().endsWith(PluginImage.IMG_ACTIVITY_COMPENSATION.getImageKey())) {
+              
+            final int iconWidthAndHeight = 12;
+            final int xPos = (context.getShape().getGraphicsAlgorithm().getWidth() / 2) - (iconWidthAndHeight / 2) + iconWidthAndHeight + 5;
+            final int yPos = context.getShape().getGraphicsAlgorithm().getHeight() - iconWidthAndHeight - 2;
+  
+            image.setX(xPos);
+            image.setY(yPos);
           
           } else {
       		

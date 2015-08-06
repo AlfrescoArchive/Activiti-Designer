@@ -48,9 +48,11 @@ public class UpdateFlowElementFeature extends AbstractUpdateFeature {
 		String pictogramName = null;
 		PictogramElement pictogramElement = context.getPictogramElement();
     Object bo = getBusinessObjectForPictogramElement(pictogramElement);
+    
     FlowElement flowElement = (FlowElement) bo;
     boolean hasMiSequentialImage = false;
     boolean hasMiParallelImage = false;
+    boolean hasCompensationImage = false;
     
 		if (pictogramElement instanceof ContainerShape) {
 			ContainerShape cs = (ContainerShape) pictogramElement;
@@ -88,7 +90,10 @@ public class UpdateFlowElementFeature extends AbstractUpdateFeature {
 				  
 				  } else if (image.getId().endsWith(PluginImage.IMG_MULTIINSTANCE_PARALLEL.getImageKey())) {
 				    hasMiParallelImage = true;
-				  }
+				  
+				  } else if (image.getId().endsWith(PluginImage.IMG_ACTIVITY_COMPENSATION.getImageKey())) {
+            hasCompensationImage = true;
+          }
 				}
 			}
 		} else if (pictogramElement instanceof FreeFormConnection) {
@@ -126,6 +131,13 @@ public class UpdateFlowElementFeature extends AbstractUpdateFeature {
         }
       
       } else if (hasMiParallelImage || hasMiSequentialImage) {
+        return Reason.createTrueReason();
+      }
+      
+      if (activity.isForCompensation() && hasCompensationImage == false) {
+        return Reason.createTrueReason();
+        
+      } else if (activity.isForCompensation() == false && hasCompensationImage) {
         return Reason.createTrueReason();
       }
     }
@@ -212,6 +224,10 @@ public class UpdateFlowElementFeature extends AbstractUpdateFeature {
           } else if (image.getId().endsWith(PluginImage.IMG_MULTIINSTANCE_PARALLEL.getImageKey())) {
             itShape.remove();
             updated = true;
+          
+          } else if (image.getId().endsWith(PluginImage.IMG_ACTIVITY_COMPENSATION.getImageKey())) {
+            itShape.remove();
+            updated = true;
           }
 				}
 			}
@@ -219,16 +235,16 @@ public class UpdateFlowElementFeature extends AbstractUpdateFeature {
 			if (bo instanceof Activity) {
 			  Activity activity = (Activity) bo;
 			  MultiInstanceLoopCharacteristics multiInstanceObject = activity.getLoopCharacteristics();
+			  
+			  final IPeCreateService peCreateService = Graphiti.getPeCreateService();
+        final IGaService gaService = Graphiti.getGaService();
+        int imageX = (cs.getGraphicsAlgorithm().getWidth() - TaskShapeController.MI_IMAGE_SIZE) / 2;
+			  
 	      if (multiInstanceObject != null) {
 	      
 	        if (StringUtils.isNotEmpty(multiInstanceObject.getLoopCardinality()) ||
 	            StringUtils.isNotEmpty(multiInstanceObject.getInputDataItem()) ||
 	            StringUtils.isNotEmpty(multiInstanceObject.getCompletionCondition())) {
-	          
-	          final IPeCreateService peCreateService = Graphiti.getPeCreateService();
-	          final IGaService gaService = Graphiti.getGaService();
-	          
-	          int imageX = (cs.getGraphicsAlgorithm().getWidth() - TaskShapeController.MI_IMAGE_SIZE) / 2;
 	          
 	          if (multiInstanceObject.isSequential()) {
 	            final Shape miShape = peCreateService.createShape(cs, false);
@@ -241,9 +257,15 @@ public class UpdateFlowElementFeature extends AbstractUpdateFeature {
               final Image miImage = gaService.createImage(miShape, PluginImage.IMG_MULTIINSTANCE_PARALLEL.getImageKey());
               gaService.setLocationAndSize(miImage, imageX, 
                       (cs.getGraphicsAlgorithm().getHeight() - TaskShapeController.MI_IMAGE_SIZE) - 2, TaskShapeController.MI_IMAGE_SIZE, TaskShapeController.MI_IMAGE_SIZE);
-	        
 	          }
 	        }
+	      }
+	      
+	      if (activity.isForCompensation()) {
+	        final Shape compensationShape = peCreateService.createShape(cs, false);
+          final Image compensationImage = gaService.createImage(compensationShape, PluginImage.IMG_ACTIVITY_COMPENSATION.getImageKey());
+          gaService.setLocationAndSize(compensationImage, imageX + TaskShapeController.MI_IMAGE_SIZE + 5, 
+                  (cs.getGraphicsAlgorithm().getHeight() - TaskShapeController.MI_IMAGE_SIZE) - 2, TaskShapeController.MI_IMAGE_SIZE, TaskShapeController.MI_IMAGE_SIZE);
 	      }
 			
 			} else if (bo instanceof BoundaryEvent) {
@@ -265,7 +287,7 @@ public class UpdateFlowElementFeature extends AbstractUpdateFeature {
         }
       }
     }
-
+		
 		return updated;
 	}
 }
