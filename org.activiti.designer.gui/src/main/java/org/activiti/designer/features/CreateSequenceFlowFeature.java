@@ -123,7 +123,7 @@ public class CreateSequenceFlowFeature extends AbstractCreateBPMNConnectionFeatu
   /**
    * Creates a SequenceFlow between two BaseElements.
    */
-  private SequenceFlow createSequenceFlow(FlowNode source, FlowNode target, ICreateConnectionContext context) {
+  protected SequenceFlow createSequenceFlow(FlowNode source, FlowNode target, ICreateConnectionContext context) {
     SequenceFlow sequenceFlow = new SequenceFlow();
 
     sequenceFlow.setId(getNextId());

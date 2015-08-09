@@ -134,8 +134,8 @@ public class AssociationShapeController extends AbstractBusinessObjectShapeContr
     if(bendpointList != null && bendpointList.size() >= 0) {
       for (GraphicInfo graphicInfo : bendpointList) {
         Point bendPoint = StylesFactory.eINSTANCE.createPoint();
-        bendPoint.setX((int)graphicInfo.getX());
-        bendPoint.setY((int)graphicInfo.getY());
+        bendPoint.setX((int) graphicInfo.getX());
+        bendPoint.setY((int) graphicInfo.getY());
         connection.getBendpoints().add(bendPoint);
       }
       
@@ -177,14 +177,14 @@ public class AssociationShapeController extends AbstractBusinessObjectShapeContr
             (sourceGraphics.getX() + sourceGraphics.getWidth()) < targetGraphics.getX()) {
           
           boolean subProcessWithBendPoint = false;
-          if(sourceElement instanceof SubProcess) {
+          if (sourceElement instanceof SubProcess) {
             int middleSub = sourceGraphics.getY() + (sourceGraphics.getHeight() / 2);
-            if((middleSub + 20) < targetGraphics.getY() || (middleSub - 20) > targetGraphics.getY()) {
+            if ((middleSub + 20) < targetGraphics.getY() || (middleSub - 20) > targetGraphics.getY()) {
               subProcessWithBendPoint = true;
             }
           }
           
-          if(sourceElement instanceof SubProcess == false || subProcessWithBendPoint == true) {
+          if (sourceElement instanceof SubProcess == false || subProcessWithBendPoint == true) {
             Point bendPoint = StylesFactory.eINSTANCE.createPoint();
             bendPoint.setX(targetX + 20);
             bendPoint.setY(sourceY + (sourceGraphics.getHeight() / 2));

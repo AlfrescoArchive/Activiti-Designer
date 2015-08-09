@@ -3,6 +3,8 @@ package org.activiti.designer.features;
 import java.util.List;
 
 import org.activiti.bpmn.model.Activity;
+import org.activiti.bpmn.model.Artifact;
+import org.activiti.bpmn.model.Association;
 import org.activiti.bpmn.model.BoundaryEvent;
 import org.activiti.bpmn.model.FlowElement;
 import org.activiti.bpmn.model.Lane;
@@ -15,7 +17,9 @@ import org.eclipse.graphiti.datatypes.ILocation;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IMoveShapeContext;
 import org.eclipse.graphiti.features.impl.DefaultMoveShapeFeature;
+import org.eclipse.graphiti.mm.algorithms.styles.Point;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
+import org.eclipse.graphiti.mm.pictograms.FreeFormConnection;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 import org.eclipse.graphiti.services.Graphiti;
@@ -50,6 +54,15 @@ public class MoveActivityFeature extends DefaultMoveShapeFeature {
     final Shape shape = context.getShape();
     shapeLocationBeforeMove = Graphiti.getLayoutService().getLocationRelativeToDiagram(shape);
     super.preMoveShape(context);
+  }
+  
+  
+
+  @Override
+  public void moveShape(IMoveShapeContext context) {
+    preMoveShape(context);
+    internalMove(context);
+    postMoveShape(context);
   }
 
   /**
@@ -142,22 +155,31 @@ public class MoveActivityFeature extends DefaultMoveShapeFeature {
 		}
 	}
 	
-	private void moveActivityChilds(Activity activity, ILocation shapeLocationAfterMove) {
+	protected void moveActivityChilds(Activity activity, ILocation shapeLocationAfterMove) {
 		// get all boundary events of the activity
 		final List<BoundaryEvent> boundaryEvents = activity.getBoundaryEvents();
 		moveBoundaryEvents(boundaryEvents, shapeLocationAfterMove);
 		
-		// also move all boundary events in the sub process
-		if(activity instanceof SubProcess) {
-			for (FlowElement subElement : ((SubProcess) activity).getFlowElements()) {
-	      if(subElement instanceof Activity) {
+		// also move all boundary events and bendpoints in the sub process
+		if (activity instanceof SubProcess) {
+		  SubProcess subProcess = (SubProcess) activity;
+			for (FlowElement subElement : subProcess.getFlowElements()) {
+	      if (subElement instanceof Activity) {
 	      	moveActivityChilds((Activity) subElement, shapeLocationAfterMove);
+	      } else if (subElement instanceof SequenceFlow) {
+	        moveSequenceFlowBendpoints((SequenceFlow) subElement, shapeLocationAfterMove);
 	      }
       }
+			
+			for (Artifact artifact : subProcess.getArtifacts()) {
+			  if (artifact instanceof Association) {
+			    moveAssociationBendpoints((Association) artifact, shapeLocationAfterMove);
+			  }
+			}
 		}
 	}
 	
-	private void moveBoundaryEvents(final List<BoundaryEvent> boundaryEvents, ILocation shapeLocationAfterMove) {
+	protected void moveBoundaryEvents(final List<BoundaryEvent> boundaryEvents, ILocation shapeLocationAfterMove) {
 		final IGaService gaService = Graphiti.getGaService();
 		for (final BoundaryEvent boundaryEvent : boundaryEvents) {
 			
@@ -177,4 +199,27 @@ public class MoveActivityFeature extends DefaultMoveShapeFeature {
 			Graphiti.getPeService().sendToFront((Shape) picto);
 		}
 	}
+	
+	protected void moveSequenceFlowBendpoints(SequenceFlow sequenceFlow, ILocation shapeLocationAfterMove) {
+    FreeFormConnection freeFormConnection = (FreeFormConnection) getFeatureProvider().getPictogramElementForBusinessObject(sequenceFlow);
+    moveBendpoints(freeFormConnection, shapeLocationAfterMove);
+  }
+	
+	protected void moveAssociationBendpoints(Association association, ILocation shapeLocationAfterMove) {
+    FreeFormConnection freeFormConnection = (FreeFormConnection) getFeatureProvider().getPictogramElementForBusinessObject(association);
+    moveBendpoints(freeFormConnection, shapeLocationAfterMove);
+  }
+	
+	protected void moveBendpoints(FreeFormConnection freeFormConnection, ILocation shapeLocationAfterMove) {
+    if (freeFormConnection != null && freeFormConnection.getBendpoints() != null && freeFormConnection.getBendpoints().size() > 0) {
+      
+      int deltaX = shapeLocationAfterMove.getX() - shapeLocationBeforeMove.getX();
+      int deltaY = shapeLocationAfterMove.getY() - shapeLocationBeforeMove.getY();
+      
+      for (Point point : freeFormConnection.getBendpoints()) {
+        point.setX(point.getX() + deltaX);
+        point.setY(point.getY() + deltaY);
+      }
+    }
+  }
 }

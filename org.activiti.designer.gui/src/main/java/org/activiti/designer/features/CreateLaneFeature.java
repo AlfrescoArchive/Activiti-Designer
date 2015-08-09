@@ -76,11 +76,26 @@ public class CreateLaneFeature extends AbstractCreateBPMNFeature {
       height = poolShape.getGraphicsAlgorithm().getHeight();
 
     } else {
-      ContainerShape lastLaneShape = (ContainerShape) getFeatureProvider().getPictogramElementForBusinessObject(lanes.get(lanes.size() - 1));
-      x = lastLaneShape.getGraphicsAlgorithm().getX();
-      y = lastLaneShape.getGraphicsAlgorithm().getY() + lastLaneShape.getGraphicsAlgorithm().getHeight();
-      width = lastLaneShape.getGraphicsAlgorithm().getWidth();
-      height = lastLaneShape.getGraphicsAlgorithm().getHeight();
+      ContainerShape lastLaneShape = null;
+      for (int i = lanes.size() - 1; i >= 0; i--) {
+        lastLaneShape = (ContainerShape) getFeatureProvider().getPictogramElementForBusinessObject(lanes.get(i));
+        if (lastLaneShape != null) {
+          break;
+        }
+      }
+      
+      if (lastLaneShape != null) {
+        x = lastLaneShape.getGraphicsAlgorithm().getX();
+        y = lastLaneShape.getGraphicsAlgorithm().getY() + lastLaneShape.getGraphicsAlgorithm().getHeight();
+        width = lastLaneShape.getGraphicsAlgorithm().getWidth();
+        height = lastLaneShape.getGraphicsAlgorithm().getHeight();
+        
+      } else {
+        x = 20;
+        y = 0;
+        width = poolShape.getGraphicsAlgorithm().getWidth() - 20;
+        height = poolShape.getGraphicsAlgorithm().getHeight();
+      }
     }
 
     Lane newLane = new Lane();

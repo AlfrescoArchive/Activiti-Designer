@@ -154,11 +154,14 @@ public class DeleteLaneFeature extends DefaultDeleteFeature {
       toDeleteSequenceFlows.add(outgoingSequenceFlow);
     }
     for (SequenceFlow deleteObject : toDeleteSequenceFlows) {
-      IRemoveContext rc = new RemoveContext(getFeatureProvider().getPictogramElementForBusinessObject(deleteObject));
-      IFeatureProvider featureProvider = getFeatureProvider();
-      IRemoveFeature removeFeature = featureProvider.getRemoveFeature(rc);
-      if (removeFeature != null) {
-        removeFeature.remove(rc);
+      PictogramElement deleteElement = getFeatureProvider().getPictogramElementForBusinessObject(deleteObject);
+      if (deleteElement != null) {
+        IRemoveContext rc = new RemoveContext(deleteElement);
+        IFeatureProvider featureProvider = getFeatureProvider();
+        IRemoveFeature removeFeature = featureProvider.getRemoveFeature(rc);
+        if (removeFeature != null) {
+          removeFeature.remove(rc);
+        }
       }
       
       BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));

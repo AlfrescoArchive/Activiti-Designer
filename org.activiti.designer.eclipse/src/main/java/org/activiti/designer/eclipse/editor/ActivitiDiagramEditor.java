@@ -520,7 +520,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
         
         for (Process process : model.getBpmnModel().getProcesses()) {
           drawFlowElements(process.getFlowElements(), model.getBpmnModel().getLocationMap(), diagram, process);
-          drawArtifacts(process.getArtifacts(), model.getBpmnModel().getLocationMap(), diagram, process);
+          drawArtifacts(process, model.getBpmnModel().getLocationMap(), diagram, process);
         }
         drawAllFlows(model);
         drawMessageFlows(model.getBpmnModel().getMessageFlows().values(), model);
@@ -561,6 +561,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     return pictElement;
   }
 
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   protected void drawFlowElements(Collection<FlowElement> elementList, Map<String, GraphicInfo> locationMap, ContainerShape parentShape, Process process) {
 
     final IFeatureProvider featureProvider = getDiagramTypeProvider().getFeatureProvider();
@@ -778,7 +779,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     return new Point(location.x + containerShape.getGraphicsAlgorithm().getX(), location.y + containerShape.getGraphicsAlgorithm().getY());
   }
   
-  private void drawMessageFlows(final Collection<MessageFlow> messageFlows, final BpmnMemoryModel model) {
+  protected void drawMessageFlows(final Collection<MessageFlow> messageFlows, final BpmnMemoryModel model) {
 
     for (final MessageFlow messageFlow : messageFlows) {
     
@@ -833,13 +834,13 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     }
   }
 
-  private void drawArtifacts(final Collection<Artifact> artifacts, final Map<String, GraphicInfo> locationMap, final ContainerShape parent,
-          final Process process) {
+  protected void drawArtifacts(final FlowElementsContainer container, final Map<String, GraphicInfo> locationMap, 
+      final ContainerShape parent, final Process process) {
 
     final IFeatureProvider featureProvider = getDiagramTypeProvider().getFeatureProvider();
 
     final List<Artifact> artifactsWithoutDI = new ArrayList<Artifact>();
-    for (final Artifact artifact : artifacts) {
+    for (final Artifact artifact : container.getArtifacts()) {
 
       if (artifact instanceof Association) {
         continue;
@@ -862,7 +863,25 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 
         ContainerShape parentContainer = null;
         if (parent instanceof Diagram) {
-          parentContainer = getParentContainer(artifact.getId(), process, (Diagram) parent);
+          FlowElement connectingElement = null;
+          for (final Artifact associationArtifact : container.getArtifacts()) {
+            if (associationArtifact instanceof Association) {
+              Association association = (Association) associationArtifact;
+              
+              if (association.getSourceRef().equals(artifact.getId())) {
+                connectingElement = container.getFlowElement(association.getTargetRef());
+                
+              } else if (association.getTargetRef().equals(artifact.getId())) {
+                connectingElement = container.getFlowElement(association.getSourceRef());
+              }
+            }
+          }
+          
+          if (connectingElement != null) {
+            parentContainer = getParentContainer(connectingElement.getId(), process, (Diagram) parent);
+          } else {
+            parentContainer = parent;
+          }
         } else {
           parentContainer = parent;
         }
@@ -884,11 +903,18 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     }
 
     for (final Artifact artifact : artifactsWithoutDI) {
-      artifacts.remove(artifact);
+      container.getArtifacts().remove(artifact);
+    }
+    
+    for (FlowElement flowElement : container.getFlowElements()) {
+      if (flowElement instanceof SubProcess) {
+        ContainerShape subProcessShape = (ContainerShape) featureProvider.getPictogramElementForBusinessObject(flowElement);
+        drawArtifacts((SubProcess) flowElement, locationMap, subProcessShape, process);
+      }
     }
   }
 
-  private void drawAllFlows(BpmnMemoryModel model) {
+  protected void drawAllFlows(BpmnMemoryModel model) {
     BpmnModel bpmnModel = model.getBpmnModel();
 
     for (Process process : bpmnModel.getProcesses()) {
@@ -897,7 +923,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     }
   }
 
-  private void drawSequenceFlowsInList(Collection<FlowElement> flowList, BpmnMemoryModel model) {
+  protected void drawSequenceFlowsInList(Collection<FlowElement> flowList, BpmnMemoryModel model) {
     for (FlowElement flowElement : flowList) {
 
       if (flowElement instanceof SubProcess) {
@@ -913,7 +939,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     }
   }
 
-  private void drawSequenceFlow(SequenceFlow sequenceFlow, BpmnMemoryModel model) {
+  protected void drawSequenceFlow(SequenceFlow sequenceFlow, BpmnMemoryModel model) {
     Anchor sourceAnchor = null;
     Anchor targetAnchor = null;
     ContainerShape sourceShape = (ContainerShape) getDiagramTypeProvider().getFeatureProvider().getPictogramElementForBusinessObject(
@@ -964,7 +990,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     getDiagramTypeProvider().getFeatureProvider().addIfPossible(addContext);
   }
 
-  private void drawAssociationsInList(Collection<Artifact> artifactList, BpmnMemoryModel model) {
+  protected void drawAssociationsInList(Collection<Artifact> artifactList, BpmnMemoryModel model) {
     for (Artifact artifact : artifactList) {
 
       if (artifact instanceof Association == false) {
@@ -976,8 +1002,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     }
   }
 
-  private void drawAssociation(Association association, BpmnMemoryModel model) {
-
+  protected void drawAssociation(Association association, BpmnMemoryModel model) {
     Anchor sourceAnchor = null;
     Anchor targetAnchor = null;
     BaseElement sourceElement = model.getFlowElement(association.getSourceRef());

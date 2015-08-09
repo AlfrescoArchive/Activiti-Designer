@@ -9,6 +9,7 @@ import org.activiti.bpmn.model.Association;
 import org.activiti.bpmn.model.BaseElement;
 import org.activiti.bpmn.model.BoundaryEvent;
 import org.activiti.bpmn.model.FlowElement;
+import org.activiti.bpmn.model.FlowElementsContainer;
 import org.activiti.bpmn.model.Lane;
 import org.activiti.bpmn.model.MessageFlow;
 import org.activiti.bpmn.model.Pool;
@@ -214,7 +215,8 @@ public class ActivitiUiUtil {
         if (featureClass.equals(Lane.class)) {
           determinedId = loopThroughLanes(featureClass, determinedId, process.getLanes(), featureIdKey);
         } else if (featureClass.equals(TextAnnotation.class) || featureClass.equals(Association.class)) {
-          determinedId = loopThroughArtifacts(featureClass, determinedId, process.getArtifacts(), featureIdKey);
+          determinedId = loopThroughArtifacts(featureClass, determinedId, process, featureIdKey);
+          
         } else if (featureClass.equals(MessageFlow.class)) {
           determinedId = loopThroughMessageFlows(determinedId, model.getBpmnModel().getMessageFlows().values(), featureIdKey);
         } else {
@@ -247,12 +249,19 @@ public class ActivitiUiUtil {
   }
   
   public static int loopThroughArtifacts(final Class<? extends BaseElement> featureClass, int determinedId, 
-      Collection<Artifact> artifactList, final String featureIdKey) {
+      FlowElementsContainer container, final String featureIdKey) {
     
-    for (Artifact artifact : artifactList) {
+    for (Artifact artifact : container.getArtifacts()) {
       String contentObjectId = artifact.getId().replace(featureIdKey, "");
       determinedId = getId(contentObjectId, determinedId);
     }
+    
+    for (FlowElement element : container.getFlowElements()) {
+      if (element instanceof SubProcess) {
+        determinedId = loopThroughArtifacts(featureClass, determinedId, (SubProcess) element, featureIdKey);
+      }
+    }
+    
     return determinedId;
   }
   
@@ -271,11 +280,11 @@ public class ActivitiUiUtil {
   	
   	for (FlowElement element : elementList) {
       
-      if(element instanceof SubProcess) {
+      if (element instanceof SubProcess) {
       	determinedId = loopThroughElements(featureClass, determinedId, ((SubProcess) element).getFlowElements(), featureIdKey);
       }
       
-      if(featureClass == BoundaryEvent.class && element instanceof Activity) {
+      if (featureClass == BoundaryEvent.class && element instanceof Activity) {
       	Activity activity = (Activity) element;
       	for (BoundaryEvent boundaryEvent : activity.getBoundaryEvents()) {
       	  if (boundaryEvent.getId() != null) {
