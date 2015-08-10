@@ -33,7 +33,7 @@ public class PropertyMessageStartEventSection extends ActivitiPropertySection im
   protected Object getModelValueForControl(Control control, Object businessObject) {
     Event event = (Event) businessObject;
     if (control == messageCombo) {
-      return MessagePropertyUtil.getMessageValue(event, getDiagram());
+      return MessagePropertyUtil.getMessageValue(event, getDiagram(), getDiagramContainer());
     }
     return null;
   }

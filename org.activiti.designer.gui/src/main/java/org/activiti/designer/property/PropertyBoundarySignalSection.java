@@ -38,7 +38,7 @@ public class PropertyBoundarySignalSection extends ActivitiPropertySection imple
       return String.valueOf(event.isCancelActivity());
       
     } else if (control == signalCombo) {
-      return SignalPropertyUtil.getSignalValue(event, getDiagram());
+      return SignalPropertyUtil.getSignalValue(event, getDiagram(), getDiagramContainer());
     }
     return null;
   }

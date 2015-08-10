@@ -7,11 +7,14 @@ import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.bpmn.model.Event;
 import org.activiti.bpmn.model.Message;
 import org.activiti.bpmn.model.MessageEventDefinition;
+import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
+import org.eclipse.graphiti.platform.IDiagramContainer;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Combo;
 
@@ -37,12 +40,12 @@ public class MessagePropertyUtil {
   }
 
 
-  public static String getMessageValue(Event event, Diagram diagram) {
+  public static String getMessageValue(final Event event, final Diagram diagram, final IDiagramContainer diagramContainer) {
     if (event.getEventDefinitions().get(0) != null) {
-      MessageEventDefinition messageDefinition = (MessageEventDefinition) event.getEventDefinitions().get(0);
+      final MessageEventDefinition messageDefinition = (MessageEventDefinition) event.getEventDefinitions().get(0);
+      final BpmnMemoryModel memoryModel = ModelHandler.getModel(EcoreUtil.getURI(diagram));
+      final BpmnModel model = memoryModel.getBpmnModel();
       if (StringUtils.isNotEmpty(messageDefinition.getMessageRef())) {
-        BpmnMemoryModel memoryModel = ModelHandler.getModel(EcoreUtil.getURI(diagram));
-        BpmnModel model = memoryModel.getBpmnModel();
         for (Message message : model.getMessages()) {
           if (message.getId() != null && message.getId().equals(messageDefinition.getMessageRef())) {
             return message.getName() + " (" + message.getId() + ")";
@@ -50,7 +53,18 @@ public class MessagePropertyUtil {
         }
         
       } else {
-        return "message";
+        if (model.getMessages().size() > 0) {
+          final Runnable runnable = new Runnable() {
+            public void run() {
+              Message message = model.getMessages().iterator().next();
+              messageDefinition.setMessageRef(message.getId());
+            }
+          };
+          
+          TransactionalEditingDomain editingDomain = diagramContainer.getDiagramBehavior().getEditingDomain();
+          ActivitiUiUtil.runModelChange(runnable, editingDomain, "Model Update");
+          
+        }
       }
     }
     return null;

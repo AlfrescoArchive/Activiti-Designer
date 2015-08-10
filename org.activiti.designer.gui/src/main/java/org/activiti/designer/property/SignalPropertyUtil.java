@@ -6,11 +6,14 @@ import org.activiti.bpmn.model.BpmnModel;
 import org.activiti.bpmn.model.Event;
 import org.activiti.bpmn.model.Signal;
 import org.activiti.bpmn.model.SignalEventDefinition;
+import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
+import org.eclipse.graphiti.platform.IDiagramContainer;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.Combo;
 
@@ -33,12 +36,12 @@ public class SignalPropertyUtil {
   }
 
 
-  public static String getSignalValue(Event event, Diagram diagram) {
+  public static String getSignalValue(final Event event, final Diagram diagram, final IDiagramContainer diagramContainer) {
     if (event.getEventDefinitions().get(0) != null) {
-      SignalEventDefinition signalDefinition = (SignalEventDefinition) event.getEventDefinitions().get(0);
+      final SignalEventDefinition signalDefinition = (SignalEventDefinition) event.getEventDefinitions().get(0);
+      final BpmnMemoryModel memoryModel = ModelHandler.getModel(EcoreUtil.getURI(diagram));
+      final BpmnModel model = memoryModel.getBpmnModel();
       if (StringUtils.isNotEmpty(signalDefinition.getSignalRef())) {
-        BpmnMemoryModel memoryModel = ModelHandler.getModel(EcoreUtil.getURI(diagram));
-        BpmnModel model = memoryModel.getBpmnModel();
         for (Signal signal : model.getSignals()) {
           if (signal.getId() != null && signal.getId().equals(signalDefinition.getSignalRef())) {
             return signal.getName() + " (" + signal.getId() + ")";
@@ -46,7 +49,17 @@ public class SignalPropertyUtil {
         }
         
       } else {
-        return "signal";
+        if (model.getSignals().size() > 0) {
+          final Runnable runnable = new Runnable() {
+            public void run() {
+              Signal signal = model.getSignals().iterator().next();
+              signalDefinition.setSignalRef(signal.getId());
+            }
+          };
+          
+          TransactionalEditingDomain editingDomain = diagramContainer.getDiagramBehavior().getEditingDomain();
+          ActivitiUiUtil.runModelChange(runnable, editingDomain, "Model Update");
+        }
       }
     }
     return null;

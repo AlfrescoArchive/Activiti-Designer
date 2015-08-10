@@ -36,7 +36,7 @@ public class PropertyBoundaryMessageSection extends ActivitiPropertySection impl
       return String.valueOf(event.isCancelActivity());
       
     } else if (control == messageCombo) {
-      return MessagePropertyUtil.getMessageValue(event, getDiagram());
+      return MessagePropertyUtil.getMessageValue(event, getDiagram(), getDiagramContainer());
     }
     return null;
   }

@@ -29,7 +29,7 @@ public class PropertySignalStartEventSection extends ActivitiPropertySection imp
   protected Object getModelValueForControl(Control control, Object businessObject) {
     Event event = (Event) businessObject;
     if (control == signalCombo) {
-      return SignalPropertyUtil.getSignalValue(event, getDiagram());
+      return SignalPropertyUtil.getSignalValue(event, getDiagram(), getDiagramContainer());
     }
     return null;
   }
