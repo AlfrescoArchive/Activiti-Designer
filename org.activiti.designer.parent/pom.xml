@@ -4,7 +4,7 @@
 
 	<groupId>org.activiti.designer</groupId>
 	<artifactId>org.activiti.designer.parent</artifactId>
-	<version>5.18.0-SNAPSHOT</version>
+	<version>5.18.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 
 	<name>Activiti Designer - Parent project</name>
