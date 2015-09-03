@@ -32,8 +32,11 @@ import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.bpmn.model.Transaction;
 import org.activiti.designer.PluginImage;
+import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
+import org.activiti.designer.util.preferences.Preferences;
+import org.activiti.designer.util.preferences.PreferencesUtil;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.IResizeShapeContext;
@@ -208,6 +211,7 @@ public class ContainerResizeFeature extends DefaultResizeShapeFeature {
     
     int newX = shape.getGraphicsAlgorithm().getX();
     int newY = shape.getGraphicsAlgorithm().getY();
+    boolean enableMultiDiagram = PreferencesUtil.getBooleanPreference(Preferences.EDITOR_ENABLE_MULTI_DIAGRAM, ActivitiPlugin.getDefault());
     
     if (bo instanceof SubProcess) {
       SubProcess subProcess = (SubProcess) bo;
@@ -218,39 +222,55 @@ public class ContainerResizeFeature extends DefaultResizeShapeFeature {
           boundaryElement.getGraphicsAlgorithm().setY(boundaryElement.getGraphicsAlgorithm().getY() + deltaHeight);
         }
       }
-      moveSubProcessElements(subProcess, oldX, oldY, newX, newY);
-      
-      List<Shape> childShapes = ((ContainerShape) context.getShape()).getChildren();
-      for (Shape childShape : childShapes) {
-        if (childShape.getGraphicsAlgorithm() != null) {
-          if (childShape.getGraphicsAlgorithm() instanceof Image) {
-            Image image = (Image) childShape.getGraphicsAlgorithm();
-            
-            if (image.getId().endsWith(PluginImage.IMG_MULTIINSTANCE_SEQUENTIAL.getImageKey()) || 
-                    image.getId().endsWith(PluginImage.IMG_MULTIINSTANCE_PARALLEL.getImageKey())) {
-              
-              final int iconWidthAndHeight = 12;
-              final int xPos = (context.getShape().getGraphicsAlgorithm().getWidth() / 2) - (iconWidthAndHeight / 2);
-              final int yPos = context.getShape().getGraphicsAlgorithm().getHeight() - iconWidthAndHeight;
 
-              image.setX(xPos);
+    if (enableMultiDiagram) {
+      context.getShape().getGraphicsAlgorithm().setHeight(height);
+      context.getShape().getGraphicsAlgorithm().setWidth(width);
+    } else {
+      moveSubProcessElements(subProcess, oldX, oldY, newX, newY);
+    }
+
+    List<Shape> childShapes = ((ContainerShape) context.getShape()).getChildren();
+    for (Shape childShape : childShapes) {
+      if (childShape.getGraphicsAlgorithm() != null) {
+        if (childShape.getGraphicsAlgorithm() instanceof Image) {
+          Image image = (Image) childShape.getGraphicsAlgorithm();
+          boolean isSubprocess = image.getId().endsWith(PluginImage.IMG_SUBPROCESS_EXPANDED.getImageKey());
+
+          if (image.getId().endsWith(PluginImage.IMG_MULTIINSTANCE_SEQUENTIAL.getImageKey()) 
+              || image.getId().endsWith(PluginImage.IMG_MULTIINSTANCE_PARALLEL.getImageKey()) 
+              || (enableMultiDiagram && isSubprocess)) {
+
+            final int iconWidthAndHeight = 12;
+            final int xPos = (context.getShape().getGraphicsAlgorithm().getWidth() / 2) - (iconWidthAndHeight / 2);
+            if (isSubprocess) {
+              final int yPos = context.getShape().getGraphicsAlgorithm().getHeight() - iconWidthAndHeight-2;
               image.setY(yPos);
-            
-            } else if (image.getId().endsWith(PluginImage.IMG_ACTIVITY_COMPENSATION.getImageKey())) {
-              
-              final int iconWidthAndHeight = 12;
-              final int xPos = (context.getShape().getGraphicsAlgorithm().getWidth() / 2) - (iconWidthAndHeight / 2) + iconWidthAndHeight + 5;
+            } else {
               final int yPos = context.getShape().getGraphicsAlgorithm().getHeight() - iconWidthAndHeight;
-    
-              image.setX(xPos);
               image.setY(yPos);
-            } 
-          }
+            }
+
+            image.setX(xPos);
+
+          } else if (image.getId().endsWith(PluginImage.IMG_ACTIVITY_COMPENSATION.getImageKey())) {
+
+            final int iconWidthAndHeight = 12;
+            final int xPos = (context.getShape().getGraphicsAlgorithm().getWidth() / 2) - (iconWidthAndHeight / 2) + iconWidthAndHeight + 5;
+            final int yPos = context.getShape().getGraphicsAlgorithm().getHeight() - iconWidthAndHeight;
+
+            image.setX(xPos);
+            image.setY(yPos);
+          } 
+        } else if (enableMultiDiagram && childShape.getGraphicsAlgorithm() instanceof Text) {
+          Text text = (Text)childShape.getGraphicsAlgorithm();
+          Graphiti.getGaService().setLocationAndSize(text, 0, 0, width, 20);
         }
       }
     }
   }
-  
+}
+
   protected void moveSubProcessElements(SubProcess subProcess, int oldX, int oldY, int newX, int newY) {
     int deltaX = 0;
     int deltaY = 0;

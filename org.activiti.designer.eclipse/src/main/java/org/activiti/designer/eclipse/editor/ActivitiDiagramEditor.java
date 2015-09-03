@@ -108,9 +108,15 @@ public class ActivitiDiagramEditor extends DiagramEditor {
   private static GraphicalViewer activeGraphicalViewer;
 
   private TransactionalEditingDomain transactionalEditingDomain;
+  
+  private List<ActivitiDiagramEditor> childEditors = new ArrayList<ActivitiDiagramEditor>();
 
   public ActivitiDiagramEditor() {
     super();
+  }
+
+  public List<ActivitiDiagramEditor> getChildEditors() {
+    return childEditors;
   }
 
   @Override
@@ -171,8 +177,13 @@ public class ActivitiDiagramEditor extends DiagramEditor {
       final String diagramFileString = dataFile.getLocationURI().getPath();
       BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagramTypeProvider().getDiagram()));
 
-      // Save the bpmn diagram file
-      doSaveToBpmn(model, diagramFileString);
+      if (PreferencesUtil.getBooleanPreference(Preferences.EDITOR_ENABLE_MULTI_DIAGRAM, ActivitiPlugin.getDefault())
+          && null != adei.getParentEditor()) {
+        // Save the bpmn diagram file
+        doSaveToBpmn(model, this, null, null);
+      } else {
+        doSaveToBpmn(model, diagramFileString);
+      }
 
       // Save an image of the diagram
       doSaveImage(diagramFileString, model);
@@ -183,9 +194,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 
       // Invoke export marshallers to produce additional output
       doInvokeExportMarshallers(model);
-
     } catch (Exception e) {
-      // TODO Auto-generated catch block
       e.printStackTrace();
     }
 
@@ -213,6 +222,48 @@ public class ActivitiDiagramEditor extends DiagramEditor {
       messageBox.setMessage("Error while saving the model " + e.getLocalizedMessage());
       messageBox.open();
     }
+
+  }
+
+  protected void doSaveToBpmn(final BpmnMemoryModel model, ActivitiDiagramEditor editor, Map<String, GraphicInfo> locationMap, Map<String, List<GraphicInfo>> flowLocationMap) throws Exception {
+    final ActivitiDiagramEditorInput adei = (ActivitiDiagramEditorInput)editor.getEditorInput();
+
+    final IFeatureProvider featureProvider = editor.getDiagramTypeProvider().getFeatureProvider();
+    new GraphitiToBpmnDI(model, featureProvider).processGraphitiElements();
+    if (null != locationMap)
+      model.getBpmnModel().getLocationMap().putAll(locationMap);
+    if (null != flowLocationMap)
+      model.getBpmnModel().getFlowLocationMap().putAll(flowLocationMap);
+    if (null != adei.getParentEditor()) {
+      Process process = model.getBpmnModel().getMainProcess();
+      BpmnMemoryModel pModel = ModelHandler.getModel(EcoreUtil.getURI(adei.getParentEditor().getDiagramTypeProvider().getDiagram()));
+      SubProcess subprocess= adei.getSubprocess();
+      subprocess.setName(process.getName());
+      subprocess.setDocumentation(process.getDocumentation());
+
+      subprocess.getArtifacts().clear();
+      subprocess.getArtifacts().addAll(process.getArtifacts());
+
+      subprocess.getFlowElements().clear();
+      subprocess.getFlowElements().addAll(process.getFlowElements());
+
+      subprocess.getDataObjects().clear();
+      subprocess.getDataObjects().addAll(process.getDataObjects());
+
+      doSaveToBpmn(pModel,adei.getParentEditor(),model.getBpmnModel().getLocationMap(),model.getBpmnModel().getFlowLocationMap());
+    }
+
+    final IFile dataFile = adei.getDataFile();
+    final String diagramFileString = dataFile.getLocationURI().getPath();
+    BpmnXMLConverter converter = new BpmnXMLConverter();
+    byte[] xmlBytes = converter.convertToXML(model.getBpmnModel());
+    File objectsFile = new File(diagramFileString);
+    FileOutputStream fos = new FileOutputStream(objectsFile);
+    fos.write(xmlBytes);
+    fos.close();
+
+    ((BasicCommandStack)editor.getEditingDomain().getCommandStack()).saveIsDone();
+    editor.updateDirtyState();
 
   }
 
@@ -700,7 +751,8 @@ public class ActivitiDiagramEditor extends DiagramEditor {
           PictogramElement newContainer = addFeature.add(context);
           featureProvider.link(newContainer, new Object[] { flowElement });
 
-          if (flowElement instanceof SubProcess) {
+          if (!PreferencesUtil.getBooleanPreference(Preferences.EDITOR_ENABLE_MULTI_DIAGRAM, ActivitiPlugin.getDefault())
+              && flowElement instanceof SubProcess) {
             drawFlowElements(((SubProcess) flowElement).getFlowElements(), locationMap, (ContainerShape) newContainer, process);
           }
         }
@@ -926,7 +978,8 @@ public class ActivitiDiagramEditor extends DiagramEditor {
   protected void drawSequenceFlowsInList(Collection<FlowElement> flowList, BpmnMemoryModel model) {
     for (FlowElement flowElement : flowList) {
 
-      if (flowElement instanceof SubProcess) {
+      if (!PreferencesUtil.getBooleanPreference(Preferences.EDITOR_ENABLE_MULTI_DIAGRAM, ActivitiPlugin.getDefault()) 
+          && flowElement instanceof SubProcess) {
         drawSequenceFlowsInList(((SubProcess) flowElement).getFlowElements(), model);
         drawAssociationsInList(((SubProcess) flowElement).getArtifacts(), model);
 
@@ -1085,6 +1138,11 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     super.dispose();
 
     final ActivitiDiagramEditorInput adei = (ActivitiDiagramEditorInput) getEditorInput();
+
+    // if using multipane editor feature, then close any child diagram panes
+    for (ActivitiDiagramEditor editor : getChildEditors()) {
+      editor.close();
+    }
 
     ModelHandler.removeModel(EcoreUtil.getURI(getDiagramTypeProvider().getDiagram()));
     Bpmn2DiagramCreator.dispose(adei.getDiagramFile());

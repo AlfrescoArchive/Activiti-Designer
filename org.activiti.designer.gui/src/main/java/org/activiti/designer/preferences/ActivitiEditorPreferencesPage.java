@@ -19,6 +19,8 @@ public class ActivitiEditorPreferencesPage extends FieldEditorPreferencePage imp
 				"&Automatically create a label when adding a new sequence flow", getFieldEditorParent()));
 		addField(new BooleanFieldEditor(Preferences.EDITOR_ADD_DEFAULT_CONTENT_TO_DIAGRAMS.getPreferenceId(),
 				"&Create default diagram content when creating new diagrams and subprocesses", getFieldEditorParent()));
+		addField(new BooleanFieldEditor(Preferences.EDITOR_ENABLE_MULTI_DIAGRAM.getPreferenceId(),
+				"&Enable multidiagram editing for subprocesses", getFieldEditorParent()));
 	}
 
 	@Override

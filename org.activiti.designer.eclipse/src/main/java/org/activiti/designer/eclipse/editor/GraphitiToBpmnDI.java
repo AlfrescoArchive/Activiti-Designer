@@ -18,7 +18,10 @@ import org.activiti.bpmn.model.Pool;
 import org.activiti.bpmn.model.Process;
 import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.bpmn.model.SubProcess;
+import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.util.editor.BpmnMemoryModel;
+import org.activiti.designer.util.preferences.Preferences;
+import org.activiti.designer.util.preferences.PreferencesUtil;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.graphiti.datatypes.ILocation;
@@ -153,7 +156,8 @@ public class GraphitiToBpmnDI {
           updateSequenceFlow((SequenceFlow) element);
         } else if (element instanceof FlowElement) {
           updateFlowElement(element);
-          if (element instanceof SubProcess) {
+          if (!PreferencesUtil.getBooleanPreference(Preferences.EDITOR_ENABLE_MULTI_DIAGRAM, ActivitiPlugin.getDefault()) 
+              && element instanceof SubProcess) {
             SubProcess subProcess = (SubProcess) element;
             loopThroughElements(subProcess.getFlowElements(), subProcess);
             loopThroughElements(subProcess.getArtifacts(), subProcess);
