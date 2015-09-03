@@ -209,8 +209,8 @@ public class OpenSubProcessEditorFeature extends AbstractDrillDownFeature {
       @Override
       public void run() {
         try {
-          IDE.openEditor(workbench.getActiveWorkbenchWindow().getActivePage(), result,
-              ActivitiConstants.DIAGRAM_EDITOR_ID);
+          ActivitiDiagramEditor childEditor = (ActivitiDiagramEditor)IDE.openEditor(workbench.getActiveWorkbenchWindow().getActivePage(), result, ActivitiConstants.DIAGRAM_EDITOR_ID);
+          diagramEditor.getChildEditors().add(childEditor);
         } catch (PartInitException exception) {
           exception.printStackTrace();
         }
