@@ -12,6 +12,8 @@ import org.activiti.designer.util.bpmn.BpmnExtensionUtil;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.platform.OSEnum;
 import org.activiti.designer.util.platform.OSUtil;
+import org.activiti.designer.util.preferences.Preferences;
+import org.activiti.designer.util.preferences.PreferencesUtil;
 import org.activiti.designer.util.style.StyleUtil;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.graphiti.features.IDirectEditingInfo;
@@ -66,10 +68,17 @@ public class SubProcessShapeController extends AbstractBusinessObjectShapeContro
     Diagram diagram = getFeatureProvider().getDiagramTypeProvider().getDiagram();
     final SubProcess addedSubProcess = (SubProcess) businessObject;
     
+    boolean enableMultiDiagram = PreferencesUtil.getBooleanPreference(Preferences.EDITOR_ENABLE_MULTI_DIAGRAM, ActivitiPlugin.getDefault());
+
     // check whether the context has a size (e.g. from a create feature)
     // otherwise define a default size for the shape
-    width = width <= 0 ? 205 : width;
-    height = height <= 0 ? 205 : height;
+    if (!enableMultiDiagram) {
+      width = width <= 0 ? 205 : width;
+      height = height <= 0 ? 205 : height;
+    } else {
+      width = width <= 0 ? 105 : width;
+      height = height <= 0 ? 55 : height;
+    }
 
     // create invisible outer rectangle expanded by
     // the width needed for the anchor
@@ -135,7 +144,13 @@ public class SubProcessShapeController extends AbstractBusinessObjectShapeContro
     // direct editing shall be opened after object creation
     directEditingInfo.setPictogramElement(shape);
     directEditingInfo.setGraphicsAlgorithm(text);
-    
+
+    if (enableMultiDiagram) {
+      final Shape expandShape = peCreateService.createShape(containerShape, false);
+      Image expandImage = gaService.createImage(expandShape, PluginImage.IMG_SUBPROCESS_EXPANDED.getImageKey());
+      gaService.setLocationAndSize(expandImage, (width - IMAGE_SIZE) / 2, (height - IMAGE_SIZE) - 2, IMAGE_SIZE, IMAGE_SIZE);
+    }
+
     // add a chopbox anchor to the shape
     peCreateService.createChopboxAnchor(containerShape);
 

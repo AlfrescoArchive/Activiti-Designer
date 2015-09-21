@@ -4,8 +4,13 @@ import org.activiti.bpmn.model.Lane;
 import org.activiti.bpmn.model.Pool;
 import org.activiti.bpmn.model.Process;
 import org.activiti.designer.PluginImage;
+import org.activiti.designer.eclipse.common.ActivitiPlugin;
+import org.activiti.designer.eclipse.editor.ActivitiDiagramEditor;
+import org.activiti.designer.eclipse.editor.ActivitiDiagramEditorInput;
 import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
+import org.activiti.designer.util.preferences.Preferences;
+import org.activiti.designer.util.preferences.PreferencesUtil;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IAddFeature;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -26,10 +31,21 @@ public class CreatePoolFeature extends AbstractCreateBPMNFeature {
 
   @Override
   public boolean canCreate(ICreateContext context) {
-    if (context.getTargetContainer() instanceof Diagram)
+    if (context.getTargetContainer() instanceof Diagram && !isInSubprocessEditor()) {
       return true;
+    } else{
+      return false;
+    }
+  }
 
-    return false;
+  private boolean isInSubprocessEditor() {
+    if (PreferencesUtil.getBooleanPreference(Preferences.EDITOR_ENABLE_MULTI_DIAGRAM, ActivitiPlugin.getDefault())) {
+      ActivitiDiagramEditor ade = (ActivitiDiagramEditor)getDiagramBehavior().getDiagramContainer();
+      ActivitiDiagramEditorInput adei = (ActivitiDiagramEditorInput)ade.getDiagramEditorInput();
+      return adei.getParentEditor() != null;
+    } else {
+      return false;
+    }
   }
 
   @Override

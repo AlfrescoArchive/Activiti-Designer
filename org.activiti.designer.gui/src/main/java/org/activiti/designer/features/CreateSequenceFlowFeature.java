@@ -14,6 +14,8 @@ import org.activiti.bpmn.model.StartEvent;
 import org.activiti.bpmn.model.SubProcess;
 import org.activiti.designer.PluginImage;
 import org.activiti.designer.eclipse.common.ActivitiPlugin;
+import org.activiti.designer.eclipse.editor.ActivitiDiagramEditor;
+import org.activiti.designer.eclipse.editor.ActivitiDiagramEditorInput;
 import org.activiti.designer.util.editor.ModelHandler;
 import org.activiti.designer.util.preferences.Preferences;
 import org.activiti.designer.util.preferences.PreferencesUtil;
@@ -125,6 +127,7 @@ public class CreateSequenceFlowFeature extends AbstractCreateBPMNConnectionFeatu
    */
   protected SequenceFlow createSequenceFlow(FlowNode source, FlowNode target, ICreateConnectionContext context) {
     SequenceFlow sequenceFlow = new SequenceFlow();
+    boolean enableMultiDiagram = PreferencesUtil.getBooleanPreference(Preferences.EDITOR_ENABLE_MULTI_DIAGRAM, ActivitiPlugin.getDefault());
 
     sequenceFlow.setId(getNextId());
     sequenceFlow.setSourceRef(source.getId());
@@ -151,6 +154,15 @@ public class CreateSequenceFlowFeature extends AbstractCreateBPMNConnectionFeatu
     if (parentContainer instanceof Diagram) {
       ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getBpmnModel().getMainProcess().addFlowElement(sequenceFlow);
 
+      if (enableMultiDiagram) {
+        ActivitiDiagramEditor editor = (ActivitiDiagramEditor)getDiagramBehavior().getDiagramContainer();
+        ActivitiDiagramEditorInput adei=(ActivitiDiagramEditorInput)editor.getDiagramEditorInput();
+        if (adei.getSubprocess()!=null)
+        {
+          final SubProcess subProcess = (SubProcess)adei.getSubprocess();
+          subProcess.addFlowElement(sequenceFlow);
+        }
+      }
     } else {
       Object parentObject = getBusinessObjectForPictogramElement(parentContainer);
       if (parentObject instanceof SubProcess) {

@@ -89,6 +89,7 @@ import org.activiti.designer.features.CreateTimerStartEventFeature;
 import org.activiti.designer.features.CreateTransactionFeature;
 import org.activiti.designer.features.CreateUserTaskFeature;
 import org.activiti.designer.features.DeletePoolFeature;
+import org.activiti.designer.features.OpenSubProcessEditorFeature;
 import org.activiti.designer.features.contextmenu.OpenCalledElementForCallActivity;
 import org.activiti.designer.integration.annotation.TaskName;
 import org.activiti.designer.integration.annotation.TaskNames;
@@ -201,12 +202,13 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
 
   @Override
   public ICustomFeature getDoubleClickFeature(IDoubleClickContext context) {
-    /*
-     * ICustomFeature customFeature = new
-     * ExpandCollapseSubProcessFeature(getFeatureProvider()); if
-     * (customFeature.canExecute(context)) { return customFeature; }
-     */
-    
+    if (PreferencesUtil.getBooleanPreference(Preferences.EDITOR_ENABLE_MULTI_DIAGRAM, ActivitiPlugin.getDefault())) {
+      ICustomFeature customFeature = new OpenSubProcessEditorFeature(getFeatureProvider());
+      if (customFeature.canExecute(context)) {
+        return customFeature;
+      }
+    }
+
     //open call activity called element
     openCallActivityCalledElement(context);
     
@@ -1008,34 +1010,6 @@ public class ActivitiToolBehaviorProvider extends DefaultToolBehaviorProvider {
     }
   }
 
-  private boolean subProcessDiagramExists(SubProcess subProcess) {
-    Resource resource = getDiagramTypeProvider().getDiagram().eResource();
-
-    URI uri = resource.getURI();
-    URI uriTrimmed = uri.trimFragment();
-
-    if (uriTrimmed.isPlatformResource()) {
-
-      String platformString = uriTrimmed.toPlatformString(true);
-
-      IResource fileResource = ResourcesPlugin.getWorkspace().getRoot().findMember(platformString);
-
-      if (fileResource != null) {
-        IProject project = fileResource.getProject();
-        final String parentDiagramName = uriTrimmed.trimFileExtension().lastSegment();
-
-        IFile file = project.getFile(String.format(ActivitiConstants.DIAGRAM_FOLDER + "%s.%s" + ActivitiConstants.DATA_FILE_EXTENSION,
-                parentDiagramName, subProcess.getId()));
-
-        Diagram diagram = GraphitiUiInternal.getEmfService().getDiagramFromFile(file, new ResourceSetImpl());
-
-        return diagram != null;
-      }
-    }
-    // Safe default assumption
-    return true;
-  }
-  
   //method for open call activity called element
   public void openCallActivityCalledElement(ICustomContext context) {
     if (context.getPictogramElements() != null) {

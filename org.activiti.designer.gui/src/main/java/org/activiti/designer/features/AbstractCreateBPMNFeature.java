@@ -17,9 +17,14 @@ import org.activiti.bpmn.model.Lane;
 import org.activiti.bpmn.model.Process;
 import org.activiti.bpmn.model.SequenceFlow;
 import org.activiti.bpmn.model.SubProcess;
+import org.activiti.designer.eclipse.common.ActivitiPlugin;
+import org.activiti.designer.eclipse.editor.ActivitiDiagramEditor;
+import org.activiti.designer.eclipse.editor.ActivitiDiagramEditorInput;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
+import org.activiti.designer.util.preferences.Preferences;
+import org.activiti.designer.util.preferences.PreferencesUtil;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
@@ -53,19 +58,37 @@ public abstract class AbstractCreateBPMNFeature extends AbstractCreateFeature {
   protected abstract String getFeatureIdKey();
 
   protected String getNextId(BaseElement element) {
-    return ActivitiUiUtil.getNextId(element.getClass(), getFeatureIdKey(), getDiagram());
+    if (!PreferencesUtil.getBooleanPreference(Preferences.EDITOR_ENABLE_MULTI_DIAGRAM, ActivitiPlugin.getDefault())) {
+      return ActivitiUiUtil.getNextId(element.getClass(), getFeatureIdKey(), getDiagram());
+    } else {
+      return ActivitiUiUtil.getNextId(element.getClass(), getFeatureIdKey(), getTopLevelDiagram());
+    }
   }
-  
+
+  private Diagram getTopLevelDiagram() {
+    ActivitiDiagramEditor editor = (ActivitiDiagramEditor)getDiagramBehavior().getDiagramContainer();
+    ActivitiDiagramEditorInput adei=(ActivitiDiagramEditorInput)editor.getDiagramEditorInput();
+    ActivitiDiagramEditor parent= adei.getParentEditor();
+    while (parent!=null) {
+      editor=parent;
+      adei=(ActivitiDiagramEditorInput)parent.getDiagramEditorInput();
+      parent =adei.getParentEditor();
+    }
+    return editor.getDiagramTypeProvider().getDiagram();
+  }
+
   protected String getNextId(BaseElement element, String featureIdKey) {
     return ActivitiUiUtil.getNextId(element.getClass(), featureIdKey, getDiagram());
   }
   
   public boolean canCreate(ICreateContext context) {
     Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-    return (context.getTargetContainer() instanceof Diagram || 
-            parentObject instanceof SubProcess || parentObject instanceof Lane);
+   return (context.getTargetContainer() instanceof Diagram
+           || (!PreferencesUtil.getBooleanPreference(Preferences.EDITOR_ENABLE_MULTI_DIAGRAM, ActivitiPlugin.getDefault())
+               && parentObject instanceof SubProcess)
+           || parentObject instanceof Lane);
   }
-  
+
   private void addFlowNodeOrArtifact(final BaseElement baseElement, final BaseElement container) {
     
     if (container instanceof Process) {
@@ -80,20 +103,34 @@ public abstract class AbstractCreateBPMNFeature extends AbstractCreateFeature {
       }
       
     } else if (container instanceof SubProcess) {
-      final SubProcess subProcess = (SubProcess) container;
-      
-      if (baseElement instanceof FlowElement) {
-        subProcess.addFlowElement((FlowElement) baseElement);
-      } else if (baseElement instanceof Artifact) {
-        subProcess.addArtifact((Artifact) baseElement);
+      if (!PreferencesUtil.getBooleanPreference(Preferences.EDITOR_ENABLE_MULTI_DIAGRAM, ActivitiPlugin.getDefault())) {
+        final SubProcess subProcess = (SubProcess) container;
+
+        if (baseElement instanceof FlowElement) {
+          subProcess.addFlowElement((FlowElement) baseElement);
+        } else if (baseElement instanceof Artifact) {
+          subProcess.addArtifact((Artifact) baseElement);
+        } else {
+          throw new IllegalArgumentException("BaseElement must be FlowElement or Artifact.");
+        }
       } else {
-        throw new IllegalArgumentException("BaseElement must be FlowElement or Artifact.");
+        ActivitiDiagramEditor editor = (ActivitiDiagramEditor)getDiagramBehavior().getDiagramContainer();
+        ActivitiDiagramEditorInput adei=(ActivitiDiagramEditorInput)editor.getDiagramEditorInput();
+        if (adei.getSubprocess() != null) {
+          final SubProcess subProcess = (SubProcess)adei.getSubprocess();
+
+          if (baseElement instanceof FlowElement) {
+            subProcess.addFlowElement((FlowElement)baseElement);
+          } else if (baseElement instanceof Artifact) {
+            subProcess.addArtifact((Artifact)baseElement);
+          }
+        }
       }
     } else {
       throw new IllegalArgumentException("Container must be Process or SubProcess.");
     }
   }
-  
+
   /**
    * Adds the given base element to the context. At first, a new ID is generated for the new object.
    * Depending on the type of element, it is added as artifact or flow element.
