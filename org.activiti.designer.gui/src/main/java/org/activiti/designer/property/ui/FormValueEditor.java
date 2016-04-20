@@ -1,5 +1,8 @@
 package org.activiti.designer.property.ui;
 
+import java.util.List;
+
+import org.activiti.bpmn.model.FormValue;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TableItem;
@@ -16,11 +19,9 @@ public class FormValueEditor extends TableFieldEditor {
     this.parent = parent;
   }
 
-  public void initialize(String formValues) {
+  public void initialize(List<FormValue> formValues) {
     removeTableItems();
-    if(formValues == null || formValues.length() == 0) return;
-    String[] formValueList = formValues.split(";");
-    for (String formValue : formValueList) {
+    for (FormValue formValue : formValues) {
       addTableItem(formValue);
     }
   }
@@ -40,13 +41,12 @@ public class FormValueEditor extends TableFieldEditor {
     return null;
   }
   
-  protected void addTableItem(String formValue) {
+  protected void addTableItem(FormValue formValue) {
     
     if(table != null) {
-    	String[] valueObject = formValue.split(":");
       TableItem tableItem = new TableItem(table, SWT.NONE);
-      tableItem.setText(0, valueObject[0]);
-      tableItem.setText(1, valueObject[1]);
+      tableItem.setText(0, formValue.getId());
+      tableItem.setText(1, formValue.getName());
     }
   }
 
