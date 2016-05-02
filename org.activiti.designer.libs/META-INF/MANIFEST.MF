@@ -225,4 +225,6 @@ Bundle-ClassPath: .,
  activiti-bpmn-model-5.20.0-SNAPSHOT.jar,
  activiti-image-generator-5.20.0-SNAPSHOT.jar,
  activiti-simple-workflow-5.20.0-SNAPSHOT.jar,
- activiti-simple-workflow-alfresco-5.20.0-SNAPSHOT.jar
+ activiti-simple-workflow-alfresco-5.20.0-SNAPSHOT.jar,
+ activiti-bpmn-model-5.21.0-SNAPSHOT.jar,
+ activiti-bpmn-converter-5.21.0-SNAPSHOT.jar
