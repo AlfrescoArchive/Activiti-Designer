@@ -39,7 +39,8 @@ public class ActivitiPropertyFilter extends AbstractPropertySectionFilter {
 	  boolean isMailTask = false;
 	  for (FieldExtension fieldExtension : serviceTask.getFieldExtensions()) {
 	    if ("script".equalsIgnoreCase(fieldExtension.getFieldName())) {
-	      if (fieldExtension.getStringValue().contains("mail.execute(bpm_package);")) {
+	      if ( (fieldExtension.getStringValue()!=null) && fieldExtension.getStringValue().contains("mail.execute(bpm_package);") || 
+	    	   (fieldExtension.getExpression()!=null) && fieldExtension.getExpression().contains("mail.execute(bpm_package);")  ) {
 	        isMailTask = true;
 	      }
 	    }
