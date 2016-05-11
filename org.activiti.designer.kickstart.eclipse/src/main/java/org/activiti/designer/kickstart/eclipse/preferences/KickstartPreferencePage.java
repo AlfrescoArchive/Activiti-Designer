@@ -44,6 +44,7 @@ public class KickstartPreferencePage extends FieldEditorPreferencePage implement
     addField(new StringFieldEditor(Preferences.CMIS_SHARE_CONFIG_PATH.getPreferenceId(), "CMIS Share config Path", getFieldEditorParent()));
     addField(new StringFieldEditor(Preferences.SHARE_RELOAD_URL.getPreferenceId(), "Share reload webscript URL", getFieldEditorParent()));
     addField(new BooleanFieldEditor(Preferences.SHARE_ENABLED.getPreferenceId(), "Share reload enabled", getFieldEditorParent()));
+    addField(new BooleanFieldEditor(Preferences.SKIP_REBUILD.getPreferenceId(), "Skip rebuild", getFieldEditorParent()));
     
     addSeparator();
     

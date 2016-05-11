@@ -20,6 +20,7 @@ import org.activiti.workflow.simple.definition.WorkflowDefinition;
 import org.apache.chemistry.opencmis.client.api.CmisObject;
 import org.apache.chemistry.opencmis.client.api.Folder;
 import org.apache.commons.lang.StringUtils;
+import org.apache.commons.io.FileUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -42,6 +43,7 @@ public class ExportKickstartProcessWizard extends Wizard implements IExportWizar
 
   protected IProject project;
   protected IResource processResource;
+  
 
   // Pages
   protected ExportKickstartProcessWizardProjectPage projectReferencePage;
@@ -51,6 +53,7 @@ public class ExportKickstartProcessWizard extends Wizard implements IExportWizar
   protected File repoFolder;
   protected File shareFolder;
   
+  protected IFolder currentDir;
   protected String error;
 
   public ExportKickstartProcessWizard() {
@@ -129,7 +132,8 @@ public class ExportKickstartProcessWizard extends Wizard implements IExportWizar
       }
 
     } else {
-      ensureTargetExists(monitor);
+    	if (!targetPage.isSkipRebuild()) ensureTargetExists(monitor);
+    	else ensureModifiedTargetExists(monitor);
     }
     
     if (error == null) {
@@ -140,7 +144,7 @@ public class ExportKickstartProcessWizard extends Wizard implements IExportWizar
         monitor.beginTask("Converting process", IProgressMonitor.UNKNOWN);
 
         boolean isCmis = Preferences.PROCESS_EXPORT_TYPE_CMIS.equals(targetPage.getTargetType());
-        
+
         // TODO: perhaps create once and share?
         AlfrescoSimpleWorkflowJsonConverter converter = new AlfrescoSimpleWorkflowJsonConverter();
         FileInputStream fis = new FileInputStream(processResource.getLocation().toFile());
@@ -152,10 +156,11 @@ public class ExportKickstartProcessWizard extends Wizard implements IExportWizar
             
         WorkflowDefinitionConversion definitionConversion = factory.createWorkflowDefinitionConversion(definition);
         definitionConversion.convert();
-
-        monitor.beginTask("Exporting artifacts", IProgressMonitor.UNKNOWN);
-        factory.getArtifactExporter().exportArtifacts(definitionConversion, repoFolder, shareFolder, isCmis);
-        
+	
+	    if (!targetPage.isSkipRebuild()){ //don't actually overwrite the existing files, only deploy them
+		    monitor.beginTask("Exporting artifacts", IProgressMonitor.UNKNOWN);
+	        factory.getArtifactExporter().exportArtifacts(definitionConversion, repoFolder, shareFolder, isCmis);
+        }
         
         if(isCmis) {
           // Upload the created files through CMIS
@@ -227,7 +232,12 @@ public class ExportKickstartProcessWizard extends Wizard implements IExportWizar
 
   protected void ensureTargetExists(IProgressMonitor monitor) {
     // Use the target folder of the project
-    IFolder target = project.getFolder("target");
+    //IFolder target = project.getFolder("target");
+
+	  //File cwd=new File(".")).getAbsolutePath();
+	 //IFolder target=projectIFolder target=System.getProperty("user.dir").getFolder("target");
+	  
+	IFolder target=currentDir.getFolder("target");
     try {
       if (!target.exists()) {
         target.create(true, true, monitor);
@@ -252,6 +262,54 @@ public class ExportKickstartProcessWizard extends Wizard implements IExportWizar
     }
   }
 
+  protected void ensureModifiedTargetExists(IProgressMonitor monitor) {
+	    // Use the target folder of the project
+	   // IFolder target = project.getFolder("modTarget");
+		IFolder target=currentDir.getFolder("modTarget");
+	    //IFolder dyntarget = project.getFolder("target");
+	    IFolder dyntarget = currentDir.getFolder("target");
+	    try {
+	      if (!target.exists()) {
+	        target.create(true, true, monitor);
+	      }
+	      // Create folders for repo and share
+	      IFolder repoTargetFolder = target.getFolder("repo");
+	      if (!repoTargetFolder.exists()) {
+	        repoTargetFolder.create(true, true, monitor);
+	        IFolder realdyntarget=dyntarget.getFolder("repo");
+	        if (realdyntarget.exists()){
+	        	copyAll (realdyntarget, repoTargetFolder);
+	        }
+	        
+	      }
+	      IFolder shareTargetFolder = target.getFolder("share");
+	      if (!shareTargetFolder.exists()) {
+	        shareTargetFolder.create(true, true, monitor);
+	        IFolder realdyntarget=dyntarget.getFolder("share");
+	        if (realdyntarget.exists()){
+	        	copyAll (realdyntarget, shareTargetFolder);
+	        }
+	      }
+
+	      shareFolder = shareTargetFolder.getLocation().toFile();
+	      repoFolder = repoTargetFolder.getLocation().toFile();
+	    } catch (CoreException e) {
+	      String errorMessage = "Failed to create modified target folder";
+	      targetPage.setErrorMessage(errorMessage);
+	      Logger.logError(errorMessage, e);
+	    }
+	  }  
+  
+  protected void copyAll (IFolder source, IFolder dest) {
+	  File sourceFolder = source.getLocation().toFile();
+      File destFolder = dest.getLocation().toFile();	  
+      try {
+		    FileUtils.copyDirectory(sourceFolder, destFolder);
+		} catch (IOException e) {
+		    e.printStackTrace();
+		}
+  }
+  
   protected void storePreferences() {
     IPreferenceStore preferences = PreferencesUtil.getActivitiDesignerPreferenceStore();
     
@@ -264,6 +322,7 @@ public class ExportKickstartProcessWizard extends Wizard implements IExportWizar
       preferences.setValue(Preferences.CMIS_MODELS_DELETE.getPreferenceId(), targetPage.isDeleteModels());
       preferences.setValue(Preferences.CMIS_WORKFLOW_DEFINITION_PATH.getPreferenceId(), targetPage.getCmisWorkflowDefinitionsPath());
       preferences.setValue(Preferences.CMIS_SHARE_CONFIG_PATH.getPreferenceId(), targetPage.getCmisSharePath());
+      preferences.setValue(Preferences.SKIP_REBUILD.getPreferenceId(), targetPage.isSkipRebuild());
       
       
       preferences.setValue(Preferences.SHARE_ENABLED.getPreferenceId(), targetPage.isEnableShare());
@@ -300,6 +359,8 @@ public class ExportKickstartProcessWizard extends Wizard implements IExportWizar
 
       if (selectedResource != null) {
         project = selectedResource.getProject();
+        
+        currentDir=(IFolder) selectedResource.getParent();
 
         if (selectedResource instanceof IFile) {
           IFile resourceFile = (IFile) selectedResource;
