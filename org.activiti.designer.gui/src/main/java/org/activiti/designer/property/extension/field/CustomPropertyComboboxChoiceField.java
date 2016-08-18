@@ -1,3 +1,16 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -18,11 +31,11 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.activiti.bpmn.model.Task;
+import org.activiti.designer.integration.annotation.PropertyItems;
 import org.activiti.designer.integration.servicetask.PropertyType;
-import org.activiti.designer.integration.servicetask.annotation.PropertyItems;
-import org.activiti.designer.integration.servicetask.validator.RequiredFieldValidator;
-import org.activiti.designer.property.PropertyCustomServiceTaskSection;
-import org.eclipse.bpmn2.ServiceTask;
+import org.activiti.designer.integration.validator.RequiredFieldValidator;
+import org.activiti.designer.property.AbstractPropertyCustomTaskSection;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.events.FocusListener;
@@ -43,8 +56,8 @@ public class CustomPropertyComboboxChoiceField extends AbstractCustomPropertyFie
 
   private Map<String, String> values;
 
-  public CustomPropertyComboboxChoiceField(final PropertyCustomServiceTaskSection section, final ServiceTask serviceTask, final Field field) {
-    super(section, serviceTask, field);
+  public CustomPropertyComboboxChoiceField(final AbstractPropertyCustomTaskSection section, final Task task, final Field field) {
+    super(section, task, field);
   }
 
   @Override
@@ -89,6 +102,10 @@ public class CustomPropertyComboboxChoiceField extends AbstractCustomPropertyFie
 
         final String[] itemValues = propertyItemsAnnotation.value();
 
+        if (itemValues.length % 2 != 0) {
+          throw new IllegalArgumentException("Only an even number of property items is supported, every label must have a value item");
+        }
+        
         values = new HashMap<String, String>();
         labels = new String[itemValues.length / 2];
 

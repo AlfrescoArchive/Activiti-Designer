@@ -1,3 +1,16 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -20,16 +33,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
-import org.activiti.designer.integration.servicetask.annotation.Help;
-import org.activiti.designer.integration.servicetask.annotation.Property;
-import org.activiti.designer.integration.servicetask.validator.FieldValidator;
-import org.activiti.designer.integration.servicetask.validator.ValidationException;
-import org.activiti.designer.property.PropertyCustomServiceTaskSection;
-import org.activiti.designer.property.extension.util.ExtensionUtil;
+import org.activiti.bpmn.model.ComplexDataType;
+import org.activiti.bpmn.model.CustomProperty;
+import org.activiti.bpmn.model.Task;
+import org.activiti.designer.eclipse.common.ActivitiPlugin;
+import org.activiti.designer.integration.annotation.Help;
+import org.activiti.designer.integration.annotation.Locale;
+import org.activiti.designer.integration.annotation.Locales;
+import org.activiti.designer.integration.annotation.Property;
+import org.activiti.designer.integration.validator.FieldValidator;
+import org.activiti.designer.integration.validator.ValidationException;
+import org.activiti.designer.property.AbstractPropertyCustomTaskSection;
+import org.activiti.designer.util.extension.ExtensionUtil;
+import org.activiti.designer.util.preferences.Preferences;
+import org.activiti.designer.util.preferences.PreferencesUtil;
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.bpmn2.ComplexDataType;
-import org.eclipse.bpmn2.CustomProperty;
-import org.eclipse.bpmn2.ServiceTask;
 import org.eclipse.swt.custom.CCombo;
 import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.RGB;
@@ -47,28 +65,30 @@ import org.eclipse.swt.widgets.Text;
  */
 public abstract class AbstractCustomPropertyField implements CustomPropertyField {
 
-  private static final RGB ERROR_COLOR = new RGB(255, 220, 220);
+  protected static final RGB ERROR_COLOR = new RGB(255, 220, 220);
 
-  private Map<Control, List<FieldValidator>> validators = new HashMap<Control, List<FieldValidator>>();
+  protected Map<Control, List<FieldValidator>> validators = new HashMap<Control, List<FieldValidator>>();
 
-  private final PropertyCustomServiceTaskSection section;
-  private final ServiceTask serviceTask;
-  private final String customPropertyId;
+  protected AbstractPropertyCustomTaskSection section;
+  protected Task task;
+  protected String customPropertyId;
 
-  private final Field field;
+  protected Field field;
 
-  private final Property propertyAnnotation;
-  private final Help helpAnnotation;
+  protected Property propertyAnnotation;
+  protected Help helpAnnotation;
+  protected Locales localesAnnotation;
 
-  public AbstractCustomPropertyField(final PropertyCustomServiceTaskSection section, final ServiceTask serviceTask, final Field field) {
+  public AbstractCustomPropertyField(final AbstractPropertyCustomTaskSection section, final Task task, final Field field) {
     this.section = section;
-    this.serviceTask = serviceTask;
+    this.task = task;
     this.customPropertyId = field.getName();
     this.field = field;
 
     // Read and save references to annotations to be used later
     this.propertyAnnotation = field.getAnnotation(Property.class);
     this.helpAnnotation = field.getAnnotation(Help.class);
+    this.localesAnnotation = field.getAnnotation(Locales.class);
   }
   @Override
   public String getCustomPropertyId() {
@@ -114,15 +134,13 @@ public abstract class AbstractCustomPropertyField implements CustomPropertyField
     try {
       this.validators.get(control).add(fieldValidatorClass.newInstance());
     } catch (Exception e) {
-      // TODO: handle
       // fail silently
     }
-
   }
 
   protected String getSimpleValueFromModel() {
     String result = null;
-    final CustomProperty property = ExtensionUtil.getCustomProperty(serviceTask, customPropertyId);
+    final CustomProperty property = ExtensionUtil.getCustomProperty(task, customPropertyId);
     if (property != null) {
       final String propertyValue = property.getSimpleValue();
       if (propertyValue != null) {
@@ -143,9 +161,27 @@ public abstract class AbstractCustomPropertyField implements CustomPropertyField
    */
   protected String getSimpleValueOrDefault() {
     String result = getSimpleValueFromModel();
-    if (result == null && StringUtils.isNotBlank(getPropertyAnnotation().defaultValue())) {
-      result = getPropertyAnnotation().defaultValue();
-    } else if (result == null) {
+    if (StringUtils.isEmpty(result)) {
+      String localeDefaultValue = null;
+      if (localesAnnotation != null && localesAnnotation.value() != null && localesAnnotation.value().length > 0) {
+        String defaultLanguage = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_DEFAULT_LANGUAGE, ActivitiPlugin.getDefault());
+        if (StringUtils.isNotEmpty(defaultLanguage)) {
+          for (Locale locale : localesAnnotation.value()) {
+            if (defaultLanguage.equalsIgnoreCase(locale.locale())) {
+              localeDefaultValue = locale.defaultValue();
+            }
+          }
+        }
+      }
+      
+      if (StringUtils.isNotEmpty(localeDefaultValue)) {  
+        result = localeDefaultValue;
+      } else if (StringUtils.isNotEmpty(getPropertyAnnotation().defaultValue())) {
+        result = getPropertyAnnotation().defaultValue();
+      }
+    }
+    
+    if (result == null) {
       result = "";
     }
     return result;
@@ -153,7 +189,7 @@ public abstract class AbstractCustomPropertyField implements CustomPropertyField
 
   protected ComplexDataType getComplexValueFromModel() {
     ComplexDataType result = null;
-    final CustomProperty property = ExtensionUtil.getCustomProperty(serviceTask, customPropertyId);
+    final CustomProperty property = ExtensionUtil.getCustomProperty(task, customPropertyId);
     if (property != null) {
       final ComplexDataType propertyValue = property.getComplexValue();
       if (propertyValue != null) {
@@ -175,7 +211,7 @@ public abstract class AbstractCustomPropertyField implements CustomPropertyField
     return this.field;
   }
 
-  protected PropertyCustomServiceTaskSection getSection() {
+  protected AbstractPropertyCustomTaskSection getSection() {
     return section;
   }
 

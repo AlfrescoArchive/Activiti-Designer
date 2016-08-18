@@ -1,7 +1,22 @@
 /**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/**
  * 
  */
 package org.activiti.designer.integration.servicetask;
+
+import org.activiti.designer.integration.DiagramBaseShape;
 
 /**
  * Interface for customizations of the default ServiceTask from BPMN.
@@ -10,7 +25,6 @@ package org.activiti.designer.integration.servicetask;
  * base class that implements this interface should be extended instead
  * 
  * @author Tiese Barrell
- * @version 1
  * @since 0.5.1
  * 
  */
@@ -88,14 +102,24 @@ public interface CustomServiceTask {
   DiagramBaseShape getDiagramBaseShape();
 
   /**
-   * Gets the name of the class to be used at runtime for this
-   * {@link CustomServiceTask}. This class is determined by the task's
-   * {@link org.activiti.designer.integration.servicetask.annotation.Runtime}
-   * annotation
+   * Gets the type of delegate defined by the {@link @Runtime} annotation.
    * 
-   * @return the canonical name of the runtime class
+   * @return the delegate type
    */
-  String getRuntimeClassname();
+  DelegateType getDelegateType();
+
+  /**
+   * Gets the specification of the delegate to be used at runtime for this
+   * {@link CustomServiceTask}. This specification is determined by the task's
+   * {@link org.activiti.designer.integration.annotation.Runtime}
+   * annotation. The type of the specification is provided by
+   * {@link #getDelegateType()}
+   * 
+   * @see #getDelegateType()
+   * 
+   * @return the specification or an empty string if there is none
+   */
+  String getDelegateSpecification();
 
   /**
    * Gets the order index for this {@link CustomServiceTask} within it's

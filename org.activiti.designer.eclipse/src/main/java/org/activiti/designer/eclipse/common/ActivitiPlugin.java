@@ -1,13 +1,23 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.activiti.designer.eclipse.common;
 
 import java.net.URL;
 
-import org.activiti.designer.eclipse.outline.ContentOutlinePageAdapterFactory;
+import org.activiti.designer.eclipse.util.PaletteExtensionUtil;
 import org.eclipse.core.resources.IWorkspace;
 import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IAdapterManager;
-import org.eclipse.core.runtime.Platform;
-import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.jface.resource.ImageDescriptor;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Shell;
@@ -21,6 +31,8 @@ public class ActivitiPlugin extends AbstractUIPlugin {
 
   public static final String PLUGIN_ID = "org.activiti.designer.eclipse"; //$NON-NLS-1$
 
+  public static final String GUI_PLUGIN_ID = "org.activiti.designer.gui"; //$NON-NLS-1$
+
   /**
    * The name used for the user library that contains extensions for the
    * Activiti Designer.
@@ -29,9 +41,13 @@ public class ActivitiPlugin extends AbstractUIPlugin {
 
   public static final String DESIGNER_EXTENSIONS_USER_LIB_PATH = "org.eclipse.jdt.USER_LIBRARY/" + USER_LIBRARY_NAME_EXTENSIONS;
 
-  public static final String EXPORT_MARSHALLER_EXTENSIONPOINT_ID = "org.activiti.designer.eclipse.extension.export.ExportMarshaller";
+  public static final String EXPORT_MARSHALLER_EXTENSIONPOINT_ID = "org.activiti.designer.eclipse.extension.ExportMarshaller";
 
-  public static final String PROCESS_VALIDATOR_EXTENSIONPOINT_ID = "org.activiti.designer.eclipse.extension.validation.ProcessValidator";
+  public static final String PROCESS_VALIDATOR_EXTENSIONPOINT_ID = "org.activiti.designer.eclipse.extension.ProcessValidator";
+
+  public static final String ICON_PROVIDER_EXTENSIONPOINT_ID = "org.activiti.designer.eclipse.extension.IconProvider";
+
+  public static final String PALETTE_EXTENSION_PROVIDER_EXTENSIONPOINT_ID = "org.activiti.designer.eclipse.extension.PaletteExtensionProvider";
 
   private static ActivitiPlugin _plugin;
 
@@ -60,11 +76,10 @@ public class ActivitiPlugin extends AbstractUIPlugin {
   public void start(BundleContext context) throws Exception {
     super.start(context);
 
-    IAdapterManager manager = Platform.getAdapterManager();
-    manager.registerAdapters(new ContentOutlinePageAdapterFactory(), DiagramEditor.class);
-
     // Initialize the image cache
     imageCache = new ImageCache();
+
+    PaletteExtensionUtil.pushPaletteExtensions();
   }
 
   @Override
@@ -149,7 +164,7 @@ public class ActivitiPlugin extends AbstractUIPlugin {
   }
 
   /**
-   * Gets an image from this plugin.
+   * Gets an image from this plugin and serves it from the {@link ImageCache}.
    * 
    * @param pluginImage
    *          the PluginImage to get the image for
@@ -158,6 +173,18 @@ public class ActivitiPlugin extends AbstractUIPlugin {
    */
   public static Image getImage(PluginImage pluginImage) {
     return imageCache.getImage(pluginImage);
+  }
+
+  /**
+   * Gets an image from this plugin and serves it from the {@link ImageCache}.
+   * 
+   * @param imageDescriptor
+   *          the ImageDescriptor to get the image for
+   * 
+   * @return an Image if the image was found, null otherwise
+   */
+  public static Image getImage(ImageDescriptor imageDescriptor) {
+    return ImageCache.getImage(imageDescriptor);
   }
 
   /**

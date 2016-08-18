@@ -1,82 +1,64 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.activiti.designer.features;
 
-import org.activiti.designer.ActivitiImageProvider;
-import org.activiti.designer.util.features.AbstractCreateBPMNFeature;
-import org.eclipse.bpmn2.Activity;
-import org.eclipse.bpmn2.BoundaryEvent;
-import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.SubProcess;
-import org.eclipse.bpmn2.Task;
-import org.eclipse.bpmn2.TimerEventDefinition;
+import org.activiti.bpmn.model.Activity;
+import org.activiti.bpmn.model.BoundaryEvent;
+import org.activiti.bpmn.model.TimerEventDefinition;
+import org.activiti.designer.PluginImage;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
-import org.eclipse.graphiti.mm.pictograms.Diagram;
 
 public class CreateBoundaryTimerFeature extends AbstractCreateBPMNFeature {
-	
-	public static final String FEATURE_ID_KEY = "boundarytimer";
 
-	public CreateBoundaryTimerFeature(IFeatureProvider fp) {
-		// set name and description of the creation feature
-		super(fp, "TimerBoundaryEvent", "Add timer boundary event");
-	}
+  public static final String FEATURE_ID_KEY = "boundarytimer";
 
-	public boolean canCreate(ICreateContext context) {
-	  Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-    if (parentObject instanceof SubProcess == true ||
-            parentObject instanceof Task == true) {
-      
+  public CreateBoundaryTimerFeature(IFeatureProvider fp) {
+    // set name and description of the creation feature
+    super(fp, "TimerBoundaryEvent", "Add timer boundary event");
+  }
+
+  public boolean canCreate(ICreateContext context) {
+    Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
+    if (parentObject instanceof Activity) {
       return true;
     }
     return false;
-	}
+  }
 
-	public Object[] create(ICreateContext context) {
-	  BoundaryEvent boundaryEvent = Bpmn2Factory.eINSTANCE.createBoundaryEvent();
-		TimerEventDefinition timerEvent = Bpmn2Factory.eINSTANCE.createTimerEventDefinition();
-		boundaryEvent.getEventDefinitions().add(timerEvent);
-		
-		boundaryEvent.setId(getNextId());
-		
-		Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-    if (parentObject instanceof SubProcess) {
-      getDiagram().eResource().getContents().add(boundaryEvent);
-    } else if(context.getTargetContainer().getContainer() != null && 
-            context.getTargetContainer().getContainer() instanceof Diagram == false) {
-      
-      Object containerObject = getBusinessObjectForPictogramElement(context.getTargetContainer().getContainer());
-      if (containerObject instanceof SubProcess) {
-        ((SubProcess) containerObject).getFlowElements().add(boundaryEvent);
-      }
-      
-    } else {
-      getDiagram().eResource().getContents().add(boundaryEvent);
-    }
+  public Object[] create(ICreateContext context) {
+    BoundaryEvent boundaryEvent = new BoundaryEvent();
+    TimerEventDefinition timerEvent = new TimerEventDefinition();
+    boundaryEvent.getEventDefinitions().add(timerEvent);
     
-    ((Activity) parentObject).getBoundaryEventRefs().add(boundaryEvent);
+    Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
+    ((Activity) parentObject).getBoundaryEvents().add(boundaryEvent);
     boundaryEvent.setAttachedToRef((Activity) parentObject);
+    
+    addObjectToContainer(context, boundaryEvent, "Timer");
 
-		// do the add
-		addGraphicalRepresentation(context, boundaryEvent);
-		
-		// return newly created business object(s)
-		return new Object[] { boundaryEvent };
-	}
-	
-	@Override
-	public String getCreateImageId() {
-		return ActivitiImageProvider.IMG_BOUNDARY_TIMER;
-	}
+    // return newly created business object(s)
+    return new Object[] { boundaryEvent };
+  }
 
-	@Override
-	protected String getFeatureIdKey() {
-		return FEATURE_ID_KEY;
-	}
+  @Override
+  public String getCreateImageId() {
+    return PluginImage.IMG_EVENT_TIMER.getImageKey();
+  }
 
-	@SuppressWarnings("rawtypes")
-	@Override
-	protected Class getFeatureClass() {
-		return Bpmn2Factory.eINSTANCE.createTimerEventDefinition().getClass();
-	}
-
+  @Override
+  protected String getFeatureIdKey() {
+    return FEATURE_ID_KEY;
+  }
 }

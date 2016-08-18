@@ -1,3 +1,16 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 /* Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -15,9 +28,10 @@ package org.activiti.designer.property.extension.field;
 
 import java.lang.reflect.Field;
 
+import org.activiti.designer.integration.annotation.Help;
+import org.activiti.designer.integration.annotation.Locales;
+import org.activiti.designer.integration.annotation.Property;
 import org.activiti.designer.integration.servicetask.CustomServiceTask;
-import org.activiti.designer.integration.servicetask.annotation.Help;
-import org.activiti.designer.integration.servicetask.annotation.Property;
 
 /**
  * Container object for Fields used in property screens for
@@ -29,10 +43,11 @@ import org.activiti.designer.integration.servicetask.annotation.Property;
  */
 public class FieldInfo implements Comparable<FieldInfo> {
 
-  private Property propertyAnnotation;
-  private Help helpAnnotation;
-  private final Field field;
-
+  protected Property propertyAnnotation;
+  protected Help helpAnnotation;
+  protected Locales localesAnnotation;
+  protected final Field field;
+  
   public FieldInfo(Field field) {
     this.field = field;
     final Property propertyAnnotation = field.getAnnotation(Property.class);
@@ -47,13 +62,23 @@ public class FieldInfo implements Comparable<FieldInfo> {
     if (helpAnnotation != null) {
       this.helpAnnotation = helpAnnotation;
     }
+    
+    final Locales localesAnnotation = field.getAnnotation(Locales.class);
+    if (localesAnnotation != null) {
+      this.localesAnnotation = localesAnnotation;
+    }
   }
+  
   public Property getPropertyAnnotation() {
     return propertyAnnotation;
   }
 
   public Help getHelpAnnotation() {
     return helpAnnotation;
+  }
+  
+  public Locales getLocalesAnnotation() {
+    return localesAnnotation;
   }
 
   public String getFieldName() {

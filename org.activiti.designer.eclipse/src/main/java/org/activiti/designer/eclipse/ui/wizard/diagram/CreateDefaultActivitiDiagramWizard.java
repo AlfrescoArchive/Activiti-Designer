@@ -1,49 +1,37 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.activiti.designer.eclipse.ui.wizard.diagram;
 
-import java.io.InputStream;
-import java.util.Collection;
+import java.lang.reflect.InvocationTargetException;
 
-import org.activiti.designer.eclipse.Logger;
-import org.activiti.designer.eclipse.bpmnimport.BpmnFileReader;
-import org.activiti.designer.eclipse.common.ActivitiBPMNDiagramConstants;
-import org.activiti.designer.eclipse.common.ActivitiPlugin;
-import org.activiti.designer.eclipse.common.FileService;
-import org.activiti.designer.eclipse.extension.export.ExportMarshaller;
-import org.activiti.designer.eclipse.navigator.nodes.base.AbstractInstancesOfTypeContainerNode;
-import org.activiti.designer.eclipse.preferences.PreferencesUtil;
-import org.activiti.designer.eclipse.ui.ExportMarshallerRunnable;
-import org.activiti.designer.eclipse.util.ExtensionPointUtil;
-import org.activiti.designer.eclipse.util.Util;
-import org.activiti.designer.util.preferences.Preferences;
+import org.activiti.designer.eclipse.editor.Bpmn2DiagramCreator;
+import org.activiti.designer.eclipse.util.FileService;
 import org.apache.commons.lang.StringUtils;
-import org.apache.commons.lang.WordUtils;
-import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.Documentation;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
-import org.eclipse.core.resources.IProject;
-import org.eclipse.core.runtime.IStatus;
-import org.eclipse.core.runtime.Status;
-import org.eclipse.emf.common.util.URI;
-import org.eclipse.emf.ecore.util.EcoreUtil;
-import org.eclipse.emf.transaction.RecordingCommand;
-import org.eclipse.emf.transaction.TransactionalEditingDomain;
-import org.eclipse.graphiti.dt.IDiagramTypeProvider;
-import org.eclipse.graphiti.features.IFeatureProvider;
+import org.eclipse.core.resources.IWorkspaceRoot;
+import org.eclipse.core.resources.ResourcesPlugin;
+import org.eclipse.core.runtime.IPath;
+import org.eclipse.core.runtime.IProgressMonitor;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
-import org.eclipse.graphiti.services.Graphiti;
-import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
-import org.eclipse.graphiti.ui.services.GraphitiUi;
-import org.eclipse.jdt.core.IJavaProject;
-import org.eclipse.jdt.internal.core.PackageFragment;
-import org.eclipse.jface.dialogs.ErrorDialog;
+import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.operation.IRunnableWithProgress;
 import org.eclipse.jface.viewers.IStructuredSelection;
 import org.eclipse.jface.wizard.IWizardPage;
 import org.eclipse.ui.IWorkbench;
-import org.eclipse.ui.PartInitException;
-import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.progress.IProgressService;
 import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
+
 
 /**
  * The Class CreateDefaultActivitiDiagramWizard.
@@ -51,12 +39,14 @@ import org.eclipse.ui.wizards.newresource.BasicNewResourceWizard;
 public class CreateDefaultActivitiDiagramWizard extends BasicNewResourceWizard {
 
   private Diagram diagram;
-  private CreateDefaultActivitiDiagramInitialContentPage initialContentPage;
+  protected CreateDefaultActivitiDiagramNameWizardPage namePage;
+  protected CreateDefaultActivitiDiagramInitialContentPage initialContentPage;
 
   @Override
   public void addPages() {
     super.addPages();
-    addPage(new CreateDefaultActivitiDiagramNameWizardPage(super.getSelection()));
+    namePage = new CreateDefaultActivitiDiagramNameWizardPage(super.getSelection());
+    addPage(namePage);
     initialContentPage = new CreateDefaultActivitiDiagramInitialContentPage();
     addPage(initialContentPage);
   }
@@ -67,9 +57,11 @@ public class CreateDefaultActivitiDiagramWizard extends BasicNewResourceWizard {
   }
 
   private boolean canCreateDiagramFile() {
-    final IFile fileToCreate = getDiagramFile();
-    if (fileToCreate != null) {
-      return !fileToCreate.exists();
+    if (namePage.getContainerFullPath() != null) {
+      final IFile fileToCreate = getDiagramFile();
+      if (fileToCreate != null) {
+        return !fileToCreate.exists();
+      }
     }
     return false;
   }
@@ -81,51 +73,18 @@ public class CreateDefaultActivitiDiagramWizard extends BasicNewResourceWizard {
       return null;
     }
 
-    IProject project = null;
-    IFolder diagramFolder = null;
-
-    // Added check on IJavaProject
-    // Kept IProject check for future facet implementation
-    Object element = getSelection().getFirstElement();
-    if (element instanceof IProject) {
-      project = (IProject) element;
-    } else if (element instanceof IJavaProject) {
-      IJavaProject javaProject = (IJavaProject) element;
-      project = javaProject.getProject();
-    } else if (element instanceof AbstractInstancesOfTypeContainerNode) {
-      AbstractInstancesOfTypeContainerNode aiocn = (AbstractInstancesOfTypeContainerNode) element;
-      project = aiocn.getProject();
-    } else if (element instanceof IFolder) {
-      diagramFolder = (IFolder) element;
-      project = diagramFolder.getProject();
-    } else if (element instanceof PackageFragment) { // access is
-      // discouraged, but
-      // inevitable when
-      // the selection is
-      // the diagrams
-      // package itself
-      PackageFragment fragment = (PackageFragment) element;
-      project = fragment.getJavaProject().getProject();
+    IWorkspaceRoot root = ResourcesPlugin.getWorkspace().getRoot();
+    if(namePage.getContainerFullPath().segmentCount() == 1) {
+    	return root.getProject(namePage.getContainerFullPath().lastSegment()).getFile(diagramName);
+    } else {
+	    IFolder diagramFolder = root.getFolder(namePage.getContainerFullPath());
+	    return diagramFolder.getFile(diagramName);
     }
-
-    if (project == null || !project.isAccessible()) {
-      String error = "No open project was found for the current selection. Select a project and restart the wizard.";
-      IStatus status = new Status(IStatus.ERROR, ActivitiPlugin.getID(), error);
-      ErrorDialog.openError(getShell(), "No Project Found", null, status);
-      return null;
-    }
-
-    if (diagramFolder == null) {
-      diagramFolder = project.getFolder(ActivitiBPMNDiagramConstants.DIAGRAM_FOLDER);
-    }
-
-    return diagramFolder.getFile(diagramName);
-
   }
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see
    * org.eclipse.ui.wizards.newresource.BasicNewResourceWizard#init(org.eclipse
    * .ui.IWorkbench, org.eclipse.jface.viewers.IStructuredSelection)
@@ -145,121 +104,60 @@ public class CreateDefaultActivitiDiagramWizard extends BasicNewResourceWizard {
 
   /*
    * (non-Javadoc)
-   * 
+   *
    * @see org.eclipse.jface.wizard.Wizard#performFinish()
    */
   @Override
   public boolean performFinish() {
 
-    final String diagramTypeId = "BPMNdiagram";
+    final IFile dataFile = getDiagramFile();
 
-    final IFile diagramFile = getDiagramFile();
-    final String diagramName = getDiagramName();
+    String tempFileName = null;
+		if(initialContentPage.contentSourceTemplate.getSelection() == true &&
+        initialContentPage.templateTable.getSelectionIndex() >= 0) {
 
-    URI uri = URI.createPlatformResourceURI(diagramFile.getFullPath().toString(), true);
+			tempFileName = this.getClass().getClassLoader().getResource("src/main/resources/templates/" +
+          TemplateInfo.templateFilenames[initialContentPage.templateTable.getSelectionIndex()]).getPath();
+		}
 
-    TransactionalEditingDomain domain = null;
+		final String contentFileName = tempFileName;
 
-    boolean createContent = PreferencesUtil.getBooleanPreference(Preferences.EDITOR_ADD_DEFAULT_CONTENT_TO_DIAGRAMS);
+		IRunnableWithProgress op = new IRunnableWithProgress() {
+			@Override
+			public void run(IProgressMonitor monitor) throws InvocationTargetException {
+				try {
+				  IPath path = dataFile.getFullPath();
+				  
+				  // get or create the corresponding temporary folder
+			    final IFolder tempFolder = FileService.getOrCreateTempFolder(path);
 
-    if (createContent) {
-      final InputStream contentStream = Util.getContentStream(Util.Content.NEW_DIAGRAM_CONTENT);
-      InputStream replacedStream = Util.swapStreamContents(diagramName, contentStream);
-      domain = FileService.createEmfFileForDiagram(uri, null, replacedStream, diagramFile);
-      diagram = org.eclipse.graphiti.ui.internal.services.GraphitiUiInternal.getEmfService().getDiagramFromFile(diagramFile, domain.getResourceSet());
-
-    } else {
-      diagram = Graphiti.getPeCreateService().createDiagram(diagramTypeId, diagramName, true);
-      domain = FileService.createEmfFileForDiagram(uri, diagram, null, null);
-      final String simpleDiagramName = StringUtils.substringBefore(diagramName, ActivitiBPMNDiagramConstants.DIAGRAM_EXTENSION);
-      final String diagramId = StringUtils.deleteWhitespace(WordUtils.capitalize(simpleDiagramName));
-      
-      if(initialContentPage.contentSourceTemplate.getSelection() == true &&
-              initialContentPage.templateTable.getSelectionIndex() >= 0) {
-        
-        domain.getCommandStack().execute(new RecordingCommand(domain, "template process content") {
-
-          protected void doExecute() {
-            IDiagramTypeProvider dtp = GraphitiUi.getExtensionManager().createDiagramTypeProvider(diagram,
-                    GraphitiUi.getExtensionManager().getDiagramTypeProviderId(diagram.getDiagramTypeId())); //$NON-NLS-1$
-            IFeatureProvider featureProvider = dtp.getFeatureProvider();
-            final InputStream contentStream = Util.class.getClassLoader().getResourceAsStream("src/main/resources/templates/" + 
-                    TemplateInfo.templateFilenames[initialContentPage.templateTable.getSelectionIndex()]);
-            BpmnFileReader bpmnFileReader = new BpmnFileReader(contentStream, diagramId,
-                    diagram, featureProvider);
-            bpmnFileReader.readBpmn();
-          }
-        });
-        
-      } else {
-
-        final Runnable runnable = new Runnable() {
-  
-          public void run() {
-  
-            org.eclipse.bpmn2.Process process = Bpmn2Factory.eINSTANCE.createProcess();
-            process.setId(diagramId);
-            process.setName(simpleDiagramName);
-            Documentation documentation = Bpmn2Factory.eINSTANCE.createDocumentation();
-            documentation.setId("documentation_process");
-            documentation.setText(String.format("Place documentation for the '%s' process here.", simpleDiagramName));
-            process.getDocumentation().add(documentation);
-  
-            diagram.eResource().getContents().add(process);
-          }
-        };
-        
-        domain.getCommandStack().execute(new RecordingCommand(domain, "default process content") {
-
-          protected void doExecute() {
-            runnable.run();
-          }
-        });
-      }
-    }
-
-    String providerId = GraphitiUi.getExtensionManager().getDiagramTypeProviderId(diagram.getDiagramTypeId());
-    DiagramEditorInput editorInput = new DiagramEditorInput(EcoreUtil.getURI(diagram), domain, providerId);
-
-    try {
-      PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(editorInput, ActivitiBPMNDiagramConstants.DIAGRAM_EDITOR_ID);
-    } catch (PartInitException e) {
-      String error = "Error while opening diagram editor";
-      IStatus status = new Status(IStatus.ERROR, ActivitiPlugin.getID(), error, e);
-      ErrorDialog.openError(getShell(), "An error occured", null, status);
-      return false;
-    }
-    
-    if(initialContentPage.contentSourceTemplate.getSelection() == true &&
-            initialContentPage.templateTable.getSelectionIndex() >= 0) {
-    
-      // Determine list of ExportMarshallers to invoke after regular save
-      final Collection<ExportMarshaller> marshallers = ExtensionPointUtil
-          .getActiveExportMarshallers();
-  
-      if (marshallers.size() > 0) {
-        // Get the resource belonging to the editor part
-        final Diagram diagram = editorInput.getDiagram();
-  
-        // Get the progress service so we can have a progress monitor
-        final IProgressService progressService = PlatformUI.getWorkbench().getProgressService();
-  
-        try {
-          final ExportMarshallerRunnable runnable = new ExportMarshallerRunnable(
-              diagram, marshallers);
-          progressService.busyCursorWhile(runnable);
-        } catch (Exception e) {
-          Logger.logError("Exception while performing save", e);
-        }
-      }
-    }
-
-    return true;
+			    // finally get the diagram file that corresponds to the data file
+			    final IFile diagramFile = FileService.getTemporaryDiagramFile(path, tempFolder);
+			    
+				  Bpmn2DiagramCreator creator = new Bpmn2DiagramCreator();
+				  creator.createBpmnDiagram(dataFile, diagramFile, null, contentFileName, true);
+				} catch (Exception e) {
+					e.printStackTrace();
+				} finally {
+					monitor.done();
+				}
+			}
+		};
+		try {
+			getContainer().run(true, false, op);
+		} catch (InterruptedException e) {
+			return false;
+		} catch (InvocationTargetException e) {
+			Throwable realException = e.getTargetException();
+			MessageDialog.openError(getShell(), "Error", realException.getMessage());
+			return false;
+		}
+		return true;
   }
 
   /**
    * Gets the diagram.
-   * 
+   *
    * @return the diagram
    */
   public Diagram getDiagram() {
@@ -270,7 +168,7 @@ public class CreateDefaultActivitiDiagramWizard extends BasicNewResourceWizard {
     return (CreateDefaultActivitiDiagramNameWizardPage) getPage(CreateDefaultActivitiDiagramNameWizardPage.PAGE_NAME);
   }
 
-  private String getDiagramName() {
+  protected String getDiagramName() {
     return getNamePage().getDiagramName();
   }
 

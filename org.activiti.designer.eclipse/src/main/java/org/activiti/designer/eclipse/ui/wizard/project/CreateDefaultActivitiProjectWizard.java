@@ -1,3 +1,16 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.activiti.designer.eclipse.ui.wizard.project;
 
 import java.io.ByteArrayInputStream;
@@ -6,10 +19,9 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.activiti.designer.eclipse.common.ActivitiBPMNDiagramConstants;
 import org.activiti.designer.eclipse.common.ActivitiPlugin;
-import org.activiti.designer.eclipse.common.ActivitiProjectNature;
 import org.activiti.designer.eclipse.common.PluginImage;
+import org.activiti.designer.util.ActivitiConstants;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -50,8 +62,9 @@ public class CreateDefaultActivitiProjectWizard extends BasicNewProjectResourceW
 
   @Override
   public boolean performFinish() {
-    if (!super.performFinish())
+    if (!super.performFinish()) {
       return false;
+    }
 
     IProject newProject = getNewProject();
 
@@ -60,7 +73,7 @@ public class CreateDefaultActivitiProjectWizard extends BasicNewProjectResourceW
       IProjectDescription description = newProject.getDescription();
       String[] newNatures = new String[2];
       newNatures[0] = JavaCore.NATURE_ID;
-      newNatures[1] = ActivitiProjectNature.NATURE_ID;
+      newNatures[1] = ActivitiConstants.NATURE_ID;
       description.setNatureIds(newNatures);
       newProject.setDescription(description, null);
 
@@ -89,18 +102,22 @@ public class CreateDefaultActivitiProjectWizard extends BasicNewProjectResourceW
         IPath containerPath = new Path(JavaCore.USER_LIBRARY_CONTAINER_ID);
         initializer.requestClasspathContainerUpdate(containerPath.append(ActivitiPlugin.USER_LIBRARY_NAME_EXTENSIONS), null, new IClasspathContainer() {
 
+          @Override
           public IPath getPath() {
             return new Path(JavaCore.USER_LIBRARY_CONTAINER_ID).append(ActivitiPlugin.USER_LIBRARY_NAME_EXTENSIONS);
           }
 
+          @Override
           public int getKind() {
             return K_APPLICATION;
           }
 
+          @Override
           public String getDescription() {
             return ActivitiPlugin.USER_LIBRARY_NAME_EXTENSIONS;
           }
 
+          @Override
           public IClasspathEntry[] getClasspathEntries() {
             return new IClasspathEntry[] {};
           }
@@ -120,14 +137,21 @@ public class CreateDefaultActivitiProjectWizard extends BasicNewProjectResourceW
 
   @Override
   public void setWindowTitle(final String newTitle) {
-    super.setWindowTitle("New Activiti Project");
+    if (null == newTitle || "".equals(newTitle))
+    {
+      super.setWindowTitle("New Activiti Project");
+    }
+    else
+    {
+      super.setWindowTitle(newTitle);
+    }
   }
 
   /**
    * Gets the WizardNewProjectCreationPage from the Wizard, which is the first
    * page allowing the user to specify the project name and location.
    */
-  private WizardNewProjectCreationPage getBasicNewProjectPage() {
+  protected WizardNewProjectCreationPage getBasicNewProjectPage() {
 
     WizardNewProjectCreationPage result = null;
 
@@ -165,7 +189,7 @@ public class CreateDefaultActivitiProjectWizard extends BasicNewProjectResourceW
     sourceFolders.add("src/main");
     sourceFolders.add("src/main/java");
     sourceFolders.add("src/main/resources/");
-    sourceFolders.add(ActivitiBPMNDiagramConstants.DIAGRAM_FOLDER);
+    sourceFolders.add(ActivitiConstants.DIAGRAM_FOLDER);
     sourceFolders.add("src/test/");
     sourceFolders.add("src/test/java/");
     sourceFolders.add("src/test/resources");
@@ -193,21 +217,17 @@ public class CreateDefaultActivitiProjectWizard extends BasicNewProjectResourceW
     buffer.append("  <packaging>jar</packaging>\n");
     buffer.append("  <name>BPMN 2.0 with Activiti - Examples</name>\n");
     buffer.append("  <properties>\n");
-    buffer.append("    <activiti-version>5.8</activiti-version>\n");
+    buffer.append("    <activiti-version>5.18.0</activiti-version>\n");
     buffer.append("  </properties>\n");
     buffer.append("  <dependencies>\n");
     addDependency(buffer, "org.activiti", "activiti-engine", "${activiti-version}");
     addDependency(buffer, "org.activiti", "activiti-spring", "${activiti-version}");
-    addDependency(buffer, "org.codehaus.groovy", "groovy", "1.7.5");
-    addDependency(buffer, "com.h2database", "h2", "1.2.132");
-    addDependency(buffer, "junit", "junit", "4.8.1");
+    addDependency(buffer, "org.codehaus.groovy", "groovy-all", "2.4.3");
+    addDependency(buffer, "com.h2database", "h2", "1.3.168");
+    addDependency(buffer, "org.slf4j", "slf4j-api", "1.7.6");
+    addDependency(buffer, "org.slf4j", "slf4j-jdk14", "1.7.6");
+    addDependency(buffer, "junit", "junit", "4.11");
     buffer.append("  </dependencies>\n");
-    buffer.append("	 <repositories>\n");
-    buffer.append("    <repository>\n");
-    buffer.append("      <id>Activiti</id>\n");
-    buffer.append("      <url>http://maven.alfresco.com/nexus/content/repositories/activiti</url>\n");
-    buffer.append("	   </repository>\n");
-    buffer.append("	 </repositories>\n");
     buffer.append("	 <build>\n");
     buffer.append("    <plugins>\n");
     buffer.append("      <plugin>\n");

@@ -1,3 +1,16 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.activiti.designer.popupmenus;
 
 import java.io.File;
@@ -11,7 +24,7 @@ import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
-import org.activiti.designer.eclipse.common.ActivitiBPMNDiagramConstants;
+import org.activiti.designer.util.ActivitiConstants;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IContainer;
 import org.eclipse.core.resources.IFile;
@@ -43,7 +56,7 @@ public class DeploymentMenu implements org.eclipse.ui.IObjectActionDelegate{
 		final IJavaProject javaProject = (IJavaProject) selection;
 		IFolder diagramFolder = null;
 		try {
-		  diagramFolder = javaProject.getProject().getFolder(ActivitiBPMNDiagramConstants.DIAGRAM_FOLDER);
+		  diagramFolder = javaProject.getProject().getFolder(ActivitiConstants.DIAGRAM_FOLDER);
 		  if(diagramFolder == null) {
 		    return;
 		  }
@@ -85,12 +98,19 @@ public class DeploymentMenu implements org.eclipse.ui.IObjectActionDelegate{
             // processdefinition
             String processName = "";
             memberList = new ArrayList<IFile>();
+            getMembersWithFilter(project, ".bpmn");
             getMembersWithFilter(project, ".bpmn20.xml");
             if(memberList.size() > 0) {
               for (IFile bpmnResource : memberList) {
                 String bpmnFilename = bpmnResource.getName();
                 if(processName.length() == 0)
                   processName = bpmnFilename.substring(0, bpmnFilename.indexOf("."));
+                
+                //TODO temp fix because .bpmn files are not parsed by the Activiti Engine version 5.9. This is fixed for 5.10
+                if(bpmnFilename.endsWith(".bpmn")) {
+                	bpmnFilename = bpmnFilename.substring(0, bpmnFilename.lastIndexOf(".")) + ".bpmn20.xml";
+                }
+                
                 bpmnResource.copy(tempbarFolder.getFile(bpmnFilename).getFullPath(), true, new NullProgressMonitor());
               }
           
@@ -137,6 +157,13 @@ public class DeploymentMenu implements org.eclipse.ui.IObjectActionDelegate{
                 }
                 compressPackage(deploymentFolder, tempclassesFolder, processName + ".jar");
               }
+
+              try {
+                tempbarFolder.delete(true, null);
+                tempclassesFolder.delete(true, null);
+              } catch(Exception e) {
+                e.printStackTrace();
+              }
           
               // refresh the output folder to reflect changes
               deploymentFolder.refreshLocal(IResource.DEPTH_INFINITE, new NullProgressMonitor());
@@ -165,7 +192,7 @@ public class DeploymentMenu implements org.eclipse.ui.IObjectActionDelegate{
 	  try {
   	  for (IResource resource : root.members()) {
         if (resource instanceof IFile) {
-          if(resource.getName().contains(extension)) {
+          if(resource.getName().endsWith(extension)) {
             memberList.add((IFile) resource);
           }
         } else if(resource instanceof IFolder && ((IFolder) resource).getName().contains("target") == false) {
@@ -209,6 +236,7 @@ public class DeploymentMenu implements org.eclipse.ui.IObjectActionDelegate{
         byte[] fileContent = new byte[(int)file.length()];
         fin.read(fileContent);
         out.write(fileContent);
+        fin.close();
       }
       out.closeEntry();
     }

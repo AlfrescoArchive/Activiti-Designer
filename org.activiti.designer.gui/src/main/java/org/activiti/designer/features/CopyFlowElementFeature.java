@@ -1,9 +1,27 @@
 /**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/**
  * 
  */
 package org.activiti.designer.features;
 
-import org.eclipse.bpmn2.FlowElement;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.activiti.bpmn.model.FlowElement;
+import org.activiti.designer.util.editor.ModelHandler;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICopyContext;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
@@ -19,9 +37,6 @@ import org.eclipse.graphiti.ui.features.AbstractCopyFeature;
  */
 public class CopyFlowElementFeature extends AbstractCopyFeature {
 
-  public static int copyX = 0;
-  public static int copyY = 0;
-
   public CopyFlowElementFeature(IFeatureProvider fp) {
     super(fp);
   }
@@ -32,7 +47,7 @@ public class CopyFlowElementFeature extends AbstractCopyFeature {
       return false;
     }
 
-    // return true, if all selected elements are a EClasses
+    // return true, if all selected elements are a Flow elements
     for (PictogramElement pe : pes) {
 
       final Object bo = getBusinessObjectForPictogramElement(pe);
@@ -45,24 +60,16 @@ public class CopyFlowElementFeature extends AbstractCopyFeature {
 
   public void copy(ICopyContext context) {
 
-    copyX = Integer.MAX_VALUE;
-    copyY = Integer.MAX_VALUE;
-
     // get the business objects for all pictogram elements
     // we already verified that all business objects are FlowElements
     PictogramElement[] pes = context.getPictogramElements();
-    Object[] bos = new Object[pes.length];
+    List<FlowElement> copyList = new ArrayList<FlowElement>();
     for (int i = 0; i < pes.length; i++) {
 
       PictogramElement pe = pes[i];
-
-      copyX = Math.min(copyX, pe.getGraphicsAlgorithm().getX());
-      copyY = Math.min(copyY, pe.getGraphicsAlgorithm().getY());
-
-      bos[i] = getBusinessObjectForPictogramElement(pe);
+      copyList.add((FlowElement) getBusinessObjectForPictogramElement(pe));
     }
-    // put all business objects to the clipboard
-    putToClipboard(bos);
+    // put all business objects to our own clipboard (default one only supports EObjects
+    ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).setClipboard(copyList);
   }
-
 }

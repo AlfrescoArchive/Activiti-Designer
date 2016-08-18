@@ -1,63 +1,50 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.activiti.designer.features;
 
-import org.activiti.designer.ActivitiImageProvider;
-import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.EndEvent;
-import org.eclipse.bpmn2.ErrorEventDefinition;
-import org.eclipse.bpmn2.SubProcess;
+import org.activiti.bpmn.model.EndEvent;
+import org.activiti.bpmn.model.ErrorEventDefinition;
+import org.activiti.designer.PluginImage;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
-import org.eclipse.graphiti.mm.pictograms.Diagram;
 
 public class CreateErrorEndEventFeature extends AbstractCreateFastBPMNFeature {
-	
-	public static final String FEATURE_ID_KEY = "endevent";
 
-	public CreateErrorEndEventFeature(IFeatureProvider fp) {
-		// set name and description of the creation feature
-		super(fp, "ErrorEndEvent", "Add error end event");
-	}
+  public static final String FEATURE_ID_KEY = "errorendevent";
 
-	public boolean canCreate(ICreateContext context) {
-	  Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-    return (context.getTargetContainer() instanceof Diagram || parentObject instanceof SubProcess);
-	}
+  public CreateErrorEndEventFeature(IFeatureProvider fp) {
+    // set name and description of the creation feature
+    super(fp, "ErrorEndEvent", "Add error end event");
+  }
 
-	public Object[] create(ICreateContext context) {
-		EndEvent endEvent = Bpmn2Factory.eINSTANCE.createEndEvent();
-		ErrorEventDefinition eventDef = Bpmn2Factory.eINSTANCE.createErrorEventDefinition();
-		endEvent.getEventDefinitions().add(eventDef);
-		
-		endEvent.setId(getNextId());
-		endEvent.setName("ErrorEnd");
-		
-		Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-		if (parentObject instanceof SubProcess) {
-      ((SubProcess) parentObject).getFlowElements().add(endEvent);
-    } else {
-      getDiagram().eResource().getContents().add(endEvent);
-    }
+  public Object[] create(ICreateContext context) {
+    EndEvent endEvent = new EndEvent();
+    ErrorEventDefinition eventDef = new ErrorEventDefinition();
+    endEvent.getEventDefinitions().add(eventDef);
+    addObjectToContainer(context, endEvent, "ErrorEnd");
 
-    addGraphicalContent(endEvent, context);
-		
-		// return newly created business object(s)
-		return new Object[] { endEvent };
-	}
-	
-	@Override
-	public String getCreateImageId() {
-		return ActivitiImageProvider.IMG_ENDEVENT_ERROR;
-	}
+    // return newly created business object(s)
+    return new Object[] { endEvent };
+  }
 
-	@Override
-	protected String getFeatureIdKey() {
-		return FEATURE_ID_KEY;
-	}
+  @Override
+  public String getCreateImageId() {
+    return PluginImage.IMG_EVENT_ERROR.getImageKey();
+  }
 
-	@SuppressWarnings("rawtypes")
-	@Override
-	protected Class getFeatureClass() {
-		return Bpmn2Factory.eINSTANCE.createEndEvent().getClass();
-	}
-
+  @Override
+  protected String getFeatureIdKey() {
+    return FEATURE_ID_KEY;
+  }
 }

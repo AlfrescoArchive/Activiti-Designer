@@ -1,113 +1,55 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.alfresco.designer.gui.property;
 
-import org.activiti.designer.eclipse.preferences.PreferencesUtil;
-import org.activiti.designer.util.eclipse.ActivitiUiUtil;
+import java.util.List;
+
+import org.activiti.bpmn.model.StartEvent;
+import org.activiti.designer.eclipse.common.ActivitiPlugin;
+import org.activiti.designer.property.ActivitiPropertySection;
 import org.activiti.designer.util.preferences.Preferences;
-import org.activiti.designer.util.property.ActivitiPropertySection;
-import org.eclipse.bpmn2.StartEvent;
-import org.eclipse.emf.transaction.TransactionalEditingDomain;
-import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.services.Graphiti;
-import org.eclipse.graphiti.ui.editor.DiagramEditor;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CCombo;
-import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.widgets.Composite;
+import org.activiti.designer.util.preferences.PreferencesUtil;
+import org.eclipse.swt.widgets.Combo;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
-import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
 public class PropertyAlfrescoStartEventSection extends ActivitiPropertySection implements ITabbedPropertyConstants {
 	
-  private CCombo formTypeCombo;
-	
-	@Override
-	public void createControls(Composite parent, TabbedPropertySheetPage tabbedPropertySheetPage) {
-		super.createControls(parent, tabbedPropertySheetPage);
+  private Combo formTypeCombo;
+  
+  @Override
+  public void createFormControls(TabbedPropertySheetPage aTabbedPropertySheetPage) {
+    List<String> formTypes = PreferencesUtil.getStringArray(Preferences.ALFRESCO_FORMTYPES_STARTEVENT, ActivitiPlugin.getDefault());
+    formTypeCombo = createCombobox(formTypes.toArray(new String[formTypes.size()]), 0);
+    createLabel("Form key", formTypeCombo);
+  }
 
-		TabbedPropertySheetWidgetFactory factory = getWidgetFactory();
-		Composite composite = factory.createFlatFormComposite(parent);
-		FormData data;
+  @Override
+  protected Object getModelValueForControl(Control control, Object businessObject) {
+    StartEvent event = (StartEvent) businessObject;
+    if (control == formTypeCombo) {
+      return event.getFormKey();
+    } 
+    return null;
+  }
 
-		formTypeCombo = factory.createCCombo(composite, SWT.NONE); //$NON-NLS-1$
-		formTypeCombo.setItems(PreferencesUtil.getStringArray(Preferences.ALFRESCO_FORMTYPES_STARTEVENT));
-    data = new FormData();
-    data.left = new FormAttachment(0, 120);
-    data.right = new FormAttachment(100, 0);
-    data.top = new FormAttachment(0, VSPACE);
-    formTypeCombo.setLayoutData(data);
-    formTypeCombo.addFocusListener(listener);
-
-    CLabel formKeyLabel = factory.createCLabel(composite, "Form key:"); //$NON-NLS-1$
-    data = new FormData();
-    data.left = new FormAttachment(0, 0);
-    data.right = new FormAttachment(formTypeCombo, -HSPACE);
-    data.top = new FormAttachment(formTypeCombo, 0, SWT.TOP);
-    formKeyLabel.setLayoutData(data);
-
-	}
-
-	@Override
-	public void refresh() {
-		PictogramElement pe = getSelectedPictogramElement();
-		if (pe != null) {
-			Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
-			// the filter assured, that it is a EClass
-			if (bo == null)
-				return;
-
-			StartEvent startEvent = ((StartEvent) bo);
-			if(startEvent.getFormKey() != null) {
-				
-			  formTypeCombo.removeFocusListener(listener);
-				String condition = startEvent.getFormKey();
-				formTypeCombo.setText(condition);
-				formTypeCombo.addFocusListener(listener);
-			} else {
-			  formTypeCombo.setText("");
-			}
-		}
-	}
-
-	private FocusListener listener = new FocusListener() {
-
-		public void focusGained(final FocusEvent e) {
-		}
-
-		public void focusLost(final FocusEvent e) {
-			PictogramElement pe = getSelectedPictogramElement();
-			if (pe != null) {
-				Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
-				if (bo instanceof StartEvent) {
-					DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
-					TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
-					ActivitiUiUtil.runModelChange(new Runnable() {
-						public void run() {
-							Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(getSelectedPictogramElement());
-							if (bo == null) {
-								return;
-							}
-							if (bo instanceof StartEvent == false) {
-								return;
-							}
-							StartEvent startEvent = (StartEvent) bo;
-							String formKey = formTypeCombo.getText();
-							if (formKey != null && formKey.length() > 0) {
-							  startEvent.setFormKey(formKey);
-								
-							} else {
-								startEvent.setFormKey("");
-							}
-						}
-					}, editingDomain, "Model Update");
-				}
-
-			}
-		}
-	};
-
+  @Override
+  protected void storeValueInModel(Control control, Object businessObject) {
+    StartEvent event = (StartEvent) businessObject;
+    if (control == formTypeCombo) {
+      event.setFormKey(formTypeCombo.getText());
+    }
+  }
 }

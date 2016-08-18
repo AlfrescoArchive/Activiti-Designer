@@ -1,19 +1,46 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.activiti.designer.features;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.designer.ActivitiImageProvider;
-import org.activiti.designer.eclipse.extension.ExtensionConstants;
+import org.activiti.bpmn.model.BaseElement;
+import org.activiti.bpmn.model.CustomProperty;
+import org.activiti.bpmn.model.ExtensionAttribute;
+import org.activiti.bpmn.model.ExtensionElement;
+import org.activiti.bpmn.model.ImplementationType;
+import org.activiti.bpmn.model.ServiceTask;
+import org.activiti.designer.PluginImage;
+import org.activiti.designer.eclipse.common.ActivitiPlugin;
+import org.activiti.designer.integration.annotation.Locale;
+import org.activiti.designer.integration.annotation.Locales;
+import org.activiti.designer.integration.annotation.Property;
+import org.activiti.designer.integration.annotation.TaskName;
+import org.activiti.designer.integration.annotation.TaskNames;
 import org.activiti.designer.integration.servicetask.CustomServiceTask;
-import org.activiti.designer.property.extension.util.ExtensionUtil;
+import org.activiti.designer.integration.servicetask.DelegateType;
+import org.activiti.designer.property.extension.field.FieldInfo;
+import org.activiti.designer.util.bpmn.BpmnExtensions;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
-import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.CustomProperty;
-import org.eclipse.bpmn2.ServiceTask;
-import org.eclipse.bpmn2.SubProcess;
+import org.activiti.designer.util.extension.ExtensionUtil;
+import org.activiti.designer.util.preferences.Preferences;
+import org.activiti.designer.util.preferences.PreferencesUtil;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
-import org.eclipse.graphiti.mm.pictograms.Diagram;
 
 public class CreateServiceTaskFeature extends AbstractCreateFastBPMNFeature {
 
@@ -30,77 +57,189 @@ public class CreateServiceTaskFeature extends AbstractCreateFastBPMNFeature {
     this.customServiceTaskId = customServiceTaskId;
   }
 
-  @Override
-  public boolean canCreate(ICreateContext context) {
-    Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-    return (context.getTargetContainer() instanceof Diagram || parentObject instanceof SubProcess);
-  }
-
+  @SuppressWarnings({ "rawtypes", "unchecked" })
   @Override
   public Object[] create(ICreateContext context) {
-    ServiceTask newServiceTask = Bpmn2Factory.eINSTANCE.createServiceTask();
-
-    newServiceTask.setId(getNextId());
-    setName("Service Task", newServiceTask, context);
+    ServiceTask newServiceTask = new ServiceTask();
+    newServiceTask.setName("Service Task");
+    newServiceTask.setExtensionId(customServiceTaskId);
+    
+    boolean isCustomNameSet = false;
 
     // Process custom service tasks
-    if (this.customServiceTaskId != null) {
+    if (newServiceTask.isExtended()) {
 
-      // Customize the name displayed by default
+      CustomServiceTask targetTask = findCustomServiceTask(newServiceTask);
+
+      if (targetTask != null) {
+
+        // What should happen if the class contain more than one annotations?
+        switch (targetTask.getDelegateType()) {
+        case JAVA_DELEGATE_CLASS:
+          newServiceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_CLASS);
+          newServiceTask.setImplementation(targetTask.getDelegateSpecification());
+          break;
+        case EXPRESSION:
+          newServiceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_EXPRESSION);
+          newServiceTask.setImplementation(targetTask.getDelegateSpecification());
+          break;
+        case JAVA_DELEGATE_EXPRESSION:
+          newServiceTask.setImplementationType(ImplementationType.IMPLEMENTATION_TYPE_DELEGATEEXPRESSION);
+          newServiceTask.setImplementation(targetTask.getDelegateSpecification());
+          break;
+        case NONE:
+          break;
+        default:
+          break;
+        }
+
+        newServiceTask.setName(targetTask.getName());
+        
+        final List<Class<CustomServiceTask>> classHierarchy = new ArrayList<Class<CustomServiceTask>>();
+        final List<FieldInfo> fieldInfoObjects = new ArrayList<FieldInfo>();
+
+        Class clazz = targetTask.getClass();
+        classHierarchy.add(clazz);
+
+        boolean hierarchyOpen = true;
+        while (hierarchyOpen) {
+          clazz = clazz.getSuperclass();
+          if (CustomServiceTask.class.isAssignableFrom(clazz)) {
+            classHierarchy.add(clazz);
+          } else {
+            hierarchyOpen = false;
+          }
+        }
+
+        // only process properties if the type is not an expression.
+        if (DelegateType.JAVA_DELEGATE_CLASS == targetTask.getDelegateType()) {
+          for (final Class<CustomServiceTask> currentClass : classHierarchy) {
+            
+            if (currentClass.isAnnotationPresent(TaskNames.class)) {
+              TaskNames taskNames = currentClass.getAnnotation(TaskNames.class);
+              if (taskNames.value() != null && taskNames.value().length > 0) {
+                for (TaskName taskName : taskNames.value()) {
+                  setCustomTaskName(newServiceTask, taskName.name(), taskName.locale());
+                  isCustomNameSet = true;
+                }
+              }
+            }
+            
+            for (final Field field : currentClass.getDeclaredFields()) {
+              if (field.isAnnotationPresent(Property.class)) {
+                fieldInfoObjects.add(new FieldInfo(field));
+              }
+            }
+          }
+        }
+        
+        for (final FieldInfo fieldInfo : fieldInfoObjects) {
+
+          final Property property = fieldInfo.getPropertyAnnotation();
+          
+          CustomProperty customProperty = ExtensionUtil.getCustomProperty(newServiceTask, fieldInfo.getFieldName());
+
+          if (customProperty == null) {
+            customProperty = new CustomProperty();
+            newServiceTask.getCustomProperties().add(customProperty);
+          }
+
+          customProperty.setId(ExtensionUtil.wrapCustomPropertyId(newServiceTask, fieldInfo.getFieldName()));
+          customProperty.setName(fieldInfo.getFieldName());
+          
+          final Locales localesAnnotation = fieldInfo.getLocalesAnnotation();
+          String localeDefaultValue = null;
+          if (localesAnnotation != null && localesAnnotation.value() != null && localesAnnotation.value().length > 0) {
+            String defaultLanguage = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_DEFAULT_LANGUAGE, ActivitiPlugin.getDefault());
+            if (StringUtils.isNotEmpty(defaultLanguage)) {
+              for (Locale locale : localesAnnotation.value()) {
+                if (defaultLanguage.equalsIgnoreCase(locale.locale())) {
+                  localeDefaultValue = locale.defaultValue();
+                }
+              }
+            }
+          }
+          
+          if (StringUtils.isNotEmpty(localeDefaultValue)) {  
+            customProperty.setSimpleValue(localeDefaultValue);
+            
+          } else if (StringUtils.isNotEmpty(property.defaultValue())) {
+            customProperty.setSimpleValue(property.defaultValue());
+          }
+        }
+      }
+    }
+
+    if (isCustomNameSet == false) {
+      addObjectToContainer(context, newServiceTask, newServiceTask.getName());
+    } else {
+      addObjectToContainer(context, newServiceTask);
+    }
+
+    return new Object[] { newServiceTask };
+  }
+
+  protected CustomServiceTask findCustomServiceTask(ServiceTask serviceTask) {
+    CustomServiceTask result = null;
+
+    if (serviceTask.isExtended()) {
+
       final List<CustomServiceTask> customServiceTasks = ExtensionUtil.getCustomServiceTasks(ActivitiUiUtil.getProjectFromDiagram(getDiagram()));
 
-      CustomServiceTask targetTask = null;
-
       for (final CustomServiceTask customServiceTask : customServiceTasks) {
-        if (this.customServiceTaskId.equals(customServiceTask.getId())) {
-          targetTask = customServiceTask;
+        if (serviceTask.getExtensionId().equals(customServiceTask.getId())) {
+          result = customServiceTask;
           break;
         }
       }
-
-      if (targetTask != null) {
-        // Create custom property containing task name
-        CustomProperty customServiceTaskProperty = Bpmn2Factory.eINSTANCE.createCustomProperty();
-
-        customServiceTaskProperty.setId(ExtensionUtil.wrapCustomPropertyId(newServiceTask, ExtensionConstants.PROPERTY_ID_CUSTOM_SERVICE_TASK));
-        customServiceTaskProperty.setName(ExtensionConstants.PROPERTY_ID_CUSTOM_SERVICE_TASK);
-        customServiceTaskProperty.setSimpleValue(this.customServiceTaskId);
-
-        getDiagram().eResource().getContents().add(customServiceTaskProperty);
-
-        newServiceTask.getCustomProperties().add(customServiceTaskProperty);
-        newServiceTask.setImplementation(targetTask.getRuntimeClassname());
-        newServiceTask.setName(targetTask.getName());
+    }
+    return result;
+  }
+  
+  protected void setCustomTaskName(Object bo, String name, String language) {
+    BaseElement element = (BaseElement) bo;
+    List<ExtensionElement> extensionElements = null;
+    if (element.getExtensionElements().containsKey(BpmnExtensions.LANGUAGE_EXTENSION)) {
+      extensionElements = element.getExtensionElements().get(BpmnExtensions.LANGUAGE_EXTENSION);
+    }
+    
+    if (extensionElements == null) {
+      extensionElements = new ArrayList<ExtensionElement>();
+      element.getExtensionElements().put(BpmnExtensions.LANGUAGE_EXTENSION, extensionElements);
+    }
+    
+    ExtensionElement languageElement = null;
+    for (ExtensionElement extensionElement : extensionElements) {
+      List<ExtensionAttribute> languageAttributes = extensionElement.getAttributes().get("language");
+      if (languageAttributes != null && languageAttributes.size() == 1) {
+        String languageValue = languageAttributes.get(0).getValue();
+        if (language.equals(languageValue)) {
+          languageElement = extensionElement;
+        }
       }
-
     }
     
-    Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-    if (parentObject instanceof SubProcess) {
-      ((SubProcess) parentObject).getFlowElements().add(newServiceTask);
-    } else {
-      getDiagram().eResource().getContents().add(newServiceTask);
+    if (languageElement == null) {
+      languageElement = new ExtensionElement();
+      languageElement.setName(BpmnExtensions.LANGUAGE_EXTENSION);
+      languageElement.setNamespace(BpmnExtensions.DESIGNER_EXTENSION_NAMESPACE);
+      languageElement.setNamespacePrefix(BpmnExtensions.DESIGNER_EXTENSION_NAMESPACE_PREFIX);
+      ExtensionAttribute languageAttribute = new ExtensionAttribute("language");
+      languageAttribute.setValue(language);
+      languageElement.addAttribute(languageAttribute);
+      extensionElements.add(languageElement);
     }
-
-    addGraphicalContent(newServiceTask, context);
     
-    return new Object[] { newServiceTask };
+    languageElement.setElementText(name);
   }
 
   @Override
   public String getCreateImageId() {
-    return ActivitiImageProvider.IMG_SERVICETASK;
+    return PluginImage.IMG_SERVICETASK.getImageKey();
   }
 
   @Override
   protected String getFeatureIdKey() {
     return FEATURE_ID_KEY;
   }
-
-  @SuppressWarnings("rawtypes")
-  @Override
-  protected Class getFeatureClass() {
-    return Bpmn2Factory.eINSTANCE.createServiceTask().getClass();
-  }
-
 }

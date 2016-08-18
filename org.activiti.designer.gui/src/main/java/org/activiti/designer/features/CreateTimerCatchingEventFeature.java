@@ -1,63 +1,50 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.activiti.designer.features;
 
-import org.activiti.designer.ActivitiImageProvider;
-import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.IntermediateCatchEvent;
-import org.eclipse.bpmn2.SubProcess;
-import org.eclipse.bpmn2.TimerEventDefinition;
+import org.activiti.bpmn.model.IntermediateCatchEvent;
+import org.activiti.bpmn.model.TimerEventDefinition;
+import org.activiti.designer.PluginImage;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
-import org.eclipse.graphiti.mm.pictograms.Diagram;
 
 public class CreateTimerCatchingEventFeature extends AbstractCreateFastBPMNFeature {
-	
-	public static final String FEATURE_ID_KEY = "timerintermediatecatchevent";
 
-	public CreateTimerCatchingEventFeature(IFeatureProvider fp) {
-		// set name and description of the creation feature
-		super(fp, "TimerCatchingEvent", "Add timer intermediate catching event");
-	}
+  public static final String FEATURE_ID_KEY = "timerintermediatecatchevent";
 
-	public boolean canCreate(ICreateContext context) {
-	  Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-    return (context.getTargetContainer() instanceof Diagram || parentObject instanceof SubProcess);
-	}
+  public CreateTimerCatchingEventFeature(IFeatureProvider fp) {
+    // set name and description of the creation feature
+    super(fp, "TimerCatchingEvent", "Add timer intermediate catching event");
+  }
 
-	public Object[] create(ICreateContext context) {
-		IntermediateCatchEvent catchEvent = Bpmn2Factory.eINSTANCE.createIntermediateCatchEvent();
-		TimerEventDefinition eventDef = Bpmn2Factory.eINSTANCE.createTimerEventDefinition();
-		catchEvent.getEventDefinitions().add(eventDef);
-		
-		catchEvent.setId(getNextId());
-		catchEvent.setName("TimerCatchEvent");
-		
-		Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-		if (parentObject instanceof SubProcess) {
-      ((SubProcess) parentObject).getFlowElements().add(catchEvent);
-    } else {
-      getDiagram().eResource().getContents().add(catchEvent);
-    }
+  public Object[] create(ICreateContext context) {
+    IntermediateCatchEvent catchEvent = new IntermediateCatchEvent();
+    TimerEventDefinition eventDef = new TimerEventDefinition();
+    catchEvent.getEventDefinitions().add(eventDef);
+    addObjectToContainer(context, catchEvent, "TimerCatchEvent");
 
-    addGraphicalContent(catchEvent, context);
-		
-		// return newly created business object(s)
-		return new Object[] { catchEvent };
-	}
-	
-	@Override
-	public String getCreateImageId() {
-		return ActivitiImageProvider.IMG_BOUNDARY_TIMER;
-	}
+    // return newly created business object(s)
+    return new Object[] { catchEvent };
+  }
 
-	@Override
-	protected String getFeatureIdKey() {
-		return FEATURE_ID_KEY;
-	}
+  @Override
+  public String getCreateImageId() {
+    return PluginImage.IMG_EVENT_TIMER.getImageKey();
+  }
 
-	@SuppressWarnings("rawtypes")
-	@Override
-	protected Class getFeatureClass() {
-		return Bpmn2Factory.eINSTANCE.createIntermediateCatchEvent().getClass();
-	}
-
+  @Override
+  protected String getFeatureIdKey() {
+    return FEATURE_ID_KEY;
+  }
 }

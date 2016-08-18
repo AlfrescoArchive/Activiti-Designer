@@ -1,121 +1,102 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.activiti.designer.property;
 
+import org.activiti.bpmn.model.SequenceFlow;
+import org.activiti.designer.util.TextUtil;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
-import org.activiti.designer.util.property.ActivitiPropertySection;
-import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.FormalExpression;
-import org.eclipse.bpmn2.SequenceFlow;
+import org.apache.commons.lang.math.NumberUtils;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
-import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.services.Graphiti;
-import org.eclipse.graphiti.ui.editor.DiagramEditor;
-import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
-import org.eclipse.swt.layout.FormAttachment;
-import org.eclipse.swt.layout.FormData;
-import org.eclipse.swt.widgets.Composite;
+import org.eclipse.graphiti.mm.pictograms.ConnectionDecorator;
+import org.eclipse.graphiti.mm.pictograms.FreeFormConnection;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
-import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
 public class PropertySequenceFlowSection extends ActivitiPropertySection implements ITabbedPropertyConstants {
 	
-	private Text conditionExpressionText;
-	
-	@Override
-	public void createControls(Composite parent, TabbedPropertySheetPage tabbedPropertySheetPage) {
-		super.createControls(parent, tabbedPropertySheetPage);
+  protected Text flowLabelWidthText;
+  protected Text conditionExpressionText;
+  protected Text skipExpressionText;
+  
+  @Override
+  public void createFormControls(TabbedPropertySheetPage aTabbedPropertySheetPage) {
+    flowLabelWidthText = createTextControl(false);
+    createLabel("Label width (50-500)", flowLabelWidthText);
+    skipExpressionText = createTextControl(false);
+    createLabel("Skip expression", skipExpressionText);
+    conditionExpressionText = createTextControl(true);
+    createLabel("Condition", conditionExpressionText);
+  }
 
-		TabbedPropertySheetWidgetFactory factory = getWidgetFactory();
-		Composite composite = factory.createFlatFormComposite(parent);
-		FormData data;
+  @Override
+  protected Object getModelValueForControl(Control control, Object businessObject) {
+    SequenceFlow sequenceFlow = (SequenceFlow) businessObject;
+    if (control == flowLabelWidthText) {
+      EList<ConnectionDecorator> decoratorList = ((FreeFormConnection) getSelectedPictogramElement()).getConnectionDecorators();
+      for (ConnectionDecorator decorator : decoratorList) {
+        if (decorator.getGraphicsAlgorithm() instanceof org.eclipse.graphiti.mm.algorithms.MultiText) {
+          org.eclipse.graphiti.mm.algorithms.MultiText text = (org.eclipse.graphiti.mm.algorithms.MultiText) decorator.getGraphicsAlgorithm();
+          return "" + text.getWidth();
+        }
+      }
+      
+    } else if (control == conditionExpressionText) {
+      return sequenceFlow.getConditionExpression();
+      
+    } else if (control == skipExpressionText) {
+      return sequenceFlow.getSkipExpression();
+    }
+    return null;
+  }
 
-		conditionExpressionText = factory.createText(composite, "", SWT.MULTI | SWT.BORDER | SWT.WRAP | SWT.V_SCROLL); //$NON-NLS-1$
-		data = new FormData(SWT.DEFAULT, 100);
-		data.left = new FormAttachment(0, 120);
-		data.right = new FormAttachment(100, 0);
-		data.top = new FormAttachment(0, VSPACE);
-		conditionExpressionText.setLayoutData(data);
-		conditionExpressionText.addFocusListener(listener);
+  @Override
+  protected void storeValueInModel(Control control, Object businessObject) {
+    SequenceFlow sequenceFlow = (SequenceFlow) businessObject;
+    if (control == flowLabelWidthText) {
+      EList<ConnectionDecorator> decoratorList = ((FreeFormConnection) getSelectedPictogramElement()).getConnectionDecorators();
+      for (ConnectionDecorator decorator : decoratorList) {
+        if (decorator.getGraphicsAlgorithm() instanceof org.eclipse.graphiti.mm.algorithms.MultiText) {
+          final org.eclipse.graphiti.mm.algorithms.MultiText text = (org.eclipse.graphiti.mm.algorithms.MultiText) decorator.getGraphicsAlgorithm();
+          final String widthText = flowLabelWidthText.getText();
+          
+          if (NumberUtils.isNumber(widthText)) {
+            final long width = Long.valueOf(widthText);
+            if (width >= 50 || width <= 500) {
+              
+              final Runnable runnable = new Runnable() {
 
-		CLabel scriptLabel = factory.createCLabel(composite, "Condition:"); //$NON-NLS-1$
-		data = new FormData();
-		data.left = new FormAttachment(0, 0);
-		data.right = new FormAttachment(conditionExpressionText, -HSPACE);
-		data.top = new FormAttachment(conditionExpressionText, 0, SWT.TOP);
-		scriptLabel.setLayoutData(data);
+                public void run() {
 
-	}
-
-	@Override
-	public void refresh() {
-		PictogramElement pe = getSelectedPictogramElement();
-		if (pe != null) {
-			Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
-			// the filter assured, that it is a EClass
-			if (bo == null)
-				return;
-
-			SequenceFlow sequenceFlow = ((SequenceFlow) bo);
-			if(sequenceFlow.getConditionExpression() != null) {
-				
-				conditionExpressionText.removeFocusListener(listener);
-				String condition = sequenceFlow.getConditionExpression().getBody();
-				conditionExpressionText.setText(condition);
-				conditionExpressionText.addFocusListener(listener);
-			} else {
-				conditionExpressionText.setText("");
-			}
-		}
-	}
-
-	private FocusListener listener = new FocusListener() {
-
-		public void focusGained(final FocusEvent e) {
-		}
-
-		public void focusLost(final FocusEvent e) {
-			PictogramElement pe = getSelectedPictogramElement();
-			if (pe != null) {
-				Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
-				if (bo instanceof SequenceFlow) {
-					DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
-					TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
-					ActivitiUiUtil.runModelChange(new Runnable() {
-						public void run() {
-							Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(getSelectedPictogramElement());
-							if (bo == null) {
-								return;
-							}
-							if (bo instanceof SequenceFlow == false) {
-								return;
-							}
-							SequenceFlow sequenceFlow = (SequenceFlow) bo;
-							String condition = conditionExpressionText.getText();
-							if (condition != null && condition.length() > 0) {
-								FormalExpression expression = sequenceFlow.getConditionExpression();
-								if(expression == null) {
-									expression = Bpmn2Factory.eINSTANCE.createFormalExpression();
-									expression.setId(sequenceFlow.getId() + "_condition");
-									sequenceFlow.setConditionExpression(expression);
-								}
-								expression.setBody(condition);
-								
-							} else {
-								FormalExpression expression = sequenceFlow.getConditionExpression();
-								if(expression != null) {
-									sequenceFlow.setConditionExpression(null);
-								}
-							}
-						}
-					}, editingDomain, "Model Update");
-				}
-
-			}
-		}
-	};
-
+                  TextUtil.setTextSize((int) width, text);
+                }
+              };
+              
+              TransactionalEditingDomain editingDomain = getDiagramContainer().getDiagramBehavior().getEditingDomain();
+              ActivitiUiUtil.runModelChange(runnable, editingDomain, "Model Update");
+            }
+          }
+        }
+      }
+      
+    } else if (control == conditionExpressionText) {
+      sequenceFlow.setConditionExpression(conditionExpressionText.getText());
+      
+    } else if (control == skipExpressionText) {
+      sequenceFlow.setSkipExpression(skipExpressionText.getText());
+    }
+  }
 }

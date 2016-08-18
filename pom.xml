@@ -1,0 +1,71 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+
+	<groupId>org.activiti.designer</groupId>
+	<artifactId>org.activiti.designer.root</artifactId>
+	<version>5.18.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<name>Activiti Designer - Root project</name>
+	<description>Activiti Designer - Root project pom</description>
+
+	<properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+	</properties>
+
+
+	<modules>
+		<module>org.activiti.designer.parent</module>
+	</modules>
+	
+	<!-- Various information, not used by the build -->
+
+	<url>http://activiti.org</url>
+	<licenses>
+		<license>
+			<name>Apache v2</name>
+			<url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
+		</license>
+	</licenses>
+	<organization>
+		<name>Alfresco</name>
+		<url>http://www.alfresco.com</url>
+	</organization>
+	<developers>
+		<developer>
+			<name>Tijs Rademakers</name>
+			<organization>Alfresco</organization>
+			<url>http://www.alfresco.com</url>
+		</developer>
+		<developer>
+			<name>Joram Barrez</name>
+			<organization>Alfresco</organization>
+			<url>http://www.alfresco.com</url>
+		</developer>
+		<developer>
+			<name>Frederik Heremans</name>
+			<organization>Alfresco</organization>
+			<url>http://www.alfresco.com</url>
+		</developer>
+		<developer>
+			<name>Yvo Swillens</name>
+			<organization>Alfresco</organization>
+			<url>http://www.alfresco.com</url>
+		</developer>
+	</developers>
+	<issueManagement>
+		<system>JIRA</system>
+		<url>https://activiti.atlassian.net/browse/ACT</url>
+	</issueManagement>
+	<ciManagement>
+		<system>Bamboo</system>
+		<url>http://bamboo.ci.codehaus.org/browse/ACT</url>
+	</ciManagement>
+	<scm>
+		<url>git@github.com:Activiti/Activiti-Designer.git</url>
+		<connection>scm:git:git@github.com:Activiti/Activiti-Designer.git</connection>
+		<developerConnection>scm:git:git@github.com:Activiti/Activiti-Designer.git</developerConnection>
+	</scm>
+
+</project>

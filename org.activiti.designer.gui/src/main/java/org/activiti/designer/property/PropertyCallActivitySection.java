@@ -1,199 +1,265 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.activiti.designer.property;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
+import org.activiti.bpmn.model.CallActivity;
 import org.activiti.designer.Activator;
 import org.activiti.designer.PluginImage;
-import org.activiti.designer.eclipse.common.ActivitiBPMNDiagramConstants;
+import org.activiti.designer.command.BpmnProcessModelUpdater;
 import org.activiti.designer.eclipse.common.ActivitiPlugin;
-import org.activiti.designer.util.eclipse.ActivitiUiUtil;
-import org.activiti.designer.util.property.ActivitiPropertySection;
+import org.activiti.designer.util.ActivitiConstants;
+import org.activiti.designer.util.dialog.ActivitiResourceSelectionDialog;
 import org.activiti.designer.util.workspace.ActivitiWorkspaceUtil;
 import org.apache.commons.lang.StringUtils;
-import org.eclipse.bpmn2.CallActivity;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.resources.ResourcesPlugin;
-import org.eclipse.core.runtime.IPath;
 import org.eclipse.core.runtime.IStatus;
 import org.eclipse.core.runtime.Status;
-import org.eclipse.emf.transaction.TransactionalEditingDomain;
-import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.services.Graphiti;
-import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.jface.dialogs.ErrorDialog;
-import org.eclipse.jface.dialogs.MessageDialog;
+import org.eclipse.jface.viewers.LabelProvider;
+import org.eclipse.jface.window.Window;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.CLabel;
-import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.widgets.Button;
-import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.Event;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
-import org.eclipse.ui.IFileEditorInput;
+import org.eclipse.ui.IWorkbenchPage;
 import org.eclipse.ui.PartInitException;
 import org.eclipse.ui.PlatformUI;
-import org.eclipse.ui.part.FileEditorInput;
+import org.eclipse.ui.dialogs.TwoPaneElementSelector;
+import org.eclipse.ui.ide.IDE;
+import org.eclipse.ui.model.WorkbenchLabelProvider;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
-import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
+/**
+ * Adds the called element of the call activity to the "Main Config" properties sheet. Provides a
+ * possibility to lookup a process with the given element ID in the currently open workspace
+ * projects as well as a choice of all available projects.
+ *
+ * @since 5.12
+ */
 public class PropertyCallActivitySection extends ActivitiPropertySection implements ITabbedPropertyConstants {
 
-  private Text callElementText;
+  /** The text field of the process ID to call */
+  private Text calledElementText;
 
-  private Button callElementButton;
+  /**
+   * A button that becomes active in case a process is found in the current workspace with this
+   * the ID
+   */
+  private Button openCalledElementButton;
 
+  /**
+   * A button that allows to choose a called element among all currently found processes.
+   */
+  private Button chooseCalledElementButton;
+  
+  
   @Override
-  public void createControls(Composite parent, TabbedPropertySheetPage tabbedPropertySheetPage) {
-    super.createControls(parent, tabbedPropertySheetPage);
-
-    TabbedPropertySheetWidgetFactory factory = getWidgetFactory();
-    Composite composite = factory.createFlatFormComposite(parent);
-    FormData data;
-
-    callElementButton = factory.createButton(composite, StringUtils.EMPTY, SWT.PUSH);
-    callElementButton.setImage(Activator.getImage(PluginImage.ACTION_GO));
-    data = new FormData();
+  public void createFormControls(TabbedPropertySheetPage aTabbedPropertySheetPage) {
+    openCalledElementButton = getWidgetFactory().createButton(formComposite, StringUtils.EMPTY, SWT.PUSH);
+    openCalledElementButton.setImage(Activator.getImage(PluginImage.ACTION_GO));
+    FormData data = new FormData();
     data.right = new FormAttachment(100, -HSPACE);
-    callElementButton.setLayoutData(data);
-    callElementButton.addSelectionListener(openListener);
+    openCalledElementButton.setLayoutData(data);
+    openCalledElementButton.addSelectionListener(openCalledElementSelected);
 
-    callElementText = factory.createText(composite, ""); //$NON-NLS-1$
+    chooseCalledElementButton = getWidgetFactory().createButton(formComposite, "\u2026", SWT.PUSH);
+    chooseCalledElementButton.setToolTipText(
+            "Click to open a dialog to choose from all found processes.");
+
     data = new FormData();
-    data.left = new FormAttachment(0, 150);
-    data.right = new FormAttachment(callElementButton, -HSPACE);
-    data.top = new FormAttachment(0, VSPACE);
-    callElementText.setLayoutData(data);
-    callElementText.addFocusListener(listener);
-    callElementText.addListener(SWT.CHANGED, new Listener() {
-
-      @Override
-      public void handleEvent(Event arg0) {
-        evaluateCallElementButtonEnabled();
-      }
-    });
-
-    CLabel elementLabel = factory.createCLabel(composite, "Called element:"); //$NON-NLS-1$
-    data = new FormData();
-    data.left = new FormAttachment(0, 0);
-    data.right = new FormAttachment(callElementText, -HSPACE);
-    data.top = new FormAttachment(callElementText, 0, SWT.TOP);
-    elementLabel.setLayoutData(data);
-
+    data.right = new FormAttachment(openCalledElementButton, -HSPACE);
+    chooseCalledElementButton.setLayoutData(data);
+    chooseCalledElementButton.addSelectionListener(chooseCalledElementSelected);
+    
+    calledElementText = createTextControl(false);
+    FormData formData = (FormData) calledElementText.getLayoutData();
+    formData.right.offset = -80;
+    createLabel("Called element", calledElementText);
   }
 
   @Override
-  public void refresh() {
-    callElementText.removeFocusListener(listener);
-
-    PictogramElement pe = getSelectedPictogramElement();
-    if (pe != null) {
-      Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
-      // the filter assured, that it is a EClass
-      if (bo == null)
-        return;
-
-      CallActivity callActivity = (CallActivity) bo;
-      String calledElement = callActivity.getCalledElement();
-      callElementText.setText(calledElement == null ? "" : calledElement);
+  protected Object getModelValueForControl(Control control, Object businessObject) {
+    CallActivity activity = (CallActivity) businessObject;
+    if (control == calledElementText) {
+      return activity.getCalledElement();
     }
-    callElementText.addFocusListener(listener);
-    evaluateCallElementButtonEnabled();
+    return null;
   }
 
-  private void evaluateCallElementButtonEnabled() {
-    final String callElement = callElementText.getText();
-    if (StringUtils.isBlank(callElement)) {
-      disableCallElementButton();
+  @Override
+  protected void storeValueInModel(Control control, Object businessObject) {
+    CallActivity activity = (CallActivity) businessObject;
+    
+    if (control == calledElementText) {
+      evaluateOpenCalledElementButtonEnabledStatus();
+      activity.setCalledElement(calledElementText.getText());
+    }
+  }
+
+  /**
+   * Checks, whether the given process ID refers to a process this call activity might lead to.
+   *
+   * @param calledElement the process ID to check
+   * @return <code>true</code> in case such a process ID exists, <code>false</code> otherwise.
+   */
+  private boolean isCalledElementExisting(final String calledElement) {
+    final Set<IFile> resources = ActivitiWorkspaceUtil.getDiagramDataFilesByProcessId(calledElement);
+
+    return !resources.isEmpty();
+  }
+
+  /**
+   * Evaluates the current state of the button to open the corresponding process diagram of the
+   * given process ID. In case the called element is empty or a not found, the button will be
+   * disabled, otherwise enabled.
+   */
+  private void evaluateOpenCalledElementButtonEnabledStatus() {
+    final String calledElement = calledElementText.getText();
+
+    if (StringUtils.isBlank(calledElement) || !isCalledElementExisting(calledElement)) {
+      openCalledElementButton.setEnabled(false);
+      openCalledElementButton.setToolTipText(null);
     } else {
-      final Set<IFile> resources = ActivitiWorkspaceUtil.getBPMNResourcesById(callElement);
-      if (resources.size() > 0) {
-        enableCallElementButton();
-      } else {
-        disableCallElementButton();
-      }
+      openCalledElementButton.setEnabled(true);
+      openCalledElementButton.setToolTipText("Click to open the called element's process diagram");
     }
   }
 
-  private void disableCallElementButton() {
-    callElementButton.setEnabled(false);
-  }
-
-  private void enableCallElementButton() {
-    callElementButton.setEnabled(true);
-    callElementButton.setToolTipText("Click to open the called element's process diagram");
-  }
-
-  private SelectionListener openListener = new SelectionListener() {
+  /**
+   * This listener is called in case the user presses the button to choose a process from one of
+   * the existing processes in any open project.
+   */
+  private SelectionListener chooseCalledElementSelected = new SelectionListener() {
 
     @Override
     public void widgetSelected(SelectionEvent event) {
-      final String calledElement = callElementText.getText();
+      final Map<IFile, Set<String>> processIdsByDataFiles
+        = ActivitiWorkspaceUtil.getAllProcessIdsByDiagramDataFile();
 
-      final Set<IFile> resources = ActivitiWorkspaceUtil.getBPMNResourcesById(calledElement);
+      // we now need to make a list out of this, as the TwoPaneElementSelector wants it this way
+      final List<Object[]> selectorInput = new ArrayList<Object[]>();
+
+      for (final Entry<IFile, Set<String>> entry : processIdsByDataFiles.entrySet()) {
+        for (final String processId : entry.getValue()) {
+          entry.getKey().getFullPath();
+
+
+          selectorInput.add(new Object[] { entry.getKey(), processId });
+        }
+      }
+
+      final TwoPaneElementSelector dialog
+        = new TwoPaneElementSelector(Display.getCurrent().getActiveShell()
+                                   , new DiagramLabelProvider()
+                                   , new ProcessIdLabelProvider());
+
+      dialog.setTitle("Choose Called Element for Call Activity");
+      dialog.setMessage("Choose a diagram and a process");
+      dialog.setBlockOnOpen(true);
+      dialog.setElements(selectorInput.toArray());
+      dialog.setUpperListLabel("Diagrams");
+      dialog.setLowerListLabel("Processes");
+
+      if (dialog.open() == Window.OK) {
+        final Object[] data = (Object[]) dialog.getFirstResult();
+
+        calledElementText.setText((String) data[1]);
+        
+        //Fix "called element" value not save when select from pop up.
+        BpmnProcessModelUpdater updater = getProcessModelUpdater();
+        Object updatableBo = updater.getUpdatableBusinessObject();
+        storeValueInModel(calledElementText, updatableBo);
+        executeModelUpdater();
+      }
+    }
+
+    @Override
+    public void widgetDefaultSelected(SelectionEvent event) {
+      // intentionally left blank
+    }
+  };
+
+  /**
+   * This listener is called in case the user clicks the button to open the selected process
+   * model.
+   */
+  private SelectionListener openCalledElementSelected = new SelectionListener() {
+
+    @Override
+    public void widgetSelected(SelectionEvent event) {
+      final String calledElement = calledElementText.getText();
+
+      final Set<IFile> resources = ActivitiWorkspaceUtil.getDiagramDataFilesByProcessId(calledElement);
 
       if (resources.size() == 1) {
         // open diagram
         openDiagramForBpmnFile(resources.iterator().next());
+        
       } else if (resources.size() > 1) {
-        // TODO open selection dialog, http://jira.codehaus.org/browse/ACT-895
-        MessageDialog.openInformation(Display.getCurrent().getActiveShell(), "Multiple processes found", String.format(
-                "There are multiple resources in the workspace that have the call element id of '%s'. Cannot determine which file should be opened.",
-                calledElement));
-      } else {
-        // The button should not have been enabled in the first place
-        throw new IllegalStateException(String.format("Cannot open diagram for process id '%s' because it can't be found in the workspace", calledElement));
+        final ActivitiResourceSelectionDialog dialog = new ActivitiResourceSelectionDialog(
+                Display.getCurrent().getActiveShell(), resources.toArray(new IResource[] {}));
+
+        dialog.setTitle("Multiple Processes Found");
+        dialog.setMessage("Select a Process Model to use (* = any string, ? = any char):");
+        dialog.setBlockOnOpen(true);
+        dialog.setInitialPattern("*");
+
+        if (dialog.open() == Window.OK) {
+          final Object[] result = dialog.getResult();
+
+          openDiagramForBpmnFile((IFile) result[0]);
+        }
       }
     }
 
-    private void openDiagramForBpmnFile(IFile resource) {
+    /**
+     * Opens the given diagram specified by the given data file in a new editor. In case an error
+     * occurs while doing so, opens an error dialog.
+     *
+     * @param dataFile the data file to use for the new editor to open
+     */
+    private void openDiagramForBpmnFile(IFile dataFile) {
 
-      boolean openBpmnFile = true;
-      IFile activitiFile = null;
+      if (dataFile.exists())
+      {
+        final IWorkbenchPage activePage
+          = PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage();
 
-      // Get the Activiti file to go with the provided resource
-      final IPath activitiFilePath = resource.getFullPath().removeFileExtension().removeFileExtension()
-              .addFileExtension(ActivitiBPMNDiagramConstants.DIAGRAM_EXTENSION_RAW);
+        try {
+          IDE.openEditor(activePage, dataFile, ActivitiConstants.DIAGRAM_EDITOR_ID, true);
+        } catch (PartInitException exception) {
+          final IStatus status = new Status(IStatus.ERROR, ActivitiPlugin.getID()
+                                          , "Error while opening new editor.", exception);
 
-      final IResource activitiResource = ResourcesPlugin.getWorkspace().getRoot().findMember(activitiFilePath);
-
-      if (activitiResource != null && activitiResource.exists() && activitiResource instanceof IFile) {
-        activitiFile = (IFile) activitiResource;
-        openBpmnFile = false;
-      }
-
-      try {
-        if (!openBpmnFile) {
-          IFileEditorInput input = new FileEditorInput(activitiFile);
-          PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(input, ActivitiBPMNDiagramConstants.DIAGRAM_EDITOR_ID);
-        } else {
-          boolean userChoice = MessageDialog
-                  .openConfirm(
-                          Display.getCurrent().getActiveShell(),
-                          "No diagram file found",
-                          String.format(
-                                  "The process with id '%s' was found in the workspace, but its matching diagram file with name '%s' appears to be missing. Would you like to open the BPMN 2.0 XML Editor instead?",
-                                  callElementText.getText(), activitiFilePath.lastSegment()));
-          if (userChoice) {
-            IFileEditorInput input = new FileEditorInput(resource);
-            PlatformUI.getWorkbench().getActiveWorkbenchWindow().getActivePage().openEditor(input, ActivitiBPMNDiagramConstants.BPMN_EDITOR_ID);
-          }
+          ErrorDialog.openError(Display.getCurrent().getActiveShell()
+                              , "Error Opening Activiti Diagram", null, status);
         }
-      } catch (PartInitException e) {
-        String error = "Error while opening editor";
-        IStatus status = new Status(IStatus.ERROR, ActivitiPlugin.getID(), error, e);
-        ErrorDialog.openError(Display.getCurrent().getActiveShell(), "An error occured", null, status);
-        return;
       }
-
     }
 
     @Override
@@ -201,34 +267,42 @@ public class PropertyCallActivitySection extends ActivitiPropertySection impleme
       widgetSelected(event);
     }
   };
+  
+  /**
+   * A private process ID label provider that simply returns the second element of the pair built
+   * from process ID and data file. This is used in the selection list for an available process.
+   */
+  private static class ProcessIdLabelProvider extends LabelProvider {
 
-  private FocusListener listener = new FocusListener() {
+    @Override
+    public String getText(Object element) {
 
-    public void focusGained(final FocusEvent e) {
+      return (String) ((Object[]) element)[1];
     }
 
-    public void focusLost(final FocusEvent e) {
-      PictogramElement pe = getSelectedPictogramElement();
-      if (pe != null) {
-        Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
-        if (bo instanceof CallActivity) {
-          DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
-          TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
-          ActivitiUiUtil.runModelChange(new Runnable() {
+  }
 
-            public void run() {
-              Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(getSelectedPictogramElement());
-              if (bo == null) {
-                return;
-              }
-              String calledElement = callElementText.getText();
-              CallActivity callActivity = (CallActivity) bo;
-              callActivity.setCalledElement(calledElement);
-            }
-          }, editingDomain, "Model Update");
-        }
+  /**
+   * This label provider is used in the selection list for a diagram in the lower list. It utilizes
+   * a workbench label provider to retrieve the appropriate image for the diagram.
+   */
+  private static class DiagramLabelProvider extends LabelProvider {
 
-      }
+    private WorkbenchLabelProvider labelProvider = new WorkbenchLabelProvider();
+
+    @Override
+    public Image getImage(Object element) {
+      final IResource resource = (IResource) ((Object[]) element)[0];
+
+      return labelProvider.getImage(resource);
     }
-  };
+
+    @Override
+    public String getText(Object element) {
+      final IResource resource = (IResource) ((Object[]) element)[0];
+
+      return resource.getFullPath().makeRelative().toString();
+    }
+
+  }
 }

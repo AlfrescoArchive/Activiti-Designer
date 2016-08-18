@@ -1,17 +1,26 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.activiti.designer.property.ui;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.activiti.designer.util.eclipse.ActivitiUiUtil;
-import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.CallActivity;
-import org.eclipse.bpmn2.IOParameter;
-import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.activiti.bpmn.model.CallActivity;
+import org.activiti.bpmn.model.IOParameter;
+import org.activiti.designer.property.ModelUpdater;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.platform.IDiagramEditor;
-import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.TableItem;
@@ -20,16 +29,17 @@ import org.eclipse.swt.widgets.TableItem;
 public class IOParameterEditor extends TableFieldEditor {
   
   protected Composite parent;
+  protected ModelUpdater modelUpdater;
+  
   public PictogramElement pictogramElement;
-  public IDiagramEditor diagramEditor;
   public Diagram diagram;
   public boolean isInputParameters = false;
 	
-  public IOParameterEditor(String key, Composite parent) {
-    
-    super(key, "", new String[] {"Source", "Target"},
-        new int[] {300, 300}, parent);
+  public IOParameterEditor(String key, Composite parent, ModelUpdater modelUpdater) {
+    super(key, "", new String[] {"Source", "Source expression", "Target", "Target expression"},
+        new int[] {150, 150, 150, 150}, parent);
     this.parent = parent;
+    this.modelUpdater = modelUpdater;
   }
 
   public void initialize(List<IOParameter> parameterList) {
@@ -38,6 +48,11 @@ public class IOParameterEditor extends TableFieldEditor {
     for (IOParameter parameter : parameterList) {
       addTableItem(parameter);
     }
+  }
+  
+  @Override
+  protected boolean isTableChangeEnabled() {
+    return false;
   }
 
   @Override
@@ -54,8 +69,14 @@ public class IOParameterEditor extends TableFieldEditor {
     
     if(table != null) {
       TableItem tableItem = new TableItem(table, SWT.NONE);
-      tableItem.setText(0, parameter.getSource());
-      tableItem.setText(1, parameter.getTarget());
+      String source = parameter.getSource() != null ? parameter.getSource() : "";
+      tableItem.setText(0, source);
+      String sourceExpression = parameter.getSourceExpression() != null ? parameter.getSourceExpression() : "";
+      tableItem.setText(1, sourceExpression);
+      String target = parameter.getTarget() != null ? parameter.getTarget() : "";
+      tableItem.setText(2, target);
+      String targetExpression = parameter.getTargetExpression() != null ? parameter.getTargetExpression() : "";
+      tableItem.setText(3, targetExpression);
     }
   }
 
@@ -63,9 +84,10 @@ public class IOParameterEditor extends TableFieldEditor {
   protected String[] getNewInputObject() {
     IOParameterDialog dialog = new IOParameterDialog(parent.getShell(), getItems());
     dialog.open();
-    if(dialog.source != null && dialog.source.length() > 0 &&
-            dialog.target != null && dialog.target.length() > 0) {
-      return new String[] { dialog.source, dialog.target};
+    if((StringUtils.isNotEmpty(dialog.source) || StringUtils.isNotEmpty(dialog.sourceExpression)) &&
+            (StringUtils.isNotEmpty(dialog.target) || StringUtils.isNotEmpty(dialog.targetExpression))) {
+      createNewIOParameter(dialog);
+      return new String[] { dialog.source, dialog.sourceExpression, dialog.target, dialog.targetExpression};
     } else {
       return null;
     }
@@ -73,12 +95,14 @@ public class IOParameterEditor extends TableFieldEditor {
   
   @Override
   protected String[] getChangedInputObject(TableItem item) {
+    int index = table.getSelectionIndex();
     IOParameterDialog dialog = new IOParameterDialog(parent.getShell(), getItems(), 
-            item.getText(0), item.getText(1));
+            item.getText(0), item.getText(1), item.getText(2), item.getText(3));
     dialog.open();
-    if(dialog.source != null && dialog.source.length() > 0 &&
-            dialog.target != null && dialog.target.length() > 0) {
-      return new String[] { dialog.source, dialog.target};
+    if((StringUtils.isNotEmpty(dialog.source) || StringUtils.isNotEmpty(dialog.sourceExpression)) &&
+        (StringUtils.isNotEmpty(dialog.target) || StringUtils.isNotEmpty(dialog.targetExpression))) {
+      saveIOParameter(dialog, index);
+    	return new String[] { dialog.source, dialog.sourceExpression, dialog.target, dialog.targetExpression};
     } else {
       return null;
     }
@@ -86,134 +110,78 @@ public class IOParameterEditor extends TableFieldEditor {
   
   @Override
   protected void removedItem(int index) {
-	  // TODO Auto-generated method stub 
+    saveRemovedObject(index);
   }
   
   @Override
-  protected void selectionChanged() {
-    super.selectionChanged();
-    saveFormProperties();
+  protected void upPressed() {
+    final int index = table.getSelectionIndex();
+    CallActivity updatableBo = (CallActivity) modelUpdater.getProcessModelUpdater().getUpdatableBusinessObject();
+    List<IOParameter> parameterList = getParameters(updatableBo);
+    IOParameter parameter = parameterList.remove(index);
+    parameterList.add(index - 1, parameter);
+    modelUpdater.executeModelUpdater();
+    super.upPressed();
+  }
+
+  @Override
+  protected void downPressed() {
+    final int index = table.getSelectionIndex();
+    CallActivity updatableBo = (CallActivity) modelUpdater.getProcessModelUpdater().getUpdatableBusinessObject();
+    List<IOParameter> parameterList = getParameters(updatableBo);
+    IOParameter parameter = parameterList.remove(index);
+    parameterList.add(index + 1, parameter);
+    modelUpdater.executeModelUpdater();
+    super.downPressed();
   }
   
-  private void saveFormProperties() {
+  protected void createNewIOParameter(IOParameterDialog dialog) {
     if (pictogramElement != null) {
-      final Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pictogramElement);
-      if (bo == null) {
-        return;
-      }
-      List<IOParameter> parameterList = null;
-      if(isInputParameters == true) {
-        parameterList = ((CallActivity) bo).getInParameters();
-      } else {
-        parameterList = ((CallActivity) bo).getOutParameters();
-      }
-      if(parametersChanged(parameterList, getItems()) == false) {
-        return;
-      }
-      TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
-      ActivitiUiUtil.runModelChange(new Runnable() {
-        public void run() {
-        	List<IOParameter> newParameterList = new ArrayList<IOParameter>();
-        	
-          List<IOParameter> parameterList = null;
-          if(isInputParameters == true) {
-            parameterList = ((CallActivity) bo).getInParameters();
-          } else {
-            parameterList = ((CallActivity) bo).getOutParameters();
-          }
-          for (TableItem item : getItems()) {
-            String source = item.getText(0);
-            String target = item.getText(1);
-            if(source != null && source.length() > 0 &&
-                    target != null && target.length() > 0) {
-              
-              IOParameter parameter = parameterExists(parameterList, source, target);
-              if(parameter != null) {
-                parameter.setSource(source);
-                parameter.setTarget(target);
-                newParameterList.add(parameter);
-              } else {
-                IOParameter newParameter = Bpmn2Factory.eINSTANCE.createIOParameter();
-                newParameter.setSource(source);
-                newParameter.setTarget(target);
-                newParameterList.add(newParameter);
-              }
-            }
-          }
-          if(isInputParameters == true) {
-            ((CallActivity) bo).getInParameters().clear();
-            ((CallActivity) bo).getInParameters().addAll(newParameterList);
-          } else {
-            ((CallActivity) bo).getOutParameters().clear();
-            ((CallActivity) bo).getOutParameters().addAll(newParameterList);
-          }
-        }
-      }, editingDomain, "Model Update");
+      CallActivity updatableBo = (CallActivity) modelUpdater.getProcessModelUpdater().getUpdatableBusinessObject();
+      List<IOParameter> parameterList = getParameters(updatableBo);
+      
+      IOParameter parameter = new IOParameter();
+      copyValuesToIOParameter(dialog, parameter);
+      parameterList.add(parameter);
+      modelUpdater.executeModelUpdater();
     }
   }
   
-  private boolean parametersChanged(List<IOParameter> parameterList, TableItem[] items) {
-    boolean noPropertySaved = false;
-    boolean nothingInTable = false;
-    if(parameterList == null || parameterList.size() == 0) {
-      noPropertySaved = true;
-    }
-    if(items == null || items.length == 0) {
-      nothingInTable = true;
-    }
-    if(noPropertySaved && nothingInTable) {
-      return false;
-    } else if(noPropertySaved == false && nothingInTable == false) {
+  private void saveIOParameter(IOParameterDialog dialog, int index) {
+    if (pictogramElement != null) {
+      CallActivity updatableBo = (CallActivity) modelUpdater.getProcessModelUpdater().getUpdatableBusinessObject();
+      List<IOParameter> parameterList = getParameters(updatableBo);
       
-    	for(int i = 0; i < parameterList.size(); i++) {
-    		IOParameter parameter = parameterList.get(i);
-      
-        boolean found = false;
-        if(items.length > i) {
-        	TableItem item = items[i];
-          if(item.getText(0).equalsIgnoreCase(parameter.getSource()) &&
-                  item.getText(1).equalsIgnoreCase(parameter.getTarget())) {
-            
-            found = true;
-          }
-        }
-        if(found == false) {
-          return true;
-        }
-      }
-      
-    	for (int i = 0; i < items.length; i++) {
-      	TableItem item = items[i];
-        boolean found = false;
-        if(parameterList.size() > i) {
-        	IOParameter parameter = parameterList.get(i);
-      
-          if(item.getText(0).equalsIgnoreCase(parameter.getSource()) &&
-                  item.getText(1).equalsIgnoreCase(parameter.getTarget())) {
-            
-            found = true;
-          }
-        }
-        if(found == false) {
-          return true;
-        }
-      }
-      
-      return false;
-      
-    } else {
-      return true;
+    	copyValuesToIOParameter(dialog, parameterList.get(index));
+    	modelUpdater.executeModelUpdater();
     }
   }
- 
-  private IOParameter parameterExists(List<IOParameter> parameterList, String source, String target) {
-    if(parameterList == null) return null;
-    for(IOParameter parameter : parameterList) {
-      if(source.equalsIgnoreCase(parameter.getSource()) &&
-              target.equalsIgnoreCase(parameter.getTarget())) {
-        return parameter;
-      }
+  
+  protected void saveRemovedObject(int index) {
+    if (pictogramElement != null) {
+      CallActivity updatableBo = (CallActivity) modelUpdater.getProcessModelUpdater().getUpdatableBusinessObject();
+      List<IOParameter> parameterList = getParameters(updatableBo);
+      
+      parameterList.remove(index);
+      
+      modelUpdater.executeModelUpdater();
     }
-    return null;
+  }
+  
+  protected void copyValuesToIOParameter(IOParameterDialog dialog, IOParameter parameter) {
+    parameter.setSource(dialog.source);
+    parameter.setSourceExpression(dialog.sourceExpression);
+    parameter.setTarget(dialog.target);
+    parameter.setTargetExpression(dialog.targetExpression);
+  }
+  
+  protected List<IOParameter> getParameters(CallActivity callActivity) {
+    List<IOParameter> parameterList = null;
+    if(isInputParameters == true) {
+      parameterList = callActivity.getInParameters();
+    } else {
+      parameterList = callActivity.getOutParameters();
+    }
+    return parameterList;
   }
 }

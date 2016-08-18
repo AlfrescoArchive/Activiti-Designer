@@ -51,27 +51,70 @@
          <propertyTab
                afterTab="org.activiti.designer.generalTab"
                category="Activiti"
+               id="org.activiti.designer.processTab"
+               label="Process">
+         </propertyTab>
+         <propertyTab
+               afterTab="org.activiti.designer.generalTab"
+               category="Activiti"
                id="org.activiti.designer.mainConfigTab"
                label="Main config">
          </propertyTab>
          <propertyTab
                afterTab="org.activiti.designer.mainConfigTab"
                category="Activiti"
+               id="org.activiti.designer.taskConfigTab"
+               label="Task config">
+         </propertyTab>
+         <propertyTab
+               afterTab="org.activiti.designer.mainConfigTab"
+               category="Activiti"
+               id="org.activiti.designer.documentationTab"
+               label="Documentation">
+         </propertyTab>
+         <propertyTab
+               afterTab="org.activiti.designer.documentationTab"
+               category="Activiti"
                id="org.activiti.designer.formTab"
                label="Form">
          </propertyTab>
          <propertyTab
-               afterTab="org.activiti.designer.mainConfigTab"
+               afterTab="org.activiti.designer.documentationTab"
+               category="Activiti"
+               id="org.activiti.designer.dataTab"
+               label="Data Objects">
+         </propertyTab>
+         <propertyTab
+               afterTab="org.activiti.designer.documentationTab"
                category="Activiti"
                id="org.activiti.designer.listenerTab"
                label="Listeners">
          </propertyTab>
          <propertyTab
-               afterTab="org.activiti.designer.mainConfigTab"
+               afterTab="org.activiti.designer.documentationTab"
                category="Activiti"
                id="org.activiti.designer.multiInstanceTab"
                label="Multi instance">
          </propertyTab>
+         <propertyTab
+               afterTab="org.activiti.designer.listenerTab"
+               category="Activiti"
+               id="org.activiti.designer.signalTab"
+               label="Signals">
+         </propertyTab>
+         <propertyTab
+               afterTab="org.activiti.designer.signalTab"
+               category="Activiti"
+               id="org.activiti.designer.messageTab" 
+               label="Messages">
+         </propertyTab>
+         <!-- <propertyTab
+               afterTab="org.activiti.designer.listenerTab"
+               category="Activiti"
+               id="org.activiti.designer.eventListenerTab"
+               label="Event Listeners">
+         </propertyTab> -->
+         
       </propertyTabs>
    </extension>
    <extension
@@ -81,8 +124,8 @@
          <propertySection
                class="org.activiti.designer.property.PropertyDiagramSection"
                filter="org.activiti.designer.property.PropertyDiagramFilter"
-               id="org.activiti.designer.generalTab.diagram"
-               tab="org.activiti.designer.generalTab">
+               id="org.activiti.designer.processTab.diagram"
+               tab="org.activiti.designer.processTab">
          </propertySection>
          <propertySection
                class="org.activiti.designer.property.PropertySequenceFlowSection"
@@ -90,6 +133,17 @@
                id="org.activiti.designer.mainConfigTab.sequenceflow"
                tab="org.activiti.designer.mainConfigTab">
          </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyMessageFlowSection"
+               filter="org.activiti.designer.property.PropertyMessageFlowFilter"
+               id="org.activiti.designer.mainConfigTab.messageflow"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <propertySection 
+         	class="org.activiti.designer.property.PropertyTextAnnotationSection"
+         	filter="org.activiti.designer.property.PropertyTextAnnotationFilter"
+         	id="org.activiti.designer.mainConfigTab.textannotation"
+         	tab="org.activiti.designer.mainConfigTab" />
          <propertySection
                class="org.activiti.designer.property.PropertyScriptTaskSection"
                filter="org.activiti.designer.property.PropertyScriptTaskFilter"
@@ -109,6 +163,12 @@
                tab="org.activiti.designer.mainConfigTab">
          </propertySection>
          <propertySection
+               class="org.activiti.designer.property.PropertyCustomUserTaskSection"
+               filter="org.activiti.designer.property.PropertyCustomUserTaskFilter"
+               id="org.activiti.designer.taskConfigTab.customusertask"
+               tab="org.activiti.designer.taskConfigTab">
+         </propertySection>
+         <propertySection
                class="org.activiti.designer.property.PropertyUserTaskSection"
                filter="org.activiti.designer.property.PropertyUserTaskFilter"
                id="org.activiti.designer.mainConfigTab.usertask"
@@ -121,9 +181,16 @@
                tab="org.activiti.designer.mainConfigTab">
          </propertySection>
          <propertySection
-               class="org.activiti.designer.property.PropertyBpmnSection"
-               filter="org.activiti.designer.property.PropertyBpmnFilter"
+               class="org.activiti.designer.property.PropertyGeneralSection"
+               filter="org.activiti.designer.property.PropertyGeneralFilter"
                id="org.activiti.designer.generalTab.flowelement"
+               tab="org.activiti.designer.generalTab">
+         </propertySection>
+         <propertySection
+               afterSection="org.activiti.designer.generalTab.flowelement"
+               class="org.activiti.designer.property.PropertyDefaultFlowSection"
+               filter="org.activiti.designer.property.PropertyDefaultFlowFilter"
+               id="org.activiti.designer.generalTab.defaultflow"
                tab="org.activiti.designer.generalTab">
          </propertySection>
          <propertySection
@@ -151,6 +218,12 @@
                tab="org.activiti.designer.mainConfigTab">
          </propertySection>
          <propertySection
+               class="org.activiti.designer.property.PropertyMessageStartEventSection"
+               filter="org.activiti.designer.property.PropertyMessageStartEventFilter"
+               id="org.activiti.designer.mainConfigTab.messagestartevent"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <propertySection
                class="org.activiti.designer.property.PropertyBoundaryTimerSection"
                filter="org.activiti.designer.property.PropertyBoundaryTimerFilter"
                id="org.activiti.designer.mainConfigTab.timerboundaryevent"
@@ -160,6 +233,18 @@
                class="org.activiti.designer.property.PropertyBoundaryErrorSection"
                filter="org.activiti.designer.property.PropertyBoundaryErrorFilter"
                id="org.activiti.designer.mainConfigTab.errorboundaryevent"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyBoundaryMessageSection"
+               filter="org.activiti.designer.property.PropertyBoundaryMessageFilter"
+               id="org.activiti.designer.mainConfigTab.messageboundaryevent"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyBoundarySignalSection"
+               filter="org.activiti.designer.property.PropertyBoundarySignalFilter"
+               id="org.activiti.designer.mainConfigTab.signalboundaryevent"
                tab="org.activiti.designer.mainConfigTab">
          </propertySection>
          <propertySection
@@ -181,6 +266,12 @@
                tab="org.activiti.designer.formTab">
          </propertySection>
          <propertySection
+               class="org.activiti.designer.property.PropertyDataPropertySection"
+               filter="org.activiti.designer.property.PropertyDataPropertyFilter"
+               id="org.activiti.designer.dataTab.dataProperty"
+               tab="org.activiti.designer.dataTab">
+         </propertySection>
+         <propertySection
                afterSection="org.activiti.designer.mainConfigTab.callactivity"
                class="org.activiti.designer.property.PropertyIOParameterSection"
                filter="org.activiti.designer.property.PropertyCallActivityFilter"
@@ -197,6 +288,24 @@
                class="org.activiti.designer.property.PropertyIntermediateCatchTimerSection"
                filter="org.activiti.designer.property.PropertyIntermediateCatchTimerFilter"
                id="org.activiti.designer.mainConfigTab.timerintermediatecatchevent"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyIntermediateCatchSignalSection"
+               filter="org.activiti.designer.property.PropertyIntermediateCatchSignalFilter"
+               id="org.activiti.designer.mainConfigTab.signalintermediatecatchevent"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyIntermediateCatchMessageSection"
+               filter="org.activiti.designer.property.PropertyIntermediateCatchMessageFilter"
+               id="org.activiti.designer.mainConfigTab.messageintermediatecatchevent"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyIntermediateThrowSignalSection"
+               filter="org.activiti.designer.property.PropertyIntermediateThrowSignalFilter"
+               id="org.activiti.designer.mainConfigTab.timerintermediatethrowevent"
                tab="org.activiti.designer.mainConfigTab">
          </propertySection>
          <propertySection
@@ -223,6 +332,69 @@
                id="org.activiti.designer.mainConfigTab.alfrescoMailtask"
                tab="org.activiti.designer.mainConfigTab">
          </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyErrorEndEventSection"
+               filter="org.activiti.designer.property.PropertyErrorEndEventFilter"
+               id="org.activiti.designer.mainConfigTab.errorendevent"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyErrorStartEventSection"
+               filter="org.activiti.designer.property.PropertyErrorStartEventFilter"
+               id="org.activiti.designer.mainConfigTab.errorstartevent"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <propertySection
+               afterSection="org.activiti.designer.generalTab.defaultflow"
+               class="org.activiti.designer.property.PropertyAsyncSection"
+               filter="org.activiti.designer.property.PropertyAsyncFilter"
+               id="org.activiti.designer.generalTab.async"
+               tab="org.activiti.designer.generalTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyDocumentationSection"
+               filter="org.activiti.designer.property.PropertyDocumentationFilter"
+               id="org.activiti.designer.documentationTab.documentation"
+               tab="org.activiti.designer.documentationTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertySignalDefinitionPropertySection"
+               filter="org.activiti.designer.property.PropertySignalDefinitionPropertyFilter"
+               id="org.activiti.designer.signalTab.signalDefinition"
+               tab="org.activiti.designer.signalTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyMessageDefinitionPropertySection"
+               filter="org.activiti.designer.property.PropertyMessageDefinitionPropertyFilter"
+               id="org.activiti.designer.messageTab.messageDefinition"
+               tab="org.activiti.designer.messageTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertySignalStartEventSection"
+               filter="org.activiti.designer.property.PropertySignalStartEventFilter"
+               id="org.activiti.designer.mainConfigTab.signalStartEvent"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <propertySection
+               afterSection="org.activiti.designer.generalTab.async"
+               class="org.activiti.designer.property.PropertyCompensationSection"
+               filter="org.activiti.designer.property.PropertyCompensationFilter"
+               id="org.activiti.designer.generalTab.compensation"
+               tab="org.activiti.designer.generalTab">
+         </propertySection>
+         <propertySection
+               class="org.activiti.designer.property.PropertyCompensationActivityRefSection"
+               filter="org.activiti.designer.property.PropertyCompensationActivityRefFilter"
+               id="org.activiti.designer.mainConfigTab.compensationActivityRef"
+               tab="org.activiti.designer.mainConfigTab">
+         </propertySection>
+         <!-- <propertySection
+               class="org.activiti.designer.property.PropertyEventListenersSection"
+               filter="org.activiti.designer.property.PropertyEventListenersFilter"
+               id="org.activiti.designer.eventListenerTab.eventListenersSection"
+               tab="org.activiti.designer.eventListenerTab">
+         </propertySection> -->
+         
       </propertySections>
    </extension>
    <extension
@@ -242,13 +414,13 @@
             category="org.activiti.designer.preferences"
             class="org.activiti.designer.preferences.ActivitiSavePreferencesPage"
             id="org.activiti.designer.gui.savepage"
-            name="Save">
+            name="Save Actions">
       </page>
       <page
             category="org.activiti.designer.preferences"
-            class="org.activiti.designer.preferences.ActivitiImportPreferencesPage"
-            id="org.activiti.designer.gui.preferences.Import"
-            name="Import">
+            class="org.activiti.designer.preferences.ActivitiLanguagePreferencesPage"
+            id="org.activiti.designer.gui.languagepage"
+            name="Activiti languages">
       </page>
       <page
             category="org.activiti.designer.preferences"
@@ -262,7 +434,7 @@
       <objectContribution
             adaptable="false"
             id="org.activiti.designer.gui.unitTestContribution"
-            nameFilter="*.bpmn20.xml"
+            nameFilter="*.bpmn"
             objectClass="org.eclipse.core.resources.IFile">
          <menu
                id="org.activiti.designer.gui.menu1"
@@ -274,107 +446,32 @@
          </menu>
          <action
                class="org.activiti.designer.actions.GenerateUnitTestAction"
+               icon="icons/activiti.logo.gradients.16x16.png"
                id="org.activiti.designer.gui.generateUnitTestAction"
                label="Generate unit test"
                menubarPath="org.activiti.designer.gui.menu1/group1">
          </action>
       </objectContribution>
-   </extension>
-   <extension point="org.eclipse.ui.commands">
-   	<command
-    	id="org.activiti.designer.gui.actions.copyCommand"
-        name="Copy Diagram Element(s)" />
-    <command
-    	id="org.activiti.designer.gui.actions.pasteCommand"
-        name="Paste Diagram Element(s)" />
-   	
-</extension>
-<extension point="org.eclipse.ui.handlers">
-  <handler
-        class="org.activiti.designer.gui.actions.CopyActionHandler"
-        commandId="org.activiti.designer.gui.actions.copyCommand">
-     <activeWhen>
-        <with variable="activePartId">
-           <equals value="org.activiti.designer.bpmneditor"/>
-           </with>
-     </activeWhen>
-  </handler>
-   <handler
-        class="org.activiti.designer.gui.actions.PasteActionHandler"
-        commandId="org.activiti.designer.gui.actions.pasteCommand">
-     <activeWhen>
-        <with variable="activePartId">
-           <equals value="org.activiti.designer.bpmneditor"/>
-           </with>
-     </activeWhen>
-  </handler>
-</extension>
-<extension
-         point="org.eclipse.ui.menus">
-      <menuContribution
-            locationURI="menu:edit">
-         <command
-               commandId="org.activiti.designer.gui.actions.copyCommand"
-               label="Copy diagram item(s)"
-               style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                     <with variable="activePartId">
-           				<equals value="org.activiti.designer.bpmneditor"/>
-           		     </with>
-               </visibleWhen>
-         </command>
-         <command
-               commandId="org.activiti.designer.gui.actions.pasteCommand"
-               label="Paste diagram item(s)"
-               style="push">
-               <visibleWhen
-                     checkEnabled="false">
-                     <with variable="activePartId">
-           				<equals value="org.activiti.designer.bpmneditor"/>
-           		     </with>
-               </visibleWhen>
-         </command>
-      </menuContribution>
-   </extension>
-<extension point="org.eclipse.ui.bindings">
-  <key
-        commandId="org.activiti.designer.gui.actions.copyCommand"
-        schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-        sequence="Ctrl+C">
-  </key>
-  <key
-        commandId="org.activiti.designer.gui.actions.pasteCommand"
-        schemeId="org.eclipse.ui.defaultAcceleratorConfiguration"
-        sequence="Ctrl+V">
-  </key>
-</extension>
-<extension
-      point="org.eclipse.ui.popupMenus">
-   <objectContribution
-         adaptable="false"
-         id="org.activiti.designer.gui.import"
-         objectClass="org.eclipse.jdt.core.IJavaProject">
-      <action
-            class="org.activiti.designer.popupmenus.ImportBpmnMenu"
-            icon="icons/type.service.png"
-            id="org.activiti.designer.gui.importAction"
-            label="Import BPMN 2.0 file"
-            menubarPath="Properties">
-      </action>
-   </objectContribution>
-   <objectContribution
+      <objectContribution
          adaptable="false"
          id="org.activiti.designer.gui.deployment"
          objectClass="org.eclipse.jdt.core.IJavaProject">
       <action
             class="org.activiti.designer.popupmenus.DeploymentMenu"
-            icon="icons/type.send.png"
+            icon="icons/activiti.logo.gradients.16x16.png"
             id="org.activiti.designer.gui.deploymentAction"
             label="Create deployment artifacts"
             menubarPath="Properties">
       </action>
    </objectContribution>
-</extension>
+   </extension>
+   <extension
+         id="org.activiti.designer.iconProvider"
+         name="Activiti Designer GUI Icon Provider"
+         point="org.activiti.designer.eclipse.extension.IconProvider">
+      <ImageProvider
+            class="org.activiti.designer.diagram.DefaultIconProvider">
+      </ImageProvider>
+   </extension>
 
 </plugin>

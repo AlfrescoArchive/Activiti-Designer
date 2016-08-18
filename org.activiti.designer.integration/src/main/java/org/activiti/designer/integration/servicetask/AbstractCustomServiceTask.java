@@ -1,4 +1,17 @@
 /**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/**
  * 
  */
 package org.activiti.designer.integration.servicetask;
@@ -6,8 +19,9 @@ package org.activiti.designer.integration.servicetask;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 
-import org.activiti.designer.integration.servicetask.annotation.Property;
-import org.activiti.designer.integration.servicetask.annotation.Runtime;
+import org.activiti.designer.integration.DiagramBaseShape;
+import org.activiti.designer.integration.annotation.Property;
+import org.activiti.designer.integration.annotation.Runtime;
 
 /**
  * Abstract base class for implementing CustomServiceTasks. Defaults provided by
@@ -29,10 +43,10 @@ import org.activiti.designer.integration.servicetask.annotation.Runtime;
  * Override to provide a more specific description.</li><li>Provides a default
  * order of 1. Override {@link #getOrder} if you wish to provide explicit
  * ordering of your {@link CustomServiceTask}s.</li><li>
- * Implements the {@link #getRuntimeClassname()} method using reflection
+ * Implements the {@link #getDelegateType()} method</li><li>
+ * Implements the {@link #getDelegateSpecification()} method</li>
  * 
  * @author Tiese Barrell
- * @version 2
  * @since 0.5.1
  * 
  */
@@ -66,16 +80,80 @@ public abstract class AbstractCustomServiceTask implements CustomServiceTask {
    * (non-Javadoc)
    * 
    * @see org.activiti.designer.integration.servicetask.CustomServiceTask#
-   * getRuntimeClassname()
+   * getDelegateType()
    */
   @Override
-  public final String getRuntimeClassname() {
+  public final DelegateType getDelegateType() {
+    return getDelegateType(getRuntimeAnnotation());
+  }
+
+  private DelegateType getDelegateType(final Runtime annotation) {
+
+    DelegateType result = DelegateType.NONE;
+
+    if (annotation != null) {
+      if (isDelegateDefined(annotation.javaDelegateClass())) {
+        result = DelegateType.JAVA_DELEGATE_CLASS;
+      } else if (isDelegateDefined(annotation.expression())) {
+        result = DelegateType.EXPRESSION;
+      } else if (isDelegateDefined(annotation.javaDelegateExpression())) {
+        result = DelegateType.JAVA_DELEGATE_EXPRESSION;
+      }
+    }
+
+    return result;
+  }
+
+  private boolean isDelegateDefined(final String definition) {
+    return definition != null && !definition.isEmpty() && !"".equals(definition);
+  }
+
+  /*
+   * (non-Javadoc)
+   * 
+   * @see org.activiti.designer.integration.servicetask.CustomServiceTask#
+   * getDelegateSpecification()
+   */
+  @Override
+  public final String getDelegateSpecification() {
+
+    String result = "";
+
+    final DelegateType delegateType = getDelegateType();
+
+    if (!DelegateType.NONE.equals(delegateType)) {
+
+      Runtime runtimeAnnotation = getRuntimeAnnotation();
+      if (runtimeAnnotation != null) {
+        switch (delegateType) {
+        case JAVA_DELEGATE_CLASS:
+          result = runtimeAnnotation.javaDelegateClass();
+          break;
+        case EXPRESSION:
+          result = runtimeAnnotation.expression();
+          break;
+        case JAVA_DELEGATE_EXPRESSION:
+          result = runtimeAnnotation.javaDelegateExpression();
+          break;
+        }
+      }
+
+    }
+
+    return result;
+  }
+
+  private Runtime getRuntimeAnnotation() {
+
+    Runtime result = null;
+
     final Annotation annotation = this.getClass().getAnnotation(Runtime.class);
 
     if (annotation != null && Runtime.class.isAssignableFrom(annotation.getClass())) {
-      return ((Runtime) annotation).delegationClass();
+      result = ((Runtime) annotation);
     }
-    return null;
+
+    return result;
   }
 
   public abstract String getName();

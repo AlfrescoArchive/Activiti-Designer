@@ -1,18 +1,29 @@
 /**
- * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.acme.servicetasks;
 
-import java.util.List;
-
+import org.activiti.designer.integration.annotation.DatePickerProperty;
+import org.activiti.designer.integration.annotation.Help;
+import org.activiti.designer.integration.annotation.Locale;
+import org.activiti.designer.integration.annotation.Locales;
+import org.activiti.designer.integration.annotation.Property;
+import org.activiti.designer.integration.annotation.PropertyItems;
+import org.activiti.designer.integration.annotation.Runtime;
+import org.activiti.designer.integration.annotation.TaskName;
+import org.activiti.designer.integration.annotation.TaskNames;
 import org.activiti.designer.integration.servicetask.AbstractCustomServiceTask;
 import org.activiti.designer.integration.servicetask.PropertyType;
-import org.activiti.designer.integration.servicetask.annotation.DataGridProperty;
-import org.activiti.designer.integration.servicetask.annotation.DatePickerProperty;
-import org.activiti.designer.integration.servicetask.annotation.Help;
-import org.activiti.designer.integration.servicetask.annotation.Property;
-import org.activiti.designer.integration.servicetask.annotation.PropertyItems;
-import org.activiti.designer.integration.servicetask.annotation.Runtime;
 
 /**
  * Defines the Money Task node.
@@ -21,8 +32,14 @@ import org.activiti.designer.integration.servicetask.annotation.Runtime;
  * @version 1
  * @since 1.0.0
  */
-@Runtime(delegationClass = "org.acme.runtime.AcmeMoneyJavaDelegation")
+@Runtime(javaDelegateClass = "org.acme.runtime.AcmeMoneyJavaDelegation")
 @Help(displayHelpShort = "Creates a new account", displayHelpLong = "Creates a new account using the account number specified")
+@TaskNames(
+    {
+      @TaskName(locale = "en", name = "English money task"),
+      @TaskName(locale = "de", name = "Deutsche geld task")
+    }
+)
 public class AcmeMoneyTask extends AbstractCustomServiceTask {
 
   private static final String HELP_ACCOUNT_NUMBER_LONG = "Provide a number that is suitable as an account number.";
@@ -54,6 +71,12 @@ public class AcmeMoneyTask extends AbstractCustomServiceTask {
 
   @Property(type = PropertyType.TEXT, displayName = "Account Number", required = true, defaultValue = "1234567890")
   @Help(displayHelpShort = "Provide an account number", displayHelpLong = HELP_ACCOUNT_NUMBER_LONG)
+  @Locales(
+      {
+        @Locale(locale = "en", labelName = "Account number", defaultValue = "01234"),
+        @Locale(locale = "de", labelName = "Kontonummer", defaultValue = "56789")
+      }
+  )
   private String accountNumber;
 
   @Property(type = PropertyType.MULTILINE_TEXT, displayName = "Comments", required = true)
@@ -63,11 +86,6 @@ public class AcmeMoneyTask extends AbstractCustomServiceTask {
   @Property(type = PropertyType.PERIOD, displayName = "Processing Time", required = true, defaultValue = "0y 0mo 2w 0d 0h 0m 0s")
   @Help(displayHelpShort = "The maximum allowed time for processing", displayHelpLong = "Processing must take no longer than the period you specify here.")
   private String maximumProcessingTime;
-
-  @Property(type = PropertyType.DATA_GRID, displayName = "Account managers")
-  @DataGridProperty(itemClass = AccountManager.class, orderable = true)
-  @Help(displayHelpShort = "People authorized for this account", displayHelpLong = "Specify the details of people allowed to manage this account.")
-  private List<AccountManager> accountManagers;
 
   @Property(type = PropertyType.BOOLEAN_CHOICE, displayName = "VIP Customer", defaultValue = "false")
   @Help(displayHelpShort = "Is the customer a VIP?", displayHelpLong = "VIP customers enjoy special privileges. Check this field to indicate the customer is a VIP.")
@@ -89,31 +107,19 @@ public class AcmeMoneyTask extends AbstractCustomServiceTask {
   @Help(displayHelpShort = "The date the account expires ", displayHelpLong = "Choose the date when the account will expire if no extended before the date.")
   @DatePickerProperty()
   private String expiryDate;
+  
+  @Property(type = PropertyType.TEXT, visible = false, defaultValue = "test")
+  private String hiddenField;
 
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.activiti.designer.integration.servicetask.AbstractCustomServiceTask
-   * #contributeToPaletteDrawer()
-   */
   @Override
   public String contributeToPaletteDrawer() {
     return "Acme Corporation";
   }
 
-  @Override
   public String getName() {
     return "Money node";
   }
-
-  /*
-   * (non-Javadoc)
-   * 
-   * @see
-   * org.activiti.designer.integration.servicetask.AbstractCustomServiceTask
-   * #getSmallIconPath()
-   */
+  
   @Override
   public String getSmallIconPath() {
     return "icons/coins.png";

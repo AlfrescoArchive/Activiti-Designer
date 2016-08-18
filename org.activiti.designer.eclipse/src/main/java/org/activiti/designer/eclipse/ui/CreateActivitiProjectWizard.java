@@ -1,3 +1,16 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.activiti.designer.eclipse.ui;
 
 import java.io.ByteArrayInputStream;
@@ -6,9 +19,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.activiti.designer.eclipse.common.ActivitiBPMNDiagramConstants;
 import org.activiti.designer.eclipse.common.ActivitiPlugin;
-import org.activiti.designer.eclipse.common.ActivitiProjectNature;
+import org.activiti.designer.util.ActivitiConstants;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -29,8 +41,9 @@ public class CreateActivitiProjectWizard extends BasicNewProjectResourceWizard {
 
 	@Override
 	public boolean performFinish() {
-		if (!super.performFinish())
-			return false;
+		if (!super.performFinish()) {
+      return false;
+    }
 
 		IProject newProject = getNewProject();
 
@@ -39,7 +52,7 @@ public class CreateActivitiProjectWizard extends BasicNewProjectResourceWizard {
 			IProjectDescription description = newProject.getDescription();
 			String[] newNatures = new String[2];
 			newNatures[0] = JavaCore.NATURE_ID;
-			newNatures[1] = ActivitiProjectNature.NATURE_ID;
+			newNatures[1] = ActivitiConstants.NATURE_ID;
 			description.setNatureIds(newNatures);
 			newProject.setDescription(description, null);
 
@@ -47,12 +60,12 @@ public class CreateActivitiProjectWizard extends BasicNewProjectResourceWizard {
 
 			createSourceFolders(newProject);
 			createOutputLocation(javaProject);
-			
+
 			IFile pomFile = newProject.getFile("pom.xml");
-			InputStream pomSource = new ByteArrayInputStream(createPOMFile().getBytes()); 
+			InputStream pomSource = new ByteArrayInputStream(createPOMFile().getBytes());
 			pomFile.create(pomSource, true, null);
 			pomSource.close();
-			
+
 			String[] userLibraryNames = JavaCore.getUserLibraryNames();
 			boolean activitiExtensionLibraryPresent = false;
 			if(userLibraryNames != null && userLibraryNames.length > 0) {
@@ -62,23 +75,27 @@ public class CreateActivitiProjectWizard extends BasicNewProjectResourceWizard {
 			    }
 			  }
 			}
-			
+
 			if(activitiExtensionLibraryPresent == false) {
   			ClasspathContainerInitializer initializer = JavaCore.getClasspathContainerInitializer(JavaCore.USER_LIBRARY_CONTAINER_ID);
   			IPath containerPath = new Path(JavaCore.USER_LIBRARY_CONTAINER_ID);
-  			initializer.requestClasspathContainerUpdate(containerPath.append(ActivitiPlugin.USER_LIBRARY_NAME_EXTENSIONS), 
+  			initializer.requestClasspathContainerUpdate(containerPath.append(ActivitiPlugin.USER_LIBRARY_NAME_EXTENSIONS),
   			        null, new IClasspathContainer() {
-  			  
-  			  public IPath getPath() {
+
+  			  @Override
+          public IPath getPath() {
   			    return new Path(JavaCore.USER_LIBRARY_CONTAINER_ID).append(ActivitiPlugin.USER_LIBRARY_NAME_EXTENSIONS) ;
   			  }
-  			  public int getKind() {
+  			  @Override
+          public int getKind() {
   			    return K_APPLICATION;
   			  }
-  			  public String getDescription() {
+  			  @Override
+          public String getDescription() {
   			    return ActivitiPlugin.USER_LIBRARY_NAME_EXTENSIONS;
   			  }
-  			  public IClasspathEntry[] getClasspathEntries() {
+  			  @Override
+          public IClasspathEntry[] getClasspathEntries() {
   			    return new IClasspathEntry[] {};
   			  }
   			});
@@ -124,7 +141,7 @@ public class CreateActivitiProjectWizard extends BasicNewProjectResourceWizard {
 		sourceFolders.add("src/main");
 		sourceFolders.add("src/main/java");
 		sourceFolders.add("src/main/resources/");
-		sourceFolders.add(ActivitiBPMNDiagramConstants.DIAGRAM_FOLDER);
+		sourceFolders.add(ActivitiConstants.DIAGRAM_FOLDER);
 		sourceFolders.add("src/test/");
 		sourceFolders.add("src/test/java/");
 		sourceFolders.add("src/test/resources");
@@ -140,7 +157,7 @@ public class CreateActivitiProjectWizard extends BasicNewProjectResourceWizard {
 		IPath targetPath = javaProject.getPath().append("target/classes");
 		javaProject.setOutputLocation(targetPath, null);
 	}
-	
+
 	private String createPOMFile() {
 		StringBuilder buffer = new StringBuilder();
 		buffer.append("<project xmlns=\"http://maven.apache.org/POM/4.0.0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n");
@@ -152,7 +169,7 @@ public class CreateActivitiProjectWizard extends BasicNewProjectResourceWizard {
 		buffer.append("  <packaging>jar</packaging>\n");
 		buffer.append("  <name>BPMN 2.0 with Activiti - Examples</name>\n");
 		buffer.append("  <properties>\n");
-		buffer.append("    <activiti-version>5.7</activiti-version>\n");
+		buffer.append("    <activiti-version>5.9</activiti-version>\n");
 		buffer.append("  </properties>\n");
 		buffer.append("  <dependencies>\n");
 		addDependency(buffer, "org.activiti", "activiti-engine", "${activiti-version}");
@@ -196,7 +213,7 @@ public class CreateActivitiProjectWizard extends BasicNewProjectResourceWizard {
 		buffer.append("</project>\n");
 		return buffer.toString();
 	}
-	
+
 	private void addDependency(StringBuilder buffer, String groupId, String artifactId, String version) {
 		buffer.append("    <dependency>\n")
 			.append("      <groupId>")

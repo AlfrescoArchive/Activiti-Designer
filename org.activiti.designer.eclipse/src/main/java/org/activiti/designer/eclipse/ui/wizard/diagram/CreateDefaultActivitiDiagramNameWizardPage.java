@@ -1,8 +1,21 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.activiti.designer.eclipse.ui.wizard.diagram;
 
-import org.activiti.designer.eclipse.common.ActivitiBPMNDiagramConstants;
 import org.activiti.designer.eclipse.common.ActivitiPlugin;
 import org.activiti.designer.eclipse.common.PluginImage;
+import org.activiti.designer.util.ActivitiConstants;
 import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IProject;
@@ -24,17 +37,34 @@ public class CreateDefaultActivitiDiagramNameWizardPage extends WizardNewFileCre
     setTitle("New Activiti Diagram");
     setImageDescriptor(ActivitiPlugin.getImageDescriptor(PluginImage.ACTIVITI_LOGO_64x64));
     setDescription("Create a new Activiti BPMN 2.0 Diagram.");
-    setFileExtension(StringUtils.substringAfter(ActivitiBPMNDiagramConstants.DIAGRAM_EXTENSION, "."));
+    setFileExtension(StringUtils.substringAfter(ActivitiConstants.DATA_FILE_EXTENSION, "."));
 
     // Set selection to the default folder if the project itself was selected
     final IProject project = getProjectFromSelection(selection);
     if (project != null) {
-      final IFolder folder = project.getFolder(ActivitiBPMNDiagramConstants.DIAGRAM_FOLDER);
+      final IFolder folder = project.getFolder(ActivitiConstants.DIAGRAM_FOLDER);
       if (folder != null && folder.exists()) {
         selection.toList().set(0, folder);
       }
     }
   }
+  
+  public CreateDefaultActivitiDiagramNameWizardPage(String pageName, IStructuredSelection selection) {
+    super(pageName, selection);
+    super.setFileName(DEFAULT_DIAGRAM_NAME);
+
+    // Set selection to the default folder if the project itself was selected
+    final IProject project = getProjectFromSelection(selection);
+    if (project != null)
+    {
+        final IFolder folder = project.getFolder(ActivitiConstants.DIAGRAM_FOLDER);
+        if (folder != null && folder.exists())
+        {
+            selection.toList().set(0, folder);
+        }
+    }
+}
+  
   private IProject getProjectFromSelection(final IStructuredSelection selection) {
     IProject result = null;
     if (selection.size() == 1) {
@@ -69,5 +99,4 @@ public class CreateDefaultActivitiDiagramNameWizardPage extends WizardNewFileCre
     }
     return null;
   }
-
 }

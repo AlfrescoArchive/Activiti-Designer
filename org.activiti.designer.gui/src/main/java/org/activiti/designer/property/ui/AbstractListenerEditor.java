@@ -1,18 +1,30 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.activiti.designer.property.ui;
 
-import java.util.Iterator;
 import java.util.List;
 
-import org.activiti.designer.model.FieldExtensionModel;
+import org.activiti.bpmn.model.ActivitiListener;
+import org.activiti.bpmn.model.FieldExtension;
+import org.activiti.bpmn.model.UserTask;
+import org.activiti.bpmn.model.alfresco.AlfrescoScriptTask;
+import org.activiti.bpmn.model.alfresco.AlfrescoUserTask;
+import org.activiti.designer.property.ModelUpdater;
 import org.activiti.designer.util.BpmnBOUtil;
-import org.activiti.designer.util.eclipse.ActivitiUiUtil;
-import org.eclipse.bpmn2.ActivitiListener;
-import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.FieldExtension;
-import org.eclipse.emf.transaction.TransactionalEditingDomain;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.platform.IDiagramEditor;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Shell;
@@ -21,18 +33,25 @@ import org.eclipse.swt.widgets.TableItem;
 
 public abstract class AbstractListenerEditor extends TableFieldEditor {
 	
+  protected static final int EXECUTION_LISTENER = 1;
+  protected static final int TASK_LISTENER = 2;
+  
 	protected Composite parent;
+	protected int listenerType;
+	protected ModelUpdater modelUpdater;
+	
 	public PictogramElement pictogramElement;
-	public IDiagramEditor diagramEditor;
 	public Diagram diagram;
 	public boolean isSequenceFlow;
 	private List<ActivitiListener> listenerList;
 	
-	public AbstractListenerEditor(String key, Composite parent) {
+	public AbstractListenerEditor(String key, Composite parent, int listenerType, ModelUpdater modelUpdater) {
 		
     super(key, "", new String[] {"Listener implementation", "Type", "Event", "Fields"},
     		new int[] {200, 150, 100, 300}, parent);
     this.parent = parent;
+    this.listenerType = listenerType;
+    this.modelUpdater = modelUpdater;
 	}
 	
 	public void initialize(List<ActivitiListener> listenerList) {
@@ -69,9 +88,13 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
       if(listener.getFieldExtensions() != null) {
         for (FieldExtension fieldExtension : listener.getFieldExtensions()) {
           if(fieldString.length() > 0) {
-            fieldString += "± ";
+            fieldString += "|";
           }
-          fieldString += fieldExtension.getFieldname() + ":" + fieldExtension.getExpression();
+          if (StringUtils.isNotEmpty(fieldExtension.getExpression())) {
+            fieldString += fieldExtension.getFieldName() + ":" + fieldExtension.getExpression();
+          } else {
+            fieldString += fieldExtension.getFieldName() + ":" + fieldExtension.getStringValue();
+          }
         }
       }
       tableItem.setText(3, fieldString);
@@ -82,10 +105,7 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
 	protected String[] getNewInputObject() {
 	  AbstractListenerDialog dialog = getDialog(parent.getShell(), getItems());
 		dialog.open();
-		if(dialog.eventName != null && dialog.eventName.length() > 0 &&
-		        dialog.implementation != null && dialog.implementation.length() > 0 &&
-		        dialog.implementationType != null && dialog.implementationType.length() > 0) {
-			
+		if(StringUtils.isNotEmpty(dialog.eventName) && StringUtils.isNotEmpty(dialog.implementation)) {
 			saveNewObject(dialog);
 			return new String[] { dialog.implementation, dialog.implementationType, dialog.eventName, getFieldString(dialog.fieldExtensionList) };
 		} else {
@@ -100,10 +120,7 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
 	  AbstractListenerDialog dialog = getDialog(parent.getShell(), getItems(), 
 	  		listenerList.get(table.getSelectionIndex()));
     dialog.open();
-    if(dialog.eventName != null && dialog.eventName.length() > 0 &&
-            dialog.implementation != null && dialog.implementation.length() > 0 &&
-            dialog.implementationType != null && dialog.implementationType.length() > 0) {
-      
+    if(StringUtils.isNotEmpty(dialog.eventName) && StringUtils.isNotEmpty(dialog.implementation)) {
     	saveChangedObject(dialog, index);
       return new String[] { dialog.implementation, dialog.implementationType, dialog.eventName, getFieldString(dialog.fieldExtensionList) };
     } else {
@@ -114,7 +131,7 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
 	@Override
   protected void removedItem(int index) {
 		if(index >= 0 && index < listenerList.size()) {
-			saveRemovedObject(listenerList.get(index));
+			saveRemovedObject(index);
 		}
   }
 	
@@ -123,14 +140,18 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
 	protected abstract AbstractListenerDialog getDialog(Shell shell, TableItem[] items, 
 	        ActivitiListener listener);
 	
-	private String getFieldString(List<FieldExtensionModel> fieldList) {
+	private String getFieldString(List<FieldExtension> fieldList) {
 	  String fieldString = "";
     if(fieldList != null) {
-      for (FieldExtensionModel fieldExtension : fieldList) {
+      for (FieldExtension fieldExtension : fieldList) {
         if(fieldString.length() > 0) {
           fieldString += ", ";
         }
-        fieldString += fieldExtension.fieldName + ":" + fieldExtension.expression;
+        if (StringUtils.isNotEmpty(fieldExtension.getExpression())) {
+          fieldString += fieldExtension.getFieldName() + ":" + fieldExtension.getExpression();
+        } else {
+          fieldString += fieldExtension.getFieldName() + ":" + fieldExtension.getStringValue();
+        }
       }
     }
     return fieldString;
@@ -138,118 +159,171 @@ public abstract class AbstractListenerEditor extends TableFieldEditor {
 	
 	private void saveNewObject(final AbstractListenerDialog dialog) {
 		if (pictogramElement != null) {
-		  final Object bo = BpmnBOUtil.getExecutionListenerBO(pictogramElement, diagram);
-		  if (bo == null) {
-        return;
+      // Perform the changes on the updatable BO instead of the original
+      Object updatableBo = modelUpdater.getProcessModelUpdater().getUpdatableBusinessObject();
+      ActivitiListener newListener = new ActivitiListener();
+      newListener.setEvent(dialog.eventName);
+      newListener.setImplementationType(dialog.implementationType);
+      newListener.setImplementation(dialog.implementation);
+      
+      if(AlfrescoUserTask.ALFRESCO_SCRIPT_TASK_LISTENER.equalsIgnoreCase(dialog.implementation) ||
+              AlfrescoScriptTask.ALFRESCO_SCRIPT_EXECUTION_LISTENER.equalsIgnoreCase(dialog.implementation)) {
+        
+        FieldExtension scriptExtension = new FieldExtension();
+        scriptExtension.setFieldName("script");
+        scriptExtension.setStringValue(dialog.script);
+        newListener.getFieldExtensions().add(scriptExtension);
+        
+        FieldExtension runAsExtension = new FieldExtension();
+        runAsExtension.setFieldName("runAs");
+        runAsExtension.setStringValue(dialog.runAs);
+        newListener.getFieldExtensions().add(runAsExtension);
+        
+        FieldExtension scriptProcessorExtension = new FieldExtension();
+        scriptProcessorExtension.setFieldName("scriptProcessor");
+        scriptProcessorExtension.setStringValue(dialog.scriptProcessor);
+        newListener.getFieldExtensions().add(scriptProcessorExtension);
+        
+      } else {
+        setFieldsInListener(newListener, dialog.fieldExtensionList);
       }
-			TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
-			ActivitiUiUtil.runModelChange(new Runnable() {
-				public void run() {
-				  ActivitiListener newListener = Bpmn2Factory.eINSTANCE.createActivitiListener();
-				  newListener.setEvent(dialog.eventName);
-				  newListener.setImplementationType(dialog.implementationType);
-				  newListener.setImplementation(dialog.implementation);
-				  if("alfrescoScriptType".equalsIgnoreCase(dialog.implementationType)) {
-				  	newListener.setRunAs(dialog.runAs);
-				  	newListener.setScriptProcessor(dialog.scriptProcessor);
-				  }
-				  setFieldsInListener(newListener, dialog.fieldExtensionList);
-				  BpmnBOUtil.addListener(bo, newListener);
-				}
-			}, editingDomain, "Model Update");
+      
+      if (listenerType == EXECUTION_LISTENER) {
+        BpmnBOUtil.addExecutionListener(updatableBo, newListener, diagram);
+      } else {
+        ((UserTask) updatableBo).getTaskListeners().add(newListener);
+      }
+      modelUpdater.executeModelUpdater();
 		}
 	}
 	
 	private void saveChangedObject(final AbstractListenerDialog dialog, final int index) {
 		if (pictogramElement != null) {
-		  final Object bo = BpmnBOUtil.getExecutionListenerBO(pictogramElement, diagram);
-		  if (bo == null) {
-        return;
-      }
-			TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
-			ActivitiUiUtil.runModelChange(new Runnable() {
-				public void run() {
-					ActivitiListener listener = listenerList.get(index);
-					if(listener != null) {
-					  listener.setEvent(dialog.eventName);
-					  listener.setImplementation(dialog.implementation);
-					  listener.setImplementationType(dialog.implementationType);
-					  if("alfrescoScriptType".equalsIgnoreCase(listener.getImplementationType())) {
-					  	listener.setRunAs(dialog.runAs);
-					  	listener.setScriptProcessor(dialog.scriptProcessor);
-					  }
-					  setFieldsInListener(listener, dialog.fieldExtensionList);
-					  BpmnBOUtil.setListener(bo, listener, index);
-					}
-					
-				}
-			}, editingDomain, "Model Update");
-		}
-	}
-	
-	private void saveRemovedObject(final ActivitiListener listener) {
-		if (pictogramElement != null) {
-		  final Object bo = BpmnBOUtil.getExecutionListenerBO(pictogramElement, diagram);
-		  if (bo == null) {
-        return;
-		  }
-			TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
-			ActivitiUiUtil.runModelChange(new Runnable() {
-				public void run() {
-					BpmnBOUtil.removeListener(bo, listener);
-				}
-			}, editingDomain, "Model Update");
-		}
-	}
-	
-	private void setFieldsInListener(ActivitiListener listener, List<FieldExtensionModel> fieldList) {
-	  if(fieldList == null || fieldList.size() == 0) {
-	    if(listener != null && listener.getFieldExtensions() != null && 
-	            listener.getFieldExtensions().size() > 0) {
-	      
-  	    removeFieldExtensionsNotInList(listener.getFieldExtensions(), null);
-	    }
-	    return;
-	  }
-	  for (FieldExtensionModel fieldModel : fieldList) {
-	    FieldExtension fieldExtension = fieldExtensionExists(listener.getFieldExtensions(), fieldModel.fieldName);
-	    if(fieldExtension == null) {
-	      fieldExtension = Bpmn2Factory.eINSTANCE.createFieldExtension();
-	      listener.getFieldExtensions().add(fieldExtension);
-	    }
-	    fieldExtension.setFieldname(fieldModel.fieldName);
-	    fieldExtension.setExpression(fieldModel.expression);
-    }
-	  removeFieldExtensionsNotInList(listener.getFieldExtensions(), fieldList);
-	}
-	
-	private FieldExtension fieldExtensionExists(List<FieldExtension> fieldList, String fieldname) {
-	  if(fieldList == null) return null;
-	  for(FieldExtension fieldExtension : fieldList) {
-      if(fieldname.equalsIgnoreCase(fieldExtension.getFieldname())) {
-        return fieldExtension;
-      }
-    }
-    return null;
-	}
-	
-	private void removeFieldExtensionsNotInList(List<FieldExtension> fieldList, List<FieldExtensionModel> newfieldList) {
-	  Iterator<FieldExtension> entryIterator = fieldList.iterator();
-    while(entryIterator.hasNext()) {
-      FieldExtension fieldExtension = entryIterator.next();
-      boolean found = false;
-      if(newfieldList != null && newfieldList.size() > 0) {
-        for (FieldExtensionModel field : newfieldList) {
-          if(field.fieldName.equals(fieldExtension.getFieldname())) {
-            found = true;
-            break;
+		  Object updatableBo = modelUpdater.getProcessModelUpdater().getUpdatableBusinessObject();
+			
+		  ActivitiListener listener = listenerList.get(index);
+			if (listener != null) {
+			  listener.setEvent(dialog.eventName);
+			  listener.setImplementation(dialog.implementation);
+			  listener.setImplementationType(dialog.implementationType);
+			  
+			  if(AlfrescoUserTask.ALFRESCO_SCRIPT_TASK_LISTENER.equalsIgnoreCase(dialog.implementation) ||
+                AlfrescoScriptTask.ALFRESCO_SCRIPT_EXECUTION_LISTENER.equalsIgnoreCase(dialog.implementation)) {
+			    
+			    List<FieldExtension> extensionList = listener.getFieldExtensions();
+			    FieldExtension scriptExtension = null;
+			    FieldExtension runAsExtension = null;
+			    FieldExtension scriptProcessorExtension = null;
+		      for (FieldExtension fieldExtension : extensionList) {
+		        if ("script".equalsIgnoreCase(fieldExtension.getFieldName())) {
+		          scriptExtension = fieldExtension;
+		        } else if ("runAs".equalsIgnoreCase(fieldExtension.getFieldName())) {
+              runAsExtension = fieldExtension;
+            } else if ("scriptProcessor".equalsIgnoreCase(fieldExtension.getFieldName())) {
+              scriptProcessorExtension = fieldExtension;
+            }
+		      }
+		      
+		      if (scriptExtension != null) {
+		        scriptExtension.setStringValue(dialog.script);
+		      } else {
+		        scriptExtension = new FieldExtension();
+		        scriptExtension.setFieldName("script");
+		        scriptExtension.setStringValue(dialog.script);
+		        listener.getFieldExtensions().add(scriptExtension);
+		      }
+		      
+		      if (runAsExtension != null) {
+		        runAsExtension.setStringValue(dialog.runAs);
+          } else {
+            runAsExtension = new FieldExtension();
+            runAsExtension.setFieldName("runAs");
+            runAsExtension.setStringValue(dialog.runAs);
+            listener.getFieldExtensions().add(runAsExtension);
           }
-        }
-      }
-      if(found == false) {
-        diagram.eResource().getContents().remove(fieldExtension);
-        entryIterator.remove();
-      }
+		      
+		      if (scriptProcessorExtension != null) {
+		        scriptProcessorExtension.setStringValue(dialog.scriptProcessor);
+          } else {
+            scriptProcessorExtension = new FieldExtension();
+            scriptProcessorExtension.setFieldName("scriptProcessor");
+            scriptProcessorExtension.setStringValue(dialog.scriptProcessor);
+            listener.getFieldExtensions().add(scriptProcessorExtension);
+          }
+			    
+			  } else {
+			    setFieldsInListener(listener, dialog.fieldExtensionList);
+			  }
+			  
+			  if (listenerType == EXECUTION_LISTENER) {
+			    BpmnBOUtil.setExecutionListener(updatableBo, listener, index, diagram);
+			  } else {
+			    ((UserTask) updatableBo).getTaskListeners().set(index, listener);
+			  }
+			  
+			  modelUpdater.executeModelUpdater();
+			}
+		}
+	}
+	
+	private void saveRemovedObject(int index) {
+		if (pictogramElement != null) {
+		  Object updatableBo = modelUpdater.getProcessModelUpdater().getUpdatableBusinessObject();
+		  
+		  if (listenerType == EXECUTION_LISTENER) {
+		    BpmnBOUtil.removeExecutionListener(updatableBo, index, diagram);
+		  } else {
+		    ((UserTask) updatableBo).getTaskListeners().remove(index);
+		  }
+		  
+		  modelUpdater.executeModelUpdater();
+		}
+	}
+	
+	@Override
+  protected void upPressed() {
+	  final int index = table.getSelectionIndex();
+	  Object updatableBo = modelUpdater.getProcessModelUpdater().getUpdatableBusinessObject();
+    List<ActivitiListener> boListeners = null;
+    if (listenerType == EXECUTION_LISTENER) {
+      boListeners = BpmnBOUtil.getExecutionListeners(updatableBo, diagram);
+    } else {
+      boListeners = ((UserTask) updatableBo).getTaskListeners();
     }
+    ActivitiListener listener = boListeners.remove(index);
+    boListeners.add(index - 1, listener);
+    listenerList = boListeners;
+    modelUpdater.executeModelUpdater();
+    super.upPressed();
+  }
+
+  @Override
+  protected void downPressed() {
+    final int index = table.getSelectionIndex();
+    Object updatableBo = modelUpdater.getProcessModelUpdater().getUpdatableBusinessObject();
+    List<ActivitiListener> boListeners = null;
+    if (listenerType == EXECUTION_LISTENER) {
+      boListeners = BpmnBOUtil.getExecutionListeners(updatableBo, diagram);
+    } else {
+      boListeners = ((UserTask) updatableBo).getTaskListeners();
+    }
+    ActivitiListener listener = boListeners.remove(index);
+    boListeners.add(index + 1, listener);
+    listenerList = boListeners;
+    modelUpdater.executeModelUpdater();
+    super.downPressed();
+  }
+
+  private void setFieldsInListener(ActivitiListener listener, List<FieldExtension> fieldList) {
+	  if(listener != null) {
+  		listener.getFieldExtensions().clear();
+		  for (FieldExtension fieldModel : fieldList) {
+		    FieldExtension fieldExtension = new FieldExtension();
+		    listener.getFieldExtensions().add(fieldExtension);
+		    fieldExtension.setFieldName(fieldModel.getFieldName());
+		    fieldExtension.setStringValue(fieldModel.getStringValue());
+		    fieldExtension.setExpression(fieldModel.getExpression());
+	    }
+	  }
 	}
 }

@@ -1,74 +1,86 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.activiti.designer.property;
 
 import java.util.List;
 
+import org.activiti.bpmn.model.ActivitiListener;
+import org.activiti.bpmn.model.UserTask;
 import org.activiti.designer.property.ui.TaskListenerEditor;
-import org.activiti.designer.util.property.ActivitiPropertySection;
-import org.eclipse.bpmn2.ActivitiListener;
-import org.eclipse.bpmn2.UserTask;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.services.Graphiti;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetPage;
-import org.eclipse.ui.views.properties.tabbed.TabbedPropertySheetWidgetFactory;
 
 public class PropertyTaskListenerSection extends ActivitiPropertySection implements ITabbedPropertyConstants {
 
 	private TaskListenerEditor listenerEditor;
-
+	
 	@Override
-	public void createControls(Composite parent, TabbedPropertySheetPage tabbedPropertySheetPage) {
-		super.createControls(parent, tabbedPropertySheetPage);
-
-		TabbedPropertySheetWidgetFactory factory = getWidgetFactory();
-		Composite composite = factory.createFlatFormComposite(parent);
-		FormData data;
-		
-		Composite listenersComposite = factory.createComposite(composite, SWT.WRAP);
-		data = new FormData();
-		data.left = new FormAttachment(0, 120);
-		data.right = new FormAttachment(100, 0);
-		data.top = new FormAttachment(0, VSPACE);
-		listenersComposite.setLayoutData(data);
-		GridLayout layout = new GridLayout();
-		layout.marginTop = 0;
-		layout.numColumns = 1;
-		listenersComposite.setLayout(layout);
-		listenerEditor = new TaskListenerEditor("taskListenerEditor", listenersComposite);
-		listenerEditor.getLabelControl(listenersComposite).setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
-		
-		CLabel listenersLabel = factory.createCLabel(composite, "Listeners:"); //$NON-NLS-1$
-		data = new FormData();
-		data.left = new FormAttachment(0, 0);
-		data.right = new FormAttachment(listenersComposite, -HSPACE);
-		data.top = new FormAttachment(listenersComposite, 0, SWT.TOP);
-		listenersLabel.setLayoutData(data);
-
-	}
+  public void createFormControls(TabbedPropertySheetPage aTabbedPropertySheetPage) {
+    Composite listenersComposite = getWidgetFactory().createComposite(formComposite, SWT.WRAP);
+    FormData data = new FormData();
+    data = new FormData();
+    data.left = new FormAttachment(0, 180);
+    data.right = new FormAttachment(100, -20);
+    data.top = new FormAttachment(0, VSPACE);
+    listenersComposite.setLayoutData(data);
+    GridLayout layout = new GridLayout();
+    layout.marginTop = 0;
+    layout.numColumns = 1;
+    listenersComposite.setLayout(layout);
+    listenerEditor = new TaskListenerEditor("taskListenerEditor", listenersComposite, (ModelUpdater) this);
+    listenerEditor.getLabelControl(listenersComposite).setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
+    
+    CLabel listenersLabel = getWidgetFactory().createCLabel(formComposite, "Task listeners:"); //$NON-NLS-1$
+    data = new FormData();
+    data.left = new FormAttachment(0, 0);
+    data.right = new FormAttachment(listenersComposite, -HSPACE);
+    data.top = new FormAttachment(listenersComposite, 0, SWT.TOP);
+    listenersLabel.setLayoutData(data);
+  }
 	
 	@Override
   public void refresh() {
-    
     PictogramElement pe = getSelectedPictogramElement();
     if (pe != null) {
-      Object bo = Graphiti.getLinkService().getBusinessObjectForLinkedPictogramElement(pe);
-      if (bo == null && (bo instanceof UserTask == false))
-        return;
-      
+      Object bo = getBusinessObject(pe);
+      resetModelUpdater();
+
       UserTask userTask = (UserTask) bo;
-      List<ActivitiListener> taskListenerList = userTask.getActivitiListeners();
-      
-      listenerEditor.pictogramElement = pe;
-      listenerEditor.diagramEditor = getDiagramEditor();
+      List<ActivitiListener> taskListenerList = userTask.getTaskListeners();
+
+      listenerEditor.pictogramElement = getSelectedPictogramElement();
       listenerEditor.diagram = getDiagram();
       listenerEditor.initialize(taskListenerList);
-   }
+    }
+  }
+
+  @Override
+  protected Object getModelValueForControl(Control control, Object businessObject) {
+    return null;
+  }
+
+  @Override
+  protected void storeValueInModel(Control control, Object businessObject) {
+    // nothing to do
   }
 }

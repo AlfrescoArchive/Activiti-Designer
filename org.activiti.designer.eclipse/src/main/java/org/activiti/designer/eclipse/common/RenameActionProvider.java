@@ -1,23 +1,22 @@
-/*******************************************************************************
- * <copyright>
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
  *
- * Copyright (c) 2005, 2010 SAP AG.
- * All rights reserved. This program and the accompanying materials
- * are made available under the terms of the Eclipse Public License v1.0
- * which accompanies this distribution, and is available at
- * http://www.eclipse.org/legal/epl-v10.html
+ * http://www.apache.org/licenses/LICENSE-2.0
  *
- * Contributors:
- *    SAP AG - initial API, implementation and documentation
- *
- * </copyright>
- *
- *******************************************************************************/
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.activiti.designer.eclipse.common;
 
 import java.io.IOException;
 import java.util.Collections;
 
+import org.activiti.designer.util.ActivitiConstants;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.ResourcesPlugin;
@@ -47,8 +46,9 @@ public class RenameActionProvider extends CommonActionProvider {
 	public void fillContextMenu(IMenuManager menu) {
 		super.fillContextMenu(menu);
 		ISelection selection = getContext().getSelection();
-		if (selection.isEmpty())
-			return;
+		if (selection.isEmpty()) {
+      return;
+    }
 		if (selection instanceof IStructuredSelection) {
 			IStructuredSelection sel = (IStructuredSelection) selection;
 			Object el = sel.getFirstElement();
@@ -57,12 +57,14 @@ public class RenameActionProvider extends CommonActionProvider {
 				String platformString = eclass.eResource().getURI().toPlatformString(true);
 				Path path = new Path(platformString);
 				IFile file = ResourcesPlugin.getWorkspace().getRoot().getFile(path);
-				if (file == null)
-					return;
+				if (file == null) {
+          return;
+        }
 				IProject project = file.getProject();
 				try {
-					if (!project.hasNature(ActivitiProjectNature.NATURE_ID))
-						return;
+					if (!project.hasNature(ActivitiConstants.NATURE_ID)) {
+            return;
+          }
 				} catch (CoreException e) {
 					e.printStackTrace();
 				}
@@ -93,8 +95,8 @@ public class RenameActionProvider extends CommonActionProvider {
 				Resource resource = eclass.eResource();
 				ResourceSet resourceSet = resource.getResourceSet();
 				TransactionalEditingDomain domain = TransactionalEditingDomain.Factory.INSTANCE.createEditingDomain(resourceSet);
-				try{
 				if (domain != null){
+			    try{
 					Command setCommand = domain.createCommand(SetCommand.class, new CommandParameter(eclass,
 							EcorePackage.Literals.ENAMED_ELEMENT__NAME, newName));
 					domain.getCommandStack().execute(setCommand);
@@ -103,9 +105,9 @@ public class RenameActionProvider extends CommonActionProvider {
 					} catch (IOException e) {
 						e.printStackTrace();
 					}
-				}
 				}finally{
 					domain.dispose();
+				}
 				}
 			}
 		}

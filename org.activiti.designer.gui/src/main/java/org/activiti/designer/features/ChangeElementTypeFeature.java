@@ -1,38 +1,130 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.activiti.designer.features;
 
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
-import org.eclipse.bpmn2.BaseElement;
-import org.eclipse.bpmn2.FlowElement;
-import org.eclipse.bpmn2.FlowNode;
-import org.eclipse.bpmn2.SequenceFlow;
-import org.eclipse.emf.common.util.EList;
-import org.eclipse.emf.ecore.EObject;
+import org.activiti.bpmn.model.Activity;
+import org.activiti.bpmn.model.BaseElement;
+import org.activiti.bpmn.model.BoundaryEvent;
+import org.activiti.bpmn.model.FlowElement;
+import org.activiti.bpmn.model.FlowNode;
+import org.activiti.bpmn.model.Lane;
+import org.activiti.bpmn.model.Process;
+import org.activiti.bpmn.model.SequenceFlow;
+import org.activiti.bpmn.model.SubProcess;
+import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICustomContext;
 import org.eclipse.graphiti.features.context.impl.CreateContext;
 import org.eclipse.graphiti.features.custom.AbstractCustomFeature;
+import org.eclipse.graphiti.features.impl.AbstractCreateFeature;
 import org.eclipse.graphiti.mm.algorithms.GraphicsAlgorithm;
-import org.eclipse.graphiti.mm.pictograms.Anchor;
-import org.eclipse.graphiti.mm.pictograms.ChopboxAnchor;
-import org.eclipse.graphiti.mm.pictograms.Connection;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
-import org.eclipse.graphiti.mm.pictograms.PictogramElement;
-import org.eclipse.graphiti.mm.pictograms.PictogramLink;
 import org.eclipse.graphiti.mm.pictograms.Shape;
 
 public class ChangeElementTypeFeature extends AbstractCustomFeature {
 	
+  public static final String TASK_SERVICE = "servicetask";
+  public static final String TASK_BUSINESSRULE = "businessruletask";
+  public static final String TASK_MAIL = "mailtask";
+  public static final String TASK_MANUAL = "manualtask";
+  public static final String TASK_RECEIVE = "receivetask";
+  public static final String TASK_SCRIPT = "scripttask";
+  public static final String TASK_USER = "usertask";
+  
+  public static final String GATEWAY_EXCLUSIVE = "exclusivegateway";
+  public static final String GATEWAY_INCLUSIVE = "inclusivegateway";
+  public static final String GATEWAY_PARALLEL = "parallelgateway";
+  public static final String GATEWAY_EVENT = "eventgateway";
+  
+  public static final String EVENT_START_NONE = "nonestartevent";
+  public static final String EVENT_START_TIMER = "timerstartevent";
+  public static final String EVENT_START_MESSAGE = "messagestartevent";
+  public static final String EVENT_START_ERROR = "errorstartevent";
+  public static final String EVENT_START_SIGNAL = "signalstartevent";
+  
+  public static final String EVENT_END_NONE = "noneendevent";
+  public static final String EVENT_END_ERROR = "errorendevent";
+  public static final String EVENT_END_TERMINATE = "terminateendevent";
+  public static final String EVENT_END_CANCEL = "cancelendevent";
+  
+  public static final String EVENT_BOUNDARY_TIMER = "timerboundaryevent";
+  public static final String EVENT_BOUNDARY_ERROR = "errorboundaryevent";
+  public static final String EVENT_BOUNDARY_MESSAGE = "messageboundaryevent";
+  public static final String EVENT_BOUNDARY_SIGNAL = "signalboundaryevent";
+  public static final String EVENT_BOUNDARY_CANCEL = "cancelboundaryevent";
+  public static final String EVENT_BOUNDARY_COMPENSATION = "compensationboundaryevent";
+  
+  public static final String EVENT_CATCH_TIMER = "timercatchevent";
+  public static final String EVENT_CATCH_MESSAGE = "messagecatchevent";
+  public static final String EVENT_CATCH_SIGNAL = "signalcatchevent";
+  
+  public static final String EVENT_THROW_NONE = "nonethrowevent";
+  public static final String EVENT_THROW_SIGNAL = "signalthrowevent";
+  public static final String EVENT_THROW_COMPENSATION = "compensationthrowevent";
+  
+  protected Map<String, AbstractCreateFeature> createFeatureMap = new HashMap<String, AbstractCreateFeature>();
+  
 	private String newType;
 	
 	public ChangeElementTypeFeature(IFeatureProvider fp) {
 		super(fp);
+		createFeatureMap.put(TASK_SERVICE, new CreateServiceTaskFeature(fp));
+		createFeatureMap.put(TASK_BUSINESSRULE, new CreateBusinessRuleTaskFeature(fp));
+		createFeatureMap.put(TASK_MAIL, new CreateMailTaskFeature(fp));
+		createFeatureMap.put(TASK_MANUAL, new CreateManualTaskFeature(fp));
+		createFeatureMap.put(TASK_RECEIVE, new CreateReceiveTaskFeature(fp));
+		createFeatureMap.put(TASK_SCRIPT, new CreateScriptTaskFeature(fp));
+		createFeatureMap.put(TASK_USER, new CreateUserTaskFeature(fp));
+		
+		createFeatureMap.put(GATEWAY_EXCLUSIVE, new CreateExclusiveGatewayFeature(fp));
+		createFeatureMap.put(GATEWAY_INCLUSIVE, new CreateInclusiveGatewayFeature(fp));
+		createFeatureMap.put(GATEWAY_PARALLEL, new CreateParallelGatewayFeature(fp));
+		createFeatureMap.put(GATEWAY_EVENT, new CreateEventGatewayFeature(fp));
+		
+		createFeatureMap.put(EVENT_START_NONE, new CreateStartEventFeature(fp));
+		createFeatureMap.put(EVENT_START_TIMER, new CreateTimerStartEventFeature(fp));
+		createFeatureMap.put(EVENT_START_MESSAGE, new CreateMessageStartEventFeature(fp));
+		createFeatureMap.put(EVENT_START_ERROR, new CreateErrorStartEventFeature(fp));
+		createFeatureMap.put(EVENT_START_SIGNAL, new CreateSignalStartEventFeature(fp));
+		
+    createFeatureMap.put(EVENT_END_NONE, new CreateEndEventFeature(fp));
+    createFeatureMap.put(EVENT_END_TERMINATE, new CreateTerminateEndEventFeature(fp));
+    createFeatureMap.put(EVENT_END_ERROR, new CreateErrorEndEventFeature(fp));
+    createFeatureMap.put(EVENT_END_CANCEL, new CreateCancelEndEventFeature(fp));
+    
+		createFeatureMap.put(EVENT_BOUNDARY_TIMER, new CreateBoundaryTimerFeature(fp));
+    createFeatureMap.put(EVENT_BOUNDARY_ERROR, new CreateBoundaryErrorFeature(fp));
+    createFeatureMap.put(EVENT_BOUNDARY_MESSAGE, new CreateBoundaryMessageFeature(fp));
+    createFeatureMap.put(EVENT_BOUNDARY_SIGNAL, new CreateBoundarySignalFeature(fp));
+    
+    createFeatureMap.put(EVENT_CATCH_TIMER, new CreateTimerCatchingEventFeature(fp));
+    createFeatureMap.put(EVENT_CATCH_MESSAGE, new CreateMessageCatchingEventFeature(fp));
+    createFeatureMap.put(EVENT_CATCH_SIGNAL, new CreateSignalCatchingEventFeature(fp));
+    
+    createFeatureMap.put(EVENT_THROW_NONE, new CreateNoneThrowingEventFeature(fp));
+    createFeatureMap.put(EVENT_THROW_SIGNAL, new CreateSignalThrowingEventFeature(fp));
+    createFeatureMap.put(EVENT_THROW_COMPENSATION, new CreateCompensationThrowingEventFeature(fp));
 	}
 
 	public ChangeElementTypeFeature(IFeatureProvider fp, String newType) {
-		super(fp);
+		this(fp);
 		this.newType = newType;
 	}
 	
@@ -43,118 +135,66 @@ public class ChangeElementTypeFeature extends AbstractCustomFeature {
 
 	@Override
   public void execute(ICustomContext context) {
-	  PictogramElement element = (PictogramElement) context.getProperty("org.activiti.designer.changetype.pictogram");
+	  Shape element = (Shape) context.getProperty("org.activiti.designer.changetype.pictogram");
 	  GraphicsAlgorithm elementGraphics = element.getGraphicsAlgorithm();
 	  int x = elementGraphics.getX();
 	  int y = elementGraphics.getY();
 	  
 	  CreateContext taskContext = new CreateContext();
-	  ContainerShape targetContainer = (ContainerShape) element.eContainer();
+	  ContainerShape targetContainer = (ContainerShape) element.getContainer();
   	taskContext.setTargetContainer(targetContainer);
   	taskContext.setLocation(x, y);
   	taskContext.setHeight(elementGraphics.getHeight());
   	taskContext.setWidth(elementGraphics.getWidth());
   	
-  	FlowElement oldObject = (FlowElement) element.getLink().getBusinessObjects().get(0);
-	  String objectId = oldObject.getId();
+  	FlowNode oldObject = (FlowNode) getFeatureProvider().getBusinessObjectForPictogramElement(element);
+  	if (oldObject instanceof BoundaryEvent) {
+  	  BoundaryEvent boundaryEvent = (BoundaryEvent) oldObject;
+  	  ContainerShape parentShape = (ContainerShape) getFeatureProvider().getPictogramElementForBusinessObject(boundaryEvent.getAttachedToRef());
+  	  taskContext.setTargetContainer(parentShape);
+  	  taskContext.setLocation(x - parentShape.getGraphicsAlgorithm().getX(), y - parentShape.getGraphicsAlgorithm().getY());
+  	}
 	  
-	  List<SequenceFlow> sourceList = new ArrayList<SequenceFlow>();
-	  List<SequenceFlow> targetList = new ArrayList<SequenceFlow>();
-	  for(EObject eObject : targetContainer.eResource().getContents()) {
-	  	if(eObject instanceof SequenceFlow) {
-	  		SequenceFlow sequenceFlow = (SequenceFlow) eObject;
-	  		if(sequenceFlow.getSourceRef().getId().equals(objectId)) {
-	  			sourceList.add(sequenceFlow);
-	  		}
-	  		if(sequenceFlow.getTargetRef().getId().equals(objectId)) {
-	  			targetList.add(sequenceFlow);
-	  		}
-	  	}
-	  }
+	  List<SequenceFlow> sourceList = oldObject.getOutgoingFlows();
+	  List<SequenceFlow> targetList = oldObject.getIncomingFlows();
+	  
 	  taskContext.putProperty("org.activiti.designer.changetype.sourceflows", sourceList);
 	  taskContext.putProperty("org.activiti.designer.changetype.targetflows", targetList);
 	  taskContext.putProperty("org.activiti.designer.changetype.name", oldObject.getName());
 	  
-	  Anchor elementAnchor = null;
-	  for (Shape shape : targetContainer.getChildren()) {
-      FlowNode flowNode = (FlowNode) getBusinessObjectForPictogramElement(shape.getGraphicsAlgorithm().getPictogramElement());
-      if(flowNode == null || flowNode.getId() == null) continue;
-      if(flowNode.getId().equals(objectId)) {
-        EList<Anchor> anchorList = ((ContainerShape) shape).getAnchors();
-        for (Anchor anchor : anchorList) {
-          if(anchor instanceof ChopboxAnchor) {
-          	elementAnchor = anchor;
-            break;
-          }
-        }
+	  targetContainer.getChildren().remove(element);
+	  List<Process> processes = ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getBpmnModel().getProcesses();
+    for (Process process : processes) {
+      process.removeFlowElement(oldObject.getId());
+      for (Lane lane : process.getLanes()) {
+        lane.getFlowReferences().remove(oldObject.getId());
+      }
+      removeElement(oldObject, process);
+    }
+	  
+    if (createFeatureMap.containsKey(newType)) {
+      createFeatureMap.get(newType).create(taskContext);
+    }
+  }
+	
+	private void removeElement(FlowElement element, BaseElement parentElement) {
+	  Collection<FlowElement> elementList = null;
+	  if (parentElement instanceof Process) {
+	    elementList = ((Process) parentElement).getFlowElements();
+	  } else if (parentElement instanceof SubProcess) {
+	    elementList = ((SubProcess) parentElement).getFlowElements();
+	    ((SubProcess) parentElement).getBoundaryEvents().remove(element);
+	  }
+	  
+    for (FlowElement flowElement : elementList) {
+      if (flowElement instanceof SubProcess) {
+        SubProcess subProcess = (SubProcess) flowElement;
+        subProcess.removeFlowElement(element.getId());
+        removeElement(element, subProcess);
+      }
+      if (flowElement instanceof Activity) {
+        ((Activity) flowElement).getBoundaryEvents().remove(element);
       }
     }
-	  
-	  List<Connection> sourceConnections = new ArrayList<Connection>();
-	  List<Connection> targetConnections = new ArrayList<Connection>();
-	  for(Connection connection : getDiagram().getConnections()) {
-	  	if(connection.getStart().equals(elementAnchor)) {
-	  		sourceConnections.add(connection);
-	  	}
-	  	if(connection.getEnd().equals(elementAnchor)) {
-	  		targetConnections.add(connection);
-	  	}
-	  }
-	  taskContext.putProperty("org.activiti.designer.changetype.sourceconnections", sourceConnections);
-	  taskContext.putProperty("org.activiti.designer.changetype.targetconnections", targetConnections);
-	  
-	  List<PictogramLink> toDeleteLinks = new ArrayList<PictogramLink>();
-	  for (PictogramLink link : getDiagram().getPictogramLinks()) {
-	  	BaseElement flowNode = (BaseElement) getBusinessObjectForPictogramElement(link.getPictogramElement());
-	  	if(flowNode.getId().equals(objectId)) {
-	  		toDeleteLinks.add(link);
-	  	}
-    }
-	  
-	  List<Shape> toDeleteShapes = new ArrayList<Shape>();
-	  for(Shape shape : targetContainer.getChildren()) {
-	  	BaseElement flowNode = (BaseElement) getBusinessObjectForPictogramElement(shape.getGraphicsAlgorithm().getPictogramElement());
-	  	if(flowNode.getId().equals(objectId)) {
-	  		toDeleteShapes.add(shape);
-	  	}
-	  }
-	  for (PictogramLink link : toDeleteLinks) {
-	  	getDiagram().getPictogramLinks().remove(link);
-    }
-	  for (Shape shape : toDeleteShapes) {
-	  	targetContainer.getChildren().remove(shape);
-	  }
-	  EcoreUtil.delete(oldObject, true);
-	  
-	  if("servicetask".equals(newType)) {
-	  	new CreateServiceTaskFeature(getFeatureProvider()).create(taskContext);
-	  
-	  } else if("businessruletask".equals(newType)) {
-	  	new CreateBusinessRuleTaskFeature(getFeatureProvider()).create(taskContext);
-
-	  } else if("mailtask".equals(newType)) {
-	  	new CreateMailTaskFeature(getFeatureProvider()).create(taskContext);
-	  
-	  } else if("manualtask".equals(newType)) {
-	  	new CreateManualTaskFeature(getFeatureProvider()).create(taskContext);
-	  	
-	  } else if("receivetask".equals(newType)) {
-	  	new CreateReceiveTaskFeature(getFeatureProvider()).create(taskContext);
-	  
-	  } else if("scripttask".equals(newType)) {
-	  	new CreateScriptTaskFeature(getFeatureProvider()).create(taskContext);
-	  	
-	  } else if("usertask".equals(newType)) {
-	  	new CreateUserTaskFeature(getFeatureProvider()).create(taskContext);
-	  
-	  } else if("exclusivegateway".equals(newType)) {
-	  	new CreateExclusiveGatewayFeature(getFeatureProvider()).create(taskContext);
-	 
-	  } else if("inclusivegateway".equals(newType)) {
-        new CreateInclusiveGatewayFeature(getFeatureProvider()).create(taskContext);
-     
-      } else if("parallelgateway".equals(newType)) {
-	  	new CreateParallelGatewayFeature(getFeatureProvider()).create(taskContext);
-	  }
   }
 }

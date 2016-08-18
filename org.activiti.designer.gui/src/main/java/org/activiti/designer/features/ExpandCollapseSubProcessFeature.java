@@ -1,16 +1,30 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.activiti.designer.features;
 
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import org.activiti.designer.eclipse.common.FileService;
-import org.activiti.designer.eclipse.preferences.PreferencesUtil;
+import org.activiti.bpmn.model.SubProcess;
+import org.activiti.designer.eclipse.common.ActivitiPlugin;
+import org.activiti.designer.eclipse.editor.ActivitiDiagramEditor;
+import org.activiti.designer.eclipse.util.FileService;
 import org.activiti.designer.eclipse.util.Util;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.preferences.Preferences;
-import org.eclipse.bpmn2.SubProcess;
-import org.eclipse.bpmn2.impl.SubProcessImpl;
+import org.activiti.designer.util.preferences.PreferencesUtil;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IProject;
 import org.eclipse.core.resources.IResource;
@@ -50,13 +64,13 @@ public class ExpandCollapseSubProcessFeature extends AbstractDrillDownFeature {
 
 	@Override
 	public boolean canExecute(ICustomContext context) {
-		return ActivitiUiUtil.contextPertainsToBusinessObject(context, SubProcessImpl.class);
+		return ActivitiUiUtil.contextPertainsToBusinessObject(context, SubProcess.class);
 	}
 
-	public void execute(ICustomContext context) {
+	@Override
+  public void execute(ICustomContext context) {
 		try {
-			SubProcess subprocess = (SubProcess) ActivitiUiUtil.getBusinessObjectFromContext(context,
-					SubProcessImpl.class);
+			SubProcess subprocess = (SubProcess) ActivitiUiUtil.getBusinessObjectFromContext(context, SubProcess.class);
 			this.subprocessId = subprocess.getId();
 			this.subprocessName = subprocess.getName();
 		} catch (Exception e) {
@@ -110,18 +124,21 @@ public class ExpandCollapseSubProcessFeature extends AbstractDrillDownFeature {
 
 		TransactionalEditingDomain domain = null;
 
-		boolean createContent = PreferencesUtil
-				.getBooleanPreference(Preferences.EDITOR_ADD_DEFAULT_CONTENT_TO_DIAGRAMS);
+		boolean createContent = PreferencesUtil.getBooleanPreference(
+		    Preferences.EDITOR_ADD_DEFAULT_CONTENT_TO_DIAGRAMS, ActivitiPlugin.getDefault());
+
+		final ActivitiDiagramEditor diagramEditor
+		  = (ActivitiDiagramEditor) getFeatureProvider().getDiagramTypeProvider().getDiagramEditor();
 
 		if (createContent) {
 			final InputStream contentStream = Util.getContentStream(Util.Content.NEW_SUBPROCESS_CONTENT);
 			InputStream replacedStream = Util.swapStreamContents(subprocessName, contentStream);
-			domain = FileService.createEmfFileForDiagram(uri, null, replacedStream, targetFile);
+			domain = FileService.createEmfFileForDiagram(uri, null, diagramEditor, replacedStream, targetFile);
 			diagram = org.eclipse.graphiti.ui.internal.services.GraphitiUiInternal.getEmfService().getDiagramFromFile(
 					targetFile, domain.getResourceSet());
 		} else {
 			diagram = Graphiti.getPeCreateService().createDiagram("BPMNdiagram", subprocessName, true);
-			domain = FileService.createEmfFileForDiagram(uri, diagram, null, null);
+			domain = FileService.createEmfFileForDiagram(uri, diagram, diagramEditor, null, null);
 		}
 
 		return diagram;

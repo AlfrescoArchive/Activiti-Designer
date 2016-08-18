@@ -1,3 +1,16 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.activiti.designer.eclipse.ui.wizard.diagram;
 
 import org.activiti.designer.eclipse.common.ActivitiPlugin;
@@ -25,12 +38,17 @@ public class CreateDefaultActivitiDiagramInitialContentPage extends WizardPage {
   public Button contentSourceImport;
   public Button contentSourceTemplate;
   public Table templateTable;
+  public Group templateGroup;
 
   public CreateDefaultActivitiDiagramInitialContentPage() {
     super(PAGE_NAME);
     setTitle("New Activiti Diagram");
     setImageDescriptor(ActivitiPlugin.getImageDescriptor(PluginImage.ACTIVITI_LOGO_64x64));
     setDescription("Select the initial content for the new diagram.");
+  }
+
+  public CreateDefaultActivitiDiagramInitialContentPage(String pageName) {
+    super(pageName);
   }
 
   @Override
@@ -64,7 +82,7 @@ public class CreateDefaultActivitiDiagramInitialContentPage extends WizardPage {
     contentSourceTemplate = toolkit.createButton(contentSourceGroup, "Yes, use a template", SWT.RADIO);
     contentSourceTemplate.setEnabled(true);
     
-    Group templateGroup = new Group(container, SWT.SHADOW_IN);
+    templateGroup = new Group(container, SWT.SHADOW_IN);
     templateGroup.setText("Choose template");
     data = new GridData();
     data.grabExcessHorizontalSpace = true;

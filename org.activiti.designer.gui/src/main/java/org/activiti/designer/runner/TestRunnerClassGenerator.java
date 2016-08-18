@@ -1,3 +1,16 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.activiti.designer.runner;
 
 import java.io.ByteArrayInputStream;
@@ -65,7 +78,7 @@ public class TestRunnerClassGenerator {
       return;
     }
 
-    ICompilationUnit cu = pack.createCompilationUnit(testClassName, createTestClass(bpmnResource, testClassName, pack), false, null);
+    ICompilationUnit cu = pack.createCompilationUnit(testClassName, createTestClass(bpmnResource, processId, testClassName, pack), false, null);
 
     IFolder testResourceFolder = project.getFolder("src").getFolder("test").getFolder("resources");
     IFile propertiesFile = testResourceFolder.getFile("activiti.cfg.xml");
@@ -76,15 +89,28 @@ public class TestRunnerClassGenerator {
     }
 
   }
-  private String createTestClass(IResource bpmnResource, String className, IPackageFragment pack) {
+  private String createTestClass(IResource bpmnResource, String name, String className, IPackageFragment pack) {
     StringBuffer buffer = new StringBuffer();
+    String absoluteResourceLocation = bpmnResource.getLocation().toOSString();
+    absoluteResourceLocation = absoluteResourceLocation.replace("\\", "\\\\");
     buffer.append("package " + pack.getElementName() + ";\n\n").append("import static org.junit.Assert.*;\n\n").append("import java.util.HashMap;\n")
-            .append("import java.util.Map;\n\n").append("import org.activiti.engine.RuntimeService;\n")
-            .append("import org.activiti.engine.runtime.ProcessInstance;\n").append("import org.activiti.engine.test.Deployment;\n")
-            .append("import org.activiti.engine.test.ActivitiRule;\n").append("import org.junit.Rule;\n").append("import org.junit.Test;\n\n")
-            .append("public class ").append(className.substring(0, className.length() - 5)).append(" {\n\n").append("@Rule\n")
-            .append("public ActivitiRule activitiRule = new ActivitiRule();\n\n").append("\t@Test\n")
-            .append("\t@Deployment(resources=\"diagrams/" + bpmnResource.getName() + "\")\n").append("\tpublic void startProcess() {\n")
+            .append("import java.util.Map;\n")
+            .append("import java.io.FileInputStream;\n\n")
+            .append("import org.activiti.engine.RepositoryService;\n")
+            .append("import org.activiti.engine.RuntimeService;\n")
+            .append("import org.activiti.engine.runtime.ProcessInstance;\n")
+            .append("import org.activiti.engine.test.ActivitiRule;\n")
+            .append("import org.junit.Rule;\n")
+            .append("import org.junit.Test;\n\n")
+            .append("public class ").append(className.substring(0, className.length() - 5)).append(" {\n\n")
+            .append("\tprivate String filename = \"" + bpmnResource.getLocation().toOSString() + "\";\n\n")
+            .append("\t@Rule\n")
+            .append("\tpublic ActivitiRule activitiRule = new ActivitiRule();\n\n")
+            .append("\t@Test\n")
+            .append("\tpublic void startProcess() throws Exception {\n")
+            .append("\t\tRepositoryService repositoryService = activitiRule.getRepositoryService();\n")
+						.append("\t\trepositoryService.createDeployment().addInputStream(\"" + name + ".bpmn20.xml\",\n")
+						.append("\t\t\t\tnew FileInputStream(filename)).deploy();\n")
             .append("\t\tRuntimeService runtimeService = activitiRule.getRuntimeService();\n")
             .append("\t\tMap<String, Object> variableMap = new HashMap<String, Object>();\n").append("\t\tvariableMap.put(\"name\", \"Activiti\");\n")
             .append("\t\tProcessInstance processInstance = runtimeService.startProcessInstanceByKey(\"" + processId + "\", variableMap);\n")

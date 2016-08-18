@@ -1,24 +1,47 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.activiti.designer.features;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
-import org.activiti.designer.property.extension.util.ExtensionUtil;
-import org.eclipse.bpmn2.Activity;
-import org.eclipse.bpmn2.BoundaryEvent;
-import org.eclipse.bpmn2.CallActivity;
-import org.eclipse.bpmn2.CustomProperty;
-import org.eclipse.bpmn2.Event;
-import org.eclipse.bpmn2.FlowElement;
-import org.eclipse.bpmn2.FlowNode;
-import org.eclipse.bpmn2.Gateway;
-import org.eclipse.bpmn2.SequenceFlow;
-import org.eclipse.bpmn2.ServiceTask;
-import org.eclipse.bpmn2.SubProcess;
-import org.eclipse.bpmn2.Task;
-import org.eclipse.emf.ecore.EObject;
+import org.activiti.bpmn.model.Activity;
+import org.activiti.bpmn.model.Artifact;
+import org.activiti.bpmn.model.Association;
+import org.activiti.bpmn.model.BaseElement;
+import org.activiti.bpmn.model.BoundaryEvent;
+import org.activiti.bpmn.model.BpmnModel;
+import org.activiti.bpmn.model.CallActivity;
+import org.activiti.bpmn.model.Event;
+import org.activiti.bpmn.model.FlowElement;
+import org.activiti.bpmn.model.FlowElementsContainer;
+import org.activiti.bpmn.model.FlowNode;
+import org.activiti.bpmn.model.Gateway;
+import org.activiti.bpmn.model.Lane;
+import org.activiti.bpmn.model.Process;
+import org.activiti.bpmn.model.SequenceFlow;
+import org.activiti.bpmn.model.SubProcess;
+import org.activiti.bpmn.model.Task;
+import org.activiti.designer.util.editor.BpmnMemoryModel;
+import org.activiti.designer.util.editor.ModelHandler;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.graphiti.features.IFeatureProvider;
+import org.eclipse.graphiti.features.IRemoveFeature;
+import org.eclipse.graphiti.features.context.IRemoveContext;
+import org.eclipse.graphiti.features.context.impl.RemoveContext;
 import org.eclipse.graphiti.ui.features.DefaultDeleteFeature;
 
 public class DeleteFlowElementFeature extends DefaultDeleteFeature {
@@ -30,65 +53,95 @@ public class DeleteFlowElementFeature extends DefaultDeleteFeature {
 	protected void deleteBusinessObject(Object bo) {
 		if (bo instanceof Task || bo instanceof Gateway || bo instanceof Event || bo instanceof SubProcess || bo instanceof CallActivity) {
 		  deleteSequenceFlows((FlowNode) bo);
+		  deleteAssociations((FlowNode) bo);
+		}
+		
+		if (bo instanceof SequenceFlow) {
+		  deletedConnectingFlows((SequenceFlow) bo);
 		}
 
-		if (bo instanceof EObject) {
-
-			// If this is a custom service task, all of the linked custom
-			// properties should also be removed
-			if (bo instanceof ServiceTask && ExtensionUtil.isCustomServiceTask((EObject) bo)) {
-
-				final List<EObject> toDeleteCustomProperties = new ArrayList<EObject>();
-
-				final ServiceTask serviceTask = (ServiceTask) bo;
-				for (final CustomProperty customProperty : serviceTask.getCustomProperties()) {
-					toDeleteCustomProperties.add(customProperty);
-				}
-
-				for (final EObject deleteObject : toDeleteCustomProperties) {
-					EcoreUtil.delete(deleteObject, true);
-				}
-			}
-			
-			if (bo instanceof SubProcess || bo instanceof Task) {
-			  if(((Activity) bo).getBoundaryEventRefs() != null) {
-			    for (BoundaryEvent boundaryEvent : ((Activity) bo).getBoundaryEventRefs()) {
-			      EObject toDeleteEvent = getFlowElement(boundaryEvent);
-			      if(toDeleteEvent != null) {
-			        EcoreUtil.delete(toDeleteEvent, true);
-			      }
-          }
-			  }
-			}
-			
-			if (bo instanceof SubProcess) {
-			  SubProcess subProcess = (SubProcess) bo;
-			  List<FlowElement> toDeleteElements = new ArrayList<FlowElement>();
-			  for (FlowElement subFlowElement : subProcess.getFlowElements()) {
-			    toDeleteElements.add(subFlowElement);
+		if (bo instanceof Activity) {
+		  Activity activity = (Activity) bo;
+		  if (activity.getBoundaryEvents() != null) {
+		    for (BoundaryEvent boundaryEvent : activity.getBoundaryEvents()) {
+		      IRemoveContext rc = new RemoveContext(getFeatureProvider().getPictogramElementForBusinessObject(boundaryEvent));
+		      IFeatureProvider featureProvider = getFeatureProvider();
+		      IRemoveFeature removeFeature = featureProvider.getRemoveFeature(rc);
+		      if (removeFeature != null) {
+		        removeFeature.remove(rc);
+		        // Bug 347421: Set hasDoneChanges flag only after first modification
+		        setDoneChanges(true);
+		      }
+		      removeElement(boundaryEvent);
         }
-			  for (FlowElement subFlowElement : toDeleteElements) {
-			    if(subFlowElement instanceof FlowNode) {
-            deleteSequenceFlows((FlowNode) subFlowElement);
-          }
-          EcoreUtil.delete(subFlowElement, true);
-        }
-			  subProcess.getFlowElements().clear();
-			}
-
-			EcoreUtil.delete((EObject) bo, true);
+		  }
 		}
+		
+		if (bo instanceof BoundaryEvent) {
+      if(((BoundaryEvent) bo).getAttachedToRef() != null) {
+        ((BoundaryEvent) bo).getAttachedToRef().getBoundaryEvents().remove(bo);
+      }
+    }
+		
+		if (bo instanceof SubProcess) {
+		  SubProcess subProcess = (SubProcess) bo;
+		  List<FlowElement> toDeleteElements = new ArrayList<FlowElement>();
+		  for (FlowElement subFlowElement : subProcess.getFlowElements()) {
+		    toDeleteElements.add(subFlowElement);
+      }
+		  for (FlowElement subFlowElement : toDeleteElements) {
+		    if(subFlowElement instanceof FlowNode) {
+          deleteSequenceFlows((FlowNode) subFlowElement);
+        }
+		    removeElement(subFlowElement);
+      }
+		  subProcess.getFlowElements().clear();
+		}
+
+		removeElement((BaseElement) bo);
 	}
 	
-	private void deleteSequenceFlows(FlowNode flowNode) {
+	protected void removeElement(BaseElement element) {
+  	List<Process> processes = ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getBpmnModel().getProcesses();
+    for (Process process : processes) {
+      process.removeFlowElement(element.getId());
+      removeElementInLanes(element.getId(), process.getLanes());
+      removeElementInProcess(element, process);
+    }
+	}
+	
+	protected void removeElementInLanes(String elementId, List<Lane> laneList) {
+    for (Lane lane : laneList) {
+      lane.getFlowReferences().remove(elementId);
+    }
+  }
+	
+	protected void removeElementInProcess(BaseElement element, BaseElement parentElement) {
+	  Collection<FlowElement> elementList = null;
+    if (parentElement instanceof Process) {
+      elementList = ((Process) parentElement).getFlowElements();
+    } else if (parentElement instanceof SubProcess) {
+      elementList = ((SubProcess) parentElement).getFlowElements();
+    }
+	  
+    for (FlowElement flowElement : elementList) {
+      if(flowElement instanceof SubProcess) {
+        SubProcess subProcess = (SubProcess) flowElement;
+        subProcess.removeFlowElement(element.getId());
+        removeElementInProcess(element, subProcess);
+      }
+    }
+  }
+	
+	protected void deleteSequenceFlows(FlowNode flowNode) {
 	  List<SequenceFlow> toDeleteSequenceFlows = new ArrayList<SequenceFlow>();
-    for (SequenceFlow incomingSequenceFlow : flowNode.getIncoming()) {
+    for (SequenceFlow incomingSequenceFlow : flowNode.getIncomingFlows()) {
       SequenceFlow toDeleteObject = (SequenceFlow) getFlowElement(incomingSequenceFlow);
       if (toDeleteObject != null) {
         toDeleteSequenceFlows.add(toDeleteObject);
       }
     }
-    for (SequenceFlow outgoingSequenceFlow : flowNode.getOutgoing()) {
+    for (SequenceFlow outgoingSequenceFlow : flowNode.getOutgoingFlows()) {
       SequenceFlow toDeleteObject = (SequenceFlow) getFlowElement(outgoingSequenceFlow);
       if (toDeleteObject != null) {
         toDeleteSequenceFlows.add(toDeleteObject);
@@ -96,55 +149,101 @@ public class DeleteFlowElementFeature extends DefaultDeleteFeature {
     }
     for (SequenceFlow deleteObject : toDeleteSequenceFlows) {
       deletedConnectingFlows(deleteObject);
-      EcoreUtil.delete(deleteObject, true);
+      removeElement(deleteObject);
     }
 	}
 	
-	private void deletedConnectingFlows(SequenceFlow sequenceFlow) {
-	  for (EObject diagramObject : getDiagram().eResource().getContents()) {
-  	  if(diagramObject instanceof FlowNode) {
-        SequenceFlow foundIncoming = null;
-        SequenceFlow foundOutgoing = null;
-        for(SequenceFlow flow : ((FlowNode) diagramObject).getIncoming()) {
-          if(flow.getId().equals(sequenceFlow.getId())) {
-            foundIncoming = flow;
-          }
-        }
-        for(SequenceFlow flow : ((FlowNode) diagramObject).getOutgoing()) {
-          if(flow.getId().equals(sequenceFlow.getId())) {
-            foundOutgoing = flow;
-          }
-        }
-        if(foundIncoming != null) {
-          ((FlowNode) diagramObject).getIncoming().remove(foundIncoming);
-        }
-        if(foundOutgoing != null) {
-          ((FlowNode) diagramObject).getOutgoing().remove(foundOutgoing);
+	protected void deletedConnectingFlows(SequenceFlow sequenceFlow) {
+	  BpmnModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getBpmnModel();
+	  FlowElement sourceElement = model.getFlowElement(sequenceFlow.getSourceRef());
+	  FlowElement targetElement = model.getFlowElement(sequenceFlow.getTargetRef());
+	  if (sourceElement != null) {
+	    deleteSequenceFlowFromFlows(sequenceFlow.getId(), ((FlowNode) sourceElement).getOutgoingFlows());
+    }
+    if (targetElement != null) {
+      deleteSequenceFlowFromFlows(sequenceFlow.getId(), ((FlowNode) targetElement).getIncomingFlows());
+    }
+	}
+	
+	protected void deleteAssociations(FlowNode flowNode) {
+    List<Process> processes = ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getBpmnModel().getProcesses();
+    for (Process process : processes) {
+      removeAssociation(process.getArtifacts(), flowNode);
+      removeAssociationInProcess(process, flowNode);
+    }
+  }
+  
+	protected void removeAssociationInProcess(FlowElementsContainer parentElement, FlowNode flowNode) {
+    Collection<FlowElement> elementList = parentElement.getFlowElements();
+    for (FlowElement flowElement : elementList) {
+      if(flowElement instanceof SubProcess) {
+        SubProcess subProcess = (SubProcess) flowElement;
+        removeAssociation(subProcess.getArtifacts(), flowNode);
+        removeAssociationInProcess(subProcess, flowNode);
+      }
+    }
+  }
+  
+  protected void removeAssociation(Collection<Artifact> artifacts, FlowNode flowNode) {
+    List<Association> toDeleteAssociations = new ArrayList<Association>();
+    for (Artifact artifact : artifacts) {
+      if (artifact instanceof Association) {
+        Association association = (Association) artifact;
+        if (association.getSourceRef().equals(flowNode.getId()) || association.getTargetRef().equals(flowNode.getId())) {
+          toDeleteAssociations.add(association);
         }
       }
-	  }
+    }
+    
+    for (Association deleteObject : toDeleteAssociations) {
+      deletedConnectingFlows(deleteObject);
+      removeArtifact(deleteObject);
+    }
+  }
+  
+  protected void deletedConnectingFlows(Association association) {
+    BpmnModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getBpmnModel();
+    FlowElement sourceElement = model.getFlowElement(association.getSourceRef());
+    FlowElement targetElement = model.getFlowElement(association.getTargetRef());
+    if (sourceElement != null) {
+      ((FlowNode) sourceElement).getOutgoingFlows().remove(association);
+    }
+    if (targetElement != null) {
+      ((FlowNode) targetElement).getIncomingFlows().remove(association);
+    }
+  }
+  
+  protected void removeArtifact(Artifact element) {
+    List<Process> processes = ModelHandler.getModel(EcoreUtil.getURI(getDiagram())).getBpmnModel().getProcesses();
+    for (Process process : processes) {
+      process.removeArtifact(element.getId());
+      removeArtifactInProcess(element, process);
+    }
+  }
+  
+  protected void removeArtifactInProcess(Artifact element, FlowElementsContainer parentElement) {
+    Collection<FlowElement> elementList = parentElement.getFlowElements();
+    for (FlowElement flowElement : elementList) {
+      if(flowElement instanceof SubProcess) {
+        SubProcess subProcess = (SubProcess) flowElement;
+        subProcess.removeArtifact(element.getId());
+        removeArtifactInProcess(element, subProcess);
+      }
+    }
+  }
+
+  protected FlowElement getFlowElement(FlowElement flowElement) {
+	  BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagram()));
+	  return model.getFlowElement(flowElement.getId());
 	}
-
-	private EObject getFlowElement(FlowElement flowElement) {
-		for (EObject diagramObject : getDiagram().eResource().getContents()) {
-		  
-		  if(diagramObject instanceof FlowElement == false) continue;
-		  
-			if (((FlowElement) diagramObject).getId().equals(flowElement.getId())) {
-
-				return diagramObject;
-			}
-			
-			if (diagramObject instanceof SubProcess) {
-			  for (FlowElement subFlowElement : ((SubProcess) diagramObject).getFlowElements()) {
-			    if (subFlowElement.getId().equals(flowElement.getId())) {
-
-	          return subFlowElement;
-	        }
-        }
-			}
-		}
-		return null;
-	}
-
+  
+  protected void deleteSequenceFlowFromFlows(String elementId, List<SequenceFlow> flows) {
+    Iterator<SequenceFlow> flowIterator = flows.iterator();
+    while (flowIterator.hasNext()) {
+      SequenceFlow flow = flowIterator.next();
+      if (flow.getId().equals(elementId)) {
+        flowIterator.remove();
+      }
+    }
+  }
 }

@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<?eclipse version="3.6"?>
+<?eclipse version="3.7"?>
 <plugin>
    <extension
-         point="org.activiti.designer.eclipse.extension.validation.ProcessValidator">
+         point="org.activiti.designer.eclipse.extension.ProcessValidator">
       <ProcessValidator
             class="org.activiti.designer.validation.bpmn20.validation.BPMN20ProcessValidator">
       </ProcessValidator>

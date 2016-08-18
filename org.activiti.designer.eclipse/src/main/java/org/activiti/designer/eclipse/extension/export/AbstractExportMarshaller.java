@@ -1,4 +1,17 @@
 /**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+/**
  * 
  */
 package org.activiti.designer.eclipse.extension.export;
@@ -25,6 +38,14 @@ import org.eclipse.graphiti.mm.pictograms.Diagram;
 public abstract class AbstractExportMarshaller extends AbstractDiagramWorker implements ExportMarshaller {
 
   private static final int WORK_INVOKE_VALIDATORS_VALIDATOR = 10;
+
+  @Override
+  public void marshallDiagram(final ExportMarshallerContext context) {
+    super.setDiagramWorkerContext(context);
+    doMarshallDiagram();
+  }
+
+  protected abstract void doMarshallDiagram();
 
   /**
    * Invokes validators marked by the provided validatorIds. If no validator is
@@ -91,6 +112,11 @@ public abstract class AbstractExportMarshaller extends AbstractDiagramWorker imp
     final List<String> validatorIds = new ArrayList<String>();
     validatorIds.add(validatorId);
     return invokeValidators(validatorIds, diagram, monitor);
+  }
+
+  @Override
+  protected String getMarkerId() {
+    return ExportMarshaller.MARKER_ID;
   }
 
 }

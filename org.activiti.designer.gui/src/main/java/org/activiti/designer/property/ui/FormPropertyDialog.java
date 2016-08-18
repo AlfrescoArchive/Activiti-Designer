@@ -1,3 +1,16 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.activiti.designer.property.ui;
 
 import org.eclipse.jface.dialogs.MessageDialog;
@@ -26,7 +39,10 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
 	public String id;
 	public String name;
 	public String type;
-	public String value;
+	public String expression;
+	public String variable;
+	public String defaultExpression;
+	public String datePattern;
 	public String required;
 	public String readable;
 	public String writeable;
@@ -35,7 +51,10 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
 	protected String savedId;
 	protected String savedName;
 	protected String savedType;
-	protected String savedValue;
+	protected String savedExpression;
+	protected String savedVariable;
+	protected String savedDefaultExpression;
+	protected String savedDatePattern;
 	protected String savedRequired;
 	protected String savedReadable;
 	protected String savedWriteable;
@@ -43,18 +62,22 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
 
 	public FormPropertyDialog(Shell parent, TableItem[] fieldList) {
 		// Pass the default styles here
-		this(parent, fieldList, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+		this(parent, fieldList, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
 	}
 	
 	public FormPropertyDialog(Shell parent, TableItem[] fieldList, String savedId, 
-	        String savedName, String savedType, String savedValue, String savedRequired,
-	        String savedReadable, String savedWriteable, String savedFormValues) {
+	        String savedName, String savedType, String savedExpression, String savedVariable, 
+	        String savedDefaultExpression, String savedDatePattern, String savedRequired, String savedReadable, 
+	        String savedWriteable, String savedFormValues) {
     // Pass the default styles here
-    this(parent, fieldList, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL);
+    this(parent, fieldList, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
     this.savedId = savedId;
     this.savedName = savedName;
     this.savedType = savedType;
-    this.savedValue = savedValue;
+    this.savedExpression = savedExpression;
+    this.savedVariable = savedVariable;
+    this.savedDefaultExpression = savedDefaultExpression;
+    this.savedDatePattern = savedDatePattern;
     this.savedRequired = savedRequired;
     this.savedReadable = savedReadable;
     this.savedWriteable = savedWriteable;
@@ -77,7 +100,7 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
 		Shell shell = new Shell(getParent(), getStyle());
 		shell.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
 		shell.setText(getText());
-		shell.setSize(700, 550);
+		shell.setSize(700, 700);
 		Point location = getParent().getShell().getLocation();
 		Point size = getParent().getShell().getSize();
 		shell.setLocation((location.x + size.x - 300) / 2, (location.y + size.y - 150) / 2);
@@ -105,53 +128,26 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
 	  shell.setLayout(layout);
 	  FormData data;
 	  
-	  final Text idText = new Text(shell, SWT.BORDER);
-	  if(savedId != null) {
-	    idText.setText(savedId);
-	  }
-    data = new FormData();
-    data.left = new FormAttachment(0, 120);
-    data.right = new FormAttachment(70, 0);
-    data.top = new FormAttachment(0, 10);
-    idText.setLayoutData(data);
-    
+	  final Text idText = createText(savedId, shell, null);
     createLabel("Id", shell, idText);
     
-    final Text nameText = new Text(shell, SWT.BORDER);
-    if(savedName != null) {
-      nameText.setText(savedName);
-    }
-    data = new FormData();
-    data.left = new FormAttachment(0, 120);
-    data.right = new FormAttachment(70, 0);
-    data.top = new FormAttachment(idText, 10);
-    nameText.setLayoutData(data);
-    
+    final Text nameText = createText(savedName, shell, idText);
     createLabel("Name", shell, nameText);
     
-    final Text typeText = new Text(shell, SWT.BORDER);
-    if(savedType != null) {
-      typeText.setText(savedType);
-    }
-    data = new FormData();
-    data.left = new FormAttachment(0, 120);
-    data.right = new FormAttachment(70, 0);
-    data.top = new FormAttachment(nameText, 10);
-    typeText.setLayoutData(data);
-    
+    final Text typeText = createText(savedType, shell, nameText);
     createLabel("Type", shell, typeText);
     
-    final Text valueText = new Text(shell, SWT.BORDER);
-    if(savedValue != null) {
-      valueText.setText(savedValue);
-    }
-    data = new FormData();
-    data.left = new FormAttachment(0, 120);
-    data.right = new FormAttachment(70, 0);
-    data.top = new FormAttachment(typeText, 10);
-    valueText.setLayoutData(data);
+    final Text expressionText = createText(savedExpression, shell, typeText);
+    createLabel("Expression", shell, expressionText);
     
-    createLabel("Value", shell, valueText);
+    final Text variableText = createText(savedVariable, shell, expressionText);
+    createLabel("Variable", shell, variableText);
+    
+    final Text defaultText = createText(savedDefaultExpression, shell, variableText);
+    createLabel("Default", shell, defaultText);
+    
+    final Text patternText = createText(savedDatePattern, shell, defaultText);
+    createLabel("Date pattern", shell, patternText);
     
     final Combo readableDropDown = new Combo(shell, SWT.DROP_DOWN | SWT.BORDER);
     readableDropDown.add("");
@@ -160,7 +156,7 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
     data = new FormData();
     data.left = new FormAttachment(0, 120);
     data.right = new FormAttachment(50, 0);
-    data.top = new FormAttachment(valueText, VSPACE);
+    data.top = new FormAttachment(patternText, VSPACE);
     readableDropDown.setLayoutData(data);
     if("true".equalsIgnoreCase(savedReadable)) {
       readableDropDown.select(1);
@@ -258,7 +254,10 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
 				id = idText.getText();
 				name = nameText.getText();
 				type = typeText.getText();
-				value = valueText.getText();
+				expression = expressionText.getText();
+				variable = variableText.getText();
+				defaultExpression = defaultText.getText(); 
+				datePattern = patternText.getText();
 				readable = readableDropDown.getText();
 				writeable = writeableDropDown.getText();
 				required = requiredDropDown.getText();
@@ -281,6 +280,23 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
 		// user can type input and press Enter
 		// to dismiss
 		shell.setDefaultButton(ok);
+	}
+	
+	private Text createText(String saved, Shell shell, Control control) {
+		Text textField = new Text(shell, SWT.BORDER);
+    if(saved != null) {
+    	textField.setText(saved);
+    }
+    FormData data = new FormData();
+    data.left = new FormAttachment(0, 120);
+    data.right = new FormAttachment(70, 0);
+    if(control != null) {
+    	data.top = new FormAttachment(control, 10);
+    } else {
+    	data.top = new FormAttachment(0, 10);
+    }
+    textField.setLayoutData(data);
+    return textField;
 	}
 	
 	private void createLabel(String text, Shell shell, Control control) {

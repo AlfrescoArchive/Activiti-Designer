@@ -1,63 +1,220 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.activiti.designer.features;
 
-import org.activiti.designer.ActivitiImageProvider;
-import org.eclipse.bpmn2.Bpmn2Factory;
-import org.eclipse.bpmn2.SubProcess;
-import org.eclipse.bpmn2.UserTask;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.List;
+
+import org.activiti.bpmn.model.BaseElement;
+import org.activiti.bpmn.model.CustomProperty;
+import org.activiti.bpmn.model.ExtensionAttribute;
+import org.activiti.bpmn.model.ExtensionElement;
+import org.activiti.bpmn.model.UserTask;
+import org.activiti.designer.PluginImage;
+import org.activiti.designer.eclipse.common.ActivitiPlugin;
+import org.activiti.designer.integration.annotation.Locale;
+import org.activiti.designer.integration.annotation.Locales;
+import org.activiti.designer.integration.annotation.Property;
+import org.activiti.designer.integration.annotation.TaskName;
+import org.activiti.designer.integration.annotation.TaskNames;
+import org.activiti.designer.integration.usertask.CustomUserTask;
+import org.activiti.designer.property.extension.field.FieldInfo;
+import org.activiti.designer.util.bpmn.BpmnExtensions;
+import org.activiti.designer.util.eclipse.ActivitiUiUtil;
+import org.activiti.designer.util.extension.ExtensionUtil;
+import org.activiti.designer.util.preferences.Preferences;
+import org.activiti.designer.util.preferences.PreferencesUtil;
+import org.apache.commons.lang.StringUtils;
 import org.eclipse.graphiti.features.IFeatureProvider;
 import org.eclipse.graphiti.features.context.ICreateContext;
-import org.eclipse.graphiti.mm.pictograms.Diagram;
 
 public class CreateUserTaskFeature extends AbstractCreateFastBPMNFeature {
 
-	public static final String FEATURE_ID_KEY = "usertask";
+  public static final String FEATURE_ID_KEY = "usertask";
+  
+  private String customUserTaskId;
 
-	public CreateUserTaskFeature(IFeatureProvider fp) {
-		super(fp, "UserTask", "Add user task");
-	}
+  public CreateUserTaskFeature(IFeatureProvider fp) {
+    super(fp, "UserTask", "Add user task");
+  }
+  
+  public CreateUserTaskFeature(IFeatureProvider fp, String name, String description, String customUserTaskId) {
+    super(fp, name, description);
+    this.customUserTaskId = customUserTaskId;
+  }
 
-	@Override
-	public boolean canCreate(ICreateContext context) {
-	  Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-    return (context.getTargetContainer() instanceof Diagram || parentObject instanceof SubProcess);
-	}
+  @Override
+  public Object[] create(ICreateContext context) {
+    UserTask newUserTask = new UserTask();
+    newUserTask.setExtensionId(customUserTaskId);
+    
+    boolean isCustomNameSet = false;
+    
+    // Process custom user tasks
+    if (newUserTask.isExtended()) {
 
-	@Override
-	public Object[] create(ICreateContext context) {
-		UserTask newUserTask = Bpmn2Factory.eINSTANCE.createUserTask();
+      CustomUserTask targetTask = findCustomUserTask(newUserTask);
 
-		newUserTask.setId(getNextId());
-		setName("User Task", newUserTask, context);
+      if (targetTask != null) {
 
-		Object parentObject = getBusinessObjectForPictogramElement(context.getTargetContainer());
-    if (parentObject instanceof SubProcess) {
-      ((SubProcess) parentObject).getFlowElements().add(newUserTask);
+        newUserTask.setName(targetTask.getName());
+        
+        final List<Class<CustomUserTask>> classHierarchy = new ArrayList<Class<CustomUserTask>>();
+        final List<FieldInfo> fieldInfoObjects = new ArrayList<FieldInfo>();
+
+        Class clazz = targetTask.getClass();
+        classHierarchy.add(clazz);
+
+        boolean hierarchyOpen = true;
+        while (hierarchyOpen) {
+          clazz = clazz.getSuperclass();
+          if (CustomUserTask.class.isAssignableFrom(clazz)) {
+            classHierarchy.add(clazz);
+          } else {
+            hierarchyOpen = false;
+          }
+        }
+        
+        for (final Class<CustomUserTask> currentClass : classHierarchy) {
+          if (currentClass.isAnnotationPresent(TaskNames.class)) {
+            TaskNames taskNames = currentClass.getAnnotation(TaskNames.class);
+            if (taskNames.value() != null && taskNames.value().length > 0) {
+              for (TaskName taskName : taskNames.value()) {
+                setCustomTaskName(newUserTask, taskName.name(), taskName.locale());
+                isCustomNameSet = true;
+              }
+            }
+          }
+          
+          for (final Field field : currentClass.getDeclaredFields()) {
+            if (field.isAnnotationPresent(Property.class)) {
+              fieldInfoObjects.add(new FieldInfo(field));
+            }
+          }
+        }
+        
+        for (final FieldInfo fieldInfo : fieldInfoObjects) {
+
+          final Property property = fieldInfo.getPropertyAnnotation();
+          
+          CustomProperty customProperty = ExtensionUtil.getCustomProperty(newUserTask, fieldInfo.getFieldName());
+
+          if (customProperty == null) {
+            customProperty = new CustomProperty();
+            newUserTask.getCustomProperties().add(customProperty);
+          }
+
+          customProperty.setId(ExtensionUtil.wrapCustomPropertyId(newUserTask, fieldInfo.getFieldName()));
+          customProperty.setName(fieldInfo.getFieldName());
+          
+          final Locales localesAnnotation = fieldInfo.getLocalesAnnotation();
+          String localeDefaultValue = null;
+          if (localesAnnotation != null && localesAnnotation.value() != null && localesAnnotation.value().length > 0) {
+            String defaultLanguage = PreferencesUtil.getStringPreference(Preferences.ACTIVITI_DEFAULT_LANGUAGE, ActivitiPlugin.getDefault());
+            if (StringUtils.isNotEmpty(defaultLanguage)) {
+              for (Locale locale : localesAnnotation.value()) {
+                if (defaultLanguage.equalsIgnoreCase(locale.locale())) {
+                  localeDefaultValue = locale.defaultValue();
+                }
+              }
+            }
+          }
+          
+          if (StringUtils.isNotEmpty(localeDefaultValue)) {  
+            customProperty.setSimpleValue(localeDefaultValue);
+            
+          } else if (StringUtils.isNotEmpty(property.defaultValue())) {
+            customProperty.setSimpleValue(property.defaultValue());
+          }
+        }
+      }
+    }
+    
+    if (isCustomNameSet == false) {
+      addObjectToContainer(context, newUserTask, "User Task");
     } else {
-      getDiagram().eResource().getContents().add(newUserTask);
+      addObjectToContainer(context, newUserTask);
     }
 
-    addGraphicalContent(newUserTask, context);
+    // activate direct editing after object creation
+    getFeatureProvider().getDirectEditingInfo().setActive(true);
 
-		// activate direct editing after object creation
-		getFeatureProvider().getDirectEditingInfo().setActive(true);
+    return new Object[] { newUserTask };
+  }
+  
+  protected CustomUserTask findCustomUserTask(UserTask userTask) {
+    CustomUserTask result = null;
 
-		return new Object[] { newUserTask };
-	}
+    if (userTask.isExtended()) {
 
-	@Override
-	public String getCreateImageId() {
-		return ActivitiImageProvider.IMG_USERTASK;
-	}
+      final List<CustomUserTask> customUserTasks = ExtensionUtil.getCustomUserTasks(ActivitiUiUtil.getProjectFromDiagram(getDiagram()));
 
-	@Override
-	protected String getFeatureIdKey() {
-		return FEATURE_ID_KEY;
-	}
+      for (final CustomUserTask customUserTask : customUserTasks) {
+        if (userTask.getExtensionId().equals(customUserTask.getId())) {
+          result = customUserTask;
+          break;
+        }
+      }
+    }
+    return result;
+  }
+  
+  protected void setCustomTaskName(Object bo, String name, String language) {
+    BaseElement element = (BaseElement) bo;
+    List<ExtensionElement> extensionElements = null;
+    if (element.getExtensionElements().containsKey(BpmnExtensions.LANGUAGE_EXTENSION)) {
+      extensionElements = element.getExtensionElements().get(BpmnExtensions.LANGUAGE_EXTENSION);
+    }
+    
+    if (extensionElements == null) {
+      extensionElements = new ArrayList<ExtensionElement>();
+      element.getExtensionElements().put(BpmnExtensions.LANGUAGE_EXTENSION, extensionElements);
+    }
+    
+    ExtensionElement languageElement = null;
+    for (ExtensionElement extensionElement : extensionElements) {
+      List<ExtensionAttribute> languageAttributes = extensionElement.getAttributes().get("language");
+      if (languageAttributes != null && languageAttributes.size() == 1) {
+        String languageValue = languageAttributes.get(0).getValue();
+        if (language.equals(languageValue)) {
+          languageElement = extensionElement;
+        }
+      }
+    }
+    
+    if (languageElement == null) {
+      languageElement = new ExtensionElement();
+      languageElement.setName(BpmnExtensions.LANGUAGE_EXTENSION);
+      languageElement.setNamespace(BpmnExtensions.DESIGNER_EXTENSION_NAMESPACE);
+      languageElement.setNamespacePrefix(BpmnExtensions.DESIGNER_EXTENSION_NAMESPACE_PREFIX);
+      ExtensionAttribute languageAttribute = new ExtensionAttribute("language");
+      languageAttribute.setValue(language);
+      languageElement.addAttribute(languageAttribute);
+      extensionElements.add(languageElement);
+    }
+    
+    languageElement.setElementText(name);
+  }
 
-	@SuppressWarnings("rawtypes")
-	@Override
-	protected Class getFeatureClass() {
-		return Bpmn2Factory.eINSTANCE.createUserTask().getClass();
-	}
+  @Override
+  public String getCreateImageId() {
+    return PluginImage.IMG_USERTASK.getImageKey();
+  }
 
+  @Override
+  protected String getFeatureIdKey() {
+    return FEATURE_ID_KEY;
+  }
 }

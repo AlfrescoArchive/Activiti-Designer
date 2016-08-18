@@ -1,3 +1,16 @@
+/**
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.activiti.designer.property.ui;
 import org.eclipse.jface.dialogs.IDialogConstants;
 import org.eclipse.jface.preference.FieldEditor;
@@ -118,6 +131,8 @@ public abstract class TableFieldEditor extends FieldEditor {
 		parent.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
 		createControl(parent);
 	}
+	
+	protected abstract boolean isTableChangeEnabled(); 
 
 	/**
 	 * Combines the given list of items into a single string. This method is the
@@ -476,8 +491,10 @@ public abstract class TableFieldEditor extends FieldEditor {
 		setPresentsDefaultValue(false);
 		String[] newInputObject = getNewInputObject();
 		if(newInputObject != null) {
-			TableItem tableItem = new TableItem(table, SWT.NONE);
-			tableItem.setText(newInputObject);
+		  if (isTableChangeEnabled()) {
+		    TableItem tableItem = new TableItem(table, SWT.NONE);
+		    tableItem.setText(newInputObject);
+		  }
 			selectionChanged();
 		}
 	}
@@ -488,7 +505,9 @@ public abstract class TableFieldEditor extends FieldEditor {
 	  TableItem tableItem = table.getItem(index);
     String[] changedInputObject = getChangedInputObject(tableItem);
     if(changedInputObject != null) {
-      tableItem.setText(changedInputObject);
+      if (isTableChangeEnabled()) {
+        tableItem.setText(changedInputObject);
+      }
       selectionChanged();
     }
 	}
@@ -500,7 +519,9 @@ public abstract class TableFieldEditor extends FieldEditor {
 		setPresentsDefaultValue(false);
 		int index = table.getSelectionIndex();
 		if (index >= 0) {
-			table.remove(index);
+		  if (isTableChangeEnabled()) {
+		    table.remove(index);
+		  }
 			removedItem(index);
 			selectionChanged();
 		}
@@ -509,14 +530,14 @@ public abstract class TableFieldEditor extends FieldEditor {
 	/**
    * Notifies that the Up button has been pressed.
    */
-  private void upPressed() {
+  protected void upPressed() {
   	swap(true);
   }
 
   /**
    * Notifies that the Down button has been pressed.
    */
-  private void downPressed() {
+  protected void downPressed() {
   	swap(false);
   }
 	
@@ -543,7 +564,7 @@ public abstract class TableFieldEditor extends FieldEditor {
 		editButton.setEnabled(index >= 0);
 		removeButton.setEnabled(index >= 0);
 		upButton.setEnabled(size > 1 && index > 0);
-    downButton.setEnabled(size > 1 && index >= 0 && index < size - 1);
+		downButton.setEnabled(size > 1 && index >= 0 && index < size - 1);
 	}
 
 	/*
