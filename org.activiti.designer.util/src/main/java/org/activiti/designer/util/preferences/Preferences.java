@@ -66,7 +66,8 @@ public enum Preferences {
   CMIS_MODELS_DELETE("cmis-models-delete"),
   CMIS_SHARE_CONFIG_PATH("cmis-share-config-path"),
   SHARE_RELOAD_URL("share-reload-url"),
-  SHARE_ENABLED("share-enabled");
+  SHARE_ENABLED("share-enabled"),
+  SKIP_REBUILD("skip-rebuild");
 
   public static final String PROCESS_EXPORT_TYPE_TARGET = "target";
   public static final String PROCESS_EXPORT_TYPE_FS = "fs";

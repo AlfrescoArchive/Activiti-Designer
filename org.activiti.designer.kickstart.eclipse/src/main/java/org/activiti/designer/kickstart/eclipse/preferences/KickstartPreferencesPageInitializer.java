@@ -44,6 +44,7 @@ public class KickstartPreferencesPageInitializer extends AbstractPreferenceIniti
     store.setDefault(Preferences.PROCESS_TARGET_LOCATION_SHARE.getPreferenceId(), ".../shared/classes/alfresco/web-extension");
     store.setDefault(Preferences.SHARE_RELOAD_URL.getPreferenceId(), "http://localhost:8081/share/service/reload-module-deployments");
     store.setDefault(Preferences.SHARE_ENABLED.getPreferenceId(), Boolean.TRUE);
+    store.setDefault(Preferences.SKIP_REBUILD.getPreferenceId(), Boolean.FALSE);
     
   }
 }

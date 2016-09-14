@@ -59,7 +59,9 @@ public class ExportKickstartProcessTargetWizardPage extends WizardPage {
   protected String shareReloadUrl;
   protected boolean enableShare;
   protected boolean deleteModels;
-  
+  protected boolean skipRebuild;
+  protected Button skipRebuildButton;
+
   public ExportKickstartProcessTargetWizardPage(String title) {
     super("select-traget");
 
@@ -144,6 +146,9 @@ public class ExportKickstartProcessTargetWizardPage extends WizardPage {
     enableShareButton = new Button(createCompositeWithLabel(cmisComposite, "Reload share"), SWT.CHECK);
     enableShareButton.setLayoutData(createFillHorizontalGridData());
     
+    skipRebuildButton = new Button(createCompositeWithLabel(cmisComposite, "Skip rebuild"), SWT.CHECK);
+    skipRebuildButton.setLayoutData(createFillHorizontalGridData());
+
     cmisShareText = new Text(createCompositeWithLabel(cmisComposite, "Share config path"), SWT.BORDER | SWT.SINGLE);
     cmisShareText.setLayoutData(createFillHorizontalGridData());
     
@@ -191,6 +196,13 @@ public class ExportKickstartProcessTargetWizardPage extends WizardPage {
       }
     });
     
+    skipRebuildButton.addSelectionListener(new SelectionAdapter() {
+        @Override
+        public void widgetSelected(SelectionEvent e) {
+          skipRebuild = enableShareButton.getSelection();
+        }
+      });
+
     deleteModelButton.addSelectionListener(new SelectionAdapter() {
       @Override
       public void widgetSelected(SelectionEvent e) {
@@ -258,6 +270,7 @@ public class ExportKickstartProcessTargetWizardPage extends WizardPage {
     String shareReloadUrl = PreferencesUtil.getStringPreference(Preferences.SHARE_RELOAD_URL);
     enableShare = PreferencesUtil.getBooleanPreference(Preferences.SHARE_ENABLED);
     deleteModels = PreferencesUtil.getBooleanPreference(Preferences.CMIS_MODELS_DELETE);
+    skipRebuild = PreferencesUtil.getBooleanPreference(Preferences.SKIP_REBUILD);
     
     // Update widgets according to preferences
     String targetType = PreferencesUtil.getStringPreference(Preferences.PROCESS_EXPORT_TYPE);
@@ -288,6 +301,7 @@ public class ExportKickstartProcessTargetWizardPage extends WizardPage {
     cmisShareText.setEnabled(enableShare);
     enableShareButton.setSelection(enableShare);
     deleteModelButton.setSelection(deleteModels);
+    skipRebuildButton.setSelection(skipRebuild);
   }
 
   public String getCustomRepositoryFolder() {
@@ -324,6 +338,10 @@ public class ExportKickstartProcessTargetWizardPage extends WizardPage {
   
   public boolean isDeleteModels() {
     return deleteModels;
+  }
+
+  public boolean isSkipRebuild() {
+	    return skipRebuild;
   }
   
   protected void createLabel(String text, Control control, Composite parent) {
