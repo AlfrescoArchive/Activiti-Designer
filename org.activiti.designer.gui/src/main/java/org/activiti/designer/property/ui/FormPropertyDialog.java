@@ -13,6 +13,11 @@
  */
 package org.activiti.designer.property.ui;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import org.activiti.bpmn.model.FormValue;
+import org.apache.commons.lang.StringEscapeUtils;
 import org.eclipse.jface.dialogs.MessageDialog;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.CLabel;
@@ -35,7 +40,7 @@ import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.views.properties.tabbed.ITabbedPropertyConstants;
 
 public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstants {
-	
+
 	public String id;
 	public String name;
 	public String type;
@@ -46,8 +51,8 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
 	public String required;
 	public String readable;
 	public String writeable;
-	public String formValues;
-	
+	public List<FormValue> formValues;
+
 	protected String savedId;
 	protected String savedName;
 	protected String savedType;
@@ -58,31 +63,30 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
 	protected String savedRequired;
 	protected String savedReadable;
 	protected String savedWriteable;
-	protected String savedFormValues;
+	protected List<FormValue> savedFormValues;
 
 	public FormPropertyDialog(Shell parent, TableItem[] fieldList) {
 		// Pass the default styles here
 		this(parent, fieldList, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
 	}
-	
-	public FormPropertyDialog(Shell parent, TableItem[] fieldList, String savedId, 
-	        String savedName, String savedType, String savedExpression, String savedVariable, 
-	        String savedDefaultExpression, String savedDatePattern, String savedRequired, String savedReadable, 
-	        String savedWriteable, String savedFormValues) {
-    // Pass the default styles here
-    this(parent, fieldList, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
-    this.savedId = savedId;
-    this.savedName = savedName;
-    this.savedType = savedType;
-    this.savedExpression = savedExpression;
-    this.savedVariable = savedVariable;
-    this.savedDefaultExpression = savedDefaultExpression;
-    this.savedDatePattern = savedDatePattern;
-    this.savedRequired = savedRequired;
-    this.savedReadable = savedReadable;
-    this.savedWriteable = savedWriteable;
-    this.savedFormValues = savedFormValues;
-  }
+
+	public FormPropertyDialog(Shell parent, TableItem[] fieldList, String savedId, String savedName, String savedType,
+			String savedExpression, String savedVariable, String savedDefaultExpression, String savedDatePattern,
+			String savedRequired, String savedReadable, String savedWriteable, List<FormValue> savedFormValues) {
+		// Pass the default styles here
+		this(parent, fieldList, SWT.DIALOG_TRIM | SWT.APPLICATION_MODAL | SWT.RESIZE);
+		this.savedId = savedId;
+		this.savedName = savedName;
+		this.savedType = savedType;
+		this.savedExpression = savedExpression;
+		this.savedVariable = savedVariable;
+		this.savedDefaultExpression = savedDefaultExpression;
+		this.savedDatePattern = savedDatePattern;
+		this.savedRequired = savedRequired;
+		this.savedReadable = savedReadable;
+		this.savedWriteable = savedWriteable;
+		this.savedFormValues = savedFormValues;
+	}
 
 	public FormPropertyDialog(Shell parent, TableItem[] fieldList, int style) {
 		// Let users override the default styles
@@ -122,91 +126,91 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
 	 *            the dialog window
 	 */
 	private void createContents(final Shell shell) {
-	  FormLayout layout = new FormLayout();
-	  layout.marginHeight = 5;
-	  layout.marginWidth = 5;
-	  shell.setLayout(layout);
-	  FormData data;
-	  
-	  final Text idText = createText(savedId, shell, null);
-    createLabel("Id", shell, idText);
-    
-    final Text nameText = createText(savedName, shell, idText);
-    createLabel("Name", shell, nameText);
-    
-    final Text typeText = createText(savedType, shell, nameText);
-    createLabel("Type", shell, typeText);
-    
-    final Text expressionText = createText(savedExpression, shell, typeText);
-    createLabel("Expression", shell, expressionText);
-    
-    final Text variableText = createText(savedVariable, shell, expressionText);
-    createLabel("Variable", shell, variableText);
-    
-    final Text defaultText = createText(savedDefaultExpression, shell, variableText);
-    createLabel("Default", shell, defaultText);
-    
-    final Text patternText = createText(savedDatePattern, shell, defaultText);
-    createLabel("Date pattern", shell, patternText);
-    
-    final Combo readableDropDown = new Combo(shell, SWT.DROP_DOWN | SWT.BORDER);
-    readableDropDown.add("");
-    readableDropDown.add("True");
-    readableDropDown.add("False");
-    data = new FormData();
-    data.left = new FormAttachment(0, 120);
-    data.right = new FormAttachment(50, 0);
-    data.top = new FormAttachment(patternText, VSPACE);
-    readableDropDown.setLayoutData(data);
-    if("true".equalsIgnoreCase(savedReadable)) {
-      readableDropDown.select(1);
-    } else if("false".equalsIgnoreCase(savedReadable)) {
-      readableDropDown.select(2);
-    } else {
-    	readableDropDown.select(0);
-    }
-    
-    createLabel("Readable", shell, readableDropDown);
-    
-    final Combo writeableDropDown = new Combo(shell, SWT.DROP_DOWN | SWT.BORDER);
-    writeableDropDown.add("");
-    writeableDropDown.add("True");
-    writeableDropDown.add("False");
-    data = new FormData();
-    data.left = new FormAttachment(0, 120);
-    data.right = new FormAttachment(50, 0);
-    data.top = new FormAttachment(readableDropDown, VSPACE);
-    writeableDropDown.setLayoutData(data);
-    if("true".equalsIgnoreCase(savedWriteable)) {
-      writeableDropDown.select(1);
-    } else if("false".equalsIgnoreCase(savedWriteable)) {
-      writeableDropDown.select(2);
-    } else {
-    	writeableDropDown.select(0);
-    }
-    
-    createLabel("Writeable", shell, writeableDropDown);
-    
-    final Combo requiredDropDown = new Combo(shell, SWT.DROP_DOWN | SWT.BORDER);
-    requiredDropDown.add("");
-    requiredDropDown.add("True");
-    requiredDropDown.add("False");
-    data = new FormData();
-    data.left = new FormAttachment(0, 120);
-    data.right = new FormAttachment(50, 0);
-    data.top = new FormAttachment(writeableDropDown, VSPACE);
-    requiredDropDown.setLayoutData(data);
-    if("true".equalsIgnoreCase(savedRequired)) {
-      requiredDropDown.select(1);
-    } else if("false".equalsIgnoreCase(savedRequired)) {
-      requiredDropDown.select(2);
-    } else {
-    	requiredDropDown.select(0);
-    }
-    
-    createLabel("Required", shell, requiredDropDown);
-    
-    Composite valuesComposite = new Composite(shell, SWT.WRAP);
+		FormLayout layout = new FormLayout();
+		layout.marginHeight = 5;
+		layout.marginWidth = 5;
+		shell.setLayout(layout);
+		FormData data;
+
+		final Text idText = createText(savedId, shell, null);
+		createLabel("Id", shell, idText);
+
+		final Text nameText = createText(savedName, shell, idText);
+		createLabel("Name", shell, nameText);
+
+		final Text typeText = createText(savedType, shell, nameText);
+		createLabel("Type", shell, typeText);
+
+		final Text expressionText = createText(savedExpression, shell, typeText);
+		createLabel("Expression", shell, expressionText);
+
+		final Text variableText = createText(savedVariable, shell, expressionText);
+		createLabel("Variable", shell, variableText);
+
+		final Text defaultText = createText(savedDefaultExpression, shell, variableText);
+		createLabel("Default", shell, defaultText);
+
+		final Text patternText = createText(savedDatePattern, shell, defaultText);
+		createLabel("Date pattern", shell, patternText);
+
+		final Combo readableDropDown = new Combo(shell, SWT.DROP_DOWN | SWT.BORDER);
+		readableDropDown.add("");
+		readableDropDown.add("True");
+		readableDropDown.add("False");
+		data = new FormData();
+		data.left = new FormAttachment(0, 120);
+		data.right = new FormAttachment(50, 0);
+		data.top = new FormAttachment(patternText, VSPACE);
+		readableDropDown.setLayoutData(data);
+		if ("true".equalsIgnoreCase(savedReadable)) {
+			readableDropDown.select(1);
+		} else if ("false".equalsIgnoreCase(savedReadable)) {
+			readableDropDown.select(2);
+		} else {
+			readableDropDown.select(0);
+		}
+
+		createLabel("Readable", shell, readableDropDown);
+
+		final Combo writeableDropDown = new Combo(shell, SWT.DROP_DOWN | SWT.BORDER);
+		writeableDropDown.add("");
+		writeableDropDown.add("True");
+		writeableDropDown.add("False");
+		data = new FormData();
+		data.left = new FormAttachment(0, 120);
+		data.right = new FormAttachment(50, 0);
+		data.top = new FormAttachment(readableDropDown, VSPACE);
+		writeableDropDown.setLayoutData(data);
+		if ("true".equalsIgnoreCase(savedWriteable)) {
+			writeableDropDown.select(1);
+		} else if ("false".equalsIgnoreCase(savedWriteable)) {
+			writeableDropDown.select(2);
+		} else {
+			writeableDropDown.select(0);
+		}
+
+		createLabel("Writeable", shell, writeableDropDown);
+
+		final Combo requiredDropDown = new Combo(shell, SWT.DROP_DOWN | SWT.BORDER);
+		requiredDropDown.add("");
+		requiredDropDown.add("True");
+		requiredDropDown.add("False");
+		data = new FormData();
+		data.left = new FormAttachment(0, 120);
+		data.right = new FormAttachment(50, 0);
+		data.top = new FormAttachment(writeableDropDown, VSPACE);
+		requiredDropDown.setLayoutData(data);
+		if ("true".equalsIgnoreCase(savedRequired)) {
+			requiredDropDown.select(1);
+		} else if ("false".equalsIgnoreCase(savedRequired)) {
+			requiredDropDown.select(2);
+		} else {
+			requiredDropDown.select(0);
+		}
+
+		createLabel("Required", shell, requiredDropDown);
+
+		Composite valuesComposite = new Composite(shell, SWT.WRAP);
 		data = new FormData();
 		data.left = new FormAttachment(0, 120);
 		data.right = new FormAttachment(100, 0);
@@ -217,37 +221,38 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
 		valuesLayout.numColumns = 1;
 		valuesComposite.setLayout(valuesLayout);
 		final FormValueEditor formValueEditor = new FormValueEditor("formValueEditor", valuesComposite);
-		formValueEditor.getLabelControl(valuesComposite).setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
-		
+		formValueEditor.getLabelControl(valuesComposite)
+				.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
+
 		formValueEditor.initialize(savedFormValues);
-		
+
 		createLabel("Form values", shell, valuesComposite);
-    
-    // Create the cancel button and add a handler
-    // so that pressing it will set input to null
-    Button cancel = new Button(shell, SWT.PUSH);
-    cancel.setText("Cancel");
-    data = new FormData();
-    data.left = new FormAttachment(0, 120);
-    data.right = new FormAttachment(50, 0);
-    data.top = new FormAttachment(valuesComposite, 20);
-    cancel.setLayoutData(data);
-    cancel.addSelectionListener(new SelectionAdapter() {
-      public void widgetSelected(SelectionEvent event) {
-        shell.close();
-      }
-    });
+
+		// Create the cancel button and add a handler
+		// so that pressing it will set input to null
+		Button cancel = new Button(shell, SWT.PUSH);
+		cancel.setText("Cancel");
+		data = new FormData();
+		data.left = new FormAttachment(0, 120);
+		data.right = new FormAttachment(50, 0);
+		data.top = new FormAttachment(valuesComposite, 20);
+		cancel.setLayoutData(data);
+		cancel.addSelectionListener(new SelectionAdapter() {
+			public void widgetSelected(SelectionEvent event) {
+				shell.close();
+			}
+		});
 
 		Button ok = new Button(shell, SWT.PUSH);
 		ok.setText("OK");
 		data = new FormData();
-    data.left = new FormAttachment(0, 0);
-    data.right = new FormAttachment(cancel, -HSPACE);
-    data.top = new FormAttachment(cancel, 0, SWT.TOP);
+		data.left = new FormAttachment(0, 0);
+		data.right = new FormAttachment(cancel, -HSPACE);
+		data.top = new FormAttachment(cancel, 0, SWT.TOP);
 		ok.setLayoutData(data);
 		ok.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent event) {
-				if(idText.getText() == null || idText.getText().length() == 0) {
+				if (idText.getText() == null || idText.getText().length() == 0) {
 					MessageDialog.openError(shell, "Validation error", "ID must be filled.");
 					return;
 				}
@@ -256,20 +261,20 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
 				type = typeText.getText();
 				expression = expressionText.getText();
 				variable = variableText.getText();
-				defaultExpression = defaultText.getText(); 
+				defaultExpression = defaultText.getText();
 				datePattern = patternText.getText();
 				readable = readableDropDown.getText();
 				writeable = writeableDropDown.getText();
 				required = requiredDropDown.getText();
-				formValues = "";
+				formValues = new ArrayList<FormValue>();
 				TableItem[] formValueItems = formValueEditor.getItems();
-				if(formValueItems != null) {
-					for(int i = 0; i < formValueItems.length; i++) {
+				if (formValueItems != null) {
+					for (int i = 0; i < formValueItems.length; i++) {
 						TableItem formValueItem = formValueItems[i];
-						if(i > 0) {
-							formValues += ";"; 
-						}
-						formValues += formValueItem.getText(0) + ":" + formValueItem.getText(1);
+						FormValue formValue = new FormValue();
+						formValue.setId(formValueItem.getText(0));
+						formValue.setName(formValueItem.getText(1));
+						formValues.add(formValue);
 					}
 				}
 				shell.close();
@@ -281,32 +286,32 @@ public class FormPropertyDialog extends Dialog implements ITabbedPropertyConstan
 		// to dismiss
 		shell.setDefaultButton(ok);
 	}
-	
+
 	private Text createText(String saved, Shell shell, Control control) {
 		Text textField = new Text(shell, SWT.BORDER);
-    if(saved != null) {
-    	textField.setText(saved);
-    }
-    FormData data = new FormData();
-    data.left = new FormAttachment(0, 120);
-    data.right = new FormAttachment(70, 0);
-    if(control != null) {
-    	data.top = new FormAttachment(control, 10);
-    } else {
-    	data.top = new FormAttachment(0, 10);
-    }
-    textField.setLayoutData(data);
-    return textField;
+		if (saved != null) {
+			textField.setText(saved);
+		}
+		FormData data = new FormData();
+		data.left = new FormAttachment(0, 120);
+		data.right = new FormAttachment(70, 0);
+		if (control != null) {
+			data.top = new FormAttachment(control, 10);
+		} else {
+			data.top = new FormAttachment(0, 10);
+		}
+		textField.setLayoutData(data);
+		return textField;
 	}
-	
+
 	private void createLabel(String text, Shell shell, Control control) {
-	  CLabel idLabel = new CLabel(shell, SWT.NONE);
-    idLabel.setText(text);
-    FormData data = new FormData();
-    data.left = new FormAttachment(0, 0);
-    data.right = new FormAttachment(control, -HSPACE);
-    data.top = new FormAttachment(control, 0, SWT.TOP);
-    idLabel.setLayoutData(data);
-    idLabel.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
+		CLabel idLabel = new CLabel(shell, SWT.NONE);
+		idLabel.setText(text);
+		FormData data = new FormData();
+		data.left = new FormAttachment(0, 0);
+		data.right = new FormAttachment(control, -HSPACE);
+		data.top = new FormAttachment(control, 0, SWT.TOP);
+		idLabel.setLayoutData(data);
+		idLabel.setBackground(Display.getDefault().getSystemColor(SWT.COLOR_WHITE));
 	}
 }
