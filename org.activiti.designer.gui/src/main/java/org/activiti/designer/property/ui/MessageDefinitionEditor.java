@@ -17,8 +17,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import org.activiti.bpmn.model.BpmnModel;
-import org.activiti.bpmn.model.Message;
+import org.activiti.bpmn.model.*;
+import org.activiti.bpmn.model.Process;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
@@ -136,7 +136,7 @@ public class MessageDefinitionEditor extends TableFieldEditor {
 	}
 
 	protected void saveChangedObject(final MessageDefinitionDialog dialog, final int index) {
-		Message originalMessage = messages.get(index);
+		final Message originalMessage = messages.get(index);
 
     // verify that id is unique
 		if (!dialog.id.equals(originalMessage.getId()) && !isUnique(dialog.id)) {
@@ -154,10 +154,49 @@ public class MessageDefinitionEditor extends TableFieldEditor {
         public void run() {
           messages.set(index, changedMessage);
           getBpmnModel().setMessages(messages);
+		  updateMessageCatchingEvents(originalMessage,changedMessage);
         }
-      };
+
+
+	  };
       runModelChange(runnable);
       initialize(messages);
+		}
+	}
+
+	private void updateMessageCatchingEvents(Message originalMessage, Message changedMessage) {
+		BpmnModel model=getBpmnModel();
+		for (Process process:model.getProcesses()) {
+			for (FlowElement element:process.getFlowElements()) {
+				if (element instanceof SubProcess) {
+					updateMessageCatchingEventsInSubProcess((SubProcess)element,originalMessage,changedMessage);
+				} else {
+					updateMessageRef(originalMessage, changedMessage, element);
+				}
+			}
+		}
+	}
+
+	private void updateMessageCatchingEventsInSubProcess(SubProcess subProcess, Message originalMessage, Message changedMessage) {
+		for (FlowElement element: subProcess.getFlowElements()) {
+			if (element instanceof SubProcess) {
+				updateMessageCatchingEventsInSubProcess((SubProcess)element,originalMessage,changedMessage);
+			} else {
+				updateMessageRef(originalMessage, changedMessage, element);
+			}
+		}
+	}
+
+
+	private void updateMessageRef(Message originalMessage, Message changedMessage, FlowElement element) {
+		if (element instanceof IntermediateCatchEvent) {
+            IntermediateCatchEvent event=(IntermediateCatchEvent)element;
+			if (event.getEventDefinitions().get(0) != null) {
+				MessageEventDefinition eventDefinition = (MessageEventDefinition) event.getEventDefinitions().get(0);
+	            if (originalMessage.getId().equals(eventDefinition.getMessageRef())) {
+					eventDefinition.setMessageRef(changedMessage.getId());
+				}
+			}
 		}
 	}
 
