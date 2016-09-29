@@ -87,7 +87,9 @@ public class DeleteLaneFeature extends DefaultDeleteFeature {
 		  
 		  if(laneProcess.getLanes().size() == 1) {
         Process process = model.getBpmnModel().getProcess(parentPool.getId());
-        model.getBpmnModel().getProcesses().remove(process);
+        if (model.getBpmnModel().getProcesses().size()>1) {
+              model.getBpmnModel().getProcesses().remove(process);
+        }
         model.getBpmnModel().getPools().remove(parentPool);
         PictogramElement poolElement = getFeatureProvider().getPictogramElementForBusinessObject(parentPool);
         IRemoveContext poolRc = new RemoveContext(poolElement);
