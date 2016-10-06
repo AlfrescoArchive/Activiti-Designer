@@ -192,10 +192,12 @@ public class MessageDefinitionEditor extends TableFieldEditor {
 	private void updateMessageRef(Message originalMessage, Message changedMessage, FlowElement element) {
 		if (element instanceof Event) {
             Event event=(Event)element;
-			if (event.getEventDefinitions().get(0) != null) {
-				MessageEventDefinition eventDefinition = (MessageEventDefinition) event.getEventDefinitions().get(0);
-	            if (originalMessage.getId().equals(eventDefinition.getMessageRef())) {
-					eventDefinition.setMessageRef(changedMessage.getId());
+			for (EventDefinition eventDefinition:event.getEventDefinitions()) {
+				if (eventDefinition instanceof MessageEventDefinition)  {
+					MessageEventDefinition messageEventDefinition = (MessageEventDefinition)eventDefinition;
+					if (originalMessage.getId().equals(messageEventDefinition.getMessageRef())) {
+						messageEventDefinition.setMessageRef(changedMessage.getId());
+					}
 				}
 			}
 		}
