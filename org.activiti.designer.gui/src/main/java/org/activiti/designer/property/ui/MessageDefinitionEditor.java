@@ -19,6 +19,7 @@ import java.util.List;
 
 import org.activiti.bpmn.model.*;
 import org.activiti.bpmn.model.Process;
+import org.activiti.designer.features.CreateMessageStartEventFeature;
 import org.activiti.designer.util.eclipse.ActivitiUiUtil;
 import org.activiti.designer.util.editor.BpmnMemoryModel;
 import org.activiti.designer.util.editor.ModelHandler;
@@ -189,8 +190,8 @@ public class MessageDefinitionEditor extends TableFieldEditor {
 
 
 	private void updateMessageRef(Message originalMessage, Message changedMessage, FlowElement element) {
-		if (element instanceof IntermediateCatchEvent) {
-            IntermediateCatchEvent event=(IntermediateCatchEvent)element;
+		if (element instanceof Event) {
+            Event event=(Event)element;
 			if (event.getEventDefinitions().get(0) != null) {
 				MessageEventDefinition eventDefinition = (MessageEventDefinition) event.getEventDefinitions().get(0);
 	            if (originalMessage.getId().equals(eventDefinition.getMessageRef())) {
