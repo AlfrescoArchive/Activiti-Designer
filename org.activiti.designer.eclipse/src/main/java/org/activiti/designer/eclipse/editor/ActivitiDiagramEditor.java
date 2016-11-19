@@ -75,9 +75,7 @@ import org.apache.commons.lang.StringUtils;
 import org.eclipse.core.resources.IFile;
 import org.eclipse.core.resources.IFolder;
 import org.eclipse.core.resources.IResource;
-import org.eclipse.core.runtime.CoreException;
-import org.eclipse.core.runtime.IPath;
-import org.eclipse.core.runtime.IProgressMonitor;
+import org.eclipse.core.runtime.*;
 import org.eclipse.draw2d.IFigure;
 import org.eclipse.draw2d.SWTGraphics;
 import org.eclipse.draw2d.geometry.Rectangle;
@@ -198,8 +196,13 @@ public class ActivitiDiagramEditor extends DiagramEditor {
       doInvokeExportMarshallers(model);
 
     } catch (Exception e) {
-      // TODO Auto-generated catch block
+      Status status=new Status(IStatus.ERROR, ActivitiPlugin.getDefault().getBundle().getSymbolicName(), "save failed!", e);
+      ActivitiPlugin.getDefault().getLog().log(status);
       e.printStackTrace();
+      MessageBox messageBox = new MessageBox(Display.getCurrent().getActiveShell(), SWT.ICON_WARNING | SWT.OK);
+      messageBox.setText("Warning");
+      messageBox.setMessage("Error while saving the model " + e.getLocalizedMessage());
+      messageBox.open();
     }
 
     ((BasicCommandStack) getEditingDomain().getCommandStack()).saveIsDone();
