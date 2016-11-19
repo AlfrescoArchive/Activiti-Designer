@@ -47,6 +47,7 @@ public class BpmnMemoryModel {
     process.setName("My process");
     process.setId("myProcess");
     bpmnModel.addProcess(process);
+    bpmnModel.setTargetNamespace("http://www.activiti.org/test");
     }
     
     public FlowElement getFlowElement(String ref) {

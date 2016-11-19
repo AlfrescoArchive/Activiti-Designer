@@ -215,6 +215,10 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     final IFeatureProvider featureProvider = getDiagramTypeProvider().getFeatureProvider();
     new GraphitiToBpmnDI(model, featureProvider).processGraphitiElements();
 
+    MessageBox mb = new MessageBox(Display.getCurrent().getActiveShell(), SWT.ICON_WARNING | SWT.OK);
+    mb.setText("Warning");
+    mb.setMessage("model target name space"+    model.getBpmnModel().getTargetNamespace());
+    mb.open();
     BpmnXMLConverter converter = new BpmnXMLConverter();
     byte[] xmlBytes = converter.convertToXML(model.getBpmnModel());
 
