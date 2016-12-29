@@ -127,8 +127,8 @@ public class ExpandCollapseSubProcessFeature extends AbstractDrillDownFeature {
 		boolean createContent = PreferencesUtil.getBooleanPreference(
 		    Preferences.EDITOR_ADD_DEFAULT_CONTENT_TO_DIAGRAMS, ActivitiPlugin.getDefault());
 
-		final ActivitiDiagramEditor diagramEditor
-		  = (ActivitiDiagramEditor) getFeatureProvider().getDiagramTypeProvider().getDiagramEditor();
+		ActivitiDiagramEditor diagramEditor
+			= (ActivitiDiagramEditor) getFeatureProvider().getDiagramTypeProvider().getDiagramBehavior();
 
 		if (createContent) {
 			final InputStream contentStream = Util.getContentStream(Util.Content.NEW_SUBPROCESS_CONTENT);

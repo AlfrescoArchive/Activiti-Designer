@@ -27,8 +27,8 @@ public class AbstractPropertyCustomTaskSection extends BaseActivitiPropertySecti
     if (pe != null) {
       Object bo = getBusinessObject(pe);
       if (bo instanceof ServiceTask || bo instanceof UserTask) {
-        DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
-        TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
+		DiagramEditor diagramEditor = (DiagramEditor) getDiagramContainer();
+		TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
         ActivitiUiUtil.runModelChange(runnable, editingDomain, "Model Update");
       }
     }
