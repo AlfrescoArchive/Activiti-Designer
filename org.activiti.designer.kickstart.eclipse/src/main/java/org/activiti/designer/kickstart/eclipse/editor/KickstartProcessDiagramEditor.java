@@ -113,7 +113,7 @@ public class KickstartProcessDiagramEditor extends DiagramEditor {
 
     try {
       final IFile dataFile = adei.getDataFile();
-      final String diagramFileString = dataFile.getLocationURI().getPath();
+      final String diagramFileString = dataFile.getLocation().toOSString();
 
       KickstartProcessMemoryModel model = ModelHandler.getKickstartProcessModel(EcoreUtil
           .getURI(getDiagramTypeProvider().getDiagram()));
@@ -156,7 +156,7 @@ public class KickstartProcessDiagramEditor extends DiagramEditor {
         .getFeatureProvider(), dataFile);
     ModelHandler.addModel(EcoreUtil.getURI(getDiagramTypeProvider().getDiagram()), model);
 
-    String filePath = dataFile.getLocationURI().getPath();
+    String filePath = dataFile.getLocation().toOSString();
     File kickstartProcessFile = new File(filePath);
     try {
       if (kickstartProcessFile.exists() == false) {

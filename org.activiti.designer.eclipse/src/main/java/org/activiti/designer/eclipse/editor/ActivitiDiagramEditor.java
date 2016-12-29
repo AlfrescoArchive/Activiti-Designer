@@ -181,7 +181,8 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 
     try {
       final IFile dataFile = adei.getDataFile();
-      final String diagramFileString = dataFile.getLocationURI().getPath();
+//    final String diagramFileString = dataFile.getLocationURI().getPath(); // Does not work when the project is in Jazz SCM
+      final String diagramFileString = dataFile.getLocation().toOSString();
       BpmnMemoryModel model = ModelHandler.getModel(EcoreUtil.getURI(getDiagramTypeProvider().getDiagram()));
 
       // Save the bpmn diagram file
@@ -414,7 +415,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
     final BpmnMemoryModel model = new BpmnMemoryModel(getDiagramTypeProvider().getFeatureProvider(), dataFile);
     ModelHandler.addModel(EcoreUtil.getURI(getDiagramTypeProvider().getDiagram()), model);
 
-    String filePath = dataFile.getLocationURI().getPath();
+    String filePath = dataFile.getLocation().toOSString();
     File bpmnFile = new File(filePath);
     try {
       if (bpmnFile.exists() == false) {

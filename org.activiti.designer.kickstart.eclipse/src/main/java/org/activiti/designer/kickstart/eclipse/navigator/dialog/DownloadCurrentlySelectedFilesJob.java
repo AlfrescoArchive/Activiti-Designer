@@ -115,7 +115,7 @@ public class DownloadCurrentlySelectedFilesJob extends Job {
 		            if ("kickproc".equalsIgnoreCase(unzippedFile.getFileExtension())) {
 		              processFile = unzippedFile;
 		            }
-		            String filePath = unzippedFile.getLocationURI().getPath();
+		            String filePath = unzippedFile.getLocation().toOSString();
 		            File extractFile = new File(filePath);
 		            FileOutputStream fos = new FileOutputStream(extractFile);
 		            int len;
@@ -170,7 +170,7 @@ public class DownloadCurrentlySelectedFilesJob extends Job {
     unzippedFolder.getFile(sourceFile.getName()).copy(sourceFile.getProject().getFullPath().append(sourceFile.getName()), true, new NullProgressMonitor());
     IFile newProcessFile = sourceFile.getProject().getFile(sourceFile.getName());
     
-	  String filePath = newProcessFile.getLocationURI().getPath();
+	  String filePath = newProcessFile.getLocation().toOSString();
     File processFile = new File(filePath);
     FileInputStream fileStream = new FileInputStream(processFile);
     AlfrescoSimpleWorkflowJsonConverter converter = new AlfrescoSimpleWorkflowJsonConverter();
@@ -212,7 +212,7 @@ public class DownloadCurrentlySelectedFilesJob extends Job {
     definition.getParameters().put(SyncConstants.VERSION, document.getVersionLabel());
     
     // Write
-    FileWriter writer = new FileWriter(new File(newProcessFile.getLocationURI().getPath()));
+    FileWriter writer = new FileWriter(new File(newProcessFile.getLocation().toOSString()));
     converter.writeWorkflowDefinition(definition, writer);
     newProcessFile.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
     
