@@ -62,7 +62,7 @@ This Agreement is governed by the laws of the State of New York and the intellec
 
    <includes
          id="org.eclipse.graphiti.feature"
-         version="0.11.4"/>
+         version="0.0.0"/>
 
    <requires>
       <import plugin="org.eclipse.ui"/>

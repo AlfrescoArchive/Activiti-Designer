@@ -28,6 +28,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.emf.transaction.TransactionalEditingDomain;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
+import org.eclipse.graphiti.ui.editor.DiagramBehavior;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.graphiti.ui.platform.GFPropertySection;
 import org.eclipse.swt.SWT;
@@ -241,8 +242,8 @@ public abstract class AbstractKickstartFormComponentSection extends GFPropertySe
   protected void executeModelUpdater() {
     // Make sure the update of the model is done in the transactional editing domain
     // to allow for "undoing" changes
-    DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
-    TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
+	DiagramBehavior diagramBehavior = (DiagramBehavior) getDiagramTypeProvider().getDiagramBehavior();
+    TransactionalEditingDomain editingDomain = diagramBehavior.getEditingDomain();
     
     if(currentUpdater != null) {
       // Do the actual changes to the business-object in a command
