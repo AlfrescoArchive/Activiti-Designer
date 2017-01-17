@@ -100,6 +100,7 @@ import org.eclipse.graphiti.mm.pictograms.ChopboxAnchor;
 import org.eclipse.graphiti.mm.pictograms.ContainerShape;
 import org.eclipse.graphiti.mm.pictograms.Diagram;
 import org.eclipse.graphiti.mm.pictograms.PictogramElement;
+import org.eclipse.graphiti.ui.editor.DiagramBehavior;
 import org.eclipse.graphiti.ui.editor.DiagramEditor;
 import org.eclipse.graphiti.ui.editor.DiagramEditorInput;
 import org.eclipse.swt.SWT;
@@ -305,7 +306,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 
   private void marshallImage(BpmnMemoryModel model, String modelFileName) {
     try {
-      final GraphicalViewer graphicalViewer = (GraphicalViewer) ((DiagramEditor) model.getFeatureProvider().getDiagramTypeProvider().getDiagramEditor())
+      final GraphicalViewer graphicalViewer = (GraphicalViewer) ((DiagramBehavior) model.getFeatureProvider().getDiagramTypeProvider().getDiagramBehavior())
               .getAdapter(GraphicalViewer.class);
 
       if (graphicalViewer == null || graphicalViewer.getEditPartRegistry() == null) {
