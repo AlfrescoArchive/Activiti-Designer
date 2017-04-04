@@ -69,7 +69,7 @@ public class KickstartFormEditor extends DiagramEditor {
     
     try {
       final IFile dataFile = adei.getDataFile();
-      final String diagramFileString = dataFile.getLocationURI().getPath();
+      final String diagramFileString = dataFile.getLocation().toOSString();
 
       File objectsFile = new File(diagramFileString);
       FileWriter writer = new FileWriter(objectsFile);
@@ -138,7 +138,7 @@ public class KickstartFormEditor extends DiagramEditor {
         dataFile);
     ModelHandler.addModel(EcoreUtil.getURI(getDiagramTypeProvider().getDiagram()), model);
 
-    String filePath = dataFile.getLocationURI().getPath();
+    String filePath = dataFile.getLocation().toOSString();
     File formDefinitionFile = new File(filePath);
     try {
       if (formDefinitionFile.exists() == false) {

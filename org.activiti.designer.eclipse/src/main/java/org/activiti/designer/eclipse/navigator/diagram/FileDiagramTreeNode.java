@@ -113,7 +113,7 @@ public class FileDiagramTreeNode extends AbstractDiagramTreeNode<IFile> {
   private BpmnMemoryModel buildModel(final IFile modelFile) {
     final BpmnMemoryModel result = new BpmnMemoryModel(null, modelFile);
 
-    String filePath = modelFile.getLocationURI().getPath();
+    String filePath = modelFile.getLocation().toOSString();
     File bpmnFile = new File(filePath);
     try {
       if (bpmnFile.exists()) {

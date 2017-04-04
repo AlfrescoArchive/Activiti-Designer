@@ -192,7 +192,7 @@ public class SyncUtil {
 		workflowDefinition.getParameters().put(SyncConstants.VERSION, document.getVersionLabel());
 		
 		// Write
-		FileWriter writer = new FileWriter(new File(sourceFile.getLocationURI().getPath()));
+		FileWriter writer = new FileWriter(new File(sourceFile.getLocation().toOSString()));
 		simpleWorkflowJsonConverter.writeWorkflowDefinition(workflowDefinition, writer);
 		sourceFile.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
 	}
@@ -290,7 +290,7 @@ public class SyncUtil {
           if ("kickproc".equalsIgnoreCase(unzippedFile.getFileExtension())) {
             processFile = unzippedFile;
           }
-          String filePath = unzippedFile.getLocationURI().getPath();
+          String filePath = unzippedFile.getLocation().toOSString();
           File extractFile = new File(filePath);
           FileOutputStream fos = new FileOutputStream(extractFile);
           int len;
@@ -324,7 +324,7 @@ public class SyncUtil {
     unzippedFolder.getFile(sourceFile.getName()).copy(sourceFile.getProject().getFullPath().append(sourceFile.getName()), true, monitor);
     IFile newProcessFile = sourceFile.getProject().getFile(sourceFile.getName());
     
-    String filePath = newProcessFile.getLocationURI().getPath();
+    String filePath = newProcessFile.getLocation().toOSString();
     File processFile = new File(filePath);
     FileInputStream fileStream = new FileInputStream(processFile);
     AlfrescoSimpleWorkflowJsonConverter converter = new AlfrescoSimpleWorkflowJsonConverter();
@@ -366,7 +366,7 @@ public class SyncUtil {
     definition.getParameters().put(SyncConstants.VERSION, document.getVersionLabel());
     
     // Write
-    FileWriter writer = new FileWriter(new File(newProcessFile.getLocationURI().getPath()));
+    FileWriter writer = new FileWriter(new File(newProcessFile.getLocation().toOSString()));
     converter.writeWorkflowDefinition(definition, writer);
     newProcessFile.getProject().refreshLocal(IResource.DEPTH_INFINITE, null);
     
@@ -429,7 +429,7 @@ public class SyncUtil {
   }
 	
 	protected static IFile createZipFile(final IFile sourceFile, final Shell shell) throws IOException, CoreException {
-	  String filePath = sourceFile.getLocationURI().getPath();
+	  String filePath = sourceFile.getLocation().toOSString();
     File processFile = new File(filePath);
     FileInputStream fileStream = new FileInputStream(processFile);
     AlfrescoSimpleWorkflowJsonConverter converter = new AlfrescoSimpleWorkflowJsonConverter();
