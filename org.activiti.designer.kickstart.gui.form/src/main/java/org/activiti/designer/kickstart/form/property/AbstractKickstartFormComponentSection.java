@@ -241,7 +241,7 @@ public abstract class AbstractKickstartFormComponentSection extends GFPropertySe
   protected void executeModelUpdater() {
     // Make sure the update of the model is done in the transactional editing domain
     // to allow for "undoing" changes
-    DiagramEditor diagramEditor = (DiagramEditor) getDiagramEditor();
+    DiagramEditor diagramEditor = null;//(DiagramEditor) getDiagramEditor();
     TransactionalEditingDomain editingDomain = diagramEditor.getEditingDomain();
     
     if(currentUpdater != null) {

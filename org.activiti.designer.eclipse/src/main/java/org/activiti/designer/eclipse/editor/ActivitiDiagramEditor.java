@@ -305,8 +305,7 @@ public class ActivitiDiagramEditor extends DiagramEditor {
 
   private void marshallImage(BpmnMemoryModel model, String modelFileName) {
     try {
-      final GraphicalViewer graphicalViewer = (GraphicalViewer) ((DiagramEditor) model.getFeatureProvider().getDiagramTypeProvider().getDiagramEditor())
-              .getAdapter(GraphicalViewer.class);
+      final GraphicalViewer graphicalViewer = null;
 
       if (graphicalViewer == null || graphicalViewer.getEditPartRegistry() == null) {
         return;
