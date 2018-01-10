@@ -43,7 +43,7 @@
 				<eclipse-site>http://download.eclipse.org/releases/kepler</eclipse-site>
 				<platform-version>[4.3)</platform-version>
 				<platform-version-name>kepler</platform-version-name>
-				<graphiti-site>http://download.eclipse.org/graphiti/updates/0.10.2</graphiti-site>
+				<graphiti-site>http://archive.eclipse.org/graphiti/updates/0.10.2</graphiti-site>
 			</properties>
 		</profile>
 		<profile>
@@ -59,7 +59,7 @@
 				<eclipse-site>http://download.eclipse.org/releases/luna</eclipse-site>
 				<platform-version>[4.4)</platform-version>
 				<platform-version-name>luna</platform-version-name>
-				<graphiti-site>http://download.eclipse.org/graphiti/updates/0.11.4</graphiti-site>
+				<graphiti-site>http://archive.eclipse.org/graphiti/updates/0.11.4</graphiti-site>
 			</properties>
 		</profile>
 	</profiles>
