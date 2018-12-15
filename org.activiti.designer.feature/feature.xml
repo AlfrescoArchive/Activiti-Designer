@@ -2,7 +2,7 @@
 <feature
       id="org.activiti.designer.feature"
       label="Activiti Eclipse BPMN 2.0 Designer"
-      version="5.18.1.qualifier"
+      version="5.22.0.qualifier"
       provider-name="Activiti">
 
    <description url="http://www.activiti.org">
@@ -62,7 +62,7 @@ This Agreement is governed by the laws of the State of New York and the intellec
 
    <includes
          id="org.eclipse.graphiti.feature"
-         version="0.13.2"/>
+         version="0.15.0.201806050830"/>
 
    <requires>
       <import plugin="org.eclipse.ui"/>
