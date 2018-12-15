@@ -62,6 +62,22 @@
 				<graphiti-site>http://archive.eclipse.org/graphiti/updates/0.12.2</graphiti-site>
 			</properties>
 		</profile>
+		<profile>
+			<id>platform-mars</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+				<property>
+					<name>platform-version-name</name>
+					<value>mars</value>
+				</property>
+			</activation>
+			<properties>
+				<eclipse-site>http://download.eclipse.org/releases/mars</eclipse-site>
+				<platform-version>[4.5)</platform-version>
+				<platform-version-name>mars</platform-version-name>
+				<graphiti-site>http://archive.eclipse.org/graphiti/updates/0.13.2</graphiti-site>
+			</properties>
+		</profile>
 	</profiles>
 
 	<modules>
