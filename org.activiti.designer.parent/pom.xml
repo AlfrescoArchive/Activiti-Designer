@@ -110,6 +110,22 @@
 				<graphiti-site>http://download.eclipse.org/graphiti/updates/0.15.0</graphiti-site>
 			</properties>
 		</profile>
+		<profile>
+			<id>platform-photon</id>
+			<activation>
+				<activeByDefault>true</activeByDefault>
+				<property>
+					<name>platform-version-name</name>
+					<value>photon</value>
+				</property>
+			</activation>
+			<properties>
+				<eclipse-site>http://download.eclipse.org/releases/photon</eclipse-site>
+				<platform-version>[4.8)</platform-version>
+				<platform-version-name>photon</platform-version-name>
+				<graphiti-site>http://download.eclipse.org/graphiti/updates/0.15.0</graphiti-site>
+			</properties>
+		</profile>
 	</profiles>
 
 	<modules>
